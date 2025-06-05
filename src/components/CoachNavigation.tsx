@@ -42,7 +42,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
             className="h-12 w-auto"
             key="coach-logo"
           />
-          <span className="ml-3 text-lg font-semibold text-gray-900">Coach Dashboard</span>
         </div>
         
         <div className="flex justify-center flex-1">

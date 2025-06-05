@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import RoleSelector from './RoleSelector';
 import SignUpFormFields from './SignUpFormFields';
 
 const SignUpForm = () => {
@@ -16,7 +15,7 @@ const SignUpForm = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'MENTEE' as 'COACH' | 'MENTEE'
+    role: 'MENTEE' as const // Force mentee role only
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,14 +24,6 @@ const SignUpForm = () => {
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
-
-  const handleRoleChange = (role: 'COACH' | 'MENTEE') => {
-    console.log('Role selected:', role);
-    setFormData(prev => ({
-      ...prev,
-      role
     }));
   };
 
@@ -51,13 +42,7 @@ const SignUpForm = () => {
     try {
       setIsLoading(true);
       
-      console.log('Submitting signup with role:', formData.role);
-      console.log('Full form data:', {
-        email: formData.email,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        role: formData.role
-      });
+      console.log('Submitting mentee signup');
       
       // Create the user with metadata
       const { data, error } = await supabase.auth.signUp({
@@ -81,25 +66,9 @@ const SignUpForm = () => {
       if (data.user) {
         console.log('User created with metadata:', data.user.user_metadata);
         
-        // Wait a moment for the trigger to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Verify the profile was created with the correct role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profileError) {
-          console.error('Error fetching created profile:', profileError);
-        } else {
-          console.log('Created profile with role:', profile.role);
-        }
-        
         toast({
           title: "Success",
-          description: `Account created successfully as ${formData.role}! Please check your email to confirm your account.`,
+          description: "Mentee account created successfully! Please check your email to confirm your account.",
         });
         
         // Redirect to login page after successful signup
@@ -119,10 +88,6 @@ const SignUpForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <RoleSelector 
-        selectedRole={formData.role}
-        onRoleChange={handleRoleChange}
-      />
       <SignUpFormFields 
         formData={formData}
         onChange={handleChange}
@@ -132,7 +97,7 @@ const SignUpForm = () => {
         className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
         disabled={isLoading}
       >
-        {isLoading ? 'Creating Account...' : `Create ${formData.role === 'COACH' ? 'Coach' : 'Mentee'} Account`}
+        {isLoading ? 'Creating Account...' : 'Create Mentee Account'}
       </Button>
 
       <div className="text-center mt-6">
@@ -144,6 +109,16 @@ const SignUpForm = () => {
             className="text-indigo-600 hover:text-indigo-500 font-medium"
           >
             Sign in
+          </button>
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          Are you a coach?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/coach-signup')}
+            className="text-purple-600 hover:text-purple-500 font-medium"
+          >
+            Sign up as coach
           </button>
         </p>
       </div>
