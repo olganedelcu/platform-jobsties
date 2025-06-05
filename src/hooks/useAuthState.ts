@@ -53,20 +53,20 @@ export const useAuthState = () => {
                 console.log('Using metadata role:', userRole);
                 
                 if (userRole === 'COACH') {
-                  console.log('Redirecting to coach dashboard');
+                  console.log('Redirecting to coach dashboard (from metadata)');
                   navigate('/coach/mentees');
                 } else {
-                  console.log('Redirecting to mentee dashboard');
+                  console.log('Redirecting to mentee dashboard (from metadata)');
                   navigate('/dashboard');
                 }
               } else {
                 console.log('User role from profiles table:', profile.role);
                 
                 if (profile.role === 'COACH') {
-                  console.log('Redirecting to coach dashboard');
+                  console.log('Redirecting to coach dashboard (from profile)');
                   navigate('/coach/mentees');
                 } else {
-                  console.log('Redirecting to mentee dashboard');
+                  console.log('Redirecting to mentee dashboard (from profile)');
                   navigate('/dashboard');
                 }
               }

@@ -52,6 +52,12 @@ const SignUpForm = () => {
       setIsLoading(true);
       
       console.log('Submitting signup with role:', formData.role);
+      console.log('Full form data:', {
+        email: formData.email,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        role: formData.role
+      });
       
       // Create the user with metadata
       const { data, error } = await supabase.auth.signUp({
@@ -75,9 +81,25 @@ const SignUpForm = () => {
       if (data.user) {
         console.log('User created with metadata:', data.user.user_metadata);
         
+        // Wait a moment for the trigger to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Verify the profile was created with the correct role
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+          
+        if (profileError) {
+          console.error('Error fetching created profile:', profileError);
+        } else {
+          console.log('Created profile with role:', profile.role);
+        }
+        
         toast({
           title: "Success",
-          description: "Account created successfully! Please check your email to confirm your account.",
+          description: `Account created successfully as ${formData.role}! Please check your email to confirm your account.`,
         });
         
         // Redirect to login page after successful signup
@@ -110,7 +132,7 @@ const SignUpForm = () => {
         className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
         disabled={isLoading}
       >
-        {isLoading ? 'Creating Account...' : 'Create Account'}
+        {isLoading ? 'Creating Account...' : `Create ${formData.role === 'COACH' ? 'Coach' : 'Mentee'} Account`}
       </Button>
 
       <div className="text-center mt-6">
