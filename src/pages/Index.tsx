@@ -17,11 +17,11 @@ const Index = () => {
         </div>
         
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
-          Welcome to Jobsties Platform
+          Speed Up Your Jobsearch
         </h1>
         
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Connect with your professional network and advance your career
+          Let's get you hired, connect, track, schedule your sessions here
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
