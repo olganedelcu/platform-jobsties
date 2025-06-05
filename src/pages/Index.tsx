@@ -9,7 +9,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="text-center space-y-8 p-8">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
-          Welcome!
+          Welcome you!
         </h1>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
