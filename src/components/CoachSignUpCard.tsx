@@ -2,17 +2,17 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import SignUpCardHeader from './SignUpCardHeader';
-import MenteeSignUpForm from './MenteeSignUpForm';
+import CoachSignUpForm from './CoachSignUpForm';
 
-const SignUpCard = () => {
+const CoachSignUpCard = () => {
   return (
     <Card className="border-none shadow-xl">
       <SignUpCardHeader />
       <CardContent className="p-6 sm:p-8">
-        <MenteeSignUpForm />
+        <CoachSignUpForm />
       </CardContent>
     </Card>
   );
 };
 
-export default SignUpCard;
+export default CoachSignUpCard;
