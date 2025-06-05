@@ -1,15 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import AddExperience from '@/components/AddExperience';
 import AddEducation from '@/components/AddEducation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Mail, Phone, Globe, Building, GraduationCap, Edit, Camera, Save, X, Calendar, Trash2 } from 'lucide-react';
+import ProfileCard from '@/components/ProfileCard';
+import ExperienceSection from '@/components/ExperienceSection';
+import EducationSection from '@/components/EducationSection';
 import { useToast } from '@/hooks/use-toast';
 
 interface Experience {
@@ -140,13 +138,6 @@ const Profile = () => {
     });
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const [year, month] = dateString.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -167,267 +158,31 @@ const Profile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Information */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <div className="relative inline-block mb-4">
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      className="w-32 h-32 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-4xl font-bold">
-                        {profileData.firstName?.[0]}{profileData.lastName?.[0]}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {isEditing && (
-                    <label className="absolute bottom-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-2 rounded-full cursor-pointer hover:from-indigo-700 hover:to-purple-700">
-                      <Camera className="h-4 w-4" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfilePictureUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
-                </div>
-                
-                {isEditing ? (
-                  <div className="space-y-3 mb-6">
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        value={profileData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        placeholder="First Name"
-                        className="text-center"
-                      />
-                      <Input
-                        value={profileData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        placeholder="Last Name"
-                        className="text-center"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {profileData.firstName} {profileData.lastName}
-                    </h2>
-                    <p className="text-gray-600">{profileData.email}</p>
-                  </div>
-                )}
-                
-                <div className="space-y-4 text-left">
-                  <div className="flex items-center space-x-3">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    {isEditing ? (
-                      <Input 
-                        value={profileData.location}
-                        onChange={(e) => handleInputChange('location', e.target.value)}
-                        placeholder="Add location"
-                        className="border-none bg-transparent p-0 flex-1"
-                      />
-                    ) : (
-                      <span className="text-gray-700">{profileData.location || 'Add location'}</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-700">{profileData.email}</span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Phone className="h-4 w-4 text-gray-400" />
-                    {isEditing ? (
-                      <Input 
-                        value={profileData.phone}
-                        onChange={(e) => handleInputChange('phone', e.target.value)}
-                        placeholder="Add phone number"
-                        className="border-none bg-transparent p-0 flex-1"
-                      />
-                    ) : (
-                      <span className="text-gray-700">{profileData.phone || 'Add phone number'}</span>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center space-x-3">
-                    <Globe className="h-4 w-4 text-gray-400" />
-                    {isEditing ? (
-                      <Input 
-                        value={profileData.website}
-                        onChange={(e) => handleInputChange('website', e.target.value)}
-                        placeholder="Add website"
-                        className="border-none bg-transparent p-0 flex-1"
-                      />
-                    ) : (
-                      <span className="text-gray-700">{profileData.website || 'Add website'}</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="mt-8">
-                  <Label className="text-left block text-gray-700 font-medium mb-2">About</Label>
-                  {isEditing ? (
-                    <Textarea 
-                      value={profileData.about}
-                      onChange={(e) => handleInputChange('about', e.target.value)}
-                      placeholder="Tell us about yourself..." 
-                      className="min-h-[100px]"
-                    />
-                  ) : (
-                    <div className="text-gray-700 text-left min-h-[100px] p-3 bg-gray-50 rounded-md">
-                      {profileData.about || 'Tell us about yourself...'}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex space-x-2 mt-6">
-                  {isEditing ? (
-                    <>
-                      <Button 
-                        onClick={handleSaveProfile}
-                        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Changes
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => setIsEditing(false)}
-                        className="border-gray-300 hover:bg-gray-50"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  ) : (
-                    <Button 
-                      className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <ProfileCard
+              profileData={profileData}
+              profilePicture={profilePicture}
+              isEditing={isEditing}
+              onEdit={() => setIsEditing(true)}
+              onSave={handleSaveProfile}
+              onCancel={() => setIsEditing(false)}
+              onInputChange={handleInputChange}
+              onProfilePictureUpload={handleProfilePictureUpload}
+            />
           </div>
           
           {/* Experience and Education */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Experience Section */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <Building className="h-5 w-5 text-indigo-600" />
-                  <span>Experience</span>
-                </CardTitle>
-                <Button 
-                  variant="outline" 
-                  className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
-                  onClick={() => setShowAddExperience(true)}
-                >
-                  Add Experience
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {experiences.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    No experience added yet. Click "Add Experience" to get started.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {experiences.map((exp) => (
-                      <div key={exp.id} className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{exp.position}</h4>
-                            <p className="text-indigo-600 font-medium">{exp.company}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteExperience(exp.id)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
-                        </div>
-                        {exp.description && (
-                          <p className="text-sm text-gray-700">{exp.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <ExperienceSection
+              experiences={experiences}
+              onAddExperience={() => setShowAddExperience(true)}
+              onDeleteExperience={handleDeleteExperience}
+            />
             
-            {/* Education Section */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <GraduationCap className="h-5 w-5 text-indigo-600" />
-                  <span>Education</span>
-                </CardTitle>
-                <Button 
-                  variant="outline" 
-                  className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
-                  onClick={() => setShowAddEducation(true)}
-                >
-                  Add Education
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {educations.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    No education added yet. Click "Add Education" to get started.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {educations.map((edu) => (
-                      <div key={edu.id} className="border rounded-lg p-4 bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">{edu.degree}</h4>
-                            <p className="text-indigo-600 font-medium">{edu.institution}</p>
-                            {edu.fieldOfStudy && (
-                              <p className="text-sm text-gray-600">{edu.fieldOfStudy}</p>
-                            )}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteEducation(edu.id)}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <Calendar className="h-4 w-4 mr-1" />
-                          {formatDate(edu.startDate)} - {edu.current ? 'Present' : formatDate(edu.endDate)}
-                        </div>
-                        {edu.description && (
-                          <p className="text-sm text-gray-700">{edu.description}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <EducationSection
+              educations={educations}
+              onAddEducation={() => setShowAddEducation(true)}
+              onDeleteEducation={handleDeleteEducation}
+            />
           </div>
         </div>
       </main>
