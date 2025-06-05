@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import SignUp from "./pages/SignUp";
 import CoachSignUp from "./pages/CoachSignUp";
 import Login from "./pages/Login";
+import CoachLogin from "./pages/CoachLogin";
 import Dashboard from "./pages/Dashboard";
 import Course from "./pages/Course";
 import Sessions from "./pages/Sessions";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/signup" element={<SignUp />} />
           <Route path="/coach-signup" element={<CoachSignUp />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/coach-login" element={<CoachLogin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/course" element={<Course />} />
           <Route path="/sessions" element={<Sessions />} />

@@ -40,6 +40,26 @@ const Index = () => {
             Sign In
           </Button>
         </div>
+
+        <div className="pt-8 border-t border-gray-200 mt-12">
+          <p className="text-lg font-medium text-gray-900 mb-4">Are you a coach?</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => navigate('/coach-signup')}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-2"
+            >
+              Register as Coach
+            </Button>
+            
+            <Button
+              onClick={() => navigate('/coach-login')}
+              variant="outline"
+              className="border-purple-200 text-purple-600 hover:bg-purple-50 px-6 py-2"
+            >
+              Coach Sign In
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

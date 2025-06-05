@@ -93,8 +93,8 @@ const CoachSignUpForm = () => {
           description: "Coach account created successfully! Please check your email to confirm your account.",
         });
         
-        // Redirect to login page after successful signup
-        navigate('/login');
+        // Redirect to coach login page after successful signup
+        navigate('/coach-login');
       }
     } catch (error: any) {
       console.error('Coach signup error:', error);
@@ -131,13 +131,13 @@ const CoachSignUpForm = () => {
 
       <div className="text-center mt-6">
         <p className="text-sm text-gray-600">
-          Already have an account?{' '}
+          Already have a coach account?{' '}
           <button
             type="button"
-            onClick={() => navigate('/login')}
-            className="text-indigo-600 hover:text-indigo-500 font-medium"
+            onClick={() => navigate('/coach-login')}
+            className="text-purple-600 hover:text-purple-500 font-medium"
           >
-            Sign in
+            Sign in here
           </button>
         </p>
       </div>
