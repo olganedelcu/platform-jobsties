@@ -12,11 +12,12 @@ import { useExperienceData } from '@/hooks/useExperienceData';
 import { useEducationData } from '@/hooks/useEducationData';
 
 const Profile = () => {
-  const { user, loading, handleSignOut } = useAuthState();
+  const { user, loading: authLoading, handleSignOut } = useAuthState();
   const {
     profileData,
     profilePicture,
     isEditing,
+    loading: profileLoading,
     setIsEditing,
     handleProfilePictureUpload,
     handleSaveProfile,
@@ -39,7 +40,7 @@ const Profile = () => {
     handleDeleteEducation
   } = useEducationData();
 
-  if (loading) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
