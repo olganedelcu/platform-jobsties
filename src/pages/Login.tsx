@@ -45,7 +45,7 @@ const Login = () => {
         description: "Welcome back!",
       });
       
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
