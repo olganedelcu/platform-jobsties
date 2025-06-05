@@ -38,14 +38,41 @@ export const useAuthState = () => {
           
           // Redirect based on user role after login or signup confirmation
           if (event === 'SIGNED_IN') {
-            const userRole = session.user.user_metadata?.role;
-            console.log('User role from metadata:', userRole);
-            
-            if (userRole === 'COACH') {
-              console.log('Redirecting to coach dashboard');
-              navigate('/coach/mentees');
-            } else {
-              console.log('Redirecting to mentee dashboard');
+            try {
+              // Check the user's role from the profiles table
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+              if (error) {
+                console.error('Error fetching user profile:', error);
+                // Fall back to metadata if profile doesn't exist yet
+                const userRole = session.user.user_metadata?.role;
+                console.log('Using metadata role:', userRole);
+                
+                if (userRole === 'COACH') {
+                  console.log('Redirecting to coach dashboard');
+                  navigate('/coach/mentees');
+                } else {
+                  console.log('Redirecting to mentee dashboard');
+                  navigate('/dashboard');
+                }
+              } else {
+                console.log('User role from profiles table:', profile.role);
+                
+                if (profile.role === 'COACH') {
+                  console.log('Redirecting to coach dashboard');
+                  navigate('/coach/mentees');
+                } else {
+                  console.log('Redirecting to mentee dashboard');
+                  navigate('/dashboard');
+                }
+              }
+            } catch (error) {
+              console.error('Error during role check:', error);
+              // Default redirect to regular dashboard
               navigate('/dashboard');
             }
           }
