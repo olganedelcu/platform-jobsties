@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Users, Upload, Calendar, LogOut, Settings, User, ChevronDown } from 'lucide-react';
+import { Users, Upload, Calendar, LogOut, Settings, User, ChevronDown, CheckSquare } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface CoachNavigationProps {
@@ -18,6 +18,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
     { path: '/coach/mentees', label: 'Mentees', icon: Users },
     { path: '/coach/cv-upload', label: 'CV Upload', icon: Upload },
     { path: '/coach/sessions', label: 'Sessions', icon: Calendar },
+    { path: '/coach/todos', label: 'Todos', icon: CheckSquare },
   ];
 
   const isActive = (path: string) => location.pathname === path;
