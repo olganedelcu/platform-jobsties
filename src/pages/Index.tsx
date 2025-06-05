@@ -17,7 +17,7 @@ const Index = () => {
         </div>
         
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
-          Speed Up Your Jobsearch
+          Speed Up Your <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Jobsearch</span>
         </h1>
         
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">

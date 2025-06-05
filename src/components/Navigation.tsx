@@ -36,16 +36,16 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center space-x-8">
-          <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
-              alt="Jobsties Platform Logo" 
-              className="h-12 w-auto"
-              key="main-logo"
-            />
-          </div>
-          
+        <div className="flex items-center">
+          <img 
+            src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
+            alt="Jobsties Platform Logo" 
+            className="h-12 w-auto"
+            key="main-logo"
+          />
+        </div>
+        
+        <div className="flex justify-center flex-1">
           <div className="flex space-x-1">
             {navItems.map((item) => {
               const Icon = item.icon;
