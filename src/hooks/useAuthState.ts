@@ -12,6 +12,7 @@ export const useAuthState = () => {
     const checkUser = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', session);
         
         if (!session) {
           navigate('/login');
@@ -35,14 +36,16 @@ export const useAuthState = () => {
         if (session?.user) {
           setUser(session.user);
           
-          // Redirect based on user role after login
+          // Redirect based on user role after login or signup confirmation
           if (event === 'SIGNED_IN') {
             const userRole = session.user.user_metadata?.role;
-            console.log('User role:', userRole);
+            console.log('User role from metadata:', userRole);
             
             if (userRole === 'COACH') {
+              console.log('Redirecting to coach dashboard');
               navigate('/coach/mentees');
             } else {
+              console.log('Redirecting to mentee dashboard');
               navigate('/dashboard');
             }
           }
@@ -62,8 +65,12 @@ export const useAuthState = () => {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   return {

@@ -29,6 +29,7 @@ const SignUpForm = () => {
   };
 
   const handleRoleChange = (role: 'COACH' | 'MENTEE') => {
+    console.log('Role selected:', role);
     setFormData(prev => ({
       ...prev,
       role
@@ -50,16 +51,13 @@ const SignUpForm = () => {
     try {
       setIsLoading(true);
       
-      // Determine redirect URL based on role
-      const redirectUrl = formData.role === 'COACH' 
-        ? `${window.location.origin}/coach/mentees` 
-        : `${window.location.origin}/dashboard`;
+      console.log('Submitting signup with role:', formData.role);
       
-      const { error } = await supabase.auth.signUp({
+      // Create the user with metadata
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -68,17 +66,23 @@ const SignUpForm = () => {
         }
       });
 
+      console.log('Signup response:', { data, error });
+
       if (error) {
         throw error;
       }
 
-      toast({
-        title: "Success",
-        description: "Account created successfully! Please check your email to confirm your account.",
-      });
-      
-      // Redirect to login page after successful signup
-      navigate('/login');
+      if (data.user) {
+        console.log('User created with metadata:', data.user.user_metadata);
+        
+        toast({
+          title: "Success",
+          description: "Account created successfully! Please check your email to confirm your account.",
+        });
+        
+        // Redirect to login page after successful signup
+        navigate('/login');
+      }
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({
