@@ -26,13 +26,12 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     <nav className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center space-x-8">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             <img 
               src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-              alt="JobSties Logo" 
+              alt="Logo" 
               className="h-8 w-auto"
             />
-            <span className="text-xl font-semibold text-gray-900">JobSties</span>
           </div>
           
           <div className="flex space-x-1">
