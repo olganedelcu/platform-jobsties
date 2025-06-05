@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cv_files: {
+        Row: {
+          coach_id: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          mentee_id: string
+          updated_at: string
+          uploaded_at: string
+        }
+        Insert: {
+          coach_id: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          mentee_id: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Update: {
+          coach_id?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          mentee_id?: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

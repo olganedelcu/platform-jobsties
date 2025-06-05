@@ -11,8 +11,10 @@ const CVUploadContent = () => {
     setSelectedMentee,
     uploadingFile,
     mentees,
+    cvFiles,
     loading,
-    handleFileUpload
+    handleFileUpload,
+    handleDeleteCV
   } = useCVUpload();
 
   if (loading) {
@@ -42,7 +44,10 @@ const CVUploadContent = () => {
         <CVMenteesList mentees={mentees} />
       </div>
 
-      <CVFilesList />
+      <CVFilesList 
+        cvFiles={cvFiles}
+        onDeleteCV={handleDeleteCV}
+      />
     </main>
   );
 };
