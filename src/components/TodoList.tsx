@@ -41,7 +41,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
     title: '',
     description: '',
     mentee_id: '',
-    priority: 'medium' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high',
     due_date: ''
   });
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,15 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setTodos(data || []);
+      
+      // Type cast the data to ensure it matches our Todo interface
+      const typedTodos: Todo[] = (data || []).map(item => ({
+        ...item,
+        status: item.status as 'pending' | 'in_progress' | 'completed',
+        priority: item.priority as 'low' | 'medium' | 'high'
+      }));
+      
+      setTodos(typedTodos);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -99,7 +107,14 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
 
       if (error) throw error;
 
-      setTodos([data, ...todos]);
+      // Type cast the returned data
+      const typedTodo: Todo = {
+        ...data,
+        status: data.status as 'pending' | 'in_progress' | 'completed',
+        priority: data.priority as 'low' | 'medium' | 'high'
+      };
+
+      setTodos([typedTodo, ...todos]);
       setNewTodo({
         title: '',
         description: '',
@@ -133,8 +148,15 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
 
       if (error) throw error;
 
+      // Type cast the returned data
+      const typedUpdatedTodo: Todo = {
+        ...data,
+        status: data.status as 'pending' | 'in_progress' | 'completed',
+        priority: data.priority as 'low' | 'medium' | 'high'
+      };
+
       setTodos(todos.map(todo => 
-        todo.id === todoId ? { ...todo, ...data } : todo
+        todo.id === todoId ? { ...todo, ...typedUpdatedTodo } : todo
       ));
 
       toast({
