@@ -13,6 +13,9 @@ import Sessions from "./pages/Sessions";
 import Profile from "./pages/Profile";
 import Tracker from "./pages/Tracker";
 import NotFound from "./pages/NotFound";
+import Mentees from "./pages/coach/Mentees";
+import CVUpload from "./pages/coach/CVUpload";
+import CoachSessions from "./pages/coach/CoachSessions";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +34,9 @@ const App = () => (
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/tracker" element={<Tracker />} />
+          <Route path="/coach/mentees" element={<Mentees />} />
+          <Route path="/coach/cv-upload" element={<CVUpload />} />
+          <Route path="/coach/sessions" element={<CoachSessions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
