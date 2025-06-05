@@ -42,6 +42,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
               src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
               alt="Jobsties Platform Logo" 
               className="h-12 w-auto"
+              key="main-logo"
             />
           </div>
           

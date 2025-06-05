@@ -41,6 +41,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
               src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
               alt="Jobsties Platform Logo" 
               className="h-12 w-auto"
+              key="coach-logo"
             />
             <span className="ml-3 text-lg font-semibold text-gray-900">Coach Dashboard</span>
           </div>
