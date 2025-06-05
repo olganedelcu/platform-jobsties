@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -51,11 +50,16 @@ const SignUp = () => {
     try {
       setIsLoading(true);
       
+      // Determine redirect URL based on role
+      const redirectUrl = formData.role === 'COACH' 
+        ? `${window.location.origin}/coach/mentees` 
+        : `${window.location.origin}/dashboard`;
+      
       const { error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: redirectUrl,
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -73,6 +77,7 @@ const SignUp = () => {
         description: "Account created successfully! Please check your email to confirm your account.",
       });
       
+      // Redirect to login page after successful signup
       navigate('/login');
     } catch (error: any) {
       console.error('Signup error:', error);

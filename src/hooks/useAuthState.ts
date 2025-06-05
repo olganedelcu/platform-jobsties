@@ -27,7 +27,38 @@ export const useAuthState = () => {
       }
     };
 
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.user_metadata);
+        
+        if (session?.user) {
+          setUser(session.user);
+          
+          // Redirect based on user role after login
+          if (event === 'SIGNED_IN') {
+            const userRole = session.user.user_metadata?.role;
+            console.log('User role:', userRole);
+            
+            if (userRole === 'COACH') {
+              navigate('/coach/mentees');
+            } else {
+              navigate('/dashboard');
+            }
+          }
+        } else {
+          setUser(null);
+          if (event === 'SIGNED_OUT') {
+            navigate('/');
+          }
+        }
+        setLoading(false);
+      }
+    );
+
     checkUser();
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleSignOut = async () => {
