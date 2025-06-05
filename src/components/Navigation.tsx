@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, Calendar, BarChart, LogOut, Settings, User, ChevronDown } from 'lucide-react';
@@ -23,6 +23,16 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleNavigation = (path: string) => {
+    console.log('Navigating to:', path);
+    navigate(path);
+  };
+
+  const handleProfileClick = () => {
+    console.log('Navigating to profile');
+    navigate('/profile');
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -42,8 +52,11 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                 <Button
                   key={item.path}
                   variant={isActive(item.path) ? "default" : "ghost"}
-                  onClick={() => navigate(item.path)}
-                  className={`flex items-center space-x-2 ${
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavigation(item.path);
+                  }}
+                  className={`flex items-center space-x-2 cursor-pointer ${
                     isActive(item.path) 
                       ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
                       : 'text-gray-700 hover:text-indigo-600'
@@ -76,11 +89,17 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-lg">
-              <DropdownMenuItem onClick={() => navigate('/profile')} className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleProfileClick();
+                }} 
+                className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50 cursor-pointer"
+              >
                 <User className="h-4 w-4" />
                 <span>View Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50">
+              <DropdownMenuItem className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50 cursor-pointer">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
@@ -89,7 +108,10 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
           
           <Button 
             variant="outline" 
-            onClick={onSignOut}
+            onClick={(e) => {
+              e.preventDefault();
+              onSignOut();
+            }}
             className="text-gray-700 border-gray-300 hover:bg-gray-50 p-2"
             size="icon"
           >
