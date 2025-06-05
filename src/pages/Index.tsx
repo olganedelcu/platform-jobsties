@@ -6,7 +6,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-purple-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="text-center space-y-8 p-8">
         <div className="flex justify-center mb-8">
           <img 
