@@ -65,7 +65,7 @@ const CoachLogin = () => {
           <CardHeader className="space-y-4 text-center bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg px-6 py-8">
             <div className="flex justify-center">
               <img 
-                src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
+                src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
                 alt="JobSties Logo" 
                 className="h-16 w-auto filter brightness-0 invert"
               />
