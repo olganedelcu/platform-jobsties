@@ -1,15 +1,37 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
+import AddExperience from '@/components/AddExperience';
+import AddEducation from '@/components/AddEducation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Mail, Phone, Globe, Building, GraduationCap, Edit, Camera, Save, X } from 'lucide-react';
+import { MapPin, Mail, Phone, Globe, Building, GraduationCap, Edit, Camera, Save, X, Calendar, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+interface Experience {
+  id: string;
+  company: string;
+  position: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
+
+interface Education {
+  id: string;
+  institution: string;
+  degree: string;
+  fieldOfStudy: string;
+  startDate: string;
+  endDate: string;
+  current: boolean;
+  description: string;
+}
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -18,6 +40,10 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [showAddExperience, setShowAddExperience] = useState(false);
+  const [showAddEducation, setShowAddEducation] = useState(false);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [educations, setEducations] = useState<Education[]>([]);
   const [profileData, setProfileData] = useState({
     firstName: '',
     lastName: '',
@@ -88,6 +114,37 @@ const Profile = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleAddExperience = (experience: Experience) => {
+    setExperiences([...experiences, experience]);
+  };
+
+  const handleAddEducation = (education: Education) => {
+    setEducations([...educations, education]);
+  };
+
+  const handleDeleteExperience = (id: string) => {
+    setExperiences(experiences.filter(exp => exp.id !== id));
+    toast({
+      title: "Experience Deleted",
+      description: "Work experience has been removed from your profile.",
+    });
+  };
+
+  const handleDeleteEducation = (id: string) => {
+    setEducations(educations.filter(edu => edu.id !== id));
+    toast({
+      title: "Education Deleted", 
+      description: "Education has been removed from your profile.",
+    });
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const [year, month] = dateString.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   };
 
   if (loading) {
@@ -265,42 +322,129 @@ const Profile = () => {
           
           {/* Experience and Education */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Experience Section */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
                   <Building className="h-5 w-5 text-indigo-600" />
                   <span>Experience</span>
                 </CardTitle>
-                <Button variant="outline" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50">
+                <Button 
+                  variant="outline" 
+                  className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
+                  onClick={() => setShowAddExperience(true)}
+                >
                   Add Experience
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-500">
-                  No experience added yet. Click "Add Experience" to get started.
-                </div>
+                {experiences.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No experience added yet. Click "Add Experience" to get started.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {experiences.map((exp) => (
+                      <div key={exp.id} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{exp.position}</h4>
+                            <p className="text-indigo-600 font-medium">{exp.company}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteExperience(exp.id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+                        </div>
+                        {exp.description && (
+                          <p className="text-sm text-gray-700">{exp.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
             
+            {/* Education Section */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
                   <GraduationCap className="h-5 w-5 text-indigo-600" />
                   <span>Education</span>
                 </CardTitle>
-                <Button variant="outline" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50">
+                <Button 
+                  variant="outline" 
+                  className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
+                  onClick={() => setShowAddEducation(true)}
+                >
                   Add Education
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-gray-500">
-                  No education added yet. Click "Add Education" to get started.
-                </div>
+                {educations.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No education added yet. Click "Add Education" to get started.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {educations.map((edu) => (
+                      <div key={edu.id} className="border rounded-lg p-4 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{edu.degree}</h4>
+                            <p className="text-indigo-600 font-medium">{edu.institution}</p>
+                            {edu.fieldOfStudy && (
+                              <p className="text-sm text-gray-600">{edu.fieldOfStudy}</p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteEducation(edu.id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 mb-2">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {formatDate(edu.startDate)} - {edu.current ? 'Present' : formatDate(edu.endDate)}
+                        </div>
+                        {edu.description && (
+                          <p className="text-sm text-gray-700">{edu.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
+
+      {/* Add Experience Dialog */}
+      <AddExperience
+        isOpen={showAddExperience}
+        onClose={() => setShowAddExperience(false)}
+        onAdd={handleAddExperience}
+      />
+
+      {/* Add Education Dialog */}
+      <AddEducation
+        isOpen={showAddEducation}
+        onClose={() => setShowAddEducation(false)}
+        onAdd={handleAddEducation}
+      />
     </div>
   );
 };

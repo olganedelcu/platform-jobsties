@@ -29,8 +29,8 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         <div className="flex items-center space-x-8">
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-              alt="Logo" 
+              src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
+              alt="Jobsties Platform Logo" 
               className="h-12 w-auto"
             />
           </div>
