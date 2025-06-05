@@ -8,22 +8,9 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="text-center space-y-8 p-8">
-        <div className="flex justify-center mb-8">
-          <img 
-            src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-            alt="JobSties Logo" 
-            className="h-24 w-auto"
-          />
-        </div>
-        
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
-          Welcome to JobSties
+        <h1 className="text-4xl md:text-6xl font-bold text-gray-900">
+          Welcome!
         </h1>
-        
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-          Connect with mentors and coaches to accelerate your career growth. 
-          Join our platform to find guidance, share knowledge, and build meaningful professional relationships.
-        </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
