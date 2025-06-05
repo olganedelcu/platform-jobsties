@@ -45,7 +45,7 @@ const Course = () => {
       icon: FileText,
       completed: false,
       locked: false,
-      action: 'Upload Document'
+      action: 'Download Document'
     },
     {
       title: 'LinkedIn & Cover Letter',
@@ -105,7 +105,7 @@ const Course = () => {
           <div className="mt-4">
             <div className="flex items-center space-x-2">
               <div className="flex-1 bg-gray-200 rounded-full h-3">
-                <div className="bg-indigo-600 h-3 rounded-full" style={{ width: '0%' }}></div>
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full" style={{ width: '0%' }}></div>
               </div>
               <span className="text-sm text-gray-600 font-medium">0% Complete</span>
             </div>
@@ -122,7 +122,7 @@ const Course = () => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${module.locked ? 'bg-gray-100' : 'bg-indigo-100'}`}>
+                    <div className={`p-2 rounded-lg ${module.locked ? 'bg-gray-100' : 'bg-gradient-to-r from-indigo-100 to-purple-100'}`}>
                       {module.locked ? (
                         <Lock className="h-6 w-6 text-gray-400" />
                       ) : (
@@ -141,9 +141,8 @@ const Course = () => {
                 
                 {module.action && !module.locked && (
                   <Button 
-                    className="w-full bg-indigo-600 hover:bg-indigo-700"
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                     onClick={() => {
-                      // Handle module action
                       console.log(`Starting ${module.title}`);
                     }}
                   >

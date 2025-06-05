@@ -3,13 +3,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
+import ScheduleSession from '@/components/ScheduleSession';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, Clock, User } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Sessions = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -36,6 +41,15 @@ const Sessions = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
+  };
+
+  const handleScheduleSession = (sessionData: any) => {
+    console.log('Scheduling session:', sessionData);
+    toast({
+      title: "Session Scheduled",
+      description: `Your ${sessionData.sessionType} session has been scheduled for ${sessionData.date} at ${sessionData.time}`,
+    });
+    setShowScheduleDialog(false);
   };
 
   const sessions = [
@@ -75,9 +89,20 @@ const Sessions = () => {
             <h1 className="text-3xl font-bold text-gray-900">Coaching Sessions</h1>
             <p className="text-gray-600 mt-2">Schedule and manage your coaching sessions</p>
           </div>
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
-            Schedule Session
-          </Button>
+          
+          <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
+                Schedule Session
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white">
+              <ScheduleSession 
+                onSchedule={handleScheduleSession}
+                onCancel={() => setShowScheduleDialog(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="space-y-6">
@@ -102,10 +127,10 @@ const Sessions = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button variant="outline" className="text-indigo-600 border-indigo-600">
+                  <Button variant="outline" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50">
                     Reschedule
                   </Button>
-                  <Button variant="outline" className="text-red-600 border-red-600">
+                  <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
                     Cancel
                   </Button>
                 </div>

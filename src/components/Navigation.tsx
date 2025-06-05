@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, Calendar, BarChart, Users } from 'lucide-react';
+import { Home, BookOpen, Calendar, BarChart, LogOut, Settings, User, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface NavigationProps {
   user: any;
@@ -30,7 +31,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
             <img 
               src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
               alt="Logo" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </div>
           
@@ -44,7 +45,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                   onClick={() => navigate(item.path)}
                   className={`flex items-center space-x-2 ${
                     isActive(item.path) 
-                      ? 'bg-indigo-600 text-white' 
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
                       : 'text-gray-700 hover:text-indigo-600'
                   }`}
                 >
@@ -57,25 +58,42 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">
-                {user?.user_metadata?.first_name?.[0]}{user?.user_metadata?.last_name?.[0]}
-              </span>
-            </div>
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-gray-900">
-                {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
-              </p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50">
+                <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-medium">
+                    {user?.user_metadata?.first_name?.[0]}{user?.user_metadata?.last_name?.[0]}
+                  </span>
+                </div>
+                <div className="hidden md:block text-left">
+                  <p className="text-sm font-medium text-gray-900">
+                    {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
+                  </p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                </div>
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-lg">
+              <DropdownMenuItem onClick={() => navigate('/profile')} className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50">
+                <User className="h-4 w-4" />
+                <span>View Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50">
+                <Settings className="h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
           <Button 
             variant="outline" 
             onClick={onSignOut}
-            className="text-gray-700 border-gray-300"
+            className="text-gray-700 border-gray-300 hover:bg-gray-50 p-2"
+            size="icon"
           >
-            Sign Out
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>

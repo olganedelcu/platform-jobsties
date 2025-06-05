@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,7 +84,7 @@ const Dashboard = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Course Progress</h3>
             <div className="flex items-center space-x-2">
               <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-indigo-600 h-2 rounded-full" style={{ width: '0%' }}></div>
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full" style={{ width: '0%' }}></div>
               </div>
               <span className="text-sm text-gray-600">0%</span>
             </div>
