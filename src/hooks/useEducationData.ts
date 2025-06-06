@@ -14,6 +14,13 @@ interface Education {
   description: string;
 }
 
+// Helper function to convert YYYY-MM to a proper date (first day of the month)
+const formatDateForDatabase = (monthString: string): string => {
+  if (!monthString) return '';
+  // Convert "YYYY-MM" to "YYYY-MM-01"
+  return `${monthString}-01`;
+};
+
 export const useEducationData = (user?: any) => {
   const { toast } = useToast();
   const [educations, setEducations] = useState<Education[]>([]);
@@ -94,8 +101,8 @@ export const useEducationData = (user?: any) => {
           institution: education.institution,
           degree: education.degree,
           field_of_study: education.fieldOfStudy,
-          start_date: education.startDate,
-          end_date: education.current ? null : education.endDate,
+          start_date: formatDateForDatabase(education.startDate),
+          end_date: education.current ? null : formatDateForDatabase(education.endDate),
           is_current: education.current,
           description: education.description
         });

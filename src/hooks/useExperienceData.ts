@@ -13,6 +13,13 @@ interface Experience {
   description: string;
 }
 
+// Helper function to convert YYYY-MM to a proper date (first day of the month)
+const formatDateForDatabase = (monthString: string): string => {
+  if (!monthString) return '';
+  // Convert "YYYY-MM" to "YYYY-MM-01"
+  return `${monthString}-01`;
+};
+
 export const useExperienceData = (user?: any) => {
   const { toast } = useToast();
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -91,8 +98,8 @@ export const useExperienceData = (user?: any) => {
           user_id: user.id,
           company: experience.company,
           position: experience.position,
-          start_date: experience.startDate,
-          end_date: experience.current ? null : experience.endDate,
+          start_date: formatDateForDatabase(experience.startDate),
+          end_date: experience.current ? null : formatDateForDatabase(experience.endDate),
           is_current: experience.current,
           description: experience.description
         });
