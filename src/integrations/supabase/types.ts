@@ -203,48 +203,6 @@ export type Database = {
         }
         Relationships: []
       }
-      education_records: {
-        Row: {
-          created_at: string
-          degree: string
-          description: string | null
-          end_date: string | null
-          field_of_study: string
-          id: string
-          institution: string
-          is_current: boolean | null
-          start_date: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          degree: string
-          description?: string | null
-          end_date?: string | null
-          field_of_study: string
-          id?: string
-          institution: string
-          is_current?: boolean | null
-          start_date: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          degree?: string
-          description?: string | null
-          end_date?: string | null
-          field_of_study?: string
-          id?: string
-          institution?: string
-          is_current?: boolean | null
-          start_date?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       job_applications: {
         Row: {
           application_status: string
@@ -386,45 +344,6 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website?: string | null
-        }
-        Relationships: []
-      }
-      work_experiences: {
-        Row: {
-          company: string
-          created_at: string
-          description: string | null
-          end_date: string | null
-          id: string
-          is_current: boolean | null
-          position: string
-          start_date: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          company: string
-          created_at?: string
-          description?: string | null
-          end_date?: string | null
-          id?: string
-          is_current?: boolean | null
-          position: string
-          start_date: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          company?: string
-          created_at?: string
-          description?: string | null
-          end_date?: string | null
-          id?: string
-          is_current?: boolean | null
-          position?: string
-          start_date?: string
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
