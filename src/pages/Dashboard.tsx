@@ -109,7 +109,7 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Welcome back, {user.user_metadata?.first_name}!
+              Welcome, {user.user_metadata?.first_name}!
             </h1>
             <p className="text-gray-600 mt-2">Your coaching sessions</p>
           </div>
