@@ -15,16 +15,17 @@ export const useAuthState = () => {
         console.log('Initial session check:', session);
         
         if (!session) {
+          setLoading(false);
           navigate('/login');
           return;
         }
         
         setUser(session.user);
+        setLoading(false);
       } catch (error) {
         console.error('Auth check error:', error);
-        navigate('/login');
-      } finally {
         setLoading(false);
+        navigate('/login');
       }
     };
 
@@ -35,50 +36,50 @@ export const useAuthState = () => {
         
         if (session?.user) {
           setUser(session.user);
+          setLoading(false);
           
           // Redirect based on user role after login or signup confirmation
           if (event === 'SIGNED_IN') {
             try {
-              // First check the user's role from metadata
+              // First check the user's role from metadata for faster response
               const userRoleFromMetadata = session.user.user_metadata?.role;
               console.log('User role from metadata:', userRoleFromMetadata);
               
-              // Wait a bit for the database trigger to complete
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              
-              // Then check the user's role from the profiles table
-              const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', session.user.id)
-                .single();
-
-              console.log('Profile query result:', { profile, error });
-
-              if (error) {
-                console.error('Error fetching user profile:', error);
-                // If profile doesn't exist yet, use metadata role
-                if (userRoleFromMetadata === 'COACH') {
-                  console.log('Redirecting to coach dashboard (from metadata - profile not found)');
-                  navigate('/coach/mentees');
-                } else {
-                  console.log('Redirecting to mentee dashboard (from metadata - profile not found)');
-                  navigate('/dashboard');
-                }
+              if (userRoleFromMetadata === 'COACH') {
+                console.log('Redirecting to coach dashboard (from metadata)');
+                navigate('/coach/mentees');
               } else {
-                console.log('User role from profiles table:', profile.role);
-                
-                if (profile.role === 'COACH') {
-                  console.log('Redirecting to coach dashboard (from profile)');
-                  navigate('/coach/mentees');
-                } else {
-                  console.log('Redirecting to mentee dashboard (from profile)');
-                  navigate('/dashboard');
-                }
+                console.log('Redirecting to mentee dashboard (from metadata)');
+                navigate('/dashboard');
               }
+              
+              // Optional: Verify with database in background (no await to avoid blocking)
+              setTimeout(async () => {
+                try {
+                  const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', session.user.id)
+                    .single();
+
+                  console.log('Profile verification result:', { profile, error });
+                  
+                  // Only redirect if role differs from metadata
+                  if (!error && profile.role !== userRoleFromMetadata) {
+                    if (profile.role === 'COACH') {
+                      navigate('/coach/mentees');
+                    } else {
+                      navigate('/dashboard');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Background role verification error:', error);
+                }
+              }, 100);
+              
             } catch (error) {
               console.error('Error during role check:', error);
-              // If there's an error, check metadata as fallback
+              // If there's an error, use metadata as fallback
               const userRoleFromMetadata = session.user.user_metadata?.role;
               if (userRoleFromMetadata === 'COACH') {
                 console.log('Redirecting to coach dashboard (error fallback)');
@@ -91,11 +92,11 @@ export const useAuthState = () => {
           }
         } else {
           setUser(null);
+          setLoading(false);
           if (event === 'SIGNED_OUT') {
             navigate('/');
           }
         }
-        setLoading(false);
       }
     );
 

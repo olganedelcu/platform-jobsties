@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,7 +44,25 @@ const Sessions = () => {
       }
     };
 
+    // Check for existing session immediately
     checkUser();
+
+    // Set up listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+          if (event === 'SIGNED_OUT') {
+            navigate('/login');
+          }
+        }
+        setAuthLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleSignOut = async () => {
@@ -70,7 +89,10 @@ const Sessions = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="flex items-center">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <div className="text-lg">Loading...</div>
+        </div>
       </div>
     );
   }

@@ -3,20 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
-  // Get coach's full name from profiles
-  const { data: userData } = await supabase
-    .from('profiles')
-    .select('first_name, last_name')
-    .eq('id', userId)
-    .single();
-    
-  if (!userData) {
-    return [];
-  }
-  
-  const coachFullName = `${userData.first_name} ${userData.last_name}`;
-  
-  // Fetch sessions either assigned to this coach's ID or where preferred coach matches name
+  // Fetch ALL sessions for all coaches to see
   const { data, error } = await supabase
     .from('coaching_sessions')
     .select(`
@@ -27,7 +14,6 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
         last_name
       )
     `)
-    .or(`coach_id.eq.${userId},preferred_coach.eq.${coachFullName}`)
     .order('session_date', { ascending: true });
 
   if (error) {

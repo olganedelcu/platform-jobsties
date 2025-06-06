@@ -6,6 +6,7 @@ import CoachNavigation from '@/components/CoachNavigation';
 import SessionsHeader from '@/components/coach/SessionsHeader';
 import SessionsList from '@/components/coach/SessionsList';
 import { useCoachSessions } from '@/hooks/useCoachSessions';
+import { Loader2 } from 'lucide-react';
 
 const CoachSessions = () => {
   const navigate = useNavigate();
@@ -31,7 +32,25 @@ const CoachSessions = () => {
       }
     };
 
+    // Check for existing session immediately
     checkUser();
+
+    // Set up listener for future changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+          if (event === 'SIGNED_OUT') {
+            navigate('/login');
+          }
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const { 
@@ -53,7 +72,10 @@ const CoachSessions = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="flex items-center">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <div className="text-lg">Loading...</div>
+        </div>
       </div>
     );
   }
