@@ -1,15 +1,9 @@
 
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import AddExperience from '@/components/AddExperience';
-import AddEducation from '@/components/AddEducation';
 import ProfileCard from '@/components/ProfileCard';
-import ExperienceSection from '@/components/ExperienceSection';
-import EducationSection from '@/components/EducationSection';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useProfileData } from '@/hooks/useProfileData';
-import { useExperienceData } from '@/hooks/useExperienceData';
-import { useEducationData } from '@/hooks/useEducationData';
 
 const Profile = () => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
@@ -23,24 +17,6 @@ const Profile = () => {
     handleSaveProfile,
     handleInputChange
   } = useProfileData(user);
-  
-  const {
-    experiences,
-    showAddExperience,
-    setShowAddExperience,
-    handleAddExperience,
-    handleDeleteExperience,
-    loading: experiencesLoading
-  } = useExperienceData(user);
-  
-  const {
-    educations,
-    showAddEducation,
-    setShowAddEducation,
-    handleAddEducation,
-    handleDeleteEducation,
-    loading: educationsLoading
-  } = useEducationData(user);
 
   if (authLoading || profileLoading) {
     return (
@@ -74,38 +50,19 @@ const Profile = () => {
             />
           </div>
           
-          {/* Experience and Education */}
+          {/* Content Area - Ready for your form with questions */}
           <div className="lg:col-span-2 space-y-6">
-            <ExperienceSection
-              experiences={experiences}
-              onAddExperience={() => setShowAddExperience(true)}
-              onDeleteExperience={handleDeleteExperience}
-              loading={experiencesLoading}
-            />
-            
-            <EducationSection
-              educations={educations}
-              onAddEducation={() => setShowAddEducation(true)}
-              onDeleteEducation={handleDeleteEducation}
-              loading={educationsLoading}
-            />
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Coming Soon
+              </h3>
+              <p className="text-gray-600">
+                This area will contain a form with questions for you to answer.
+              </p>
+            </div>
           </div>
         </div>
       </main>
-
-      {/* Add Experience Dialog */}
-      <AddExperience
-        isOpen={showAddExperience}
-        onClose={() => setShowAddExperience(false)}
-        onAdd={handleAddExperience}
-      />
-
-      {/* Add Education Dialog */}
-      <AddEducation
-        isOpen={showAddEducation}
-        onClose={() => setShowAddEducation(false)}
-        onAdd={handleAddEducation}
-      />
     </div>
   );
 };

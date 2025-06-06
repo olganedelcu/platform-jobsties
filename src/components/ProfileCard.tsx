@@ -14,7 +14,6 @@ interface ProfileCardProps {
     email: string;
     location: string;
     phone: string;
-    website: string;
     about: string;
   };
   profilePicture: string | null;
@@ -59,7 +58,6 @@ const ProfileCard = ({
           location={profileData.location}
           email={profileData.email}
           phone={profileData.phone}
-          website={profileData.website}
           isEditing={isEditing}
           onInputChange={onInputChange}
         />

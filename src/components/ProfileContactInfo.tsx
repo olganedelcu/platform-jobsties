@@ -1,13 +1,12 @@
 
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import { MapPin, Mail, Phone, Globe } from 'lucide-react';
+import { MapPin, Mail, Phone } from 'lucide-react';
 
 interface ProfileContactInfoProps {
   location: string;
   email: string;
   phone: string;
-  website: string;
   isEditing: boolean;
   onInputChange: (field: string, value: string) => void;
 }
@@ -16,7 +15,6 @@ const ProfileContactInfo = ({
   location,
   email,
   phone,
-  website,
   isEditing,
   onInputChange
 }: ProfileContactInfoProps) => {
@@ -52,20 +50,6 @@ const ProfileContactInfo = ({
           />
         ) : (
           <span className="text-gray-700">{phone || 'Add phone number'}</span>
-        )}
-      </div>
-      
-      <div className="flex items-center space-x-3">
-        <Globe className="h-4 w-4 text-gray-400" />
-        {isEditing ? (
-          <Input 
-            value={website}
-            onChange={(e) => onInputChange('website', e.target.value)}
-            placeholder="Add website"
-            className="border-none bg-transparent p-0 flex-1"
-          />
-        ) : (
-          <span className="text-gray-700">{website || 'Add website'}</span>
         )}
       </div>
     </div>

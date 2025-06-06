@@ -9,7 +9,6 @@ interface ProfileData {
   email: string;
   location: string;
   phone: string;
-  website: string;
   about: string;
 }
 
@@ -24,7 +23,6 @@ export const useProfileData = (user: any) => {
     email: '',
     location: '',
     phone: '',
-    website: '',
     about: ''
   });
 
@@ -59,7 +57,6 @@ export const useProfileData = (user: any) => {
           email: user.email || '',
           location: userProfile.location || '',
           phone: userProfile.phone || '',
-          website: userProfile.website || '',
           about: userProfile.about || ''
         });
         setProfilePicture(userProfile.profile_picture_url);
@@ -71,7 +68,6 @@ export const useProfileData = (user: any) => {
           email: user?.email || '',
           location: '',
           phone: '',
-          website: '',
           about: ''
         });
       }
@@ -113,7 +109,6 @@ export const useProfileData = (user: any) => {
         last_name: profileData.lastName,
         location: profileData.location,
         phone: profileData.phone,
-        website: profileData.website,
         about: profileData.about,
         profile_picture_url: profilePicture
       };
