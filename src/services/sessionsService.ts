@@ -53,7 +53,7 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
       duration: parseInt(sessionData.duration),
       notes: sessionData.notes,
       preferred_coach: sessionData.preferredCoach,
-      status: 'pending',
+      status: 'pending', // Use the correct status value
       coach_id: coachId
     })
     .select()

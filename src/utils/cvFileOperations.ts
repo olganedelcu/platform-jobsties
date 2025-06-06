@@ -40,6 +40,23 @@ export const uploadCVFile = async (
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
+    // First, check if cv-files bucket exists, if not create it
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const cvBucketExists = buckets?.some(bucket => bucket.name === 'cv-files');
+    
+    if (!cvBucketExists) {
+      const { error: bucketError } = await supabase.storage.createBucket('cv-files', {
+        public: true,
+        allowedMimeTypes: ['application/pdf'],
+        fileSizeLimit: 10485760 // 10MB limit
+      });
+      
+      if (bucketError && !bucketError.message.includes('already exists')) {
+        console.error('Error creating bucket:', bucketError);
+        throw new Error('Failed to create storage bucket');
+      }
+    }
+
     // Upload file to Supabase storage
     const { error: uploadError } = await supabase.storage
       .from('cv-files')
@@ -49,13 +66,9 @@ export const uploadCVFile = async (
       });
 
     if (uploadError) {
+      console.error('Upload error:', uploadError);
       throw uploadError;
     }
-
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('cv-files')
-      .getPublicUrl(filePath);
 
     // Save CV record to database with the storage file path
     const { error: dbError } = await supabase
@@ -64,11 +77,12 @@ export const uploadCVFile = async (
         mentee_id: selectedMentee,
         coach_id: user.id,
         file_name: file.name,
-        file_url: filePath, // Store the storage path instead of public URL
+        file_url: filePath, // Store the storage path
         file_size: file.size
       });
 
     if (dbError) {
+      console.error('Database error:', dbError);
       // If database insert fails, clean up the uploaded file
       await supabase.storage
         .from('cv-files')
@@ -113,6 +127,7 @@ export const deleteCVFile = async (
       .eq('id', cvId);
 
     if (dbError) {
+      console.error('Database deletion error:', dbError);
       throw dbError;
     }
 

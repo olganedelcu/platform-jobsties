@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
-  // Fetch ALL sessions for all coaches to see
+  // Fetch ALL sessions for all coaches to see (as requested)
   const { data, error } = await supabase
     .from('coaching_sessions')
     .select(`
@@ -17,6 +17,7 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
     .order('session_date', { ascending: true });
 
   if (error) {
+    console.error('Error fetching coach sessions:', error);
     throw error;
   }
 
@@ -43,6 +44,7 @@ export const confirmSession = async (sessionId: string, coachId: string) => {
     .eq('id', sessionId);
 
   if (error) {
+    console.error('Error confirming session:', error);
     throw error;
   }
 
@@ -60,6 +62,7 @@ export const cancelSession = async (sessionId: string) => {
     .eq('id', sessionId);
 
   if (error) {
+    console.error('Error cancelling session:', error);
     throw error;
   }
 };

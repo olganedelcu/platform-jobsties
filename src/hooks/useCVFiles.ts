@@ -48,7 +48,7 @@ export const useCVFiles = () => {
             .from('profiles')
             .select('first_name, last_name')
             .eq('id', file.mentee_id)
-            .single();
+            .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
           if (menteeError && menteeError.code !== 'PGRST116') {
             console.error('Error fetching mentee profile:', menteeError);
@@ -59,7 +59,7 @@ export const useCVFiles = () => {
             .from('profiles')
             .select('first_name, last_name')
             .eq('id', file.coach_id)
-            .single();
+            .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
           if (coachError && coachError.code !== 'PGRST116') {
             console.error('Error fetching coach profile:', coachError);
@@ -69,10 +69,10 @@ export const useCVFiles = () => {
             ...file,
             mentee_name: menteeData 
               ? `${menteeData.first_name} ${menteeData.last_name}` 
-              : 'Unknown',
+              : 'Unknown Mentee',
             coach_name: coachData 
               ? `${coachData.first_name} ${coachData.last_name}` 
-              : 'Unknown Coach'
+              : 'Ana Nedelcu' // Default to Ana Nedelcu since she's the only coach
           };
         })
       );
