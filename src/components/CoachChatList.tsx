@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import Chat from '@/components/Chat';
 
 interface Conversation {
   mentee_id: string;
@@ -117,7 +116,13 @@ const CoachChatList = ({ coachId }: CoachChatListProps) => {
             Chat with {conversation?.mentee_name}
           </h2>
         </div>
-        <Chat userId={coachId} userEmail="" />
+        <Card>
+          <CardContent className="text-center py-12">
+            <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Chat feature coming soon</h3>
+            <p className="text-gray-500">Direct messaging functionality will be available soon.</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
