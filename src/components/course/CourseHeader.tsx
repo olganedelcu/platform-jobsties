@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Progress } from '@/components/ui/progress';
 
 interface CourseHeaderProps {
   progress?: number;
@@ -13,13 +14,8 @@ const CourseHeader = ({ progress = 0 }: CourseHeaderProps) => {
       
       <div className="mt-4">
         <div className="flex items-center space-x-2">
-          <div className="flex-1 bg-gray-200 rounded-full h-3">
-            <div 
-              className="bg-gradient-to-r from-violet-600 to-purple-600 h-3 rounded-full" 
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="text-sm text-gray-600 font-medium">{progress}% Complete</span>
+          <Progress value={progress} className="flex-1" />
+          <span className="text-sm text-gray-600 font-medium">{Math.round(progress)}% Complete</span>
         </div>
       </div>
     </div>

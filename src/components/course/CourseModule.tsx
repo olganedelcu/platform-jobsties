@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { ChevronDown, ChevronUp, Lock, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import CourseModuleContent from './CourseModuleContent';
 
 export interface CourseModuleData {
@@ -18,9 +19,10 @@ interface CourseModuleProps {
   expanded: boolean;
   userId: string;
   onToggle: () => void;
+  onComplete: () => void;
 }
 
-const CourseModule = ({ module, index, expanded, userId, onToggle }: CourseModuleProps) => {
+const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete }: CourseModuleProps) => {
   const Icon = module.icon;
 
   return (
@@ -31,26 +33,54 @@ const CourseModule = ({ module, index, expanded, userId, onToggle }: CourseModul
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-lg ${module.locked ? 'bg-gray-100' : 'bg-gradient-to-r from-indigo-100 to-purple-100'}`}>
+            <div className={`p-2 rounded-lg ${
+              module.locked 
+                ? 'bg-gray-100' 
+                : module.completed 
+                ? 'bg-green-100' 
+                : 'bg-gradient-to-r from-indigo-100 to-purple-100'
+            }`}>
               {module.locked ? (
                 <Lock className="h-6 w-6 text-gray-400" />
+              ) : module.completed ? (
+                <CheckCircle className="h-6 w-6 text-green-600" />
               ) : (
-                <Icon className={`h-6 w-6 ${module.locked ? 'text-gray-400' : 'text-indigo-600'}`} />
+                <Icon className="h-6 w-6 text-indigo-600" />
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{module.title}</h3>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-lg font-semibold text-gray-900">{module.title}</h3>
+                {module.completed && (
+                  <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-gray-600">{module.description}</p>
             </div>
           </div>
-          {!module.locked && (
-            <div className="flex items-center">
-              {expanded ? 
-                <ChevronUp className="h-5 w-5 text-gray-500" /> : 
-                <ChevronDown className="h-5 w-5 text-gray-500" />
-              }
-            </div>
-          )}
+          <div className="flex items-center space-x-3">
+            {!module.locked && !module.completed && (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onComplete();
+                }}
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"
+              >
+                Complete
+              </Button>
+            )}
+            {!module.locked && (
+              <div className="flex items-center">
+                {expanded ? 
+                  <ChevronUp className="h-5 w-5 text-gray-500" /> : 
+                  <ChevronDown className="h-5 w-5 text-gray-500" />
+                }
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
