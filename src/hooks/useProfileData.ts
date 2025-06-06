@@ -135,6 +135,11 @@ export const useProfileData = (user: any) => {
         if (error) throw error;
       }
 
+      // Trigger a window event to notify other components about the profile update
+      window.dispatchEvent(new CustomEvent('profileUpdated', { 
+        detail: { profilePicture } 
+      }));
+
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully saved.",

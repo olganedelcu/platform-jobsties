@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, BookOpen, Calendar, BarChart, LogOut, Settings, User, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavigationProps {
   user: any;
@@ -13,6 +14,7 @@ interface NavigationProps {
 const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
@@ -20,6 +22,46 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     { path: '/tracker', label: 'Tracker', icon: BarChart },
     { path: '/sessions', label: 'Sessions', icon: Calendar },
   ];
+
+  // Fetch user profile picture
+  const fetchProfilePicture = async () => {
+    if (user?.id) {
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('profile_picture_url')
+          .eq('user_id', user.id)
+          .single();
+
+        if (userProfile?.profile_picture_url) {
+          setProfilePicture(userProfile.profile_picture_url);
+        } else {
+          setProfilePicture(null);
+        }
+      } catch (error) {
+        console.error('Error fetching profile picture:', error);
+        setProfilePicture(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchProfilePicture();
+  }, [user?.id]);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const handleProfileUpdate = (event: CustomEvent) => {
+      const { profilePicture: updatedPicture } = event.detail;
+      setProfilePicture(updatedPicture);
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate as EventListener);
+    };
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -75,11 +117,19 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-3 hover:bg-gray-50">
-                <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">
-                    {user?.user_metadata?.first_name?.[0]}{user?.user_metadata?.last_name?.[0]}
-                  </span>
-                </div>
+                {profilePicture ? (
+                  <img 
+                    src={profilePicture} 
+                    alt="Profile" 
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {user?.user_metadata?.first_name?.[0]}{user?.user_metadata?.last_name?.[0]}
+                    </span>
+                  </div>
+                )}
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-medium text-gray-900">
                     {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
