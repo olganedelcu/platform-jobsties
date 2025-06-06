@@ -1,4 +1,3 @@
-
 import { getGoogleClientId, getRedirectUri, GOOGLE_SCOPE } from './googleCalendarConfig';
 import { GoogleTokenManager, GoogleTokens } from './googleTokenManager';
 import { GoogleCalendarApi, GoogleCalendarEvent } from './googleCalendarApi';
@@ -7,8 +6,8 @@ export type { GoogleCalendarEvent } from './googleCalendarApi';
 export type { GoogleTokens } from './googleTokenManager';
 
 export class GoogleCalendarService {
-  static getAuthUrl(): string {
-    const clientId = getGoogleClientId();
+  static async getAuthUrl(): Promise<string> {
+    const clientId = await getGoogleClientId();
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: getRedirectUri(),
@@ -22,22 +21,20 @@ export class GoogleCalendarService {
   }
 
   static async handleAuthCallback(code: string, userId: string): Promise<void> {
-    const clientId = getGoogleClientId();
-    const response = await fetch('https://oauth2.googleapis.com/token', {
+    const response = await fetch('/api/google-oauth', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({
-        client_id: clientId,
+      body: JSON.stringify({
         code,
-        grant_type: 'authorization_code',
-        redirect_uri: getRedirectUri(),
+        redirectUri: getRedirectUri(),
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to exchange auth code for tokens');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to exchange auth code for tokens: ${errorData.error || 'Unknown error'}`);
     }
 
     const data = await response.json();

@@ -32,9 +32,18 @@ const GoogleCalendarIntegration = ({ userId, onConnectionChange }: GoogleCalenda
     }
   };
 
-  const handleConnect = () => {
-    const authUrl = GoogleCalendarService.getAuthUrl();
-    window.location.href = authUrl;
+  const handleConnect = async () => {
+    try {
+      const authUrl = await GoogleCalendarService.getAuthUrl();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Error getting auth URL:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to Google Calendar. Please check your configuration.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDisconnect = () => {

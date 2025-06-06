@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { getGoogleClientId } from './googleCalendarConfig';
 
@@ -39,21 +38,19 @@ export class GoogleTokenManager {
   }
 
   static async refreshAccessToken(refreshToken: string): Promise<GoogleTokens> {
-    const clientId = getGoogleClientId();
-    const response = await fetch('https://oauth2.googleapis.com/token', {
+    const response = await fetch('/api/google-token-refresh', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: new URLSearchParams({
-        client_id: clientId,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token',
+      body: JSON.stringify({
+        refreshToken,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to refresh access token');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to refresh access token: ${errorData.error || 'Unknown error'}`);
     }
 
     const data = await response.json();
