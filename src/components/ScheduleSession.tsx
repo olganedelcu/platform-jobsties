@@ -24,6 +24,10 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
   });
 
   const { coaches, loading: coachesLoading } = useCoaches();
+  
+  // Add debugging
+  console.log('ScheduleSession - coaches:', coaches);
+  console.log('ScheduleSession - coachesLoading:', coachesLoading);
 
   const sessionTypes = [
     'CV Review',
@@ -90,17 +94,21 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
                     </SelectItem>
                   ) : coaches.length === 0 ? (
                     <SelectItem value="no-coaches" disabled>
-                      No coaches available
+                      No coaches available (Debug: {coaches.length} coaches found)
                     </SelectItem>
                   ) : (
                     coaches.map((coach) => (
                       <SelectItem key={coach.id} value={`${coach.first_name} ${coach.last_name}`}>
-                        {coach.first_name} {coach.last_name}
+                        {coach.first_name} {coach.last_name} ({coach.email})
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
+              {/* Debug information */}
+              <div className="text-xs text-gray-500">
+                Debug: Found {coaches.length} coaches, Loading: {coachesLoading.toString()}
+              </div>
             </div>
           </div>
 
