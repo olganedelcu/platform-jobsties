@@ -21,7 +21,7 @@ const Index = () => {
         </h1>
         
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Let's get you hired, connect, track, schedule your sessions here
+          Let's get you hired! Connect, track, schedule your sessions here
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
