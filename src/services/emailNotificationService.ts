@@ -11,6 +11,12 @@ export interface SessionNotificationData {
   notes?: string;
 }
 
+export interface CourseFeedbackData {
+  menteeEmail: string;
+  menteeName: string;
+  feedback: string;
+}
+
 export const EmailNotificationService = {
   async sendSessionBookingNotification(sessionData: SessionNotificationData): Promise<void> {
     try {
@@ -27,6 +33,25 @@ export const EmailNotificationService = {
       }
     } catch (error) {
       console.error('Failed to send session notification:', error);
+      throw error;
+    }
+  },
+
+  async sendCourseFeedback(feedbackData: CourseFeedbackData): Promise<void> {
+    try {
+      const { error } = await supabase.functions.invoke('send-session-notification', {
+        body: {
+          type: 'course_feedback',
+          data: feedbackData
+        }
+      });
+
+      if (error) {
+        console.error('Error sending course feedback:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Failed to send course feedback:', error);
       throw error;
     }
   }

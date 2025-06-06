@@ -11,15 +11,16 @@ const corsHeaders = {
 };
 
 interface SessionNotificationRequest {
-  type: 'session_booked';
+  type: 'session_booked' | 'course_feedback';
   data: {
     menteeEmail: string;
     menteeName: string;
-    sessionType: string;
-    sessionDate: string;
-    sessionTime: string;
-    duration: number;
+    sessionType?: string;
+    sessionDate?: string;
+    sessionTime?: string;
+    duration?: number;
     notes?: string;
+    feedback?: string;
   };
 }
 
@@ -33,10 +34,10 @@ const handler = async (req: Request): Promise<Response> => {
     const { type, data }: SessionNotificationRequest = await req.json();
 
     if (type === 'session_booked') {
-      // Send notification email to Ana (coach) - using the verified email
+      // Send session booking notification email to Ana (coach)
       const coachEmailResponse = await resend.emails.send({
         from: "JobsTies Booking <onboarding@resend.dev>",
-        to: ["ana@jobsties.com"], // Using the verified email address
+        to: ["ana@jobsties.com"],
         subject: `New Session Booking: ${data.sessionType}`,
         html: `
           <h1>New Session Booking</h1>
@@ -51,12 +52,6 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      console.log("Coach notification sent:", coachEmailResponse);
-
-      // For now, we'll only send to the coach since Resend requires domain verification
-      // to send to arbitrary email addresses. In production, you'll need to verify
-      // your domain at https://resend.com/domains
-      
       if (coachEmailResponse.error) {
         console.error("Error sending coach notification:", coachEmailResponse.error);
         throw new Error(`Failed to send coach notification: ${coachEmailResponse.error.message}`);
@@ -65,7 +60,44 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ 
         success: true,
         coachEmailId: coachEmailResponse.data?.id,
-        message: "Coach notification sent successfully. Mentee confirmation disabled until domain verification."
+        message: "Session booking notification sent successfully."
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    }
+
+    if (type === 'course_feedback') {
+      // Send course feedback email to Ana (coach)
+      const feedbackEmailResponse = await resend.emails.send({
+        from: "JobsTies Feedback <onboarding@resend.dev>",
+        to: ["ana@jobsties.com"],
+        subject: `Course Feedback from ${data.menteeName}`,
+        html: `
+          <h1>Course Feedback Received</h1>
+          <p><strong>Mentee:</strong> ${data.menteeName} (${data.menteeEmail})</p>
+          <br>
+          <h2>Feedback:</h2>
+          <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #007bff; margin: 15px 0;">
+            ${data.feedback?.replace(/\n/g, '<br>')}
+          </div>
+          <br>
+          <p><em>This feedback was submitted through the Career Development Course platform.</em></p>
+        `,
+      });
+
+      if (feedbackEmailResponse.error) {
+        console.error("Error sending feedback email:", feedbackEmailResponse.error);
+        throw new Error(`Failed to send feedback email: ${feedbackEmailResponse.error.message}`);
+      }
+
+      return new Response(JSON.stringify({ 
+        success: true,
+        feedbackEmailId: feedbackEmailResponse.data?.id,
+        message: "Course feedback sent successfully."
       }), {
         status: 200,
         headers: {
