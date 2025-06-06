@@ -1,0 +1,78 @@
+
+import React from 'react';
+import { ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import CourseModuleContent from './CourseModuleContent';
+
+export interface CourseModuleData {
+  title: string;
+  description: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  completed: boolean;
+  locked: boolean;
+  action: string | null;
+}
+
+interface CourseModuleProps {
+  module: CourseModuleData;
+  index: number;
+  expanded: boolean;
+  userId: string;
+  onToggle: () => void;
+}
+
+const CourseModule = ({ module, index, expanded, userId, onToggle }: CourseModuleProps) => {
+  const Icon = module.icon;
+
+  return (
+    <div className={`bg-white rounded-lg shadow overflow-hidden ${module.locked ? 'opacity-60' : ''}`}>
+      <div 
+        className="p-6 cursor-pointer"
+        onClick={() => !module.locked && onToggle()}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-lg ${module.locked ? 'bg-gray-100' : 'bg-gradient-to-r from-indigo-100 to-purple-100'}`}>
+              {module.locked ? (
+                <Lock className="h-6 w-6 text-gray-400" />
+              ) : (
+                <Icon className={`h-6 w-6 ${module.locked ? 'text-gray-400' : 'text-indigo-600'}`} />
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{module.title}</h3>
+              <p className="text-sm text-gray-600">{module.description}</p>
+            </div>
+          </div>
+          {!module.locked && (
+            <div className="flex items-center">
+              {expanded ? 
+                <ChevronUp className="h-5 w-5 text-gray-500" /> : 
+                <ChevronDown className="h-5 w-5 text-gray-500" />
+              }
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {expanded && !module.locked && (
+        <div className="px-6 pb-6 border-t border-gray-100 pt-4">
+          <CourseModuleContent 
+            moduleIndex={index} 
+            userId={userId}
+            moduleAction={module.action} 
+          />
+        </div>
+      )}
+      
+      {module.locked && (
+        <div className="px-6 pb-6">
+          <div className="text-sm text-gray-500">
+            Complete previous modules to unlock
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CourseModule;
