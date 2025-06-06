@@ -15,7 +15,7 @@ const CourseHeader = ({ progress = 0 }: CourseHeaderProps) => {
         <div className="flex items-center space-x-2">
           <div className="flex-1 bg-gray-200 rounded-full h-3">
             <div 
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 h-3 rounded-full" 
+              className="bg-gradient-to-r from-violet-600 to-purple-600 h-3 rounded-full" 
               style={{ width: `${progress}%` }}
             />
           </div>
