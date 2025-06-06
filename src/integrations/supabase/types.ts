@@ -62,9 +62,12 @@ export type Database = {
           created_at: string
           duration: number | null
           id: string
+          meeting_link: string | null
           mentee_id: string
           notes: string | null
+          preferred_coach: string | null
           session_date: string
+          session_type: string | null
           status: string | null
           updated_at: string
         }
@@ -73,9 +76,12 @@ export type Database = {
           created_at?: string
           duration?: number | null
           id?: string
+          meeting_link?: string | null
           mentee_id: string
           notes?: string | null
+          preferred_coach?: string | null
           session_date: string
+          session_type?: string | null
           status?: string | null
           updated_at?: string
         }
@@ -84,9 +90,12 @@ export type Database = {
           created_at?: string
           duration?: number | null
           id?: string
+          meeting_link?: string | null
           mentee_id?: string
           notes?: string | null
+          preferred_coach?: string | null
           session_date?: string
+          session_type?: string | null
           status?: string | null
           updated_at?: string
         }
