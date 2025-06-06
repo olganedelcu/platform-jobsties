@@ -67,13 +67,14 @@ export class GoogleCalendarService {
   }
 
   private static async refreshAccessToken(refreshToken: string): Promise<GoogleTokens> {
+    const clientId = getGoogleClientId();
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: clientId,
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
       }),
