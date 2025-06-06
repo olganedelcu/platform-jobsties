@@ -9,7 +9,7 @@ const CalendarIntegrationBanner = () => {
         <Mail className="h-5 w-5 text-blue-600" />
         <div className="text-sm text-blue-800">
           <p className="font-medium">Email notifications enabled</p>
-          <p>Ana will be notified via email and you'll receive a confirmation. She'll then confirm your session and send you the meeting link.</p>
+          <p>Ana will be notified via email when you book a session. She'll then confirm your session and send you the meeting link directly.</p>
         </div>
       </div>
     </div>

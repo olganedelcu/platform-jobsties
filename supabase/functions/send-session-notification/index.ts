@@ -33,10 +33,10 @@ const handler = async (req: Request): Promise<Response> => {
     const { type, data }: SessionNotificationRequest = await req.json();
 
     if (type === 'session_booked') {
-      // Send notification email to Ana (coach)
+      // Send notification email to Ana (coach) - using the verified email
       const coachEmailResponse = await resend.emails.send({
         from: "JobsTies Booking <onboarding@resend.dev>",
-        to: ["ana.nedelcu@example.com"], // Replace with Ana's actual email
+        to: ["ana@jobsties.com"], // Using the verified email address
         subject: `New Session Booking: ${data.sessionType}`,
         html: `
           <h1>New Session Booking</h1>
@@ -51,37 +51,21 @@ const handler = async (req: Request): Promise<Response> => {
         `,
       });
 
-      // Send confirmation email to mentee
-      const menteeEmailResponse = await resend.emails.send({
-        from: "JobsTies <onboarding@resend.dev>",
-        to: [data.menteeEmail],
-        subject: "Session Booking Confirmation",
-        html: `
-          <h1>Session Booking Confirmation</h1>
-          <p>Hi ${data.menteeName},</p>
-          <p>Thank you for booking a session with Ana Nedelcu!</p>
-          <br>
-          <p><strong>Session Details:</strong></p>
-          <p><strong>Type:</strong> ${data.sessionType}</p>
-          <p><strong>Date:</strong> ${data.sessionDate}</p>
-          <p><strong>Time:</strong> ${data.sessionTime}</p>
-          <p><strong>Duration:</strong> ${data.duration} minutes</p>
-          ${data.notes ? `<p><strong>Your Notes:</strong> ${data.notes}</p>` : ''}
-          <br>
-          <p>Ana will confirm your session and provide you with the meeting link soon.</p>
-          <p>You can manage your sessions through your JobsTies dashboard.</p>
-          <br>
-          <p>Best regards,<br>The JobsTies Team</p>
-        `,
-      });
-
       console.log("Coach notification sent:", coachEmailResponse);
-      console.log("Mentee confirmation sent:", menteeEmailResponse);
+
+      // For now, we'll only send to the coach since Resend requires domain verification
+      // to send to arbitrary email addresses. In production, you'll need to verify
+      // your domain at https://resend.com/domains
+      
+      if (coachEmailResponse.error) {
+        console.error("Error sending coach notification:", coachEmailResponse.error);
+        throw new Error(`Failed to send coach notification: ${coachEmailResponse.error.message}`);
+      }
 
       return new Response(JSON.stringify({ 
         success: true,
         coachEmailId: coachEmailResponse.data?.id,
-        menteeEmailId: menteeEmailResponse.data?.id
+        message: "Coach notification sent successfully. Mentee confirmation disabled until domain verification."
       }), {
         status: 200,
         headers: {
