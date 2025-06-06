@@ -92,7 +92,7 @@ const Tracker = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">This Week</p>
+                  <p className="text-sm text-gray-600">This Month</p>
                   <p className="text-2xl font-bold text-orange-600">{recentApplications}</p>
                 </div>
                 <Award className="h-8 w-8 text-orange-600" />
