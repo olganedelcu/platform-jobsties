@@ -7,13 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Clock, User, Video } from 'lucide-react';
+import GoogleCalendarIntegration from '@/components/GoogleCalendarIntegration';
+import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
 
 interface ScheduleSessionProps {
   onSchedule: (sessionData: any) => void;
   onCancel: () => void;
+  userId?: string;
 }
 
-const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
+const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps) => {
   const [sessionData, setSessionData] = useState({
     sessionType: '',
     date: '',
@@ -23,10 +26,13 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
     preferredCoach: 'Ana Nedelcu'
   });
 
+  const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
+  const { isConnected: isCalendarConnected } = useGoogleCalendar(userId || null);
+
   // Updated session types - removed Career Planning, LinkedIn Optimization, and General Mentoring
   const sessionTypes = [
     'CV Review',
-    'Interview Preparation',
+    'Interview Preparation', 
     'Job Search Strategy'
   ];
 
@@ -145,6 +151,54 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Google Calendar Integration Section */}
+          {userId && (
+            <div className="space-y-4">
+              {!showCalendarIntegration && !isCalendarConnected && (
+                <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-amber-800 font-medium">Want automatic calendar sync?</p>
+                      <p className="text-amber-600 text-sm">Connect Google Calendar to automatically create events for your sessions.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowCalendarIntegration(true)}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                    >
+                      Connect
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {showCalendarIntegration && (
+                <GoogleCalendarIntegration
+                  userId={userId}
+                  onConnectionChange={(connected) => {
+                    if (connected) {
+                      setShowCalendarIntegration(false);
+                    }
+                  }}
+                />
+              )}
+
+              {isCalendarConnected && !showCalendarIntegration && (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-5 w-5 text-green-600" />
+                    <div className="text-sm text-green-800">
+                      <p className="font-medium">Google Calendar connected</p>
+                      <p>Your session will be automatically added to your calendar</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="sessionType">Session Type</Label>
@@ -175,19 +229,6 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
               </Select>
             </div>
           </div>
-
-          {/* Show Calendly notice for CV Review */}
-          {sessionData.sessionType === 'CV Review' && (
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5 text-blue-600" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium">CV Review sessions use Calendly scheduling</p>
-                  <p>Click "Continue" to access the Calendly booking widget</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Regular form fields for other session types */}
           {sessionData.sessionType && sessionData.sessionType !== 'CV Review' && (
@@ -257,26 +298,13 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
           )}
 
           <div className="flex space-x-4 pt-4">
-            {sessionData.sessionType === 'CV Review' ? (
-              <Button
-                type="button"
-                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                onClick={() => {
-                  // For CV Review, we just continue to show the Calendly widget
-                  setSessionData({...sessionData, sessionType: 'CV Review'});
-                }}
-              >
-                Continue to Calendly
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                disabled={!sessionData.sessionType}
-              >
-                Schedule Session
-              </Button>
-            )}
+            <Button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              disabled={!sessionData.sessionType}
+            >
+              Schedule Session
+            </Button>
             <Button
               type="button"
               variant="outline"

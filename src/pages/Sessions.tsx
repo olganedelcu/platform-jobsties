@@ -123,6 +123,7 @@ const Sessions = () => {
               <ScheduleSession 
                 onSchedule={handleScheduleSession}
                 onCancel={() => setShowScheduleDialog(false)}
+                userId={user?.id}
               />
             </DialogContent>
           </Dialog>

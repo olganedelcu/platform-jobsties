@@ -12,6 +12,8 @@ export interface Session {
   mentee_id: string;
   created_at: string;
   updated_at: string;
+  google_event_id?: string;
+  google_calendar_id?: string;
 }
 
 export interface NewSessionData {

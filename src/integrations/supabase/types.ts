@@ -61,6 +61,8 @@ export type Database = {
           coach_id: string | null
           created_at: string
           duration: number | null
+          google_calendar_id: string | null
+          google_event_id: string | null
           id: string
           meeting_link: string | null
           mentee_id: string
@@ -75,6 +77,8 @@ export type Database = {
           coach_id?: string | null
           created_at?: string
           duration?: number | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
           id?: string
           meeting_link?: string | null
           mentee_id: string
@@ -89,6 +93,8 @@ export type Database = {
           coach_id?: string | null
           created_at?: string
           duration?: number | null
+          google_calendar_id?: string | null
+          google_event_id?: string | null
           id?: string
           meeting_link?: string | null
           mentee_id?: string
@@ -278,6 +284,36 @@ export type Database = {
           last_name?: string
           role?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_google_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_token: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
