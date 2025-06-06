@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import SessionCard from '@/components/SessionCard';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
-import ChatPopup from '@/components/ChatPopup';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, Plus, Loader2 } from 'lucide-react';
@@ -165,9 +165,6 @@ const Dashboard = () => {
           </div>
         )}
       </main>
-
-      {/* Chat Popup */}
-      <ChatPopup userId={user.id} userEmail={user.email} />
     </div>
   );
 };

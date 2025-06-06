@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   User, 
   BookOpen, 
@@ -8,7 +10,8 @@ import {
   BarChart3, 
   LogOut, 
   Menu, 
-  X
+  X,
+  MessageCircle
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -19,16 +22,34 @@ interface NavigationProps {
 const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const handleProfileUpdate = (event: any) => {
+      if (event.detail?.profilePicture) {
+        setProfilePicture(event.detail.profilePicture);
+      }
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
+  }, []);
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/course', label: 'Course', icon: BookOpen },
     { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/tracker', label: 'Tracker', icon: BarChart3 },
+    { path: '/chat', label: 'Chat', icon: MessageCircle },
   ];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
   };
 
   return (
@@ -66,8 +87,23 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
             })}
           </div>
 
-          {/* User Menu */}
+          {/* User Profile Section */}
           <div className="hidden md:flex md:items-center md:space-x-4">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={profilePicture || undefined} />
+                <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs">
+                  {getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-gray-900">
+                  {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
+                </span>
+                <span className="text-xs text-gray-500">{user?.email}</span>
+              </div>
+            </div>
+            
             <Link
               to="/profile"
               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -108,6 +144,21 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex items-center space-x-3 px-3 py-2 mb-4">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={profilePicture || undefined} />
+                <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                  {getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-gray-900">
+                  {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
+                </span>
+                <span className="text-xs text-gray-500">{user?.email}</span>
+              </div>
+            </div>
+            
             <div className="space-y-2">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
