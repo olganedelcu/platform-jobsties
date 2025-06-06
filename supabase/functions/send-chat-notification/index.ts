@@ -25,13 +25,19 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { menteeEmail, menteeName, message }: ChatNotificationRequest = await req.json();
 
+    if (!menteeEmail || !message) {
+      throw new Error("Email and message are required");
+    }
+
+    console.log(`Sending message from ${menteeName} (${menteeEmail})`);
+
     // Send notification email to Ana
     const emailResponse = await resend.emails.send({
       from: "JobsTies Chat <onboarding@resend.dev>",
       to: ["ana@jobsties.com"],
-      subject: `New Message from ${menteeName}`,
+      subject: `New Message from ${menteeName || menteeEmail}`,
       html: `
-        <h1>New Chat Message Received</h1>
+        <h1>New Message Received</h1>
         <p><strong>From:</strong> ${menteeName} (${menteeEmail})</p>
         <br>
         <h2>Message:</h2>
@@ -39,9 +45,11 @@ const handler = async (req: Request): Promise<Response> => {
           ${message.replace(/\n/g, '<br>')}
         </div>
         <br>
-        <p>You can reply to this message through your JobsTies coach dashboard.</p>
-        <p><a href="https://platform.jobsties.com/coach/chat" style="background-color: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go to Coach Dashboard</a></p>
+        <p>To reply, simply respond directly to this email.</p>
+        <hr>
+        <p style="color: #777; font-size: 12px;">JobsTies Platform | Respond directly to this email to contact ${menteeName}</p>
       `,
+      reply_to: menteeEmail,
     });
 
     if (emailResponse.error) {
@@ -49,10 +57,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Failed to send notification: ${emailResponse.error.message}`);
     }
 
+    console.log("Email sent successfully:", emailResponse.data?.id);
+
     return new Response(JSON.stringify({ 
       success: true,
       emailId: emailResponse.data?.id,
-      message: "Chat notification sent successfully."
+      message: "Message sent successfully."
     }), {
       status: 200,
       headers: {
