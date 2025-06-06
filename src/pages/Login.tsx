@@ -154,16 +154,6 @@ const Login = () => {
                     Sign up
                   </button>
                 </p>
-                <p className="text-sm text-gray-600 mt-2">
-                  Are you a coach?{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/coach-login')}
-                    className="text-purple-600 hover:text-purple-500 font-medium"
-                  >
-                    Coach login
-                  </button>
-                </p>
               </div>
             </form>
           </CardContent>
