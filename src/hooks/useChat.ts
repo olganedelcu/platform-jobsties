@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useCoachService } from '@/services/coachService';
+import { useCoachService } from '@/hooks/useCoachService';
 import { chatMessagesService } from '@/services/chatMessagesService';
 import { chatNotificationService } from '@/services/chatNotificationService';
 

@@ -1,11 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
-export const useCoachService = () => {
-  const { toast } = useToast();
-
-  const getCoachId = async (): Promise<string | null> => {
+export const coachService = {
+  async getCoachId(): Promise<{ success: boolean; coachId: string | null; error?: string }> {
     try {
       console.log('Looking for Ana coach profile...');
       
@@ -21,14 +18,17 @@ export const useCoachService = () => {
         
         if (profileError.code === 'PGRST116') {
           console.log('Ana profile not found in profiles table');
-          // Check if Ana exists in auth.users but not in profiles
-          toast({
-            title: "Coach Setup Required",
-            description: "Ana needs to complete her coach profile setup. Please contact support.",
-            variant: "destructive"
-          });
+          return {
+            success: false,
+            coachId: null,
+            error: 'COACH_SETUP_REQUIRED'
+          };
         }
-        return null;
+        return {
+          success: false,
+          coachId: null,
+          error: 'PROFILE_LOOKUP_ERROR'
+        };
       }
 
       console.log('Found Ana profile:', profileData);
@@ -36,12 +36,11 @@ export const useCoachService = () => {
       // Check if Ana has the COACH role
       if (profileData.role !== 'COACH') {
         console.error('Ana does not have COACH role:', profileData.role);
-        toast({
-          title: "Invalid Coach Role",
-          description: "Ana's account is not set up as a coach. Please contact support.",
-          variant: "destructive"
-        });
-        return null;
+        return {
+          success: false,
+          coachId: null,
+          error: 'INVALID_COACH_ROLE'
+        };
       }
 
       console.log('Ana coach profile confirmed:', {
@@ -51,17 +50,17 @@ export const useCoachService = () => {
         name: `${profileData.first_name} ${profileData.last_name}`
       });
       
-      return profileData.id;
+      return {
+        success: true,
+        coachId: profileData.id
+      };
     } catch (error) {
       console.error('Unexpected error in getCoachId:', error);
-      toast({
-        title: "Connection Error",
-        description: "Unable to connect to coach services. Please try again later.",
-        variant: "destructive"
-      });
-      return null;
+      return {
+        success: false,
+        coachId: null,
+        error: 'CONNECTION_ERROR'
+      };
     }
-  };
-
-  return { getCoachId };
+  }
 };
