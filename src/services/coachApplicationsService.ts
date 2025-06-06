@@ -58,15 +58,3 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     throw error;
   }
 };
-
-export const updateApplicationNotes = async (applicationId: string, coachNotes: string): Promise<void> => {
-  const { error } = await supabase
-    .from('job_applications')
-    .update({ coach_notes: coachNotes })
-    .eq('id', applicationId);
-
-  if (error) {
-    console.error('Error updating application notes:', error);
-    throw error;
-  }
-};

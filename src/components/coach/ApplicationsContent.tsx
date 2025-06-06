@@ -4,11 +4,7 @@ import { useCoachApplications } from '@/hooks/useCoachApplications';
 import MenteeApplicationsList from '@/components/coach/MenteeApplicationsList';
 
 const ApplicationsContent = () => {
-  const { 
-    applications, 
-    loading, 
-    handleUpdateNotes 
-  } = useCoachApplications();
+  const { applications, loading } = useCoachApplications();
 
   if (loading) {
     return (
@@ -25,14 +21,16 @@ const ApplicationsContent = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Mentee Job Applications</h1>
         <p className="text-gray-600 mt-2">
-          View and provide feedback on your mentees' job applications
+          View your mentees' job applications and track their progress
         </p>
+        {applications.length > 0 && (
+          <div className="mt-4 text-sm text-gray-500">
+            Showing {applications.length} application{applications.length !== 1 ? 's' : ''}
+          </div>
+        )}
       </div>
 
-      <MenteeApplicationsList 
-        applications={applications} 
-        onUpdateNotes={handleUpdateNotes} 
-      />
+      <MenteeApplicationsList applications={applications} />
     </div>
   );
 };
