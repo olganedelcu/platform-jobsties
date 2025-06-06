@@ -4,17 +4,15 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchMenteeApplications, updateApplicationNotes } from '@/services/coachApplicationsService';
 import { JobApplication } from '@/types/jobApplications';
 
-export const useCoachApplications = (coachId: string | undefined) => {
+export const useCoachApplications = () => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchApplications = async () => {
-    if (!coachId) return;
-    
     try {
       setLoading(true);
-      const applicationsData = await fetchMenteeApplications(coachId);
+      const applicationsData = await fetchMenteeApplications();
       setApplications(applicationsData);
     } catch (error) {
       console.error('Error fetching mentee applications:', error);
@@ -57,7 +55,7 @@ export const useCoachApplications = (coachId: string | undefined) => {
 
   useEffect(() => {
     fetchApplications();
-  }, [coachId]);
+  }, []);
 
   return {
     applications,

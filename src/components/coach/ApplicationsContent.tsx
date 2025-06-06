@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { useAuthState } from '@/hooks/useAuthState';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import MenteeApplicationsList from '@/components/coach/MenteeApplicationsList';
 
 const ApplicationsContent = () => {
-  const { user } = useAuthState();
   const { 
     applications, 
     loading, 
     handleUpdateNotes 
-  } = useCoachApplications(user?.id);
+  } = useCoachApplications();
 
   if (loading) {
     return (
