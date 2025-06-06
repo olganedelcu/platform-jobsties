@@ -31,7 +31,6 @@ const SimpleChat = ({ user }: SimpleChatProps) => {
     setIsLoading(true);
 
     try {
-      // Send email notification to Ana
       const { error } = await supabase.functions.invoke('send-chat-notification', {
         body: {
           menteeEmail: user.email,

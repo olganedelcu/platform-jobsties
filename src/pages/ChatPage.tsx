@@ -26,7 +26,6 @@ const ChatPage = () => {
       <Navigation user={user} onSignOut={handleSignOut} />
       
       <main className="max-w-4xl mx-auto py-8 px-6">
-        {/* Feature notification banner */}
         <Alert className="mb-6 border-orange-200 bg-orange-50">
           <Construction className="h-4 w-4 text-orange-600" />
           <AlertDescription className="text-orange-800">
