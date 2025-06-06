@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Clock, User, Video } from 'lucide-react';
+import { Calendar, Clock, User, Video, Loader2 } from 'lucide-react';
+import { useCoaches } from '@/hooks/useCoaches';
 
 interface ScheduleSessionProps {
   onSchedule: (sessionData: any) => void;
@@ -23,6 +23,8 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
     preferredCoach: ''
   });
 
+  const { coaches, loading: coachesLoading } = useCoaches();
+
   const sessionTypes = [
     'CV Review',
     'Interview Preparation',
@@ -30,13 +32,6 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
     'LinkedIn Optimization',
     'Job Search Strategy',
     'General Mentoring'
-  ];
-
-  const coaches = [
-    'Sarah Johnson',
-    'Michael Brown',
-    'Emma Davis',
-    'David Wilson'
   ];
 
   const timeSlots = [
@@ -77,14 +72,33 @@ const ScheduleSession = ({ onSchedule, onCancel }: ScheduleSessionProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="preferredCoach">Preferred Coach</Label>
-              <Select value={sessionData.preferredCoach} onValueChange={(value) => setSessionData({...sessionData, preferredCoach: value})}>
+              <Select 
+                value={sessionData.preferredCoach} 
+                onValueChange={(value) => setSessionData({...sessionData, preferredCoach: value})}
+                disabled={coachesLoading}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select coach" />
+                  <SelectValue placeholder={coachesLoading ? "Loading coaches..." : "Select coach"} />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                  {coaches.map((coach) => (
-                    <SelectItem key={coach} value={coach}>{coach}</SelectItem>
-                  ))}
+                  {coachesLoading ? (
+                    <SelectItem value="loading" disabled>
+                      <div className="flex items-center">
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Loading coaches...
+                      </div>
+                    </SelectItem>
+                  ) : coaches.length === 0 ? (
+                    <SelectItem value="no-coaches" disabled>
+                      No coaches available
+                    </SelectItem>
+                  ) : (
+                    coaches.map((coach) => (
+                      <SelectItem key={coach.id} value={`${coach.first_name} ${coach.last_name}`}>
+                        {coach.first_name} {coach.last_name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
