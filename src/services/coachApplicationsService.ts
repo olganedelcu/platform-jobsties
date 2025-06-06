@@ -4,21 +4,16 @@ import { JobApplication } from '@/types/jobApplications';
 
 export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
   try {
-    // First, get all job applications
+    // Fetch all job applications with mentee profile information
     const { data, error } = await supabase
       .from('job_applications')
       .select(`
-        id,
-        mentee_id,
-        date_applied,
-        company_name,
-        job_title,
-        application_status,
-        interview_stage,
-        recruiter_name,
-        coach_notes,
-        created_at,
-        updated_at
+        *,
+        profiles:mentee_id(
+          first_name,
+          last_name,
+          email
+        )
       `)
       .order('date_applied', { ascending: false });
 
@@ -31,23 +26,9 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       return [];
     }
 
-    // Get unique mentee IDs to fetch their profile information
-    const menteeIds = [...new Set(data.map(app => app.mentee_id))];
-
-    // Next, get profiles information for these mentees
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id, first_name, last_name')
-      .in('id', menteeIds);
-
-    if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
-      throw profilesError;
-    }
-
-    // Map profiles to applications
+    // Transform the data to include profile information
     const applicationsWithProfiles = data.map(application => {
-      const menteeProfile = profiles?.find(profile => profile.id === application.mentee_id) || null;
+      const menteeProfile = application.profiles as any;
       
       return {
         ...application,

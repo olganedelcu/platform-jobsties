@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
 
@@ -5,17 +6,18 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
   console.log('Fetching coach sessions for user:', userId);
   
   try {
-    // Fetch ALL sessions for all coaches to see (as requested)
+    // Fetch sessions that are pending or assigned to this coach
     const { data, error } = await supabase
       .from('coaching_sessions')
       .select(`
         *,
-        mentee:mentee_id(
-          email,
+        profiles:mentee_id(
           first_name,
-          last_name
+          last_name,
+          email
         )
       `)
+      .or(`status.eq.pending,coach_id.eq.${userId}`)
       .order('session_date', { ascending: true });
 
     if (error) {
@@ -27,12 +29,12 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
 
     // Transform data to include mentee information
     const transformedSessions = data?.map(session => {
-      const menteeData = session.mentee as any;
+      const menteeData = session.profiles as any;
       console.log('Processing session:', session.id, 'with mentee data:', menteeData);
       
       return {
         ...session,
-        mentee: undefined, // Remove nested mentee object
+        profiles: undefined, // Remove nested profiles object
         mentee_name: menteeData ? `${menteeData.first_name} ${menteeData.last_name}` : 'Unknown Mentee',
         mentee_email: menteeData?.email || ''
       };

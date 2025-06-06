@@ -13,6 +13,7 @@ export const useCoachApplications = () => {
     try {
       setLoading(true);
       const applicationsData = await fetchMenteeApplications();
+      console.log('Fetched applications:', applicationsData);
       setApplications(applicationsData);
     } catch (error) {
       console.error('Error fetching mentee applications:', error);
