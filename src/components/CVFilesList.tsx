@@ -36,6 +36,8 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
 
   const handleDownload = async (filePath: string, fileName: string) => {
     try {
+      console.log('Downloading file from path:', filePath);
+      
       // Get the file from Supabase storage
       const { data, error } = await supabase.storage
         .from('cv-files')
@@ -50,6 +52,8 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
         });
         return;
       }
+
+      console.log('File downloaded successfully, creating blob URL');
 
       // Create a blob URL and trigger download
       const url = URL.createObjectURL(data);

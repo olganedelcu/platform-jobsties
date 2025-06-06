@@ -32,6 +32,8 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
   const fetchCVFiles = async () => {
     try {
       setLoading(true);
+      console.log('Fetching CV files for mentee:', userId);
+      
       // Fetch CV files where mentee_id matches the current user
       const { data, error } = await supabase
         .from('cv_files')
@@ -49,6 +51,8 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         return;
       }
 
+      console.log('Fetched CV files:', data);
+
       // After getting CV files, fetch coach information for each file
       const filesWithCoachInfo = await Promise.all(
         (data || []).map(async (file) => {
@@ -57,7 +61,7 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
             .from('profiles')
             .select('first_name, last_name')
             .eq('id', file.coach_id)
-            .single();
+            .maybeSingle();
 
           if (coachError && coachError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
             console.error('Error fetching coach profile:', coachError);
@@ -67,11 +71,12 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
             ...file,
             coach_name: coachData 
               ? `${coachData.first_name} ${coachData.last_name}` 
-              : 'Unknown Coach'
+              : 'Ana Nedelcu' // Default to Ana Nedelcu as fallback
           };
         })
       );
 
+      console.log('Files with coach info:', filesWithCoachInfo);
       setCvFiles(filesWithCoachInfo);
     } catch (error) {
       console.error('Error:', error);
@@ -93,6 +98,8 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
 
   const handleDownload = async (filePath: string, fileName: string) => {
     try {
+      console.log('Downloading file from path:', filePath);
+      
       // Get the file from Supabase storage
       const { data, error } = await supabase.storage
         .from('cv-files')
@@ -107,6 +114,8 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         });
         return;
       }
+
+      console.log('File downloaded successfully, creating blob URL');
 
       // Create a blob URL and trigger download
       const url = URL.createObjectURL(data);

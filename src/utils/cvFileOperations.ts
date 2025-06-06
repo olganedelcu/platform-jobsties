@@ -40,22 +40,7 @@ export const uploadCVFile = async (
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
-    // First, check if cv-files bucket exists, if not create it
-    const { data: buckets } = await supabase.storage.listBuckets();
-    const cvBucketExists = buckets?.some(bucket => bucket.name === 'cv-files');
-    
-    if (!cvBucketExists) {
-      const { error: bucketError } = await supabase.storage.createBucket('cv-files', {
-        public: true,
-        allowedMimeTypes: ['application/pdf'],
-        fileSizeLimit: 10485760 // 10MB limit
-      });
-      
-      if (bucketError && !bucketError.message.includes('already exists')) {
-        console.error('Error creating bucket:', bucketError);
-        throw new Error('Failed to create storage bucket');
-      }
-    }
+    console.log('Uploading file to path:', filePath);
 
     // Upload file to Supabase storage
     const { error: uploadError } = await supabase.storage
@@ -69,6 +54,8 @@ export const uploadCVFile = async (
       console.error('Upload error:', uploadError);
       throw uploadError;
     }
+
+    console.log('File uploaded successfully to storage');
 
     // Save CV record to database with the storage file path
     const { error: dbError } = await supabase
@@ -89,6 +76,8 @@ export const uploadCVFile = async (
         .remove([filePath]);
       throw dbError;
     }
+
+    console.log('CV record saved to database');
 
     const mentee = mentees.find(m => m.id === selectedMentee);
     
@@ -120,6 +109,8 @@ export const deleteCVFile = async (
   toast: ReturnType<typeof useToast>['toast']
 ) => {
   try {
+    console.log('Deleting CV file:', cvId, 'at path:', filePath);
+
     // Delete from database
     const { error: dbError } = await supabase
       .from('cv_files')
@@ -131,6 +122,8 @@ export const deleteCVFile = async (
       throw dbError;
     }
 
+    console.log('CV record deleted from database');
+
     // Delete from storage using the stored file path
     const { error: storageError } = await supabase.storage
       .from('cv-files')
@@ -139,6 +132,8 @@ export const deleteCVFile = async (
     if (storageError) {
       console.error('Storage deletion error:', storageError);
       // Don't throw here as the database record is already deleted
+    } else {
+      console.log('File deleted from storage');
     }
 
     toast({
