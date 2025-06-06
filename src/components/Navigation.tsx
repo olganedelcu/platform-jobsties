@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -9,8 +8,7 @@ import {
   BarChart3, 
   LogOut, 
   Menu, 
-  X,
-  MessageCircle
+  X
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -26,7 +24,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/course', label: 'Course', icon: BookOpen },
     { path: '/sessions', label: 'Sessions', icon: Calendar },
-    { path: '/chat', label: 'Chat', icon: MessageCircle },
     { path: '/tracker', label: 'Tracker', icon: BarChart3 },
   ];
 
