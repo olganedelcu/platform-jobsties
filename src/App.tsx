@@ -16,6 +16,7 @@ import Course from "./pages/Course";
 import Sessions from "./pages/Sessions";
 import Profile from "./pages/Profile";
 import Tracker from "./pages/Tracker";
+import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 import Mentees from "./pages/coach/Mentees";
 import CVUpload from "./pages/coach/CVUpload";
@@ -24,6 +25,7 @@ import CoachTodos from "./pages/coach/CoachTodos";
 import Applications from "./pages/coach/Applications";
 import CoachProfile from "./pages/coach/CoachProfile";
 import CoachSettings from "./pages/coach/CoachSettings";
+import CoachChat from "./pages/coach/CoachChat";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +47,7 @@ const App = () => (
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/tracker" element={<Tracker />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/coach/mentees" element={
             <ProtectedCoachRoute>
               <Mentees />
@@ -78,6 +81,11 @@ const App = () => (
           <Route path="/coach/settings" element={
             <ProtectedCoachRoute>
               <CoachSettings />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/chat" element={
+            <ProtectedCoachRoute>
+              <CoachChat />
             </ProtectedCoachRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
