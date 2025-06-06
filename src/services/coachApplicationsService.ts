@@ -18,7 +18,7 @@ export const fetchMenteeApplications = async (coachId: string): Promise<JobAppli
       coach_notes,
       created_at,
       updated_at,
-      profiles:mentee_id(first_name, last_name)
+      profiles!mentee_id(first_name, last_name)
     `)
     .order('date_applied', { ascending: false });
 
