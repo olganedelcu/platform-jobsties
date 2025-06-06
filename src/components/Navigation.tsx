@@ -89,7 +89,10 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
           {/* User Profile Section */}
           <div className="hidden md:flex md:items-center md:space-x-4">
-            <div className="flex items-center space-x-3">
+            <Link
+              to="/profile"
+              className="flex items-center space-x-3 px-3 py-2 rounded-md hover:bg-gray-50 transition-colors"
+            >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={profilePicture || undefined} />
                 <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs">
@@ -102,19 +105,8 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                 </span>
                 <span className="text-xs text-gray-500">{user?.email}</span>
               </div>
-            </div>
-            
-            <Link
-              to="/profile"
-              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                location.pathname === '/profile'
-                  ? 'text-indigo-600 bg-indigo-50'
-                  : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50'
-              }`}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Profile
             </Link>
+            
             <Button
               variant="ghost"
               onClick={onSignOut}
@@ -144,7 +136,11 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
-            <div className="flex items-center space-x-3 px-3 py-2 mb-4">
+            <Link
+              to="/profile"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center space-x-3 px-3 py-2 mb-4 hover:bg-gray-50 rounded-md transition-colors"
+            >
               <Avatar className="h-10 w-10">
                 <AvatarImage src={profilePicture || undefined} />
                 <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
@@ -157,7 +153,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                 </span>
                 <span className="text-xs text-gray-500">{user?.email}</span>
               </div>
-            </div>
+            </Link>
             
             <div className="space-y-2">
               {navigationItems.map((item) => {
@@ -178,18 +174,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                   </Link>
                 );
               })}
-              <Link
-                to="/profile"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  location.pathname === '/profile'
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50'
-                }`}
-              >
-                <User className="h-4 w-4 mr-2" />
-                Profile
-              </Link>
+              
               <Button
                 variant="ghost"
                 onClick={onSignOut}

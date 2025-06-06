@@ -3,11 +3,7 @@ import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useProfileData } from '@/hooks/useProfileData';
 import Navigation from '@/components/Navigation';
-import ProfileHeader from '@/components/ProfileHeader';
 import ProfileCard from '@/components/ProfileCard';
-import ProfileContactInfo from '@/components/ProfileContactInfo';
-import ProfileAbout from '@/components/ProfileAbout';
-import ProfileActions from '@/components/ProfileActions';
 
 const Profile = () => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
@@ -38,17 +34,10 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-4xl mx-auto py-8 px-6">
-        <ProfileHeader
-          firstName={profileData.firstName}
-          lastName={profileData.lastName}
-          email={profileData.email}
-          isEditing={isEditing}
-          onInputChange={handleInputChange}
-        />
-        
+      <main className="max-w-7xl mx-auto py-8 px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+          {/* Profile Information */}
+          <div className="lg:col-span-1">
             <ProfileCard
               profileData={profileData}
               profilePicture={profilePicture}
@@ -59,16 +48,18 @@ const Profile = () => {
               onInputChange={handleInputChange}
               onProfilePictureUpload={handleProfilePictureUpload}
             />
-            
-            {/* Placeholder for future form with questions */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Career Goals & Questions</h3>
-              <p className="text-gray-600">This section will contain a form with career-related questions.</p>
-            </div>
           </div>
           
-          <div className="space-y-6">
-            {/* ProfileActions is already included in ProfileCard, so we don't need it here */}
+          {/* Content Area - Ready for your form with questions */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Career Goals & Questions
+              </h3>
+              <p className="text-gray-600">
+                This section will contain a form with career-related questions for you to answer.
+              </p>
+            </div>
           </div>
         </div>
       </main>
