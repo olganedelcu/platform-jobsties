@@ -91,14 +91,45 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
     return `${mb.toFixed(2)} MB`;
   };
 
-  const handleDownload = (fileUrl: string, fileName: string) => {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async (filePath: string, fileName: string) => {
+    try {
+      // Get the file from Supabase storage
+      const { data, error } = await supabase.storage
+        .from('cv-files')
+        .download(filePath);
+
+      if (error) {
+        console.error('Download error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to download file. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a blob URL and trigger download
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "File downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {

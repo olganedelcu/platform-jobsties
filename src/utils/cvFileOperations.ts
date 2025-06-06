@@ -57,14 +57,14 @@ export const uploadCVFile = async (
       .from('cv-files')
       .getPublicUrl(filePath);
 
-    // Save CV record to database
+    // Save CV record to database with the storage file path
     const { error: dbError } = await supabase
       .from('cv_files')
       .insert({
         mentee_id: selectedMentee,
         coach_id: user.id,
         file_name: file.name,
-        file_url: publicUrl,
+        file_url: filePath, // Store the storage path instead of public URL
         file_size: file.size
       });
 
@@ -116,16 +116,10 @@ export const deleteCVFile = async (
       throw dbError;
     }
 
-    // Extract file path from URL for storage deletion
-    const urlParts = filePath.split('/');
-    const fileName = urlParts[urlParts.length - 1];
-    const { data: { user } } = await supabase.auth.getUser();
-    const storageFilePath = `${user?.id}/${fileName}`;
-
-    // Delete from storage
+    // Delete from storage using the stored file path
     const { error: storageError } = await supabase.storage
       .from('cv-files')
-      .remove([storageFilePath]);
+      .remove([filePath]);
 
     if (storageError) {
       console.error('Storage deletion error:', storageError);

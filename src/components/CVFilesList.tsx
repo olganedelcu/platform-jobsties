@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, Download, Trash2, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface CVFile {
   id: string;
@@ -24,20 +26,53 @@ interface CVFilesListProps {
 }
 
 const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
+  const { toast } = useToast();
+
   const formatFileSize = (bytes: number | null) => {
     if (!bytes) return 'Unknown size';
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(2)} MB`;
   };
 
-  const handleDownload = (fileUrl: string, fileName: string) => {
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async (filePath: string, fileName: string) => {
+    try {
+      // Get the file from Supabase storage
+      const { data, error } = await supabase.storage
+        .from('cv-files')
+        .download(filePath);
+
+      if (error) {
+        console.error('Download error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to download file. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a blob URL and trigger download
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Success",
+        description: "File downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Group files by mentee

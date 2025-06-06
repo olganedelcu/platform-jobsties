@@ -12,6 +12,7 @@ export interface CVFile {
   file_size: number | null;
   uploaded_at: string;
   mentee_name?: string;
+  coach_name?: string;
 }
 
 export const useCVFiles = () => {
@@ -39,24 +40,39 @@ export const useCVFiles = () => {
         return;
       }
 
-      // Then, for each CV file, get the mentee profile information
+      // Then, for each CV file, get both mentee and coach profile information
       const formattedFiles = await Promise.all(
         cvFilesData.map(async (file: any) => {
+          // Get mentee info
           const { data: menteeData, error: menteeError } = await supabase
             .from('profiles')
             .select('first_name, last_name')
             .eq('id', file.mentee_id)
             .single();
 
-          if (menteeError && menteeError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+          if (menteeError && menteeError.code !== 'PGRST116') {
             console.error('Error fetching mentee profile:', menteeError);
+          }
+
+          // Get coach info
+          const { data: coachData, error: coachError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', file.coach_id)
+            .single();
+
+          if (coachError && coachError.code !== 'PGRST116') {
+            console.error('Error fetching coach profile:', coachError);
           }
 
           return {
             ...file,
             mentee_name: menteeData 
               ? `${menteeData.first_name} ${menteeData.last_name}` 
-              : 'Unknown'
+              : 'Unknown',
+            coach_name: coachData 
+              ? `${coachData.first_name} ${coachData.last_name}` 
+              : 'Unknown Coach'
           };
         })
       );
