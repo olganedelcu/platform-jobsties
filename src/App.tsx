@@ -17,7 +17,6 @@ import Sessions from "./pages/Sessions";
 import Profile from "./pages/Profile";
 import Tracker from "./pages/Tracker";
 import NotFound from "./pages/NotFound";
-import GoogleAuthCallback from "./pages/GoogleAuthCallback";
 import Mentees from "./pages/coach/Mentees";
 import CVUpload from "./pages/coach/CVUpload";
 import CoachSessions from "./pages/coach/CoachSessions";
@@ -46,7 +45,6 @@ const App = () => (
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/tracker" element={<Tracker />} />
-          <Route path="/google-auth-callback" element={<GoogleAuthCallback />} />
           <Route path="/coach/mentees" element={
             <ProtectedCoachRoute>
               <Mentees />
