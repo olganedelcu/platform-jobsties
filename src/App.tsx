@@ -20,6 +20,7 @@ import Mentees from "./pages/coach/Mentees";
 import CVUpload from "./pages/coach/CVUpload";
 import CoachSessions from "./pages/coach/CoachSessions";
 import CoachTodos from "./pages/coach/CoachTodos";
+import Applications from "./pages/coach/Applications";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/coach/cv-upload" element={<CVUpload />} />
           <Route path="/coach/sessions" element={<CoachSessions />} />
           <Route path="/coach/todos" element={<CoachTodos />} />
+          <Route path="/coach/applications" element={<Applications />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

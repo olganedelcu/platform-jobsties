@@ -11,6 +11,10 @@ export interface JobApplication {
   coach_notes: string | null;
   created_at: string;
   updated_at: string;
+  profiles?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface NewJobApplicationData {
