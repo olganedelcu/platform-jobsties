@@ -32,15 +32,10 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
   const fetchCVFiles = async () => {
     try {
       setLoading(true);
+      // Fetch CV files where mentee_id matches the current user
       const { data, error } = await supabase
         .from('cv_files')
-        .select(`
-          *,
-          profiles:coach_id (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('mentee_id', userId)
         .order('uploaded_at', { ascending: false });
 
@@ -54,12 +49,30 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         return;
       }
 
-      const formattedFiles = data?.map((file: any) => ({
-        ...file,
-        coach_name: file.profiles ? `${file.profiles.first_name} ${file.profiles.last_name}` : 'Unknown Coach'
-      })) || [];
+      // After getting CV files, fetch coach information for each file
+      const filesWithCoachInfo = await Promise.all(
+        (data || []).map(async (file) => {
+          // Get coach information from profiles table
+          const { data: coachData, error: coachError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', file.coach_id)
+            .single();
 
-      setCvFiles(formattedFiles);
+          if (coachError && coachError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            console.error('Error fetching coach profile:', coachError);
+          }
+
+          return {
+            ...file,
+            coach_name: coachData 
+              ? `${coachData.first_name} ${coachData.last_name}` 
+              : 'Unknown Coach'
+          };
+        })
+      );
+
+      setCvFiles(filesWithCoachInfo);
     } catch (error) {
       console.error('Error:', error);
       toast({
