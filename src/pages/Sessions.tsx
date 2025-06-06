@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -123,7 +122,7 @@ const Sessions = () => {
                 key={session.id}
                 session={session}
                 onReschedule={handleReschedule}
-                onCancel={handleCancel}
+                onCancel={handleDeleteSession}
               />
             ))}
           </div>

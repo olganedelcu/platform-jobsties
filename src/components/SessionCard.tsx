@@ -1,18 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, User, Video } from 'lucide-react';
-
-interface Session {
-  id: string;
-  session_type: string;
-  session_date: string;
-  duration: number;
-  notes: string;
-  preferred_coach: string;
-  status: string;
-  meeting_link: string;
-}
+import { Session } from '@/types/sessions';
 
 interface SessionCardProps {
   session: Session;
