@@ -34,6 +34,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
     navigate('/coach/profile');
   };
 
+  const handleSettingsClick = () => {
+    console.log('Navigating to coach settings');
+    navigate('/coach/settings');
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -101,7 +106,13 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 <User className="h-4 w-4" />
                 <span>View Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50 cursor-pointer">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSettingsClick();
+                }} 
+                className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50 cursor-pointer"
+              >
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
