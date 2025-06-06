@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -147,7 +148,7 @@ const Login = () => {
                   Don't have an account?{' '}
                   <a
                     href="mailto:olga@jobsties.com"
-                    className="text-indigo-600 hover:text-indigo-500 font-medium"
+                    className="text-gray-600 hover:text-gray-500"
                   >
                     Contact olga@jobsties.com
                   </a>
