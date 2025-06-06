@@ -23,30 +23,65 @@ export const useChat = (userId: string) => {
     const getCoachId = async () => {
       try {
         console.log('Looking for Ana coach profile...');
-        const { data, error } = await supabase
+        
+        // First, try to find Ana by email in profiles table
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, email, role, first_name, last_name')
           .eq('email', 'ana@jobsties.com')
           .single();
 
-        if (error) {
-          console.error('Error fetching coach:', error);
-          // If Ana's profile doesn't exist, we'll create a placeholder
-          // In a real app, Ana would need to sign up first
+        if (profileError) {
+          console.error('Profile lookup error:', profileError);
+          
+          if (profileError.code === 'PGRST116') {
+            console.log('Ana profile not found in profiles table');
+            // Check if Ana exists in auth.users but not in profiles
+            toast({
+              title: "Coach Setup Required",
+              description: "Ana needs to complete her coach profile setup. Please contact support.",
+              variant: "destructive"
+            });
+          }
           setLoading(false);
           return;
         }
 
-        console.log('Found Ana coach profile:', data);
-        setCoachId(data.id);
+        console.log('Found Ana profile:', profileData);
+        
+        // Check if Ana has the COACH role
+        if (profileData.role !== 'COACH') {
+          console.error('Ana does not have COACH role:', profileData.role);
+          toast({
+            title: "Invalid Coach Role",
+            description: "Ana's account is not set up as a coach. Please contact support.",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+
+        console.log('Ana coach profile confirmed:', {
+          id: profileData.id,
+          email: profileData.email,
+          role: profileData.role,
+          name: `${profileData.first_name} ${profileData.last_name}`
+        });
+        
+        setCoachId(profileData.id);
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Unexpected error in getCoachId:', error);
+        toast({
+          title: "Connection Error",
+          description: "Unable to connect to coach services. Please try again later.",
+          variant: "destructive"
+        });
         setLoading(false);
       }
     };
 
     getCoachId();
-  }, []);
+  }, [toast]);
 
   // Fetch messages
   useEffect(() => {
@@ -110,7 +145,7 @@ export const useChat = (userId: string) => {
       if (!coachId) {
         toast({
           title: "Coach not available",
-          description: "Ana is not available for chat at the moment.",
+          description: "Ana is not available for chat at the moment. Please try again later.",
           variant: "destructive"
         });
       }
