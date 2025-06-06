@@ -41,6 +41,7 @@ export const useJobApplicationActions = (
     try {
       await updateJobApplication(user.id, applicationId, updates);
 
+      // Update the applications list with the new data
       setApplications(prev => 
         prev.map(application => 
           application.id === applicationId 

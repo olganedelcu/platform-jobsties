@@ -27,15 +27,27 @@ export const useExperienceData = (user?: any) => {
   }, [user]);
 
   const fetchExperiences = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      console.log('Fetching experiences for user:', user.id);
+      
       const { data, error } = await supabase
         .from('work_experiences')
         .select('*')
         .eq('user_id', user.id)
         .order('start_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching work experiences:', error);
+        throw error;
+      }
+
+      console.log('Fetched work experiences:', data);
 
       const formattedExperiences = data?.map(exp => ({
         id: exp.id,
@@ -61,7 +73,18 @@ export const useExperienceData = (user?: any) => {
   };
 
   const handleAddExperience = async (experience: Experience) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save experiences.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
+      console.log('Adding experience for user:', user.id, experience);
+      
       const { error } = await supabase
         .from('work_experiences')
         .insert({
@@ -74,7 +97,10 @@ export const useExperienceData = (user?: any) => {
           description: experience.description
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding work experience:', error);
+        throw error;
+      }
 
       await fetchExperiences(); // Refresh the list
       toast({
@@ -85,20 +111,35 @@ export const useExperienceData = (user?: any) => {
       console.error('Error adding experience:', error);
       toast({
         title: "Error",
-        description: "Failed to save work experience.",
+        description: `Failed to save work experience: ${error.message}`,
         variant: "destructive"
       });
     }
   };
 
   const handleDeleteExperience = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete experiences.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
+      console.log('Deleting experience:', id);
+      
       const { error } = await supabase
         .from('work_experiences')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting work experience:', error);
+        throw error;
+      }
 
       setExperiences(experiences.filter(exp => exp.id !== id));
       toast({
@@ -109,7 +150,7 @@ export const useExperienceData = (user?: any) => {
       console.error('Error deleting experience:', error);
       toast({
         title: "Error",
-        description: "Failed to delete work experience.",
+        description: `Failed to delete work experience: ${error.message}`,
         variant: "destructive"
       });
     }

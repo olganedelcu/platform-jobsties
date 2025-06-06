@@ -28,15 +28,27 @@ export const useEducationData = (user?: any) => {
   }, [user]);
 
   const fetchEducations = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      console.log('Fetching education records for user:', user.id);
+      
       const { data, error } = await supabase
         .from('education_records')
         .select('*')
         .eq('user_id', user.id)
         .order('start_date', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching education records:', error);
+        throw error;
+      }
+
+      console.log('Fetched education records:', data);
 
       const formattedEducations = data?.map(edu => ({
         id: edu.id,
@@ -63,7 +75,18 @@ export const useEducationData = (user?: any) => {
   };
 
   const handleAddEducation = async (education: Education) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to save education records.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
+      console.log('Adding education for user:', user.id, education);
+      
       const { error } = await supabase
         .from('education_records')
         .insert({
@@ -77,7 +100,10 @@ export const useEducationData = (user?: any) => {
           description: education.description
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding education record:', error);
+        throw error;
+      }
 
       await fetchEducations(); // Refresh the list
       toast({
@@ -88,20 +114,35 @@ export const useEducationData = (user?: any) => {
       console.error('Error adding education:', error);
       toast({
         title: "Error",
-        description: "Failed to save education record.",
+        description: `Failed to save education record: ${error.message}`,
         variant: "destructive"
       });
     }
   };
 
   const handleDeleteEducation = async (id: string) => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to delete education records.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
+      console.log('Deleting education record:', id);
+      
       const { error } = await supabase
         .from('education_records')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting education record:', error);
+        throw error;
+      }
 
       setEducations(educations.filter(edu => edu.id !== id));
       toast({
@@ -112,7 +153,7 @@ export const useEducationData = (user?: any) => {
       console.error('Error deleting education:', error);
       toast({
         title: "Error",
-        description: "Failed to delete education record.",
+        description: `Failed to delete education record: ${error.message}`,
         variant: "destructive"
       });
     }
