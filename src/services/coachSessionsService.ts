@@ -6,39 +6,57 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
   console.log('Fetching coach sessions for user:', userId);
   
   try {
-    // Fetch sessions that are pending or assigned to this coach
-    const { data, error } = await supabase
+    // First fetch sessions that are pending or assigned to this coach
+    const { data: sessions, error: sessionsError } = await supabase
       .from('coaching_sessions')
-      .select(`
-        *,
-        profiles:mentee_id(
-          first_name,
-          last_name,
-          email
-        )
-      `)
+      .select('*')
       .or(`status.eq.pending,coach_id.eq.${userId}`)
       .order('session_date', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching coach sessions:', error);
-      throw error;
+    if (sessionsError) {
+      console.error('Error fetching coach sessions:', sessionsError);
+      throw sessionsError;
     }
 
-    console.log('Raw sessions data:', data);
+    console.log('Raw sessions data:', sessions);
 
-    // Transform data to include mentee information
-    const transformedSessions = data?.map(session => {
-      const menteeData = session.profiles as any;
-      console.log('Processing session:', session.id, 'with mentee data:', menteeData);
+    if (!sessions || sessions.length === 0) {
+      return [];
+    }
+
+    // Get unique mentee IDs from sessions
+    const menteeIds = [...new Set(sessions.map(session => session.mentee_id))];
+    
+    // Fetch mentee profiles separately
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', menteeIds);
+
+    if (profilesError) {
+      console.error('Error fetching mentee profiles:', profilesError);
+      throw profilesError;
+    }
+
+    console.log('Mentee profiles data:', profiles);
+
+    // Create a map of mentee profiles for easy lookup
+    const profileMap = new Map();
+    profiles?.forEach(profile => {
+      profileMap.set(profile.id, profile);
+    });
+
+    // Transform sessions to include mentee information
+    const transformedSessions = sessions.map(session => {
+      const menteeProfile = profileMap.get(session.mentee_id);
+      console.log('Processing session:', session.id, 'with mentee profile:', menteeProfile);
       
       return {
         ...session,
-        profiles: undefined, // Remove nested profiles object
-        mentee_name: menteeData ? `${menteeData.first_name} ${menteeData.last_name}` : 'Unknown Mentee',
-        mentee_email: menteeData?.email || ''
+        mentee_name: menteeProfile ? `${menteeProfile.first_name} ${menteeProfile.last_name}` : 'Unknown Mentee',
+        mentee_email: menteeProfile?.email || ''
       };
-    }) || [];
+    });
 
     console.log('Transformed sessions:', transformedSessions);
     return transformedSessions;
