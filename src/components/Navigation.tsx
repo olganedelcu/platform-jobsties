@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, BookOpen, Calendar, BarChart, LogOut, Settings, User, ChevronDown } from 'lucide-react';
+import { Home, BookOpen, Calendar, BarChart, LogOut, User, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -149,10 +148,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
               >
                 <User className="h-4 w-4" />
                 <span>View Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
