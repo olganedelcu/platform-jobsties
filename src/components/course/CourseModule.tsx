@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, ChevronUp, Lock, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Lock, CheckCircle, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CourseModuleContent from './CourseModuleContent';
 
@@ -20,10 +20,11 @@ interface CourseModuleProps {
   userId: string;
   onToggle: () => void;
   onComplete: () => void;
+  onUncomplete: () => void;
   onBookCall?: () => void;
 }
 
-const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, onBookCall }: CourseModuleProps) => {
+const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, onUncomplete, onBookCall }: CourseModuleProps) => {
   const Icon = module.icon;
 
   const handleActionClick = (e: React.MouseEvent) => {
@@ -33,6 +34,11 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, o
     } else if (!module.completed) {
       onComplete();
     }
+  };
+
+  const handleUncompleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUncomplete();
   };
 
   const getActionText = () => {
@@ -78,12 +84,24 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, o
           </div>
           <div className="flex items-center space-x-3">
             {!module.locked && (
-              <Button
-                onClick={handleActionClick}
-                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"
-              >
-                {getActionText()}
-              </Button>
+              <>
+                <Button
+                  onClick={handleActionClick}
+                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"
+                >
+                  {getActionText()}
+                </Button>
+                {module.completed && (
+                  <Button
+                    onClick={handleUncompleteClick}
+                    variant="outline"
+                    className="text-gray-600 border-gray-300 hover:bg-gray-50 px-4 py-2 text-sm flex items-center space-x-1"
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                    <span>Uncomplete</span>
+                  </Button>
+                )}
+              </>
             )}
             {!module.locked && (
               <div className="flex items-center">

@@ -24,6 +24,10 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     await updateProgress(moduleTitle, 100, true);
   };
 
+  const handleUncompleteModule = async (moduleIndex: number, moduleTitle: string) => {
+    await updateProgress(moduleTitle, 0, false);
+  };
+
   const handleBookCall = () => {
     navigate('/sessions');
   };
@@ -83,6 +87,7 @@ const CourseContent = ({ userId }: CourseContentProps) => {
             userId={userId}
             onToggle={() => toggleModule(index)}
             onComplete={() => handleCompleteModule(index, module.title)}
+            onUncomplete={() => handleUncompleteModule(index, module.title)}
             onBookCall={handleBookCall}
           />
         ))}
