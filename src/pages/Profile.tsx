@@ -29,16 +29,18 @@ const Profile = () => {
     showAddExperience,
     setShowAddExperience,
     handleAddExperience,
-    handleDeleteExperience
-  } = useExperienceData();
+    handleDeleteExperience,
+    loading: experiencesLoading
+  } = useExperienceData(user);
   
   const {
     educations,
     showAddEducation,
     setShowAddEducation,
     handleAddEducation,
-    handleDeleteEducation
-  } = useEducationData();
+    handleDeleteEducation,
+    loading: educationsLoading
+  } = useEducationData(user);
 
   if (authLoading || profileLoading) {
     return (
@@ -78,12 +80,14 @@ const Profile = () => {
               experiences={experiences}
               onAddExperience={() => setShowAddExperience(true)}
               onDeleteExperience={handleDeleteExperience}
+              loading={experiencesLoading}
             />
             
             <EducationSection
               educations={educations}
               onAddEducation={() => setShowAddEducation(true)}
               onDeleteEducation={handleDeleteEducation}
+              loading={educationsLoading}
             />
           </div>
         </div>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCap, Calendar, Trash2 } from 'lucide-react';
+import { GraduationCap, Calendar, Trash2, Loader2 } from 'lucide-react';
 
 interface Education {
   id: string;
@@ -19,9 +19,10 @@ interface EducationSectionProps {
   educations: Education[];
   onAddEducation: () => void;
   onDeleteEducation: (id: string) => void;
+  loading?: boolean;
 }
 
-const EducationSection = ({ educations, onAddEducation, onDeleteEducation }: EducationSectionProps) => {
+const EducationSection = ({ educations, onAddEducation, onDeleteEducation, loading }: EducationSectionProps) => {
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const [year, month] = dateString.split('-');
@@ -40,12 +41,18 @@ const EducationSection = ({ educations, onAddEducation, onDeleteEducation }: Edu
           variant="outline" 
           className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
           onClick={onAddEducation}
+          disabled={loading}
         >
           Add Education
         </Button>
       </CardHeader>
       <CardContent>
-        {educations.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+            <span className="ml-2 text-gray-600">Loading education records...</span>
+          </div>
+        ) : educations.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             No education added yet. Click "Add Education" to get started.
           </div>

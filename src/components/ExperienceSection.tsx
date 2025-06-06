@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Calendar, Trash2 } from 'lucide-react';
+import { Building, Calendar, Trash2, Loader2 } from 'lucide-react';
 
 interface Experience {
   id: string;
@@ -18,9 +18,10 @@ interface ExperienceSectionProps {
   experiences: Experience[];
   onAddExperience: () => void;
   onDeleteExperience: (id: string) => void;
+  loading?: boolean;
 }
 
-const ExperienceSection = ({ experiences, onAddExperience, onDeleteExperience }: ExperienceSectionProps) => {
+const ExperienceSection = ({ experiences, onAddExperience, onDeleteExperience, loading }: ExperienceSectionProps) => {
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const [year, month] = dateString.split('-');
@@ -39,12 +40,18 @@ const ExperienceSection = ({ experiences, onAddExperience, onDeleteExperience }:
           variant="outline" 
           className="text-indigo-600 border-indigo-600 hover:bg-indigo-50"
           onClick={onAddExperience}
+          disabled={loading}
         >
           Add Experience
         </Button>
       </CardHeader>
       <CardContent>
-        {experiences.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+            <span className="ml-2 text-gray-600">Loading experiences...</span>
+          </div>
+        ) : experiences.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             No experience added yet. Click "Add Experience" to get started.
           </div>

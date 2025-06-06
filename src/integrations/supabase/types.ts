@@ -56,6 +56,75 @@ export type Database = {
           },
         ]
       }
+      coaching_sessions: {
+        Row: {
+          coach_id: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          mentee_id: string
+          notes: string | null
+          session_date: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          coach_id?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          mentee_id: string
+          notes?: string | null
+          session_date: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          coach_id?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          mentee_id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      course_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          module_title: string
+          progress_percentage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_title: string
+          progress_percentage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_title?: string
+          progress_percentage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cv_files: {
         Row: {
           coach_id: string
@@ -86,6 +155,48 @@ export type Database = {
           mentee_id?: string
           updated_at?: string
           uploaded_at?: string
+        }
+        Relationships: []
+      }
+      education_records: {
+        Row: {
+          created_at: string
+          degree: string
+          description: string | null
+          end_date: string | null
+          field_of_study: string
+          id: string
+          institution: string
+          is_current: boolean | null
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          degree: string
+          description?: string | null
+          end_date?: string | null
+          field_of_study: string
+          id?: string
+          institution: string
+          is_current?: boolean | null
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string
+          description?: string | null
+          end_date?: string | null
+          field_of_study?: string
+          id?: string
+          institution?: string
+          is_current?: boolean | null
+          start_date?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -158,6 +269,45 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      work_experiences: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          position: string
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          position: string
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          position?: string
+          start_date?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
