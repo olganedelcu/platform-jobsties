@@ -39,7 +39,7 @@ const ProfileHeader = ({
       ) : (
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {firstName} {lastName}
+            Welcome, {firstName}!
           </h2>
           <p className="text-gray-600">{email}</p>
         </div>
