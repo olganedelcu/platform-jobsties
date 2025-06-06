@@ -5,12 +5,21 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import { BookOpen, Calendar, Users, BarChart } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { useDashboardData } from '@/hooks/useDashboardData';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const { 
+    upcomingSessions, 
+    profileCompletion, 
+    courseProgress, 
+    loading: dashboardLoading 
+  } = useDashboardData(user?.id);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -57,7 +66,7 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
+  if (loading || dashboardLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -82,30 +91,31 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Course Progress</h3>
-            <div className="flex items-center space-x-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full" style={{ width: '0%' }}></div>
-              </div>
-              <span className="text-sm text-gray-600">0%</span>
+            <div className="flex items-center space-x-2 mb-2">
+              <Progress value={courseProgress} className="flex-1" />
+              <span className="text-sm text-gray-600 font-medium">{courseProgress}%</span>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Continue your career development journey</p>
+            <p className="text-sm text-gray-500">Continue your career development journey</p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Upcoming Sessions</h3>
-            <p className="text-2xl font-bold text-indigo-600">2</p>
-            <p className="text-sm text-gray-500">Sessions scheduled this week</p>
+            <p className="text-2xl font-bold text-indigo-600">{upcomingSessions}</p>
+            <p className="text-sm text-gray-500">
+              {upcomingSessions === 0 
+                ? 'No sessions scheduled' 
+                : `Sessions scheduled this week`
+              }
+            </p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Profile Completion</h3>
-            <div className="flex items-center space-x-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '30%' }}></div>
-              </div>
-              <span className="text-sm text-gray-600">30%</span>
+            <div className="flex items-center space-x-2 mb-2">
+              <Progress value={profileCompletion} className="flex-1" />
+              <span className="text-sm text-gray-600 font-medium">{profileCompletion}%</span>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Complete your profile to get better matches</p>
+            <p className="text-sm text-gray-500">Complete your profile in settings</p>
           </div>
         </div>
 
