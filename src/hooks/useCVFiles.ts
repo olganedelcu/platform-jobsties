@@ -22,19 +22,15 @@ export const useCVFiles = () => {
   const fetchCVFiles = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First, get all CV files
+      const { data: cvFilesData, error: cvFilesError } = await supabase
         .from('cv_files')
-        .select(`
-          *,
-          mentee:mentee_id (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .order('uploaded_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching CV files:', error);
+      if (cvFilesError) {
+        console.error('Error fetching CV files:', cvFilesError);
         toast({
           title: "Error",
           description: "Failed to fetch CV files",
@@ -43,10 +39,27 @@ export const useCVFiles = () => {
         return;
       }
 
-      const formattedFiles = data?.map((file: any) => ({
-        ...file,
-        mentee_name: file.mentee ? `${file.mentee.first_name} ${file.mentee.last_name}` : 'Unknown'
-      })) || [];
+      // Then, for each CV file, get the mentee profile information
+      const formattedFiles = await Promise.all(
+        cvFilesData.map(async (file: any) => {
+          const { data: menteeData, error: menteeError } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', file.mentee_id)
+            .single();
+
+          if (menteeError && menteeError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+            console.error('Error fetching mentee profile:', menteeError);
+          }
+
+          return {
+            ...file,
+            mentee_name: menteeData 
+              ? `${menteeData.first_name} ${menteeData.last_name}` 
+              : 'Unknown'
+          };
+        })
+      );
 
       setCvFiles(formattedFiles);
     } catch (error) {
