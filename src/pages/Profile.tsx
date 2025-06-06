@@ -11,7 +11,16 @@ import ProfileActions from '@/components/ProfileActions';
 
 const Profile = () => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
-  const { profile, loading: profileLoading, updateProfile } = useProfileData(user);
+  const {
+    profileData,
+    profilePicture,
+    isEditing,
+    loading: profileLoading,
+    setIsEditing,
+    handleProfilePictureUpload,
+    handleSaveProfile,
+    handleInputChange
+  } = useProfileData(user);
 
   if (authLoading || profileLoading) {
     return (
@@ -30,13 +39,26 @@ const Profile = () => {
       <Navigation user={user} onSignOut={handleSignOut} />
       
       <main className="max-w-4xl mx-auto py-8 px-6">
-        <ProfileHeader user={user} />
+        <ProfileHeader
+          firstName={profileData.firstName}
+          lastName={profileData.lastName}
+          email={profileData.email}
+          isEditing={isEditing}
+          onInputChange={handleInputChange}
+        />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <ProfileCard user={user} profile={profile} />
-            <ProfileContactInfo profile={profile} onUpdate={updateProfile} />
-            <ProfileAbout profile={profile} onUpdate={updateProfile} />
+            <ProfileCard
+              profileData={profileData}
+              profilePicture={profilePicture}
+              isEditing={isEditing}
+              onEdit={() => setIsEditing(true)}
+              onSave={handleSaveProfile}
+              onCancel={() => setIsEditing(false)}
+              onInputChange={handleInputChange}
+              onProfilePictureUpload={handleProfilePictureUpload}
+            />
             
             {/* Placeholder for future form with questions */}
             <div className="bg-white rounded-lg shadow p-6">
@@ -46,7 +68,7 @@ const Profile = () => {
           </div>
           
           <div className="space-y-6">
-            <ProfileActions />
+            {/* ProfileActions is already included in ProfileCard, so we don't need it here */}
           </div>
         </div>
       </main>
