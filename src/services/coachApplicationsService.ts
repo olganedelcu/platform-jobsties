@@ -27,7 +27,8 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     throw error;
   }
 
-  return data as JobApplication[];
+  // Properly type the response to match the JobApplication interface
+  return (data as unknown) as JobApplication[];
 };
 
 export const updateApplicationNotes = async (applicationId: string, coachNotes: string): Promise<void> => {

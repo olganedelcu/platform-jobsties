@@ -14,7 +14,7 @@ export interface JobApplication {
   profiles?: {
     first_name: string;
     last_name: string;
-  };
+  } | null;
 }
 
 export interface NewJobApplicationData {
