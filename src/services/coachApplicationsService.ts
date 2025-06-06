@@ -4,31 +4,44 @@ import { JobApplication } from '@/types/jobApplications';
 
 export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
   try {
-    // Fetch all job applications with mentee profile information
-    const { data, error } = await supabase
+    // First fetch all job applications
+    const { data: applications, error: applicationsError } = await supabase
       .from('job_applications')
-      .select(`
-        *,
-        profiles:mentee_id(
-          first_name,
-          last_name,
-          email
-        )
-      `)
+      .select('*')
       .order('date_applied', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching job applications:', error);
-      throw error;
+    if (applicationsError) {
+      console.error('Error fetching job applications:', applicationsError);
+      throw applicationsError;
     }
 
-    if (!data || data.length === 0) {
+    if (!applications || applications.length === 0) {
       return [];
     }
 
-    // Transform the data to include profile information
-    const applicationsWithProfiles = data.map(application => {
-      const menteeProfile = application.profiles as any;
+    // Get unique mentee IDs from applications
+    const menteeIds = [...new Set(applications.map(app => app.mentee_id))];
+    
+    // Fetch mentee profiles separately
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', menteeIds);
+
+    if (profilesError) {
+      console.error('Error fetching mentee profiles:', profilesError);
+      throw profilesError;
+    }
+
+    // Create a map of mentee profiles for easy lookup
+    const profileMap = new Map();
+    profiles?.forEach(profile => {
+      profileMap.set(profile.id, profile);
+    });
+
+    // Transform applications to include mentee information
+    const applicationsWithProfiles = applications.map(application => {
+      const menteeProfile = profileMap.get(application.mentee_id);
       
       return {
         ...application,
