@@ -209,6 +209,48 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          application_status: string
+          coach_notes: string | null
+          company_name: string
+          created_at: string
+          date_applied: string
+          id: string
+          interview_stage: string | null
+          job_title: string
+          mentee_id: string
+          recruiter_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          application_status?: string
+          coach_notes?: string | null
+          company_name: string
+          created_at?: string
+          date_applied: string
+          id?: string
+          interview_stage?: string | null
+          job_title: string
+          mentee_id: string
+          recruiter_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          application_status?: string
+          coach_notes?: string | null
+          company_name?: string
+          created_at?: string
+          date_applied?: string
+          id?: string
+          interview_stage?: string | null
+          job_title?: string
+          mentee_id?: string
+          recruiter_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
