@@ -17,11 +17,18 @@ export const useCoachSessions = (user: any): CoachSessionsHookReturn => {
   );
 
   const fetchSessions = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping session fetch');
+      setLoading(false);
+      return;
+    }
+    
+    console.log('Fetching sessions for user:', user.id);
     
     try {
       setLoading(true);
       const sessionsData = await fetchCoachSessions(user.id);
+      console.log('Successfully fetched sessions:', sessionsData);
       setSessions(sessionsData);
     } catch (error) {
       console.error('Error fetching coach sessions:', error);
@@ -30,6 +37,7 @@ export const useCoachSessions = (user: any): CoachSessionsHookReturn => {
         description: "Failed to load sessions. Please try again.",
         variant: "destructive",
       });
+      setSessions([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
