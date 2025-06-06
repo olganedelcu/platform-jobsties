@@ -3,7 +3,8 @@ import { getGoogleClientId, getRedirectUri, GOOGLE_SCOPE } from './googleCalenda
 import { GoogleTokenManager, GoogleTokens } from './googleTokenManager';
 import { GoogleCalendarApi, GoogleCalendarEvent } from './googleCalendarApi';
 
-export { GoogleCalendarEvent, GoogleTokens } from './googleCalendarApi';
+export type { GoogleCalendarEvent } from './googleCalendarApi';
+export type { GoogleTokens } from './googleTokenManager';
 
 export class GoogleCalendarService {
   static getAuthUrl(): string {
