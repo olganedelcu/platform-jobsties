@@ -148,7 +148,7 @@ const Login = () => {
                   Don't have an account?{' '}
                   <a
                     href="mailto:olga@jobsties.com"
-                    className="text-gray-600 hover:text-gray-500"
+                    className="text-indigo-600 hover:text-indigo-500"
                   >
                     Contact olga@jobsties.com
                   </a>
