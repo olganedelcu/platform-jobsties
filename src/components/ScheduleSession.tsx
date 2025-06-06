@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
-import CalendlyWidget from '@/components/session/CalendlyWidget';
 import SessionTypeSelector from '@/components/session/SessionTypeSelector';
 import SessionForm from '@/components/session/SessionForm';
 import CalendarIntegrationBanner from '@/components/session/CalendarIntegrationBanner';
@@ -38,16 +37,6 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
     }
   };
 
-  // If CV Review is selected, show Calendly widget
-  if (sessionData.sessionType === 'CV Review') {
-    return (
-      <CalendlyWidget
-        onBack={() => setSessionData({ ...sessionData, sessionType: '' })}
-        onCancel={onCancel}
-      />
-    );
-  }
-
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -74,8 +63,8 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
             />
           </div>
 
-          {/* Regular form fields for other session types */}
-          {sessionData.sessionType && sessionData.sessionType !== 'CV Review' && (
+          {/* Show form for all session types */}
+          {sessionData.sessionType && (
             <SessionForm
               sessionData={sessionData}
               onSessionDataChange={setSessionData}

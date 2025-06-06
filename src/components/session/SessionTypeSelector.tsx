@@ -10,7 +10,6 @@ interface SessionTypeSelectorProps {
 
 const SessionTypeSelector = ({ value, onChange }: SessionTypeSelectorProps) => {
   const sessionTypes = [
-    'CV Review',
     'Interview Preparation', 
     'Job Search Strategy'
   ];
