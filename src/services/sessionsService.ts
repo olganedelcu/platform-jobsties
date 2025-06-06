@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Session, NewSessionData } from '@/types/sessions';
-import { GoogleCalendarService, GoogleCalendarEvent } from '@/services/googleCalendarService';
+import { CoachGoogleCalendarService } from '@/services/coachGoogleCalendarService';
 
 export const fetchSessions = async (userId: string): Promise<Session[]> => {
   const { data, error } = await supabase
@@ -33,7 +33,7 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
       // Try to find the coach ID using first and last name
       const { data: coachData } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, email')
         .eq('role', 'coach')
         .eq('first_name', firstName)
         .eq('last_name', lastName)
@@ -45,16 +45,31 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
     }
   }
 
-  // Create Google Calendar event if user has connected their calendar
+  // Get the user's profile for attendee information
+  const { data: userProfile } = await supabase
+    .from('profiles')
+    .select('email, first_name, last_name')
+    .eq('id', userId)
+    .single();
+
+  // Create Google Calendar event in Ana's calendar
   let googleEventId = null;
   try {
-    const isConnected = await GoogleCalendarService.isConnected(userId);
+    const isConnected = await CoachGoogleCalendarService.isCoachCalendarConnected();
     if (isConnected) {
       const endDateTime = new Date(sessionDateTime.getTime() + parseInt(sessionData.duration) * 60000);
       
-      const calendarEvent: GoogleCalendarEvent = {
-        summary: `${sessionData.sessionType} Session`,
-        description: sessionData.notes ? `Notes: ${sessionData.notes}` : undefined,
+      const attendees = [];
+      if (userProfile?.email) {
+        attendees.push({
+          email: userProfile.email,
+          displayName: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
+        });
+      }
+
+      const calendarEvent = {
+        summary: `${sessionData.sessionType} Session with ${userProfile?.first_name || 'Mentee'}`,
+        description: sessionData.notes ? `Session Notes: ${sessionData.notes}` : 'Coaching session booked through JobsTies platform.',
         start: {
           dateTime: sessionDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -63,9 +78,10 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
           dateTime: endDateTime.toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
+        attendees,
       };
 
-      googleEventId = await GoogleCalendarService.createCalendarEvent(userId, calendarEvent);
+      googleEventId = await CoachGoogleCalendarService.createCalendarEvent(calendarEvent);
     }
   } catch (error) {
     console.error('Failed to create Google Calendar event:', error);
@@ -92,7 +108,7 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
     // If session creation failed but calendar event was created, try to clean up
     if (googleEventId) {
       try {
-        await GoogleCalendarService.deleteCalendarEvent(userId, googleEventId);
+        await CoachGoogleCalendarService.deleteCalendarEvent(googleEventId);
       } catch (cleanupError) {
         console.error('Failed to clean up calendar event:', cleanupError);
       }
@@ -125,16 +141,16 @@ export const updateSession = async (userId: string, sessionId: string, updates: 
   // Update Google Calendar event if it exists and relevant fields changed
   if (currentSession?.google_event_id && (updates.session_date || updates.duration || updates.session_type || updates.notes)) {
     try {
-      const isConnected = await GoogleCalendarService.isConnected(userId);
+      const isConnected = await CoachGoogleCalendarService.isCoachCalendarConnected();
       if (isConnected) {
-        const calendarUpdates: Partial<GoogleCalendarEvent> = {};
+        const calendarUpdates: any = {};
 
         if (updates.session_type) {
           calendarUpdates.summary = `${updates.session_type} Session`;
         }
 
         if (updates.notes !== undefined) {
-          calendarUpdates.description = updates.notes ? `Notes: ${updates.notes}` : undefined;
+          calendarUpdates.description = updates.notes ? `Session Notes: ${updates.notes}` : 'Coaching session booked through JobsTies platform.';
         }
 
         if (updates.session_date || updates.duration) {
@@ -152,7 +168,7 @@ export const updateSession = async (userId: string, sessionId: string, updates: 
           };
         }
 
-        await GoogleCalendarService.updateCalendarEvent(userId, currentSession.google_event_id, calendarUpdates);
+        await CoachGoogleCalendarService.updateCalendarEvent(currentSession.google_event_id, calendarUpdates);
       }
     } catch (error) {
       console.error('Failed to update Google Calendar event:', error);
@@ -183,9 +199,9 @@ export const deleteSession = async (userId: string, sessionId: string): Promise<
   // Delete Google Calendar event if it exists
   if (session?.google_event_id) {
     try {
-      const isConnected = await GoogleCalendarService.isConnected(userId);
+      const isConnected = await CoachGoogleCalendarService.isCoachCalendarConnected();
       if (isConnected) {
-        await GoogleCalendarService.deleteCalendarEvent(userId, session.google_event_id);
+        await CoachGoogleCalendarService.deleteCalendarEvent(session.google_event_id);
       }
     } catch (error) {
       console.error('Failed to delete Google Calendar event:', error);

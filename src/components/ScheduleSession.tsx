@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
-import { useGoogleCalendar } from '@/hooks/useGoogleCalendar';
 import SessionTypeSelector from '@/components/session/SessionTypeSelector';
 import SessionForm from '@/components/session/SessionForm';
 import CalendarIntegrationBanner from '@/components/session/CalendarIntegrationBanner';
@@ -23,18 +22,9 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
     preferredCoach: 'Ana Nedelcu'
   });
 
-  const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
-  const { isConnected: isCalendarConnected } = useGoogleCalendar(userId || null);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSchedule(sessionData);
-  };
-
-  const handleConnectionChange = (connected: boolean) => {
-    if (connected) {
-      setShowCalendarIntegration(false);
-    }
   };
 
   return (
@@ -48,13 +38,7 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
       <CardContent>
         <div className="space-y-6">
           {/* Google Calendar Integration Section */}
-          <CalendarIntegrationBanner
-            userId={userId}
-            isCalendarConnected={isCalendarConnected}
-            showCalendarIntegration={showCalendarIntegration}
-            onShowIntegration={() => setShowCalendarIntegration(true)}
-            onConnectionChange={handleConnectionChange}
-          />
+          <CalendarIntegrationBanner />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <SessionTypeSelector
