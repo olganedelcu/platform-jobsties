@@ -20,10 +20,26 @@ interface CourseModuleProps {
   userId: string;
   onToggle: () => void;
   onComplete: () => void;
+  onBookCall?: () => void;
 }
 
-const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete }: CourseModuleProps) => {
+const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, onBookCall }: CourseModuleProps) => {
   const Icon = module.icon;
+
+  const handleActionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (module.action === 'Book Call' && onBookCall) {
+      onBookCall();
+    } else if (!module.completed) {
+      onComplete();
+    }
+  };
+
+  const getActionText = () => {
+    if (module.action === 'Book Call') return 'Book Call';
+    if (module.completed) return 'Completed';
+    return 'Complete';
+  };
 
   return (
     <div className={`bg-white rounded-lg shadow overflow-hidden ${module.locked ? 'opacity-60' : ''}`}>
@@ -61,15 +77,12 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete }:
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            {!module.locked && !module.completed && (
+            {!module.locked && (
               <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onComplete();
-                }}
+                onClick={handleActionClick}
                 className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"
               >
-                Complete
+                {getActionText()}
               </Button>
             )}
             {!module.locked && (
@@ -90,6 +103,7 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete }:
             moduleIndex={index} 
             userId={userId}
             moduleAction={module.action} 
+            onBookCall={onBookCall}
           />
         </div>
       )}

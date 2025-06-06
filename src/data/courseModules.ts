@@ -24,7 +24,7 @@ export const courseModules: CourseModuleData[] = [
     description: 'Develop an effective job search approach',
     icon: Search,
     completed: false,
-    locked: true,
+    locked: false, // This will be dynamically calculated
     action: null
   },
   {
@@ -33,7 +33,7 @@ export const courseModules: CourseModuleData[] = [
     icon: Video,
     completed: false,
     locked: true,
-    action: null
+    action: 'Book Call'
   },
   {
     title: 'Feedback & Next Steps',

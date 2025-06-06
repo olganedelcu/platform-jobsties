@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseModule from '@/components/course/CourseModule';
 import MenteeCVFiles from '@/components/MenteeCVFiles';
@@ -11,6 +12,7 @@ interface CourseContentProps {
 }
 
 const CourseContent = ({ userId }: CourseContentProps) => {
+  const navigate = useNavigate();
   const [expandedModule, setExpandedModule] = useState<number | null>(0);
   const { progress, updateProgress } = useCourseProgress({ id: userId });
 
@@ -20,6 +22,10 @@ const CourseContent = ({ userId }: CourseContentProps) => {
 
   const handleCompleteModule = async (moduleIndex: number, moduleTitle: string) => {
     await updateProgress(moduleTitle, 100, true);
+  };
+
+  const handleBookCall = () => {
+    navigate('/sessions');
   };
 
   // Calculate overall progress based on completed modules
@@ -33,6 +39,32 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     return progress.some(p => p.moduleTitle === moduleTitle && p.completed);
   };
 
+  // Determine if a module should be locked based on dependencies
+  const isModuleLocked = (moduleIndex: number) => {
+    // First two modules are always unlocked
+    if (moduleIndex <= 1) return false;
+    
+    // Job Search Strategy unlocks when first 2 modules are completed
+    if (moduleIndex === 2) {
+      const firstTwoCompleted = courseModules.slice(0, 2).every(module => 
+        isModuleCompleted(module.title)
+      );
+      return !firstTwoCompleted;
+    }
+    
+    // Interview Preparation unlocks when Job Search Strategy is completed
+    if (moduleIndex === 3) {
+      return !isModuleCompleted('Job Search Strategy');
+    }
+    
+    // Feedback & Next Steps unlocks when Interview Preparation is completed
+    if (moduleIndex === 4) {
+      return !isModuleCompleted('Interview Preparation');
+    }
+    
+    return false;
+  };
+
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <CourseHeader progress={calculateOverallProgress()} />
@@ -43,13 +75,15 @@ const CourseContent = ({ userId }: CourseContentProps) => {
             key={index}
             module={{
               ...module,
-              completed: isModuleCompleted(module.title)
+              completed: isModuleCompleted(module.title),
+              locked: isModuleLocked(index)
             }}
             index={index}
             expanded={expandedModule === index}
             userId={userId}
             onToggle={() => toggleModule(index)}
             onComplete={() => handleCompleteModule(index, module.title)}
+            onBookCall={handleBookCall}
           />
         ))}
       </div>
