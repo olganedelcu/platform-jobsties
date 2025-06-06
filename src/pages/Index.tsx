@@ -29,7 +29,7 @@ const Index = () => {
             onClick={() => navigate('/signup')}
             className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg"
           >
-            Get Started
+            Sign Up
           </Button>
           
           <Button
@@ -37,7 +37,7 @@ const Index = () => {
             variant="outline"
             className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 px-8 py-3 text-lg"
           >
-            Sign In
+            Log In
           </Button>
         </div>
       </div>
