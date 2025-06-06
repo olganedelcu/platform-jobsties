@@ -31,7 +31,9 @@ const Login = () => {
     try {
       setIsLoading(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Attempting login for:', formData.email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
@@ -40,12 +42,43 @@ const Login = () => {
         throw error;
       }
 
+      console.log('Login successful, user data:', data.user);
+
+      // Check user role and redirect appropriately
+      if (data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        console.log('User profile after login:', profile);
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          // Fallback to metadata
+          const userRole = data.user.user_metadata?.role;
+          if (userRole === 'COACH') {
+            navigate('/coach/mentees');
+          } else {
+            navigate('/dashboard');
+          }
+        } else {
+          if (profile.role === 'COACH') {
+            console.log('Redirecting coach to coach dashboard');
+            navigate('/coach/mentees');
+          } else {
+            console.log('Redirecting mentee to dashboard');
+            navigate('/dashboard');
+          }
+        }
+      }
+
       toast({
         title: "Success",
         description: "Welcome back!",
       });
       
-      navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
@@ -119,6 +152,16 @@ const Login = () => {
                     className="text-indigo-600 hover:text-indigo-500 font-medium"
                   >
                     Sign up
+                  </button>
+                </p>
+                <p className="text-sm text-gray-600 mt-2">
+                  Are you a coach?{' '}
+                  <button
+                    type="button"
+                    onClick={() => navigate('/coach-login')}
+                    className="text-purple-600 hover:text-purple-500 font-medium"
+                  >
+                    Coach login
                   </button>
                 </p>
               </div>

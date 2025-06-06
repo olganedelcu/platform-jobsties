@@ -44,7 +44,7 @@ export const useAuthState = () => {
               console.log('User role from metadata:', userRoleFromMetadata);
               
               // Wait a bit for the database trigger to complete
-              await new Promise(resolve => setTimeout(resolve, 2000));
+              await new Promise(resolve => setTimeout(resolve, 1000));
               
               // Then check the user's role from the profiles table
               const { data: profile, error } = await supabase
@@ -52,6 +52,8 @@ export const useAuthState = () => {
                 .select('role')
                 .eq('id', session.user.id)
                 .single();
+
+              console.log('Profile query result:', { profile, error });
 
               if (error) {
                 console.error('Error fetching user profile:', error);

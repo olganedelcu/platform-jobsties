@@ -18,5 +18,14 @@ export const fetchCoaches = async (): Promise<Coach[]> => {
     throw error;
   }
 
+  // Log each coach to debug
+  if (data) {
+    console.log('Found coaches:', data.map(coach => ({
+      id: coach.id,
+      name: `${coach.first_name} ${coach.last_name}`,
+      role: coach.role
+    })));
+  }
+
   return data || [];
 };

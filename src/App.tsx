@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedCoachRoute from "./components/ProtectedCoachRoute";
 import Index from "./pages/Index";
 import HomeCoach from "./pages/HomeCoach";
 import SignUp from "./pages/SignUp";
@@ -44,13 +45,41 @@ const App = () => (
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/tracker" element={<Tracker />} />
-          <Route path="/coach/mentees" element={<Mentees />} />
-          <Route path="/coach/cv-upload" element={<CVUpload />} />
-          <Route path="/coach/sessions" element={<CoachSessions />} />
-          <Route path="/coach/todos" element={<CoachTodos />} />
-          <Route path="/coach/applications" element={<Applications />} />
-          <Route path="/coach/profile" element={<CoachProfile />} />
-          <Route path="/coach/settings" element={<CoachSettings />} />
+          <Route path="/coach/mentees" element={
+            <ProtectedCoachRoute>
+              <Mentees />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/cv-upload" element={
+            <ProtectedCoachRoute>
+              <CVUpload />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/sessions" element={
+            <ProtectedCoachRoute>
+              <CoachSessions />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/todos" element={
+            <ProtectedCoachRoute>
+              <CoachTodos />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/applications" element={
+            <ProtectedCoachRoute>
+              <Applications />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/profile" element={
+            <ProtectedCoachRoute>
+              <CoachProfile />
+            </ProtectedCoachRoute>
+          } />
+          <Route path="/coach/settings" element={
+            <ProtectedCoachRoute>
+              <CoachSettings />
+            </ProtectedCoachRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

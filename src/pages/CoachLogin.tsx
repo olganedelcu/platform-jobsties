@@ -31,7 +31,9 @@ const CoachLogin = () => {
     try {
       setIsLoading(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Attempting coach login for:', formData.email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
@@ -40,12 +42,45 @@ const CoachLogin = () => {
         throw error;
       }
 
-      toast({
-        title: "Welcome Back, Coach!",
-        description: "Successfully signed in to your coaching dashboard.",
-      });
-      
-      navigate('/coach/mentees');
+      console.log('Coach login successful, checking role...');
+
+      // Verify this is actually a coach
+      if (data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        console.log('Coach profile check:', profile);
+
+        if (profileError) {
+          console.error('Error fetching coach profile:', profileError);
+          toast({
+            title: "Error",
+            description: "Unable to verify coach status",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (profile.role !== 'COACH') {
+          toast({
+            title: "Access Denied",
+            description: "This account is not registered as a coach",
+            variant: "destructive"
+          });
+          await supabase.auth.signOut();
+          return;
+        }
+
+        toast({
+          title: "Welcome Back, Coach!",
+          description: "Successfully signed in to your coaching dashboard.",
+        });
+        
+        navigate('/coach/mentees');
+      }
     } catch (error: any) {
       console.error('Coach login error:', error);
       toast({
