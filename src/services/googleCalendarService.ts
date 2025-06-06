@@ -25,7 +25,15 @@ export interface GoogleTokens {
   expires_at: string;
 }
 
-const GOOGLE_CLIENT_ID = 'your-google-client-id'; // This should be set in environment/config
+// We'll get this from the environment/config - you need to set this in your deployment
+const getGoogleClientId = () => {
+  // In production, this should come from environment variables
+  // For now, we'll need to set this in the Supabase edge function or as a runtime config
+  return window.location.hostname.includes('localhost') 
+    ? 'your-local-google-client-id' 
+    : 'your-production-google-client-id';
+};
+
 const GOOGLE_SCOPE = 'https://www.googleapis.com/auth/calendar';
 
 export class GoogleCalendarService {
@@ -115,8 +123,9 @@ export class GoogleCalendarService {
   }
 
   static getAuthUrl(): string {
+    const clientId = getGoogleClientId();
     const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
+      client_id: clientId,
       redirect_uri: `${window.location.origin}/google-auth-callback`,
       scope: GOOGLE_SCOPE,
       response_type: 'code',
@@ -128,13 +137,14 @@ export class GoogleCalendarService {
   }
 
   static async handleAuthCallback(code: string, userId: string): Promise<void> {
+    const clientId = getGoogleClientId();
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: clientId,
         code,
         grant_type: 'authorization_code',
         redirect_uri: `${window.location.origin}/google-auth-callback`,
