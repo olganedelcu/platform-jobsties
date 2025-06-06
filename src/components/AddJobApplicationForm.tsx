@@ -53,7 +53,7 @@ const AddJobApplicationForm = ({ onAddApplication }: AddJobApplicationFormProps)
     return (
       <Button 
         onClick={() => setShowForm(true)}
-        className="mb-6"
+        className="mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
       >
         <Plus className="h-4 w-4 mr-2" />
         Add Job Application
