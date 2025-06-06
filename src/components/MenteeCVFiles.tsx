@@ -100,22 +100,33 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
   return (
     <Card className="mt-4">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Your CV Files</CardTitle>
+        <CardTitle className="text-lg font-semibold flex items-center space-x-2">
+          <FileText className="h-5 w-5" />
+          <span>Your CV Files</span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {cvFiles.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">No CV files available yet. Your coach will upload them here.</p>
+          <div className="text-center py-8">
+            <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No CV files available yet</h3>
+            <p className="text-gray-500">Your coach will upload them here once they're ready</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {cvFiles.map((file) => (
-              <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+              <div key={file.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors">
                 <div className="flex items-center space-x-3">
-                  <FileText className="h-8 w-8 text-red-500" />
+                  <div className="p-2 rounded-lg bg-red-100">
+                    <FileText className="h-6 w-6 text-red-600" />
+                  </div>
                   <div>
                     <p className="font-medium text-gray-900">{file.file_name}</p>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-xs text-gray-500">
-                      <span>Uploaded by: {file.coach_name}</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center text-xs text-gray-500 gap-1 sm:gap-3">
+                      <span className="flex items-center">Uploaded by: {file.coach_name}</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>{formatFileSize(file.file_size)}</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>
                         {format(new Date(file.uploaded_at), 'MMM d, yyyy')}
                       </span>

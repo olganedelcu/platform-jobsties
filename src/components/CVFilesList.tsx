@@ -3,8 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Trash2 } from 'lucide-react';
+import { FileText, Download, Trash2, User } from 'lucide-react';
 import { format } from 'date-fns';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface CVFile {
   id: string;
@@ -39,6 +40,21 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
     document.body.removeChild(link);
   };
 
+  // Group files by mentee
+  const filesByMentee: Record<string, {name: string, files: CVFile[]}> = {};
+  cvFiles.forEach(file => {
+    const menteeId = file.mentee_id;
+    const menteeName = file.mentee_name || 'Unknown';
+    
+    if (!filesByMentee[menteeId]) {
+      filesByMentee[menteeId] = {
+        name: menteeName,
+        files: []
+      };
+    }
+    filesByMentee[menteeId].files.push(file);
+  });
+
   return (
     <Card className="mt-8">
       <CardHeader>
@@ -60,43 +76,60 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
             <p className="text-gray-500">Upload CV files for your mentees to get started</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {cvFiles.map((cvFile) => (
-              <div key={cvFile.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <FileText className="h-8 w-8 text-red-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {cvFile.file_name}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Mentee: {cvFile.mentee_name}
-                    </p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-400 mt-1">
-                      <span>{formatFileSize(cvFile.file_size)}</span>
-                      <span>Uploaded {format(new Date(cvFile.uploaded_at), 'MMM d, yyyy')}</span>
+          <div className="space-y-8">
+            {Object.entries(filesByMentee).map(([menteeId, menteeData]) => (
+              <div key={menteeId} className="border rounded-lg overflow-hidden">
+                <div className="bg-gray-100 p-4 border-b">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10 bg-indigo-100">
+                      <AvatarFallback className="text-indigo-700">
+                        {menteeData.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium text-gray-900">{menteeData.name}</h3>
+                      <p className="text-sm text-gray-500">{menteeData.files.length} CV file(s)</p>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(cvFile.file_url, cvFile.file_name)}
-                    className="text-blue-600 hover:text-blue-700"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onDeleteCV(cvFile.id, cvFile.file_url)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                
+                <div className="p-4 space-y-3">
+                  {menteeData.files.map((cvFile) => (
+                    <div key={cvFile.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          <FileText className="h-8 w-8 text-red-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {cvFile.file_name}
+                          </p>
+                          <div className="flex items-center space-x-4 text-xs text-gray-400 mt-1">
+                            <span>{formatFileSize(cvFile.file_size)}</span>
+                            <span>Uploaded {format(new Date(cvFile.uploaded_at), 'MMM d, yyyy')}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(cvFile.file_url, cvFile.file_name)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onDeleteCV(cvFile.id, cvFile.file_url)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
