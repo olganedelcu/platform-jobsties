@@ -122,6 +122,9 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, o
             userId={userId}
             moduleAction={module.action} 
             onBookCall={onBookCall}
+            onComplete={onComplete}
+            onUncomplete={onUncomplete}
+            isCompleted={module.completed}
           />
         </div>
       )}
