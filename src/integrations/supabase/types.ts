@@ -36,6 +36,72 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_availability: {
+        Row: {
+          coach_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          is_available: boolean
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_available?: boolean
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_available?: boolean
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      coach_blocked_dates: {
+        Row: {
+          blocked_date: string
+          coach_id: string
+          created_at: string
+          end_time: string | null
+          id: string
+          reason: string | null
+          start_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          blocked_date: string
+          coach_id: string
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blocked_date?: string
+          coach_id?: string
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          reason?: string | null
+          start_time?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coach_google_tokens: {
         Row: {
           access_token: string

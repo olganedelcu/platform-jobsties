@@ -40,7 +40,8 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
 
   const fetchAvailability = async () => {
     try {
-      const { data, error } = await supabase
+      // Using .from() with any to handle the TypeScript type issue temporarily
+      const { data, error } = await (supabase as any)
         .from('coach_availability')
         .select('*')
         .eq('coach_id', coachId)
@@ -74,13 +75,14 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
 
   const fetchBlockedDates = async () => {
     try {
-      const { data, error } = await supabase
+      // Using .from() with any to handle the TypeScript type issue temporarily
+      const { data, error } = await (supabase as any)
         .from('coach_blocked_dates')
         .select('blocked_date')
         .eq('coach_id', coachId);
 
       if (error) throw error;
-      setBlockedDates(data?.map(item => item.blocked_date) || []);
+      setBlockedDates(data?.map((item: any) => item.blocked_date) || []);
     } catch (error) {
       console.error('Error fetching blocked dates:', error);
     }
@@ -96,7 +98,7 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
     setSaving(true);
     try {
       // Delete existing availability
-      await supabase
+      await (supabase as any)
         .from('coach_availability')
         .delete()
         .eq('coach_id', coachId);
@@ -107,7 +109,7 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
         coach_id: coachId
       }));
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('coach_availability')
         .insert(availabilityData);
 
@@ -133,7 +135,7 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
     if (!newBlockedDate) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('coach_blocked_dates')
         .insert({
           coach_id: coachId,
@@ -162,7 +164,7 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
 
   const removeBlockedDate = async (dateToRemove: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('coach_blocked_dates')
         .delete()
         .eq('coach_id', coachId)

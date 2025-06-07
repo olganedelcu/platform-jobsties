@@ -34,7 +34,8 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (!coachId) return;
 
     try {
-      const { data, error } = await supabase
+      // Using .from() with any to handle the TypeScript type issue temporarily
+      const { data, error } = await (supabase as any)
         .from('coach_availability')
         .select('*')
         .eq('coach_id', coachId)
@@ -53,13 +54,14 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (!coachId) return;
 
     try {
-      const { data, error } = await supabase
+      // Using .from() with any to handle the TypeScript type issue temporarily
+      const { data, error } = await (supabase as any)
         .from('coach_blocked_dates')
         .select('blocked_date')
         .eq('coach_id', coachId);
 
       if (error) throw error;
-      setBlockedDates(data?.map(item => item.blocked_date) || []);
+      setBlockedDates(data?.map((item: any) => item.blocked_date) || []);
     } catch (error) {
       console.error('Error fetching blocked dates:', error);
     }
