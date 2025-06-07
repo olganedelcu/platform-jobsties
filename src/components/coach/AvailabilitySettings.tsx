@@ -1,13 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Calendar, Clock, Save, Plus, X } from 'lucide-react';
+import WeeklyAvailabilityCard from './availability/WeeklyAvailabilityCard';
+import BlockedDatesCard from './availability/BlockedDatesCard';
 
 interface AvailabilitySlot {
   id?: string;
@@ -28,10 +25,6 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
-
-  const daysOfWeek = [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-  ];
 
   useEffect(() => {
     fetchAvailability();
@@ -211,96 +204,20 @@ const AvailabilitySettings = ({ coachId }: AvailabilitySettingsProps) => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5" />
-            <span>Weekly Availability</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {availability.map((slot, index) => (
-            <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
-              <div className="w-24">
-                <span className="font-medium">{daysOfWeek[index]}</span>
-              </div>
-              
-              <Switch
-                checked={slot.is_available}
-                onCheckedChange={(checked) => updateAvailability(index, 'is_available', checked)}
-              />
-              
-              {slot.is_available && (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4" />
-                    <Input
-                      type="time"
-                      value={slot.start_time}
-                      onChange={(e) => updateAvailability(index, 'start_time', e.target.value)}
-                      className="w-24"
-                    />
-                    <span>to</span>
-                    <Input
-                      type="time"
-                      value={slot.end_time}
-                      onChange={(e) => updateAvailability(index, 'end_time', e.target.value)}
-                      className="w-24"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-          
-          <Button 
-            onClick={saveAvailability} 
-            disabled={saving}
-            className="w-full"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Availability'}
-          </Button>
-        </CardContent>
-      </Card>
+      <WeeklyAvailabilityCard
+        availability={availability}
+        onUpdateAvailability={updateAvailability}
+        onSave={saveAvailability}
+        saving={saving}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Blocked Dates</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex space-x-2">
-            <Input
-              type="date"
-              value={newBlockedDate}
-              onChange={(e) => setNewBlockedDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              className="flex-1"
-            />
-            <Button onClick={addBlockedDate} disabled={!newBlockedDate}>
-              <Plus className="h-4 w-4 mr-2" />
-              Block Date
-            </Button>
-          </div>
-          
-          {blockedDates.length > 0 && (
-            <div className="space-y-2">
-              {blockedDates.map((date) => (
-                <div key={date} className="flex items-center justify-between p-2 border rounded">
-                  <span>{new Date(date).toLocaleDateString()}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => removeBlockedDate(date)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <BlockedDatesCard
+        blockedDates={blockedDates}
+        newBlockedDate={newBlockedDate}
+        onNewBlockedDateChange={setNewBlockedDate}
+        onAddBlockedDate={addBlockedDate}
+        onRemoveBlockedDate={removeBlockedDate}
+      />
     </div>
   );
 };
