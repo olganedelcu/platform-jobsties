@@ -3,8 +3,7 @@ import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import Navigation from '@/components/Navigation';
-import AddJobApplicationForm from '@/components/AddJobApplicationForm';
-import JobApplicationsList from '@/components/JobApplicationsList';
+import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
 
@@ -102,15 +101,14 @@ const Tracker = () => {
         </div>
 
         <div className="space-y-8">
-          <AddJobApplicationForm onAddApplication={handleAddApplication} />
-          
           {applicationsLoading ? (
             <div className="text-center py-8">
               <div className="text-lg">Loading applications...</div>
             </div>
           ) : (
-            <JobApplicationsList
+            <ExcelLikeJobApplicationsTable
               applications={applications}
+              onAddApplication={handleAddApplication}
               onUpdateApplication={handleUpdateApplication}
               onDeleteApplication={handleDeleteApplication}
             />

@@ -93,10 +93,7 @@ export const cancelSession = async (sessionId: string) => {
   // First, get the session details before deleting
   const { data: sessionData, error: fetchError } = await supabase
     .from('coaching_sessions')
-    .select(`
-      *,
-      profiles!coaching_sessions_mentee_id_fkey(first_name, last_name, email)
-    `)
+    .select('*')
     .eq('id', sessionId)
     .single();
 
@@ -105,33 +102,41 @@ export const cancelSession = async (sessionId: string) => {
     throw fetchError;
   }
 
-  // Send cancellation notification if session data exists
-  if (sessionData && sessionData.profiles) {
-    const date = new Date(sessionData.session_date);
-    const formattedDate = date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    const formattedTime = date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
+  // Get the mentee profile separately if session data exists
+  if (sessionData) {
+    const { data: menteeProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, email')
+      .eq('id', sessionData.mentee_id)
+      .single();
 
-    try {
-      await EmailNotificationService.sendSessionCancellationNotification({
-        menteeEmail: sessionData.profiles.email,
-        menteeName: `${sessionData.profiles.first_name} ${sessionData.profiles.last_name}`,
-        sessionType: sessionData.session_type,
-        sessionDate: formattedDate,
-        sessionTime: formattedTime,
-        duration: sessionData.duration,
-        notes: sessionData.notes
+    if (!profileError && menteeProfile) {
+      const date = new Date(sessionData.session_date);
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
       });
-    } catch (emailError) {
-      console.error('Error sending cancellation email:', emailError);
-      // Don't throw email error, still proceed with deletion
+      const formattedTime = date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+
+      try {
+        await EmailNotificationService.sendSessionCancellationNotification({
+          menteeEmail: menteeProfile.email,
+          menteeName: `${menteeProfile.first_name} ${menteeProfile.last_name}`,
+          sessionType: sessionData.session_type,
+          sessionDate: formattedDate,
+          sessionTime: formattedTime,
+          duration: sessionData.duration,
+          notes: sessionData.notes
+        });
+      } catch (emailError) {
+        console.error('Error sending cancellation email:', emailError);
+        // Don't throw email error, still proceed with deletion
+      }
     }
   }
 
