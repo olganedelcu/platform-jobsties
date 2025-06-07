@@ -10,7 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import AvailabilitySettings from '@/components/coach/AvailabilitySettings';
 import { 
   Settings, 
   Bell, 
@@ -37,17 +39,6 @@ const CoachSettings = () => {
     sessionReminders: true,
     newMenteeAlerts: true,
     applicationAlerts: true,
-    
-    // Availability Settings
-    mondayAvailable: true,
-    tuesdayAvailable: true,
-    wednesdayAvailable: true,
-    thursdayAvailable: true,
-    fridayAvailable: true,
-    saturdayAvailable: false,
-    sundayAvailable: false,
-    startTime: '09:00',
-    endTime: '17:00',
     
     // Privacy Settings
     profileVisible: true,
@@ -93,265 +84,201 @@ const CoachSettings = () => {
             <p className="text-gray-600">Manage your coaching profile and preferences</p>
           </div>
 
-          <div className="space-y-6">
-            {/* Profile Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Settings className="h-5 w-5" />
-                  <span>Profile Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="displayName">Display Name</Label>
-                    <Input
-                      id="displayName"
-                      value={settings.displayName}
-                      onChange={(e) => handleInputChange('displayName', e.target.value)}
-                      placeholder="Your display name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
-                    <Input
-                      id="hourlyRate"
-                      value={settings.hourlyRate}
-                      onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
-                      placeholder="e.g., 75"
-                      type="number"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Professional Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={settings.bio}
-                    onChange={(e) => handleInputChange('bio', e.target.value)}
-                    placeholder="Tell mentees about your background and expertise..."
-                    rows={3}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="specializations">Specializations</Label>
-                  <Input
-                    id="specializations"
-                    value={settings.specializations}
-                    onChange={(e) => handleInputChange('specializations', e.target.value)}
-                    placeholder="e.g., Career Transitions, Interview Prep, Tech Leadership"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="availability">Availability</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="privacy">Privacy</TabsTrigger>
+            </TabsList>
 
-            {/* Notification Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Bell className="h-5 w-5" />
-                  <span>Notification Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Email Notifications</div>
-                    <div className="text-sm text-gray-500">Receive notifications via email</div>
+            <TabsContent value="profile" className="space-y-6">
+              {/* Profile Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Settings className="h-5 w-5" />
+                    <span>Profile Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="displayName">Display Name</Label>
+                      <Input
+                        id="displayName"
+                        value={settings.displayName}
+                        onChange={(e) => handleInputChange('displayName', e.target.value)}
+                        placeholder="Your display name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+                      <Input
+                        id="hourlyRate"
+                        value={settings.hourlyRate}
+                        onChange={(e) => handleInputChange('hourlyRate', e.target.value)}
+                        placeholder="e.g., 75"
+                        type="number"
+                      />
+                    </div>
                   </div>
-                  <Switch
-                    checked={settings.emailNotifications}
-                    onCheckedChange={(checked) => handleInputChange('emailNotifications', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Session Reminders</div>
-                    <div className="text-sm text-gray-500">Get reminded about upcoming sessions</div>
-                  </div>
-                  <Switch
-                    checked={settings.sessionReminders}
-                    onCheckedChange={(checked) => handleInputChange('sessionReminders', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">New Mentee Alerts</div>
-                    <div className="text-sm text-gray-500">Notify when new mentees request coaching</div>
-                  </div>
-                  <Switch
-                    checked={settings.newMenteeAlerts}
-                    onCheckedChange={(checked) => handleInputChange('newMenteeAlerts', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Application Alerts</div>
-                    <div className="text-sm text-gray-500">Notify about new job applications from mentees</div>
-                  </div>
-                  <Switch
-                    checked={settings.applicationAlerts}
-                    onCheckedChange={(checked) => handleInputChange('applicationAlerts', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Availability Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>Availability Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.mondayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('mondayAvailable', checked)}
-                    />
-                    <span className="text-sm">Monday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.tuesdayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('tuesdayAvailable', checked)}
-                    />
-                    <span className="text-sm">Tuesday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.wednesdayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('wednesdayAvailable', checked)}
-                    />
-                    <span className="text-sm">Wednesday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.thursdayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('thursdayAvailable', checked)}
-                    />
-                    <span className="text-sm">Thursday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.fridayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('fridayAvailable', checked)}
-                    />
-                    <span className="text-sm">Friday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.saturdayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('saturdayAvailable', checked)}
-                    />
-                    <span className="text-sm">Saturday</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      checked={settings.sundayAvailable}
-                      onCheckedChange={(checked) => handleInputChange('sundayAvailable', checked)}
-                    />
-                    <span className="text-sm">Sunday</span>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="startTime" className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4" />
-                      <span>Start Time</span>
-                    </Label>
-                    <Input
-                      id="startTime"
-                      type="time"
-                      value={settings.startTime}
-                      onChange={(e) => handleInputChange('startTime', e.target.value)}
+                    <Label htmlFor="bio">Professional Bio</Label>
+                    <Textarea
+                      id="bio"
+                      value={settings.bio}
+                      onChange={(e) => handleInputChange('bio', e.target.value)}
+                      placeholder="Tell mentees about your background and expertise..."
+                      rows={3}
                     />
                   </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="endTime" className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4" />
-                      <span>End Time</span>
-                    </Label>
+                    <Label htmlFor="specializations">Specializations</Label>
                     <Input
-                      id="endTime"
-                      type="time"
-                      value={settings.endTime}
-                      onChange={(e) => handleInputChange('endTime', e.target.value)}
+                      id="specializations"
+                      value={settings.specializations}
+                      onChange={(e) => handleInputChange('specializations', e.target.value)}
+                      placeholder="e.g., Career Transitions, Interview Prep, Tech Leadership"
                     />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Privacy Settings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5" />
-                  <span>Privacy Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Profile Visible</div>
-                    <div className="text-sm text-gray-500">Allow mentees to find your profile</div>
-                  </div>
-                  <Switch
-                    checked={settings.profileVisible}
-                    onCheckedChange={(checked) => handleInputChange('profileVisible', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Show Contact Information</div>
-                    <div className="text-sm text-gray-500">Display email and phone in profile</div>
-                  </div>
-                  <Switch
-                    checked={settings.showContactInfo}
-                    onCheckedChange={(checked) => handleInputChange('showContactInfo', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <div className="text-sm font-medium">Allow Direct Booking</div>
-                    <div className="text-sm text-gray-500">Let mentees book sessions directly</div>
-                  </div>
-                  <Switch
-                    checked={settings.allowDirectBooking}
-                    onCheckedChange={(checked) => handleInputChange('allowDirectBooking', checked)}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+                  <Button 
+                    onClick={handleSaveSettings}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Profile Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-            {/* Save Button */}
-            <Card>
-              <CardContent className="pt-6">
-                <Button 
-                  onClick={handleSaveSettings}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save All Settings
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+            <TabsContent value="availability" className="space-y-6">
+              <AvailabilitySettings coachId={user.id} />
+            </TabsContent>
+
+            <TabsContent value="notifications" className="space-y-6">
+              {/* Notification Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Bell className="h-5 w-5" />
+                    <span>Notification Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Email Notifications</div>
+                      <div className="text-sm text-gray-500">Receive notifications via email</div>
+                    </div>
+                    <Switch
+                      checked={settings.emailNotifications}
+                      onCheckedChange={(checked) => handleInputChange('emailNotifications', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Session Reminders</div>
+                      <div className="text-sm text-gray-500">Get reminded about upcoming sessions</div>
+                    </div>
+                    <Switch
+                      checked={settings.sessionReminders}
+                      onCheckedChange={(checked) => handleInputChange('sessionReminders', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">New Mentee Alerts</div>
+                      <div className="text-sm text-gray-500">Notify when new mentees request coaching</div>
+                    </div>
+                    <Switch
+                      checked={settings.newMenteeAlerts}
+                      onCheckedChange={(checked) => handleInputChange('newMenteeAlerts', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Application Alerts</div>
+                      <div className="text-sm text-gray-500">Notify about new job applications from mentees</div>
+                    </div>
+                    <Switch
+                      checked={settings.applicationAlerts}
+                      onCheckedChange={(checked) => handleInputChange('applicationAlerts', checked)}
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={handleSaveSettings}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Notification Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="privacy" className="space-y-6">
+              {/* Privacy Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>Privacy Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Profile Visible</div>
+                      <div className="text-sm text-gray-500">Allow mentees to find your profile</div>
+                    </div>
+                    <Switch
+                      checked={settings.profileVisible}
+                      onCheckedChange={(checked) => handleInputChange('profileVisible', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Show Contact Information</div>
+                      <div className="text-sm text-gray-500">Display email and phone in profile</div>
+                    </div>
+                    <Switch
+                      checked={settings.showContactInfo}
+                      onCheckedChange={(checked) => handleInputChange('showContactInfo', checked)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium">Allow Direct Booking</div>
+                      <div className="text-sm text-gray-500">Let mentees book sessions directly</div>
+                    </div>
+                    <Switch
+                      checked={settings.allowDirectBooking}
+                      onCheckedChange={(checked) => handleInputChange('allowDirectBooking', checked)}
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={handleSaveSettings}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Privacy Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     </ProtectedCoachRoute>
