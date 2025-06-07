@@ -11,28 +11,42 @@ interface CourseProgress {
   completedAt?: string;
 }
 
-export const useCourseProgress = (user?: any) => {
+interface UseCourseProgressParams {
+  id: string;
+}
+
+export const useCourseProgress = (params: UseCourseProgressParams) => {
   const { toast } = useToast();
   const [progress, setProgress] = useState<CourseProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch course progress from database
   useEffect(() => {
-    if (user) {
+    if (params?.id) {
       fetchProgress();
     }
-  }, [user]);
+  }, [params?.id]);
 
   const fetchProgress = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      console.log('Fetching course progress for user:', params.id);
+      
       const { data, error } = await supabase
         .from('course_progress')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', params.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Course progress data:', data);
 
       const formattedProgress = data?.map(item => ({
         id: item.id,
@@ -45,11 +59,16 @@ export const useCourseProgress = (user?: any) => {
       setProgress(formattedProgress);
     } catch (error: any) {
       console.error('Error fetching course progress:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load course progress.",
-        variant: "destructive"
-      });
+      setError(error.message);
+      
+      // Only show toast for non-network errors to avoid spam
+      if (!error.message?.includes('Failed to fetch')) {
+        toast({
+          title: "Error",
+          description: "Failed to load course progress.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -57,16 +76,18 @@ export const useCourseProgress = (user?: any) => {
 
   const updateProgress = async (moduleTitle: string, progressPercentage: number, completed?: boolean) => {
     try {
+      console.log('Updating progress:', { moduleTitle, progressPercentage, completed });
+      
       // Check if progress record exists
       const { data: existingProgress } = await supabase
         .from('course_progress')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('user_id', params.id)
         .eq('module_title', moduleTitle)
         .single();
 
       const progressData = {
-        user_id: user.id,
+        user_id: params.id,
         module_title: moduleTitle,
         progress_percentage: progressPercentage,
         completed: completed || progressPercentage >= 100,
@@ -104,6 +125,7 @@ export const useCourseProgress = (user?: any) => {
   return {
     progress,
     loading,
+    error,
     updateProgress,
     fetchProgress
   };
