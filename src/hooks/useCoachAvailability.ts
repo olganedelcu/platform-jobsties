@@ -46,10 +46,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       { id: '6', day_of_week: 6, start_time: '09:00', end_time: '17:00', is_available: false }, // Saturday
     ];
     setAvailability(defaultAvailability);
-
-    // Set June 9th, 2025 as a special availability day (10am to 1pm only)
-    const june9Special = ['2025-06-09'];
-    setBlockedDates(june9Special);
   };
 
   const fetchAvailability = async () => {
@@ -89,44 +85,68 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     }
   };
 
+  const getSpecificDateAvailability = (date: string): { isAvailable: boolean; times: string[] } => {
+    // Week of June 9th, 2025
+    const specificAvailability: { [key: string]: string[] } = {
+      '2025-06-09': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30'], // Monday 10am-3pm
+      '2025-06-10': ['15:00', '15:30', '16:00', '16:30', '17:00', '17:30'], // Tuesday 3pm-6pm
+      '2025-06-11': ['13:00', '13:30', '14:00', '14:30'], // Wednesday 1pm-3pm
+      '2025-06-12': ['10:30', '11:00', '11:30', '12:00', '12:30'], // Thursday 10:30am-1pm
+      '2025-06-13': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'], // Friday 10am-4:30pm
+      '2025-06-14': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'], // Saturday 10am-6pm
+      
+      // Following week (June 16-22, 2025) - 10am-1pm and 4pm-7pm
+      '2025-06-16': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Monday
+      '2025-06-17': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Tuesday
+      '2025-06-18': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Wednesday
+      '2025-06-19': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Thursday
+      '2025-06-20': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Friday
+      '2025-06-21': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Saturday
+      '2025-06-22': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Sunday
+    };
+
+    if (specificAvailability[date]) {
+      return {
+        isAvailable: true,
+        times: specificAvailability[date]
+      };
+    }
+
+    return { isAvailable: false, times: [] };
+  };
+
   const isDateAvailable = (date: string): boolean => {
-    const selectedDate = new Date(date);
-    const dayOfWeek = selectedDate.getDay();
-    
+    // Check specific date availability first
+    const specificAvailability = getSpecificDateAvailability(date);
+    if (specificAvailability.isAvailable) {
+      return true;
+    }
+
     // Check if date is blocked
     if (blockedDates.includes(date)) {
-      // Special case for June 9th, 2025 - it's available but with limited hours
-      if (date === '2025-06-09') {
-        return true;
-      }
       return false;
     }
     
-    // Check if day of week is available
+    // Check regular weekly availability
+    const selectedDate = new Date(date);
+    const dayOfWeek = selectedDate.getDay();
     const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
     return dayAvailability?.is_available || false;
   };
 
   const getAvailableTimesForDate = (date: string): string[] => {
+    // Check specific date availability first
+    const specificAvailability = getSpecificDateAvailability(date);
+    if (specificAvailability.isAvailable) {
+      return specificAvailability.times;
+    }
+
     if (!isDateAvailable(date)) {
       return [];
     }
 
     const selectedDate = new Date(date);
     const dayOfWeek = selectedDate.getDay();
-    
-    // Special case for June 9th, 2025 - limited availability
-    if (date === '2025-06-09') {
-      const specialTimes: string[] = [];
-      const start = new Date(`2000-01-01T10:00:00`);
-      const end = new Date(`2000-01-01T13:00:00`);
-      
-      for (let time = new Date(start); time < end; time.setMinutes(time.getMinutes() + 30)) {
-        const timeString = time.toTimeString().slice(0, 5);
-        specialTimes.push(timeString);
-      }
-      return specialTimes;
-    }
     
     const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
     
