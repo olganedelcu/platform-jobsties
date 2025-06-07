@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
+import { EmailNotificationService } from '@/services/emailNotificationService';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
   console.log('Fetching coach sessions for user:', userId);
@@ -89,6 +90,52 @@ export const confirmSession = async (sessionId: string, coachId: string) => {
 };
 
 export const cancelSession = async (sessionId: string) => {
+  // First, get the session details before deleting
+  const { data: sessionData, error: fetchError } = await supabase
+    .from('coaching_sessions')
+    .select(`
+      *,
+      profiles!coaching_sessions_mentee_id_fkey(first_name, last_name, email)
+    `)
+    .eq('id', sessionId)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching session for cancellation:', fetchError);
+    throw fetchError;
+  }
+
+  // Send cancellation notification if session data exists
+  if (sessionData && sessionData.profiles) {
+    const date = new Date(sessionData.session_date);
+    const formattedDate = date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    const formattedTime = date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+
+    try {
+      await EmailNotificationService.sendSessionCancellationNotification({
+        menteeEmail: sessionData.profiles.email,
+        menteeName: `${sessionData.profiles.first_name} ${sessionData.profiles.last_name}`,
+        sessionType: sessionData.session_type,
+        sessionDate: formattedDate,
+        sessionTime: formattedTime,
+        duration: sessionData.duration,
+        notes: sessionData.notes
+      });
+    } catch (emailError) {
+      console.error('Error sending cancellation email:', emailError);
+      // Don't throw email error, still proceed with deletion
+    }
+  }
+
+  // Delete the session
   const { error } = await supabase
     .from('coaching_sessions')
     .delete()

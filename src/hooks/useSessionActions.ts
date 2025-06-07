@@ -7,6 +7,8 @@ import {
   updateSession, 
   deleteSession 
 } from '@/services/sessionsService';
+import { EmailNotificationService } from '@/services/emailNotificationService';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useSessionActions = (
   user: any,
@@ -14,6 +16,37 @@ export const useSessionActions = (
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>
 ) => {
   const { toast } = useToast();
+
+  const getUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, email')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+
+    return data;
+  };
+
+  const formatDateTime = (sessionDate: string) => {
+    const date = new Date(sessionDate);
+    return {
+      date: date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }),
+      time: date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      })
+    };
+  };
 
   const handleAddSession = async (sessionData: NewSessionData): Promise<void> => {
     if (!user) return;
@@ -40,7 +73,32 @@ export const useSessionActions = (
     if (!user) return;
     
     try {
+      const currentSession = sessions.find(s => s.id === sessionId);
+      if (!currentSession) return;
+
       await updateSession(user.id, sessionId, updates);
+
+      // If the session date is being updated, send reschedule notification
+      if (updates.session_date && updates.session_date !== currentSession.session_date) {
+        const userProfile = await getUserProfile(user.id);
+        
+        if (userProfile) {
+          const oldDateTime = formatDateTime(currentSession.session_date);
+          const newDateTime = formatDateTime(updates.session_date);
+
+          await EmailNotificationService.sendSessionRescheduleNotification({
+            menteeEmail: userProfile.email,
+            menteeName: `${userProfile.first_name} ${userProfile.last_name}`,
+            sessionType: currentSession.session_type,
+            oldSessionDate: oldDateTime.date,
+            oldSessionTime: oldDateTime.time,
+            newSessionDate: newDateTime.date,
+            newSessionTime: newDateTime.time,
+            duration: currentSession.duration,
+            notes: currentSession.notes
+          });
+        }
+      }
 
       setSessions(prev => 
         prev.map(session => 
@@ -68,7 +126,27 @@ export const useSessionActions = (
     if (!user) return;
     
     try {
+      const sessionToDelete = sessions.find(s => s.id === sessionId);
+      if (!sessionToDelete) return;
+
       await deleteSession(user.id, sessionId);
+
+      // Send cancellation notification
+      const userProfile = await getUserProfile(user.id);
+      
+      if (userProfile) {
+        const dateTime = formatDateTime(sessionToDelete.session_date);
+
+        await EmailNotificationService.sendSessionCancellationNotification({
+          menteeEmail: userProfile.email,
+          menteeName: `${userProfile.first_name} ${userProfile.last_name}`,
+          sessionType: sessionToDelete.session_type,
+          sessionDate: dateTime.date,
+          sessionTime: dateTime.time,
+          duration: sessionToDelete.duration,
+          notes: sessionToDelete.notes
+        });
+      }
 
       setSessions(prev => prev.filter(session => session.id !== sessionId));
       
