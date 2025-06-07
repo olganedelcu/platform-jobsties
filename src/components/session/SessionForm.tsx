@@ -26,16 +26,14 @@ interface SessionFormProps {
 }
 
 const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: SessionFormProps) => {
-  // For now, we'll use Ana's ID - in a real app, this would come from the coach selection
-  const anaCoachId = 'ana-coach-id'; // This should be Ana's actual user ID from profiles table
-  
+  // Use the availability hook without a specific coach ID to get default Ana availability
   const {
     availability,
     blockedDates,
     loading: availabilityLoading,
     isDateAvailable,
     getAvailableTimesForDate
-  } = useCoachAvailability(anaCoachId);
+  } = useCoachAvailability();
 
   const availableTimesForSelectedDate = useMemo(() => {
     if (sessionData.date) {

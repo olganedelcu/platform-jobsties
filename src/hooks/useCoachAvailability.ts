@@ -27,14 +27,35 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (coachId) {
       fetchAvailability();
       fetchBlockedDates();
+    } else {
+      // If no coachId provided, set default availability for Ana
+      setDefaultAvailability();
+      setLoading(false);
     }
   }, [coachId]);
+
+  const setDefaultAvailability = () => {
+    // Default availability pattern: Monday to Friday, 9am to 5pm
+    const defaultAvailability = [
+      { id: '0', day_of_week: 0, start_time: '09:00', end_time: '17:00', is_available: false }, // Sunday
+      { id: '1', day_of_week: 1, start_time: '09:00', end_time: '17:00', is_available: true },  // Monday
+      { id: '2', day_of_week: 2, start_time: '09:00', end_time: '17:00', is_available: true },  // Tuesday
+      { id: '3', day_of_week: 3, start_time: '09:00', end_time: '17:00', is_available: true },  // Wednesday
+      { id: '4', day_of_week: 4, start_time: '09:00', end_time: '17:00', is_available: true },  // Thursday
+      { id: '5', day_of_week: 5, start_time: '09:00', end_time: '17:00', is_available: true },  // Friday
+      { id: '6', day_of_week: 6, start_time: '09:00', end_time: '17:00', is_available: false }, // Saturday
+    ];
+    setAvailability(defaultAvailability);
+
+    // Set June 9th, 2025 as a special availability day (10am to 1pm only)
+    const june9Special = ['2025-06-09'];
+    setBlockedDates(june9Special);
+  };
 
   const fetchAvailability = async () => {
     if (!coachId) return;
 
     try {
-      // Using .from() with any to handle the TypeScript type issue temporarily
       const { data, error } = await (supabase as any)
         .from('coach_availability')
         .select('*')
@@ -45,6 +66,8 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       setAvailability(data || []);
     } catch (error) {
       console.error('Error fetching availability:', error);
+      // Fallback to default availability if fetch fails
+      setDefaultAvailability();
     } finally {
       setLoading(false);
     }
@@ -54,7 +77,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (!coachId) return;
 
     try {
-      // Using .from() with any to handle the TypeScript type issue temporarily
       const { data, error } = await (supabase as any)
         .from('coach_blocked_dates')
         .select('blocked_date')
@@ -73,6 +95,10 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     
     // Check if date is blocked
     if (blockedDates.includes(date)) {
+      // Special case for June 9th, 2025 - it's available but with limited hours
+      if (date === '2025-06-09') {
+        return true;
+      }
       return false;
     }
     
@@ -88,6 +114,20 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
 
     const selectedDate = new Date(date);
     const dayOfWeek = selectedDate.getDay();
+    
+    // Special case for June 9th, 2025 - limited availability
+    if (date === '2025-06-09') {
+      const specialTimes: string[] = [];
+      const start = new Date(`2000-01-01T10:00:00`);
+      const end = new Date(`2000-01-01T13:00:00`);
+      
+      for (let time = new Date(start); time < end; time.setMinutes(time.getMinutes() + 30)) {
+        const timeString = time.toTimeString().slice(0, 5);
+        specialTimes.push(timeString);
+      }
+      return specialTimes;
+    }
+    
     const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
     
     if (!dayAvailability || !dayAvailability.is_available) {
