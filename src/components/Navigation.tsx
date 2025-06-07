@@ -3,9 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   BookOpen, 
-  Calendar, 
-  BarChart3, 
-  MessageCircle
+  BarChart3
 } from 'lucide-react';
 import DesktopNavigation from './DesktopNavigation';
 import MobileNavigation from './MobileNavigation';
@@ -35,9 +33,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/course', label: 'Course', icon: BookOpen },
-    { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/tracker', label: 'Tracker', icon: BarChart3 },
-    { path: '/chat', label: 'Chat', icon: MessageCircle },
   ];
 
   const toggleMobileMenu = () => {

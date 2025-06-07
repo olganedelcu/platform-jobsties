@@ -3,20 +3,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, BookOpen, User, Upload, ArrowRight } from 'lucide-react';
+import { BookOpen, User, Upload, ArrowRight } from 'lucide-react';
 
 const DashboardQuickLinks = () => {
   const navigate = useNavigate();
 
   const quickLinks = [
-    {
-      title: 'Schedule Your First Session',
-      description: 'Book a coaching session with one of our expert career coaches',
-      icon: Calendar,
-      action: () => navigate('/sessions'),
-      buttonText: 'Schedule Now',
-      color: 'from-indigo-600 to-purple-600'
-    },
     {
       title: 'Start Career Course',
       description: 'Begin your journey with our comprehensive career development modules',
@@ -52,7 +44,7 @@ const DashboardQuickLinks = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             return (

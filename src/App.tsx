@@ -13,10 +13,8 @@ import Login from "./pages/Login";
 import CoachLogin from "./pages/CoachLogin";
 import Dashboard from "./pages/Dashboard";
 import Course from "./pages/Course";
-import Sessions from "./pages/Sessions";
 import Profile from "./pages/Profile";
 import Tracker from "./pages/Tracker";
-import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 import Mentees from "./pages/coach/Mentees";
 import CVUpload from "./pages/coach/CVUpload";
@@ -44,10 +42,8 @@ const App = () => (
           <Route path="/coach-login" element={<CoachLogin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/course" element={<Course />} />
-          <Route path="/sessions" element={<Sessions />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/tracker" element={<Tracker />} />
-          <Route path="/chat" element={<ChatPage />} />
           <Route path="/coach/mentees" element={
             <ProtectedCoachRoute>
               <Mentees />
