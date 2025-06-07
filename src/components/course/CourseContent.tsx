@@ -56,11 +56,9 @@ const CourseContent = ({ userId }: CourseContentProps) => {
       return !firstTwoCompleted;
     }
     
-    // Interview Preparation unlocks when CV Optimization AND LinkedIn & Cover Letter are both completed
+    // Interview Preparation unlocks when Job Search Strategy is completed
     if (moduleIndex === 3) {
-      const cvCompleted = isModuleCompleted('CV Optimization');
-      const linkedinCompleted = isModuleCompleted('LinkedIn & Cover Letter');
-      return !(cvCompleted && linkedinCompleted);
+      return !isModuleCompleted('Job Search Strategy');
     }
     
     // Feedback & Next Steps unlocks when Interview Preparation is completed
