@@ -21,6 +21,7 @@ interface UseCoachAvailabilityReturn {
 export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityReturn => {
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [bookedTimeSlots, setBookedTimeSlots] = useState<{ [key: string]: string[] }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,8 +31,8 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     } else {
       // If no coachId provided, set default availability for Ana
       setDefaultAvailability();
-      setLoading(false);
     }
+    fetchBookedSessions();
   }, [coachId]);
 
   const setDefaultAvailability = () => {
@@ -85,6 +86,63 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     }
   };
 
+  const fetchBookedSessions = async () => {
+    try {
+      console.log('Fetching booked sessions to check availability...');
+      
+      // Fetch all confirmed and pending sessions
+      const { data: sessions, error } = await supabase
+        .from('coaching_sessions')
+        .select('session_date, duration')
+        .in('status', ['confirmed', 'pending']);
+
+      if (error) {
+        console.error('Error fetching booked sessions:', error);
+        return;
+      }
+
+      console.log('Found booked sessions:', sessions);
+
+      // Group booked time slots by date
+      const bookedSlots: { [key: string]: string[] } = {};
+      
+      sessions?.forEach(session => {
+        const sessionDate = new Date(session.session_date);
+        const dateKey = sessionDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        
+        // Calculate the time slot
+        const startTime = sessionDate.toTimeString().slice(0, 5); // HH:MM format
+        
+        // Calculate end time based on duration
+        const endTime = new Date(sessionDate.getTime() + (session.duration || 60) * 60000);
+        const endTimeString = endTime.toTimeString().slice(0, 5);
+        
+        // Generate all 30-minute slots that overlap with this session
+        const sessionStart = new Date(`2000-01-01T${startTime}:00`);
+        const sessionEnd = new Date(`2000-01-01T${endTimeString}:00`);
+        
+        if (!bookedSlots[dateKey]) {
+          bookedSlots[dateKey] = [];
+        }
+        
+        // Add time slots that would conflict with this session
+        for (let time = new Date(sessionStart); time < sessionEnd; time.setMinutes(time.getMinutes() + 30)) {
+          const timeString = time.toTimeString().slice(0, 5);
+          if (!bookedSlots[dateKey].includes(timeString)) {
+            bookedSlots[dateKey].push(timeString);
+          }
+        }
+      });
+
+      console.log('Processed booked time slots:', bookedSlots);
+      setBookedTimeSlots(bookedSlots);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error processing booked sessions:', error);
+      setLoading(false);
+    }
+  };
+
   const getSpecificDateAvailability = (date: string): { isAvailable: boolean; times: string[] } => {
     // Week of June 9th, 2025
     const specificAvailability: { [key: string]: string[] } = {
@@ -106,9 +164,13 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     };
 
     if (specificAvailability[date]) {
+      // Filter out booked time slots
+      const bookedForDate = bookedTimeSlots[date] || [];
+      const availableTimes = specificAvailability[date].filter(time => !bookedForDate.includes(time));
+      
       return {
-        isAvailable: true,
-        times: specificAvailability[date]
+        isAvailable: availableTimes.length > 0,
+        times: availableTimes
       };
     }
 
@@ -118,7 +180,7 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
   const isDateAvailable = (date: string): boolean => {
     // Check specific date availability first
     const specificAvailability = getSpecificDateAvailability(date);
-    if (specificAvailability.isAvailable) {
+    if (specificAvailability.times.length > 0) {
       return true;
     }
 
@@ -131,7 +193,14 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     const selectedDate = new Date(date);
     const dayOfWeek = selectedDate.getDay();
     const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
-    return dayAvailability?.is_available || false;
+    
+    if (!dayAvailability?.is_available) {
+      return false;
+    }
+
+    // Check if there are any available time slots for this date after filtering booked ones
+    const availableTimesForDate = getAvailableTimesForDate(date);
+    return availableTimesForDate.length > 0;
   };
 
   const getAvailableTimesForDate = (date: string): string[] => {
@@ -167,7 +236,9 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       times.push(timeString);
     }
     
-    return times;
+    // Filter out booked time slots for this date
+    const bookedForDate = bookedTimeSlots[date] || [];
+    return times.filter(time => !bookedForDate.includes(time));
   };
 
   return {

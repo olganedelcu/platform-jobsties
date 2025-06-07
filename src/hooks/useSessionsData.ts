@@ -8,6 +8,7 @@ import { Session, SessionsDataHookReturn } from '@/types/sessions';
 export const useSessionsData = (user: any): SessionsDataHookReturn => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { toast } = useToast();
 
   const { 
@@ -35,16 +36,30 @@ export const useSessionsData = (user: any): SessionsDataHookReturn => {
     }
   };
 
+  const handleAddSessionWithRefresh = async (sessionData: any) => {
+    await handleAddSession(sessionData);
+    // Trigger a refresh of the component using the availability hook
+    setRefreshTrigger(prev => prev + 1);
+    // Also refresh the sessions list to get the latest data
+    await fetchUserSessions();
+  };
+
+  const handleDeleteSessionWithRefresh = async (sessionId: string) => {
+    await handleDeleteSession(sessionId);
+    // Trigger a refresh to update availability
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   useEffect(() => {
     fetchUserSessions();
-  }, [user]);
+  }, [user, refreshTrigger]);
 
   return {
     sessions,
     loading,
-    handleAddSession,
+    handleAddSession: handleAddSessionWithRefresh,
     handleUpdateSession,
-    handleDeleteSession,
+    handleDeleteSession: handleDeleteSessionWithRefresh,
     refetchSessions: fetchUserSessions
   };
 };

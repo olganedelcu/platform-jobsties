@@ -48,7 +48,7 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
     return false;
   }, [sessionData.date, isDateAvailable]);
 
-  // Filter time slots to only show available times
+  // Filter time slots to only show available times (already filtered for booked sessions)
   const timeSlots = useMemo(() => {
     if (availableTimesForSelectedDate.length > 0) {
       return availableTimesForSelectedDate;
@@ -75,6 +75,14 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
       updateSessionData('time', '');
     }
   }, [sessionData.date, isSelectedDateAvailable]);
+
+  // Clear time selection if the currently selected time is no longer available
+  useEffect(() => {
+    if (sessionData.time && sessionData.date && !timeSlots.includes(sessionData.time)) {
+      console.log('Selected time is no longer available, clearing selection');
+      updateSessionData('time', '');
+    }
+  }, [sessionData.time, sessionData.date, timeSlots]);
 
   // Get minimum date (today)
   const minDate = new Date().toISOString().split('T')[0];
@@ -108,6 +116,11 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
             availableTimes={availableTimesForSelectedDate}
             selectedDate={sessionData.date}
           />
+          {sessionData.date && availableTimesForSelectedDate.length === 0 && (
+            <div className="mt-2 text-sm text-orange-600">
+              All time slots for this date are already booked by other mentees.
+            </div>
+          )}
         </div>
       )}
 

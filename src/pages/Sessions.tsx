@@ -17,6 +17,7 @@ const Sessions = () => {
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
 
   const {
     sessions,
@@ -73,6 +74,8 @@ const Sessions = () => {
   const handleScheduleSession = async (sessionData: any) => {
     await handleAddSession(sessionData);
     setShowScheduleDialog(false);
+    // Force refresh of the entire component to update availability
+    setSessionRefreshKey(prev => prev + 1);
   };
 
   const handleReschedule = (sessionId: string) => {
@@ -84,6 +87,8 @@ const Sessions = () => {
 
   const handleCancel = async (sessionId: string) => {
     await handleDeleteSession(sessionId);
+    // Force refresh to update availability
+    setSessionRefreshKey(prev => prev + 1);
   };
 
   if (authLoading) {
@@ -121,6 +126,7 @@ const Sessions = () => {
             </DialogTrigger>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white w-full mx-4 sm:mx-auto">
               <ScheduleSession 
+                key={sessionRefreshKey} // Force remount to refresh availability
                 onSchedule={handleScheduleSession}
                 onCancel={() => setShowScheduleDialog(false)}
                 userId={user?.id}
