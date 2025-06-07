@@ -45,7 +45,7 @@ const CourseContent = ({ userId }: CourseContentProps) => {
 
   // Determine if a module should be locked based on dependencies
   const isModuleLocked = (moduleIndex: number) => {
-    // First two modules are always unlocked
+    // First two modules (CV Optimization and LinkedIn & Cover Letter) are always unlocked
     if (moduleIndex <= 1) return false;
     
     // Job Search Strategy unlocks when first 2 modules are completed
@@ -56,9 +56,11 @@ const CourseContent = ({ userId }: CourseContentProps) => {
       return !firstTwoCompleted;
     }
     
-    // Interview Preparation unlocks when Job Search Strategy is completed
+    // Interview Preparation unlocks when CV Optimization AND LinkedIn & Cover Letter are both completed
     if (moduleIndex === 3) {
-      return !isModuleCompleted('Job Search Strategy');
+      const cvCompleted = isModuleCompleted('CV Optimization');
+      const linkedinCompleted = isModuleCompleted('LinkedIn & Cover Letter');
+      return !(cvCompleted && linkedinCompleted);
     }
     
     // Feedback & Next Steps unlocks when Interview Preparation is completed
