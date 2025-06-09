@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 interface CourseProgress {
@@ -16,7 +15,6 @@ interface UseCourseProgressParams {
 }
 
 export const useCourseProgress = (params: UseCourseProgressParams) => {
-  const { toast } = useToast();
   const [progress, setProgress] = useState<CourseProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,14 +59,7 @@ export const useCourseProgress = (params: UseCourseProgressParams) => {
       console.error('Error fetching course progress:', error);
       setError(error.message);
       
-      // Only show toast for non-network errors to avoid spam
-      if (!error.message?.includes('Failed to fetch')) {
-        toast({
-          title: "Error",
-          description: "Failed to load course progress.",
-          variant: "destructive"
-        });
-      }
+      // No toast notifications - only console logging for developers
     } finally {
       setLoading(false);
     }
@@ -114,11 +105,8 @@ export const useCourseProgress = (params: UseCourseProgressParams) => {
       await fetchProgress(); // Refresh the progress data
     } catch (error: any) {
       console.error('Error updating course progress:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save progress.",
-        variant: "destructive"
-      });
+      
+      // No toast notifications - only console logging for developers
     }
   };
 
