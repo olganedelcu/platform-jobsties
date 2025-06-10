@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication } from '@/types/jobApplications';
 
@@ -19,28 +18,52 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     if (user.email === 'ana@jobsties.com') {
       console.log('Ana detected - fetching all applications');
       
-      // First, let's check if there are any applications at all
-      const { data: allApps, error: countError } = await supabase
+      // Let's try a different approach to check if there are applications
+      console.log('Testing direct database access...');
+      
+      // First, let's see if we can access the table at all
+      const { data: testQuery, error: testError } = await supabase
         .from('job_applications')
-        .select('count(*)', { count: 'exact' });
+        .select('id')
+        .limit(1);
 
-      console.log('Total applications in database:', allApps);
+      console.log('Test query result:', testQuery);
+      console.log('Test query error:', testError);
 
-      // Fetch all job applications for Ana
+      // Try to get count using a different method
+      const { count, error: countError } = await supabase
+        .from('job_applications')
+        .select('*', { count: 'exact', head: true });
+
+      console.log('Count result:', count);
+      console.log('Count error:', countError);
+
+      // Fetch all job applications for Ana - let's try without any filters first
       const { data: applications, error: applicationsError } = await supabase
         .from('job_applications')
-        .select('*')
-        .order('date_applied', { ascending: false });
+        .select('*');
+
+      console.log('Applications query error:', applicationsError);
+      console.log('Raw applications fetched:', applications);
+      console.log('Applications length:', applications?.length || 0);
 
       if (applicationsError) {
         console.error('Error fetching job applications:', applicationsError);
         throw applicationsError;
       }
 
-      console.log('Raw applications fetched:', applications);
-
       if (!applications || applications.length === 0) {
         console.log('No applications found in database');
+        
+        // Let's also check if there are any profiles to see if the database connection is working
+        const { data: profilesTest, error: profilesTestError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .limit(1);
+        
+        console.log('Profiles test query result:', profilesTest);
+        console.log('Profiles test query error:', profilesTestError);
+        
         return [];
       }
 
