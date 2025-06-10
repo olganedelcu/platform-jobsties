@@ -1,10 +1,9 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication } from '@/types/jobApplications';
 
 export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
   try {
-    // First fetch all job applications
+    // Fetch all job applications
     const { data: applications, error: applicationsError } = await supabase
       .from('job_applications')
       .select('*')
@@ -16,13 +15,17 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     }
 
     if (!applications || applications.length === 0) {
+      console.log('No applications found');
       return [];
     }
 
+    console.log('Found applications:', applications.length);
+
     // Get unique mentee IDs from applications
     const menteeIds = [...new Set(applications.map(app => app.mentee_id))];
-    
-    // Fetch mentee profiles separately
+    console.log('Found mentee IDs:', menteeIds);
+
+    // Fetch mentee profiles
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email')
@@ -52,6 +55,7 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       };
     });
 
+    console.log('Returning applications with profiles:', applicationsWithProfiles.length);
     return applicationsWithProfiles;
   } catch (error) {
     console.error('Error in fetchMenteeApplications:', error);
