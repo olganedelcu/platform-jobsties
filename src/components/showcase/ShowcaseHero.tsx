@@ -29,7 +29,12 @@ const ShowcaseHero = () => {
         <div className={`transition-all duration-1000 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}>
-          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-5xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-5xl mx-auto relative">
+            {/* Top Left - 80% Satisfaction */}
+            <div className="absolute top-6 left-6 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+              80% Satisfaction
+            </div>
+
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -133,6 +138,11 @@ const ShowcaseHero = () => {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+
+            {/* Bottom Right - 18K Avg Salary Boost */}
+            <div className="absolute bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium">
+              ↗ €18K Avg Salary Boost
             </div>
           </div>
         </div>
