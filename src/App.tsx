@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,6 +25,7 @@ import Mentees from "./pages/coach/Mentees";
 import CVUpload from "./pages/coach/CVUpload";
 import Applications from "./pages/coach/Applications";
 import CoachChat from "./pages/coach/CoachChat";
+import Showcase from "./pages/Showcase";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -50,6 +50,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/showcase" element={<Showcase />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/coach-login" element={<CoachLogin />} />
