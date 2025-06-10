@@ -11,7 +11,9 @@ import {
   ArrowRight,
   BookOpen,
   MessageSquare,
-  BarChart3
+  BarChart3,
+  Clock,
+  Shield
 } from 'lucide-react';
 
 const Showcase = () => {
@@ -39,30 +41,51 @@ const Showcase = () => {
     {
       icon: Users,
       title: "Expert Coaching",
-      description: "Connect with professional career coaches who guide you through every step of your job search journey."
+      description: "Connect with professional career coaches who guide you through every step of your job search journey in Germany."
     },
     {
       icon: BookOpen,
-      title: "Structured Learning",
-      description: "Access comprehensive courses covering CV optimization, interview skills, and job search strategies."
+      title: "Interview Assurance",
+      description: "We guarantee you'll get interviews with our proven CV optimization and application strategies."
     },
     {
-      icon: BarChart3,
-      title: "Progress Tracking",
-      description: "Monitor your application progress and track your career development with detailed analytics."
+      icon: Shield,
+      title: "80% Success Rate",
+      description: "Our mentees have an 80% success rate in landing their dream jobs in Germany."
     },
     {
-      icon: MessageSquare,
-      title: "Real-time Support",
-      description: "Get instant feedback and support through our integrated chat system with your coach."
+      icon: Clock,
+      title: "24/7 Support",
+      description: "Get round-the-clock support and guidance whenever you need help with your job search."
     }
   ];
 
   const stats = [
-    { number: "500+", label: "Success Stories" },
-    { number: "95%", label: "Interview Rate" },
-    { number: "50+", label: "Expert Coaches" },
+    { number: "100+", label: "Jobseekers Helped" },
+    { number: "80%", label: "Success Rate" },
+    { number: "Interview", label: "Guarantee" },
     { number: "24/7", label: "Support Available" }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah M.",
+      role: "Software Engineer",
+      content: "I never thought I could land a tech job in Germany. The team helped me turn my uncertainty into multiple offers!",
+      location: "Berlin"
+    },
+    {
+      name: "Ahmed K.",
+      role: "Marketing Manager",
+      content: "The 24/7 support was incredible. They guided me through every step and I got my dream job in just 3 months.",
+      location: "Munich"
+    },
+    {
+      name: "Maria L.",
+      role: "Data Analyst",
+      content: "From resume optimization to interview prep, they made the impossible possible. Now I'm thriving in my career!",
+      location: "Hamburg"
+    }
   ];
 
   return (
@@ -86,8 +109,8 @@ const Showcase = () => {
             currentStep >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Transform Your
-              <span className="text-blue-600 ml-3">Career Journey</span>
+              Land Your Dream Job
+              <span className="text-blue-600 ml-3">in Germany</span>
             </h1>
           </div>
 
@@ -96,7 +119,7 @@ const Showcase = () => {
             currentStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Connect with expert coaches, master essential skills, and land your dream job with our comprehensive career development platform.
+              Join 100+ successful jobseekers who've transformed their careers in Germany with our expert coaching, interview guarantee, and proven 80% success rate.
             </p>
           </div>
 
@@ -144,10 +167,10 @@ const Showcase = () => {
             currentStep >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need to Succeed
+              Why Choose Jobsties?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our platform provides all the tools and support you need to accelerate your career growth.
+              We provide guaranteed results with proven strategies tailored specifically for the German job market.
             </p>
           </div>
 
@@ -173,30 +196,65 @@ const Showcase = () => {
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Testimonials Section */}
       <section className="py-20 px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${
             currentStep >= 7 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Your Path to Success
+              Hear from Our Happy Mentees!
             </h2>
             <p className="text-xl text-gray-600">
-              Follow our proven 4-step process to transform your career
+              See how we've helped them turn uncertainty into offers and build careers they never thought possible in Germany.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className={`transition-all duration-500 ${
+                currentStep >= 8 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+              }`} style={{ transitionDelay: `${index * 150}ms` }}>
+                <CardContent className="p-6">
+                  <div className="mb-4">
+                    <p className="text-gray-600 italic mb-4">"{testimonial.content}"</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
+                        <p className="text-sm text-gray-600">{testimonial.role}</p>
+                      </div>
+                      <div className="text-sm text-blue-600 font-medium">
+                        {testimonial.location}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Your Path to Success in Germany
+            </h2>
+            <p className="text-xl text-gray-600">
+              Follow our proven 4-step process to land your dream job
             </p>
           </div>
 
           <div className="space-y-8">
             {[
-              { step: 1, title: "Sign Up & Get Matched", description: "Create your profile and get matched with an expert coach based on your career goals and industry." },
-              { step: 2, title: "Complete Your Learning Path", description: "Work through our structured course modules covering CV optimization, interview prep, and job search strategies." },
-              { step: 3, title: "Apply & Track Progress", description: "Start applying to jobs while tracking your progress and receiving real-time feedback from your coach." },
-              { step: 4, title: "Land Your Dream Job", description: "Celebrate your success and continue growing with ongoing support and career development resources." }
+              { step: 1, title: "Sign Up & Get Matched", description: "Create your profile and get matched with an expert coach specialized in the German job market." },
+              { step: 2, title: "CV Optimization & Strategy", description: "Work with your coach to optimize your CV and develop a targeted job search strategy for Germany." },
+              { step: 3, title: "Interview Preparation", description: "Get prepared for German-style interviews with our guaranteed interview assurance program." },
+              { step: 4, title: "Land Your Dream Job", description: "Celebrate your success with our 80% success rate and continue growing with ongoing support." }
             ].map((item, index) => (
-              <div key={index} className={`flex items-center gap-6 transition-all duration-500 ${
-                currentStep >= 8 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
-              }`} style={{ transitionDelay: `${index * 150}ms` }}>
+              <div key={index} className="flex items-center gap-6">
                 <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                   {item.step}
                 </div>
@@ -214,10 +272,10 @@ const Showcase = () => {
       <section className="py-20 px-6 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Transform Your Career?
+            Ready to Start Your German Career Journey?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of professionals who have already accelerated their career growth with Jobsties.
+            Join 100+ professionals who have successfully launched their careers in Germany with our proven system.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/signup">
