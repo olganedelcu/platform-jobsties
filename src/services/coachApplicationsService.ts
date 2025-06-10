@@ -34,12 +34,12 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     const assignedMenteeIds = assignments.map(assignment => assignment.mentee_id);
     console.log('Assigned mentee IDs:', assignedMenteeIds);
 
-    // Fetch job applications for assigned mentees only
+    // Fetch job applications for assigned mentees with manual join to profiles
     const { data: applications, error: applicationsError } = await supabase
       .from('job_applications')
       .select(`
         *,
-        profiles!job_applications_mentee_id_fkey (
+        profiles:mentee_id (
           first_name,
           last_name
         )
