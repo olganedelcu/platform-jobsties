@@ -25,8 +25,13 @@ const Tracker = () => {
     );
   }
 
+  // If no user but not loading, redirect will be handled by useAuthState
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Please log in to access the tracker.</div>
+      </div>
+    );
   }
 
   // Calculate statistics

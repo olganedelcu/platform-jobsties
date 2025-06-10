@@ -17,7 +17,10 @@ export const useAuthState = () => {
         
         if (!session) {
           setLoading(false);
-          navigate('/login');
+          // Only redirect to login if we're not already on a public page
+          if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
+            navigate('/login');
+          }
           return;
         }
         
@@ -26,7 +29,10 @@ export const useAuthState = () => {
       } catch (error) {
         console.error('Auth check error:', error);
         setLoading(false);
-        navigate('/login');
+        // Only redirect to login if we're not already on a public page
+        if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
+          navigate('/login');
+        }
       }
     };
 
@@ -104,7 +110,7 @@ export const useAuthState = () => {
     checkUser();
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const handleSignOut = async () => {
     try {
