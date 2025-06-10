@@ -2,11 +2,12 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, User, BarChart3, Calendar, MessageCircle, Upload } from 'lucide-react';
+import CareerSuccessVisualization from '@/components/CareerSuccessVisualization';
 
 const Showcase = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Hero Section with Device Mockup */}
+      {/* Hero Section with Career Success Visualization */}
       <section className="relative px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -25,109 +26,9 @@ const Showcase = () => {
             </p>
           </div>
 
-          {/* Desktop Mockup */}
-          <div className="relative mx-auto max-w-5xl">
-            <div className="bg-gray-800 rounded-t-xl p-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              </div>
-            </div>
-            <div className="bg-white border-x border-b border-gray-200 rounded-b-xl overflow-hidden shadow-2xl">
-              {/* Navigation Bar */}
-              <div className="bg-white border-b border-gray-200 px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-8">
-                    <img 
-                      src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                      alt="JobSties Logo" 
-                      className="h-8 w-auto"
-                    />
-                    <div className="hidden md:flex space-x-6">
-                      <div className="flex items-center text-indigo-600 bg-indigo-50 px-3 py-2 rounded-md">
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Dashboard
-                      </div>
-                      <div className="flex items-center text-gray-700 px-3 py-2">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Course
-                      </div>
-                      <div className="flex items-center text-gray-700 px-3 py-2">
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Tracker
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      JD
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dashboard Content */}
-              <div className="p-6 bg-gray-50">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-gray-900">Welcome, John!</h1>
-                  <p className="text-gray-600 mt-1">Your career development dashboard</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 rounded-lg bg-gradient-to-r from-green-600 to-teal-600">
-                          <BookOpen className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Start Career Course</h3>
-                          <p className="text-xs text-gray-600 mb-3">Begin your journey with comprehensive modules</p>
-                          <Button size="sm" className="bg-gradient-to-r from-green-600 to-teal-600 text-white text-xs">
-                            Start Learning
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600">
-                          <User className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Complete Profile</h3>
-                          <p className="text-xs text-gray-600 mb-3">Add details for personalized recommendations</p>
-                          <Button size="sm" className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-xs">
-                            Update Profile
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="p-2 rounded-lg bg-gradient-to-r from-orange-600 to-red-600">
-                          <Upload className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Track Progress</h3>
-                          <p className="text-xs text-gray-600 mb-3">Monitor your career development journey</p>
-                          <Button size="sm" className="bg-gradient-to-r from-orange-600 to-red-600 text-white text-xs">
-                            View Progress
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </div>
+          {/* Career Success Visualization */}
+          <div className="flex justify-center">
+            <CareerSuccessVisualization />
           </div>
         </div>
       </section>
