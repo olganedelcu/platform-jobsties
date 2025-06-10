@@ -76,11 +76,6 @@ const ShowcaseHero = () => {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          <Link to="/signup">
-            <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-              Start Your Journey
-            </Button>
-          </Link>
         </div>
 
         {/* Stats */}
