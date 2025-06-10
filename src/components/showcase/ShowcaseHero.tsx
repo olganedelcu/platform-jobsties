@@ -41,13 +41,7 @@ const ShowcaseHero = () => {
                 🔒 jobsites.com/dashboard
               </div>
               
-              {/* 80% Satisfaction Badge - Top Right Border */}
-              <div className="absolute -top-4 -right-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg border-2 border-white transform rotate-12">
-                <span className="flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4" />
-                  80% Satisfaction
-                </span>
-              </div>
+           
             </div>
 
             {/* Dashboard Content */}
@@ -165,13 +159,7 @@ const ShowcaseHero = () => {
               </div>
             </div>
 
-            {/* €10K Avg Salary Boost Badge - Bottom Border */}
-            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-3 rounded-full text-sm font-semibold shadow-lg border-2 border-white">
-              <span className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                €10K Avg Salary Boost
-              </span>
-            </div>
+          
           </div>
         </div>
       </div>
