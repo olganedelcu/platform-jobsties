@@ -85,7 +85,7 @@ const CareerSuccessVisualization = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm opacity-90 mb-1">"I got my dream job offer in 3 weeks!"</p>
-              <p className="text-xs opacity-75">- Sarah, Software Engineer</p>
+              <p className="text-xs opacity-75">- A., Software Engineer</p>
             </div>
             <div className="text-right">
               <div className="text-lg font-bold">$85k → $127k</div>
