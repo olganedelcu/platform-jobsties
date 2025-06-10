@@ -41,24 +41,57 @@ const MenteesContent = () => {
   const fetchMentees = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'MENTEE')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching mentees:', error);
+      
+      // Get the current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
         toast({
           title: "Error",
-          description: "Failed to fetch mentees.",
+          description: "User not authenticated.",
           variant: "destructive"
         });
         return;
       }
 
-      console.log('Fetched mentees:', data);
-      setMentees(data || []);
+      // Get mentees assigned to this coach through the coach_mentee_assignments table
+      const { data: assignments, error: assignmentsError } = await supabase
+        .from('coach_mentee_assignments')
+        .select(`
+          mentee_id,
+          profiles!coach_mentee_assignments_mentee_id_fkey (
+            id,
+            first_name,
+            last_name,
+            email,
+            created_at
+          )
+        `)
+        .eq('coach_id', user.id)
+        .eq('is_active', true);
+
+      if (assignmentsError) {
+        console.error('Error fetching coach assignments:', assignmentsError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch assigned mentees.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Transform the data to match the Mentee interface
+      const assignedMentees = assignments?.map(assignment => ({
+        id: assignment.profiles.id,
+        first_name: assignment.profiles.first_name,
+        last_name: assignment.profiles.last_name,
+        email: assignment.profiles.email,
+        created_at: assignment.profiles.created_at
+      })) || [];
+
+      console.log('Fetched assigned mentees:', assignedMentees);
+      setMentees(assignedMentees);
     } catch (error) {
       console.error('Error fetching mentees:', error);
       toast({
@@ -75,16 +108,30 @@ const MenteesContent = () => {
     setDeletingMentee(menteeId);
     
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', menteeId);
-
-      if (error) {
-        console.error('Error deleting mentee:', error);
+      // Get the current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
         toast({
           title: "Error",
-          description: "Failed to delete mentee.",
+          description: "User not authenticated.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Remove the assignment instead of deleting the mentee profile
+      const { error } = await supabase
+        .from('coach_mentee_assignments')
+        .update({ is_active: false })
+        .eq('coach_id', user.id)
+        .eq('mentee_id', menteeId);
+
+      if (error) {
+        console.error('Error removing mentee assignment:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove mentee assignment.",
           variant: "destructive"
         });
         return;
@@ -92,16 +139,16 @@ const MenteesContent = () => {
 
       toast({
         title: "Success",
-        description: `${menteeName} has been removed successfully.`,
+        description: `${menteeName} has been removed from your mentee list.`,
       });
       
       // Refresh the mentees list
       await fetchMentees();
     } catch (error) {
-      console.error('Error deleting mentee:', error);
+      console.error('Error removing mentee assignment:', error);
       toast({
         title: "Error",
-        description: "Failed to delete mentee.",
+        description: "Failed to remove mentee assignment.",
         variant: "destructive"
       });
     } finally {
@@ -112,7 +159,7 @@ const MenteesContent = () => {
   if (loading) {
     return (
       <main className="max-w-7xl mx-auto py-8 px-6">
-        <div className="text-center">Loading mentees...</div>
+        <div className="text-center">Loading assigned mentees...</div>
       </main>
     );
   }
@@ -120,19 +167,19 @@ const MenteesContent = () => {
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Mentees</h1>
-        <p className="text-gray-600 mt-2">Manage and track your mentees' progress</p>
+        <h1 className="text-3xl font-bold text-gray-900">My Assigned Mentees</h1>
+        <p className="text-gray-600 mt-2">Manage and track your assigned mentees' progress</p>
         <div className="mt-4">
           <Badge variant="outline" className="text-sm">
-            Total Mentees: {mentees.length}
+            Assigned Mentees: {mentees.length}
           </Badge>
         </div>
       </div>
 
       {mentees.length === 0 ? (
         <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No mentees yet</h2>
-          <p className="text-gray-600">Mentees will appear here when they sign up to the platform.</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No assigned mentees</h2>
+          <p className="text-gray-600">You don't have any mentees assigned to you yet. Contact your administrator to get mentees assigned.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -149,7 +196,7 @@ const MenteesContent = () => {
                     <div className="flex-1">
                       <CardTitle className="text-xl">{mentee.first_name} {mentee.last_name}</CardTitle>
                       <Badge variant="default" className="mt-1">
-                        Active
+                        Assigned
                       </Badge>
                     </div>
                   </div>
@@ -166,10 +213,10 @@ const MenteesContent = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Mentee</AlertDialogTitle>
+                        <AlertDialogTitle>Remove Mentee Assignment</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to remove {mentee.first_name} {mentee.last_name} from the platform? 
-                          This action cannot be undone and will permanently delete their account and all associated data.
+                          Are you sure you want to remove {mentee.first_name} {mentee.last_name} from your assigned mentees? 
+                          This will not delete their account, but you will no longer be their assigned coach.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -178,7 +225,7 @@ const MenteesContent = () => {
                           onClick={() => handleDeleteMentee(mentee.id, `${mentee.first_name} ${mentee.last_name}`)}
                           className="bg-red-600 hover:bg-red-700"
                         >
-                          Delete
+                          Remove Assignment
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

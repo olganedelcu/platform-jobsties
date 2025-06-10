@@ -37,7 +37,13 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     // Fetch job applications for assigned mentees only
     const { data: applications, error: applicationsError } = await supabase
       .from('job_applications')
-      .select('*')
+      .select(`
+        *,
+        profiles!job_applications_mentee_id_fkey (
+          first_name,
+          last_name
+        )
+      `)
       .in('mentee_id', assignedMenteeIds)
       .order('date_applied', { ascending: false });
 
@@ -52,42 +58,9 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     }
 
     console.log('Found applications:', applications.length);
+    console.log('Applications with profiles:', applications);
 
-    // Fetch mentee profiles for the applications
-    const menteeIds = [...new Set(applications.map(app => app.mentee_id))];
-    console.log('Mentee IDs from applications:', menteeIds);
-
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('id, first_name, last_name, email')
-      .in('id', menteeIds);
-
-    if (profilesError) {
-      console.error('Error fetching mentee profiles:', profilesError);
-      throw profilesError;
-    }
-
-    // Create a map of mentee profiles for easy lookup
-    const profileMap = new Map();
-    profiles?.forEach(profile => {
-      profileMap.set(profile.id, profile);
-    });
-
-    // Transform applications to include mentee information
-    const applicationsWithProfiles = applications.map(application => {
-      const menteeProfile = profileMap.get(application.mentee_id);
-      
-      return {
-        ...application,
-        profiles: menteeProfile ? {
-          first_name: menteeProfile.first_name,
-          last_name: menteeProfile.last_name
-        } : null
-      };
-    });
-
-    console.log('Returning applications with profiles:', applicationsWithProfiles.length);
-    return applicationsWithProfiles;
+    return applications;
   } catch (error) {
     console.error('Error in fetchMenteeApplications:', error);
     throw error;

@@ -32,7 +32,7 @@ export const useMentees = () => {
         return;
       }
 
-      // First, get the mentees assigned to this coach
+      // Get the mentees assigned to this coach using the coach_mentee_assignments table
       const { data: assignments, error: assignmentsError } = await supabase
         .from('coach_mentee_assignments')
         .select(`
@@ -65,6 +65,7 @@ export const useMentees = () => {
         email: assignment.profiles.email
       })) || [];
 
+      console.log('Fetched assigned mentees:', assignedMentees);
       setMentees(assignedMentees);
     } catch (error) {
       console.error('Error fetching mentees:', error);
