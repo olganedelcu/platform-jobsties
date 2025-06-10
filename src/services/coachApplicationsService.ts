@@ -19,6 +19,13 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     if (user.email === 'ana@jobsties.com') {
       console.log('Ana detected - fetching all applications');
       
+      // First, let's check if there are any applications at all
+      const { data: allApps, error: countError } = await supabase
+        .from('job_applications')
+        .select('count(*)', { count: 'exact' });
+
+      console.log('Total applications in database:', allApps);
+
       // Fetch all job applications for Ana
       const { data: applications, error: applicationsError } = await supabase
         .from('job_applications')
@@ -30,13 +37,16 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
         throw applicationsError;
       }
 
+      console.log('Raw applications fetched:', applications);
+
       if (!applications || applications.length === 0) {
-        console.log('No applications found');
+        console.log('No applications found in database');
         return [];
       }
 
       // Get all unique mentee IDs from applications
       const menteeIds = [...new Set(applications.map(app => app.mentee_id))];
+      console.log('Unique mentee IDs:', menteeIds);
       
       // Fetch profile information for each mentee
       const { data: profiles, error: profilesError } = await supabase
@@ -46,8 +56,10 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
-        throw profilesError;
+        // Don't throw error, just continue without profile data
       }
+
+      console.log('Profiles fetched:', profiles);
 
       // Combine applications with profile data
       const applicationsWithProfiles = applications.map(application => ({
@@ -56,6 +68,7 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       }));
 
       console.log('Found applications for Ana:', applicationsWithProfiles.length);
+      console.log('Applications with profiles:', applicationsWithProfiles);
       return applicationsWithProfiles;
     }
 
@@ -105,7 +118,7 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
 
     if (profilesError) {
       console.error('Error fetching profiles:', profilesError);
-      throw profilesError;
+      // Don't throw error, just continue without profile data
     }
 
     // Combine applications with profile data
