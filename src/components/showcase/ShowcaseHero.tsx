@@ -65,14 +65,6 @@ const ShowcaseHero = () => {
           </p>
         </div>
 
-        {/* Subtitle */}
-        <div className={`transition-all duration-1000 delay-500 ${
-          currentStep >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
-          <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
-            Join 100+ successful jobseekers who've transformed their careers in Germany with our expert coaching, interview guarantee, and proven 80% success rate.
-          </p>
-        </div>
 
         {/* CTA Buttons */}
         <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 transition-all duration-1000 delay-700 ${
