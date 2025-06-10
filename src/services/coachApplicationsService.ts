@@ -18,34 +18,11 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     if (user.email === 'ana@jobsties.com') {
       console.log('Ana detected - fetching all applications');
       
-      // Let's try a different approach to check if there are applications
-      console.log('Testing direct database access...');
-      
-      // First, let's see if we can access the table at all
-      const { data: testQuery, error: testError } = await supabase
-        .from('job_applications')
-        .select('id')
-        .limit(1);
-
-      console.log('Test query result:', testQuery);
-      console.log('Test query error:', testError);
-
-      // Try to get count using a different method
-      const { count, error: countError } = await supabase
-        .from('job_applications')
-        .select('*', { count: 'exact', head: true });
-
-      console.log('Count result:', count);
-      console.log('Count error:', countError);
-
-      // Fetch all job applications for Ana - let's try without any filters first
+      // Fetch all job applications for Ana (RLS policies will handle access)
       const { data: applications, error: applicationsError } = await supabase
         .from('job_applications')
-        .select('*');
-
-      console.log('Applications query error:', applicationsError);
-      console.log('Raw applications fetched:', applications);
-      console.log('Applications length:', applications?.length || 0);
+        .select('*')
+        .order('date_applied', { ascending: false });
 
       if (applicationsError) {
         console.error('Error fetching job applications:', applicationsError);
@@ -54,16 +31,6 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
 
       if (!applications || applications.length === 0) {
         console.log('No applications found in database');
-        
-        // Let's also check if there are any profiles to see if the database connection is working
-        const { data: profilesTest, error: profilesTestError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name')
-          .limit(1);
-        
-        console.log('Profiles test query result:', profilesTest);
-        console.log('Profiles test query error:', profilesTestError);
-        
         return [];
       }
 
@@ -91,7 +58,6 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       }));
 
       console.log('Found applications for Ana:', applicationsWithProfiles.length);
-      console.log('Applications with profiles:', applicationsWithProfiles);
       return applicationsWithProfiles;
     }
 
@@ -151,7 +117,6 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     }));
 
     console.log('Found applications:', applicationsWithProfiles.length);
-    console.log('Applications with profiles:', applicationsWithProfiles);
 
     return applicationsWithProfiles;
   } catch (error) {
