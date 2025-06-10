@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -142,9 +141,9 @@ const Showcase = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link to="/coach-signup">
+            <Link to="/signup">
               <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-                Become a Coach
+                Start Your Journey
               </Button>
             </Link>
           </div>
