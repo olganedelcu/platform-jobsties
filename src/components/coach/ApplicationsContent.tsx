@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
+import { useCoachApplicationActions } from '@/hooks/useCoachApplicationActions';
 import MenteeApplicationsList from '@/components/coach/MenteeApplicationsList';
 import ApplicationDetailView from '@/components/coach/ApplicationDetailView';
 import { JobApplication } from '@/types/jobApplications';
 
 const ApplicationsContent = () => {
-  const { applications, loading } = useCoachApplications();
+  const { applications, loading, refetchApplications } = useCoachApplications();
+  const { handleUpdateApplication } = useCoachApplicationActions(applications, refetchApplications);
   const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
 
   const handleViewDetails = (application: JobApplication) => {
@@ -15,6 +17,14 @@ const ApplicationsContent = () => {
 
   const handleBackToList = () => {
     setSelectedApplication(null);
+  };
+
+  const handleApplicationUpdate = async (applicationId: string, updates: Partial<JobApplication>) => {
+    await handleUpdateApplication(applicationId, updates);
+    // Update the selected application with the new data
+    if (selectedApplication && selectedApplication.id === applicationId) {
+      setSelectedApplication(prev => prev ? { ...prev, ...updates } : null);
+    }
   };
 
   if (loading) {
@@ -33,6 +43,7 @@ const ApplicationsContent = () => {
         <ApplicationDetailView 
           application={selectedApplication} 
           onBack={handleBackToList}
+          onUpdate={handleApplicationUpdate}
         />
       ) : (
         <>

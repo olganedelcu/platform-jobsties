@@ -16,10 +16,6 @@ const Applications = () => {
     );
   }
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <ProtectedCoachRoute>
       <div className="min-h-screen bg-gray-50">
