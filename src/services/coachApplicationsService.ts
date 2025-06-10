@@ -13,7 +13,53 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     }
 
     console.log('Current user ID:', user.id);
+    console.log('Current user email:', user.email);
 
+    // Check if this is ana@jobsties.com - if so, show all applications
+    if (user.email === 'ana@jobsties.com') {
+      console.log('Ana detected - fetching all applications');
+      
+      // Fetch all job applications for Ana
+      const { data: applications, error: applicationsError } = await supabase
+        .from('job_applications')
+        .select('*')
+        .order('date_applied', { ascending: false });
+
+      if (applicationsError) {
+        console.error('Error fetching job applications:', applicationsError);
+        throw applicationsError;
+      }
+
+      if (!applications || applications.length === 0) {
+        console.log('No applications found');
+        return [];
+      }
+
+      // Get all unique mentee IDs from applications
+      const menteeIds = [...new Set(applications.map(app => app.mentee_id))];
+      
+      // Fetch profile information for each mentee
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name')
+        .in('id', menteeIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Combine applications with profile data
+      const applicationsWithProfiles = applications.map(application => ({
+        ...application,
+        profiles: profiles?.find(profile => profile.id === application.mentee_id) || null
+      }));
+
+      console.log('Found applications for Ana:', applicationsWithProfiles.length);
+      return applicationsWithProfiles;
+    }
+
+    // For other coaches, use the existing assignment-based logic
     // First, get the mentees assigned to this coach
     const { data: assignments, error: assignmentsError } = await supabase
       .from('coach_mentee_assignments')

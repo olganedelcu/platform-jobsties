@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useAuthState = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +39,7 @@ export const useAuthState = () => {
           setUser(session.user);
           setLoading(false);
           
-          // Redirect based on user role after login or signup confirmation
+          // Only redirect on SIGNED_IN event (login/signup), not on page reload
           if (event === 'SIGNED_IN') {
             try {
               // First check the user's role from metadata for faster response
