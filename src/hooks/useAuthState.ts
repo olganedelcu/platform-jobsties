@@ -19,7 +19,13 @@ export const useAuthState = () => {
           setLoading(false);
           // Only redirect to login if we're not already on a public page
           if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
-            navigate('/login');
+            // Check if user was on a protected page that should preserve state
+            const protectedPaths = ['/coach/applications', '/tracker', '/coach/mentees'];
+            const isOnProtectedPath = protectedPaths.some(path => location.pathname.startsWith(path));
+            
+            if (!isOnProtectedPath) {
+              navigate('/login');
+            }
           }
           return;
         }
@@ -31,7 +37,13 @@ export const useAuthState = () => {
         setLoading(false);
         // Only redirect to login if we're not already on a public page
         if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
-          navigate('/login');
+          // Don't redirect if user is on a page that should preserve state
+          const protectedPaths = ['/coach/applications', '/tracker', '/coach/mentees'];
+          const isOnProtectedPath = protectedPaths.some(path => location.pathname.startsWith(path));
+          
+          if (!isOnProtectedPath) {
+            navigate('/login');
+          }
         }
       }
     };
@@ -47,6 +59,18 @@ export const useAuthState = () => {
           
           // Only redirect on SIGNED_IN event (login/signup), not on page reload
           if (event === 'SIGNED_IN') {
+            // Check if user is already on a valid page for their role
+            const currentPath = location.pathname;
+            const userRole = session.user.user_metadata?.role;
+            
+            // Don't redirect if already on the correct dashboard
+            if (userRole === 'COACH' && currentPath.startsWith('/coach/')) {
+              return; // Stay on current coach page
+            }
+            if (userRole !== 'COACH' && (currentPath === '/dashboard' || currentPath === '/tracker')) {
+              return; // Stay on current mentee page
+            }
+            
             try {
               // First check the user's role from metadata for faster response
               const userRoleFromMetadata = session.user.user_metadata?.role;
@@ -101,6 +125,14 @@ export const useAuthState = () => {
           setUser(null);
           setLoading(false);
           if (event === 'SIGNED_OUT') {
+            // Clear any preserved state when signing out
+            try {
+              localStorage.removeItem('coach-applications-selected');
+              localStorage.removeItem('coach-applications-view-mode');
+              localStorage.removeItem('tracker-scroll-position');
+            } catch (error) {
+              console.error('Failed to clear localStorage on sign out:', error);
+            }
             navigate('/');
           }
         }
@@ -114,6 +146,15 @@ export const useAuthState = () => {
 
   const handleSignOut = async () => {
     try {
+      // Clear localStorage before signing out
+      try {
+        localStorage.removeItem('coach-applications-selected');
+        localStorage.removeItem('coach-applications-view-mode');
+        localStorage.removeItem('tracker-scroll-position');
+      } catch (error) {
+        console.error('Failed to clear localStorage on manual sign out:', error);
+      }
+      
       await supabase.auth.signOut();
       navigate('/');
     } catch (error) {

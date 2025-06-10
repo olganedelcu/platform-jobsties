@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import Navigation from '@/components/Navigation';
@@ -17,7 +17,48 @@ const Tracker = () => {
     handleDeleteApplication
   } = useJobApplicationsData(user);
 
-  if (authLoading) {
+  // Preserve scroll position and form state
+  const [isPageReady, setIsPageReady] = useState(false);
+
+  useEffect(() => {
+    // Restore scroll position when page loads
+    const savedScrollPosition = localStorage.getItem('tracker-scroll-position');
+    if (savedScrollPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+      }, 100);
+    }
+    setIsPageReady(true);
+  }, []);
+
+  useEffect(() => {
+    // Save scroll position periodically
+    const handleScroll = () => {
+      try {
+        localStorage.setItem('tracker-scroll-position', window.scrollY.toString());
+      } catch (error) {
+        console.error('Failed to save scroll position:', error);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        localStorage.removeItem('tracker-scroll-position');
+      } catch (error) {
+        console.error('Failed to clean up tracker localStorage:', error);
+      }
+    };
+  }, []);
+
+  if (authLoading || !isPageReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -25,7 +66,7 @@ const Tracker = () => {
     );
   }
 
-  // If no user but not loading, redirect will be handled by useAuthState
+  // If no user but not loading, show message without redirecting
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">

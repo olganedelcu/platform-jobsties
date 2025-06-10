@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import { useCoachApplicationActions } from '@/hooks/useCoachApplicationActions';
 import MenteeApplicationsList from '@/components/coach/MenteeApplicationsList';
@@ -12,8 +12,54 @@ import { Grid, List } from 'lucide-react';
 const ApplicationsContent = () => {
   const { applications, loading, refetchApplications } = useCoachApplications();
   const { handleUpdateApplication } = useCoachApplicationActions(applications, refetchApplications);
-  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // State preservation using localStorage
+  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(() => {
+    try {
+      const saved = localStorage.getItem('coach-applications-selected');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    try {
+      const saved = localStorage.getItem('coach-applications-view-mode');
+      return saved ? JSON.parse(saved) : 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('coach-applications-selected', JSON.stringify(selectedApplication));
+    } catch (error) {
+      console.error('Failed to save selected application to localStorage:', error);
+    }
+  }, [selectedApplication]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('coach-applications-view-mode', JSON.stringify(viewMode));
+    } catch (error) {
+      console.error('Failed to save view mode to localStorage:', error);
+    }
+  }, [viewMode]);
+
+  // Clean up localStorage when component unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        localStorage.removeItem('coach-applications-selected');
+        localStorage.removeItem('coach-applications-view-mode');
+      } catch (error) {
+        console.error('Failed to clean up localStorage:', error);
+      }
+    };
+  }, []);
 
   const handleViewDetails = (application: JobApplication) => {
     setSelectedApplication(application);
