@@ -88,7 +88,7 @@ const CareerSuccessVisualization = () => {
               <p className="text-xs opacity-75">- D., Product Owner</p>
             </div>
             <div className="text-right">
-              <div className="text-lg font-bold">$85k → $127k</div>
+              <div className="text-lg font-bold">€85k → €99.6K</div>
               <div className="text-xs opacity-75">Salary Jump</div>
             </div>
           </div>
