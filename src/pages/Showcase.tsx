@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, User, BarChart3, Calendar, MessageCircle, Upload } from 'lucide-react';
 import CareerSuccessVisualization from '@/components/CareerSuccessVisualization';
 import JobTrackingDashboard from '@/components/JobTrackingDashboard';
+import AppleInspiredMockup from '@/components/AppleInspiredMockup';
 
 const Showcase = () => {
   return (
@@ -36,6 +37,20 @@ const Showcase = () => {
           {/* Job Tracking Dashboard */}
           <div className="flex justify-center">
             <JobTrackingDashboard />
+          </div>
+        </div>
+      </section>
+
+      {/* Apple-Inspired Dashboard Section */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Elegant Dashboard Experience</h2>
+            <p className="text-xl text-gray-600">Clean, intuitive interface designed for productivity</p>
+          </div>
+
+          <div className="flex justify-center">
+            <AppleInspiredMockup />
           </div>
         </div>
       </section>
