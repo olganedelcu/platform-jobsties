@@ -89,7 +89,7 @@ const Showcase = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
+    <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section with Animation */}
       <section className="relative min-h-screen flex items-center justify-center px-6">
         <div className="max-w-6xl mx-auto text-center">
@@ -114,18 +114,27 @@ const Showcase = () => {
             </h1>
           </div>
 
-          {/* Subtitle */}
-          <div className={`transition-all duration-1000 delay-500 ${
+          {/* New descriptive text */}
+          <div className={`transition-all duration-1000 delay-400 ${
             currentStep >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-700 mb-6 max-w-4xl mx-auto leading-relaxed">
+              We help professionals stop playing small, own their worth, and win in today's job market without second-guessing their every move. Want to learn how it works? Book a call to see if you qualify!
+            </p>
+          </div>
+
+          {/* Subtitle */}
+          <div className={`transition-all duration-1000 delay-500 ${
+            currentStep >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
+            <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
               Join 100+ successful jobseekers who've transformed their careers in Germany with our expert coaching, interview guarantee, and proven 80% success rate.
             </p>
           </div>
 
           {/* CTA Buttons */}
           <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 transition-all duration-1000 delay-700 ${
-            currentStep >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            currentStep >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <Link to="/signup">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
@@ -142,7 +151,7 @@ const Showcase = () => {
 
           {/* Stats */}
           <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 transition-all duration-1000 delay-900 ${
-            currentStep >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            currentStep >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
@@ -155,8 +164,8 @@ const Showcase = () => {
 
         {/* Background Animation Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
         </div>
       </section>
 
@@ -164,7 +173,7 @@ const Showcase = () => {
       <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${
-            currentStep >= 5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            currentStep >= 6 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Why Choose Jobsties?
@@ -177,7 +186,7 @@ const Showcase = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className={`text-center hover:shadow-lg transition-all duration-500 ${
-                currentStep >= 6 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                currentStep >= 7 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`} style={{ transitionDelay: `${index * 100}ms` }}>
                 <CardContent className="p-6">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -200,7 +209,7 @@ const Showcase = () => {
       <section className="py-20 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className={`text-center mb-16 transition-all duration-1000 ${
-            currentStep >= 7 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            currentStep >= 8 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Hear from Our Happy Mentees!
@@ -213,7 +222,7 @@ const Showcase = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className={`transition-all duration-500 ${
-                currentStep >= 8 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                currentStep >= 9 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`} style={{ transitionDelay: `${index * 150}ms` }}>
                 <CardContent className="p-6">
                   <div className="mb-4">
