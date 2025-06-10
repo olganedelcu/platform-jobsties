@@ -34,16 +34,10 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     const assignedMenteeIds = assignments.map(assignment => assignment.mentee_id);
     console.log('Assigned mentee IDs:', assignedMenteeIds);
 
-    // Fetch job applications for assigned mentees with manual join to profiles
+    // Fetch job applications for assigned mentees
     const { data: applications, error: applicationsError } = await supabase
       .from('job_applications')
-      .select(`
-        *,
-        profiles:mentee_id (
-          first_name,
-          last_name
-        )
-      `)
+      .select('*')
       .in('mentee_id', assignedMenteeIds)
       .order('date_applied', { ascending: false });
 
@@ -57,10 +51,27 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       return [];
     }
 
-    console.log('Found applications:', applications.length);
-    console.log('Applications with profiles:', applications);
+    // Fetch profile information for each mentee
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .in('id', assignedMenteeIds);
 
-    return applications;
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+      throw profilesError;
+    }
+
+    // Combine applications with profile data
+    const applicationsWithProfiles = applications.map(application => ({
+      ...application,
+      profiles: profiles?.find(profile => profile.id === application.mentee_id) || null
+    }));
+
+    console.log('Found applications:', applicationsWithProfiles.length);
+    console.log('Applications with profiles:', applicationsWithProfiles);
+
+    return applicationsWithProfiles;
   } catch (error) {
     console.error('Error in fetchMenteeApplications:', error);
     throw error;

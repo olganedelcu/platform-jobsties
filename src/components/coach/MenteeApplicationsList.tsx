@@ -2,15 +2,17 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Building2, User, Briefcase, Phone } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Building2, User, Briefcase, Phone, Eye } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
 
 interface MenteeApplicationsListProps {
   applications: JobApplication[];
+  onViewDetails?: (application: JobApplication) => void;
 }
 
-const MenteeApplicationsList = ({ applications }: MenteeApplicationsListProps) => {
+const MenteeApplicationsList = ({ applications, onViewDetails }: MenteeApplicationsListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
@@ -63,9 +65,22 @@ const MenteeApplicationsList = ({ applications }: MenteeApplicationsListProps) =
                   </div>
                 </div>
               </div>
-              <Badge className={getStatusColor(application.application_status)}>
-                {application.application_status.replace('_', ' ').toUpperCase()}
-              </Badge>
+              <div className="flex items-center space-x-2">
+                <Badge className={getStatusColor(application.application_status)}>
+                  {application.application_status.replace('_', ' ').toUpperCase()}
+                </Badge>
+                {onViewDetails && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onViewDetails(application)}
+                    className="flex items-center space-x-1"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View Details</span>
+                  </Button>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-6">
@@ -90,7 +105,7 @@ const MenteeApplicationsList = ({ applications }: MenteeApplicationsListProps) =
               {application.coach_notes && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Notes</h4>
-                  <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                  <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md line-clamp-3">
                     {application.coach_notes}
                   </div>
                 </div>
