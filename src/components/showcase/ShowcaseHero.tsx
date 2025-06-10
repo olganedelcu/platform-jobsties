@@ -111,7 +111,7 @@ const ShowcaseHero = () => {
                       <div>
                         <h3 className="text-base font-semibold text-gray-900 mb-3">Recent Activity</h3>
                         <div className="bg-green-500 text-white px-3 py-1.5 rounded-full inline-flex items-center text-xs font-medium">
-                          ↗ €18K Avg Salary Boost
+                          ↗ €10K Avg Salary Boost
                         </div>
                       </div>
                     </div>
@@ -126,7 +126,7 @@ const ShowcaseHero = () => {
                             <span className="font-medium text-gray-900 text-sm">Next Session</span>
                           </div>
                           <div className="text-xs text-gray-600 mb-1">Today, 2:00 PM</div>
-                          <div className="text-xs font-medium text-blue-600 mb-3">Sarah Johnson</div>
+                          <div className="text-xs font-medium text-blue-600 mb-3">Ana Nedelcu</div>
                           <div className="flex justify-end">
                             <div className="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
                               <Play className="w-2.5 h-2.5 text-blue-600 fill-current" />
