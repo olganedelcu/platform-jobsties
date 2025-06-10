@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, User, BarChart3, Calendar, MessageCircle, Upload } from 'lucide-react';
 import CareerSuccessVisualization from '@/components/CareerSuccessVisualization';
+import JobTrackingDashboard from '@/components/JobTrackingDashboard';
 
 const Showcase = () => {
   return (
@@ -27,8 +29,13 @@ const Showcase = () => {
           </div>
 
           {/* Career Success Visualization */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-16">
             <CareerSuccessVisualization />
+          </div>
+
+          {/* Job Tracking Dashboard */}
+          <div className="flex justify-center">
+            <JobTrackingDashboard />
           </div>
         </div>
       </section>
