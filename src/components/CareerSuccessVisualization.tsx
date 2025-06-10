@@ -16,7 +16,7 @@ const CareerSuccessVisualization = () => {
         {/* Success Metrics */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-green-600 mb-1">92%</div>
+            <div className="text-2xl font-bold text-green-600 mb-1">80%</div>
             <div className="text-xs text-gray-600">Success Rate</div>
           </div>
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
