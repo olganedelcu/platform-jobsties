@@ -18,23 +18,54 @@ export const useMentees = () => {
   const fetchMentees = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email')
-        .eq('role', 'MENTEE')
-        .order('first_name', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching mentees:', error);
+      
+      // Get the current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
         toast({
           title: "Error",
-          description: "Failed to fetch mentees.",
+          description: "User not authenticated.",
           variant: "destructive"
         });
         return;
       }
 
-      setMentees(data || []);
+      // First, get the mentees assigned to this coach
+      const { data: assignments, error: assignmentsError } = await supabase
+        .from('coach_mentee_assignments')
+        .select(`
+          mentee_id,
+          profiles!coach_mentee_assignments_mentee_id_fkey (
+            id,
+            first_name,
+            last_name,
+            email
+          )
+        `)
+        .eq('coach_id', user.id)
+        .eq('is_active', true);
+
+      if (assignmentsError) {
+        console.error('Error fetching coach assignments:', assignmentsError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch assigned mentees.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Transform the data to match the Mentee interface
+      const assignedMentees = assignments?.map(assignment => ({
+        id: assignment.profiles.id,
+        first_name: assignment.profiles.first_name,
+        last_name: assignment.profiles.last_name,
+        email: assignment.profiles.email
+      })) || [];
+
+      setMentees(assignedMentees);
     } catch (error) {
       console.error('Error fetching mentees:', error);
       toast({

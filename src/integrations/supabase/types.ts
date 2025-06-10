@@ -132,6 +132,45 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_mentee_assignments: {
+        Row: {
+          assigned_at: string
+          coach_id: string
+          id: string
+          is_active: boolean
+          mentee_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          coach_id: string
+          id?: string
+          is_active?: boolean
+          mentee_id: string
+        }
+        Update: {
+          assigned_at?: string
+          coach_id?: string
+          id?: string
+          is_active?: boolean
+          mentee_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_mentee_assignments_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coach_mentee_assignments_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_todos: {
         Row: {
           coach_id: string
