@@ -20,11 +20,11 @@ const CareerSuccessVisualization = () => {
             <div className="text-xs text-gray-600">Success Rate</div>
           </div>
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-blue-600 mb-1">3.2x</div>
+            <div className="text-2xl font-bold text-blue-600 mb-1">1.2x</div>
             <div className="text-xs text-gray-600">Salary Increase</div>
           </div>
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <div className="text-2xl font-bold text-purple-600 mb-1">21</div>
+            <div className="text-2xl font-bold text-purple-600 mb-1">45</div>
             <div className="text-xs text-gray-600">Days Average</div>
           </div>
         </div>
