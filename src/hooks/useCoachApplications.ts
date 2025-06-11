@@ -11,10 +11,14 @@ export const useCoachApplications = () => {
 
   const fetchApplications = async () => {
     try {
+      console.log('Hook: Starting fetchApplications...');
       setLoading(true);
       const applicationsData = await fetchMenteeApplications();
-      console.log('Fetched applications:', applicationsData);
+      console.log('Hook: Fetched applications data:', applicationsData);
+      console.log('Hook: Applications count:', applicationsData.length);
+      console.log('Hook: Application IDs:', applicationsData.map(app => app.id));
       setApplications(applicationsData);
+      console.log('Hook: Applications state updated');
     } catch (error) {
       console.error('Error fetching mentee applications:', error);
       toast({
@@ -24,6 +28,7 @@ export const useCoachApplications = () => {
       });
     } finally {
       setLoading(false);
+      console.log('Hook: Loading set to false');
     }
   };
 
