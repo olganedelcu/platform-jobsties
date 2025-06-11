@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import { useMentees } from '@/hooks/useMentees';
+import { useCoachApplicationActions } from '@/hooks/useCoachApplicationActions';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Grid, List } from 'lucide-react';
@@ -10,10 +11,15 @@ import MenteeApplicationsList from './MenteeApplicationsList';
 import MenteeApplicationsSearch from './MenteeApplicationsSearch';
 
 const ApplicationsContent = () => {
-  const { applications, loading: applicationsLoading } = useCoachApplications();
+  const { applications, loading: applicationsLoading, refetchApplications } = useCoachApplications();
   const { mentees, loading: menteesLoading } = useMentees();
   const [activeTab, setActiveTab] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
+
+  const { handleUpdateApplication, handleDeleteApplication } = useCoachApplicationActions(
+    applications,
+    refetchApplications
+  );
 
   if (applicationsLoading || menteesLoading) {
     return (
@@ -89,8 +95,8 @@ const ApplicationsContent = () => {
 
         <TabsContent value="list" className="space-y-6">
           <MenteeApplicationsList
-            mentees={menteesWithApplications}
-            applicationsByMentee={applicationsByMentee}
+            applications={filteredApplications}
+            onDeleteApplication={handleDeleteApplication}
           />
         </TabsContent>
       </Tabs>
