@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { JobApplication } from '@/types/jobApplications';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Building2, User, Briefcase, Phone, Eye, Trash2 } from 'lucide-react';
-import { JobApplication } from '@/types/jobApplications';
+import { Eye, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface MenteeApplicationsListProps {
@@ -13,7 +13,11 @@ interface MenteeApplicationsListProps {
   onDeleteApplication?: (applicationId: string) => void;
 }
 
-const MenteeApplicationsList = ({ applications, onViewDetails, onDeleteApplication }: MenteeApplicationsListProps) => {
+const MenteeApplicationsList = ({ 
+  applications, 
+  onViewDetails, 
+  onDeleteApplication 
+}: MenteeApplicationsListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
@@ -28,58 +32,52 @@ const MenteeApplicationsList = ({ applications, onViewDetails, onDeleteApplicati
 
   if (applications.length === 0) {
     return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Applications Found</h3>
-          <p className="text-gray-500">No mentee job applications to review at this time.</p>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8">
+        <p className="text-gray-600">No applications found for this mentee.</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {applications.map((application) => (
-        <Card key={application.id} className="overflow-hidden">
-          <CardHeader className="bg-gray-50">
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-indigo-600" />
-                  <span>
-                    {application.profiles?.first_name} {application.profiles?.last_name}
-                  </span>
-                </CardTitle>
-                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <Building2 className="h-4 w-4" />
-                    <span>{application.company_name}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Briefcase className="h-4 w-4" />
-                    <span>{application.job_title}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{format(new Date(application.date_applied), 'MMM dd, yyyy')}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
+    <div className="border rounded-lg">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date Applied</TableHead>
+            <TableHead>Company</TableHead>
+            <TableHead>Position</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Interview Stage</TableHead>
+            <TableHead>Recruiter</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {applications.map((application) => (
+            <TableRow key={application.id}>
+              <TableCell>
+                {format(new Date(application.date_applied), 'MMM dd, yyyy')}
+              </TableCell>
+              <TableCell className="font-medium">
+                {application.company_name}
+              </TableCell>
+              <TableCell>{application.job_title}</TableCell>
+              <TableCell>
                 <Badge className={getStatusColor(application.application_status)}>
                   {application.application_status.replace('_', ' ').toUpperCase()}
                 </Badge>
-                <div className="flex items-center space-x-1">
+              </TableCell>
+              <TableCell>{application.interview_stage || '-'}</TableCell>
+              <TableCell>{application.recruiter_name || '-'}</TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-2">
                   {onViewDetails && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onViewDetails(application)}
-                      className="flex items-center space-x-1"
                     >
                       <Eye className="h-4 w-4" />
-                      <span>View Details</span>
                     </Button>
                   )}
                   {onDeleteApplication && (
@@ -87,47 +85,17 @@ const MenteeApplicationsList = ({ applications, onViewDetails, onDeleteApplicati
                       variant="outline"
                       size="sm"
                       onClick={() => onDeleteApplication(application.id)}
-                      className="flex items-center space-x-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span>Remove</span>
                     </Button>
                   )}
                 </div>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                {application.interview_stage && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-1">Interview Stage</h4>
-                    <p className="text-sm text-gray-900">{application.interview_stage}</p>
-                  </div>
-                )}
-                {application.recruiter_name && (
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-1 flex items-center space-x-1">
-                      <Phone className="h-4 w-4" />
-                      <span>Recruiter</span>
-                    </h4>
-                    <p className="text-sm text-gray-900">{application.recruiter_name}</p>
-                  </div>
-                )}
-              </div>
-              {application.coach_notes && (
-                <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Notes</h4>
-                  <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md line-clamp-3">
-                    {application.coach_notes}
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

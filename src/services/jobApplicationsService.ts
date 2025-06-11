@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 
@@ -26,7 +27,8 @@ export const addJobApplication = async (userId: string, applicationData: NewJobA
       application_status: applicationData.applicationStatus,
       interview_stage: applicationData.interviewStage || null,
       recruiter_name: applicationData.recruiterName || null,
-      coach_notes: applicationData.coachNotes || null
+      coach_notes: applicationData.coachNotes || null,
+      mentee_notes: applicationData.menteeNotes || null
     })
     .select()
     .single();
@@ -52,8 +54,8 @@ export const updateJobApplication = async (userId: string, applicationId: string
 
 export const deleteJobApplication = async (userId: string, applicationId: string): Promise<void> => {
   const { error } = await supabase
-    .from('job_applications')
     .delete()
+    .from('job_applications')
     .eq('id', applicationId)
     .eq('mentee_id', userId);
 

@@ -35,7 +35,8 @@ const ExcelLikeJobApplicationsTable = ({
     applicationStatus: 'applied',
     interviewStage: '',
     recruiterName: '',
-    coachNotes: ''
+    coachNotes: '',
+    menteeNotes: ''
   });
 
   const {
@@ -67,7 +68,8 @@ const ExcelLikeJobApplicationsTable = ({
         applicationStatus: 'applied',
         interviewStage: '',
         recruiterName: '',
-        coachNotes: ''
+        coachNotes: '',
+        menteeNotes: ''
       });
     }
   };
@@ -81,7 +83,8 @@ const ExcelLikeJobApplicationsTable = ({
       applicationStatus: 'applied',
       interviewStage: '',
       recruiterName: '',
-      coachNotes: ''
+      coachNotes: '',
+      menteeNotes: ''
     });
   };
 
@@ -147,7 +150,7 @@ const ExcelLikeJobApplicationsTable = ({
             
             {applications.length === 0 && !isAddingNew && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                   {isCoachView 
                     ? "No applications found for this mentee." 
                     : "No job applications found. Click \"Add Application\" to get started!"

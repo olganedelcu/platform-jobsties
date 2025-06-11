@@ -123,6 +123,7 @@ export const useDraftManagement = () => {
         interview_stage: application.interview_stage,
         recruiter_name: application.recruiter_name,
         coach_notes: application.coach_notes,
+        mentee_notes: application.mentee_notes,
         date_applied: application.date_applied
       });
       setHasAutoSavedDraft(false);

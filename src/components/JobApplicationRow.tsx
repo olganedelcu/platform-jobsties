@@ -118,6 +118,32 @@ const JobApplicationRow = ({
         )}
       </TableCell>
       <TableCell>
+        {isEditing ? (
+          <Textarea
+            value={editData.mentee_notes || application.mentee_notes || ''}
+            onChange={(e) => onEditDataChange({ mentee_notes: e.target.value })}
+            className="w-full min-h-[60px]"
+            placeholder="Add your notes..."
+          />
+        ) : (
+          <div className="max-w-xs">
+            {application.mentee_notes ? (
+              <div className="space-y-1">
+                <div className="text-xs text-gray-500 font-medium">My Notes:</div>
+                <div className="text-sm text-gray-700 p-2 bg-green-50 rounded border-l-2 border-green-200" title={application.mentee_notes}>
+                  {application.mentee_notes.length > 100 
+                    ? `${application.mentee_notes.substring(0, 100)}...` 
+                    : application.mentee_notes
+                  }
+                </div>
+              </div>
+            ) : (
+              <span className="text-gray-400 italic text-sm">No notes yet</span>
+            )}
+          </div>
+        )}
+      </TableCell>
+      <TableCell>
         {isEditing && isCoachView ? (
           <Textarea
             value={editData.coach_notes || application.coach_notes || ''}
@@ -129,7 +155,7 @@ const JobApplicationRow = ({
           <div className="max-w-xs">
             {application.coach_notes ? (
               <div className="space-y-1">
-                <div className="text-xs text-gray-500 font-medium">Coach Notes:</div>
+                <div className="text-xs text-gray-500 font-medium">Coach Feedback:</div>
                 <div className="text-sm text-gray-700 p-2 bg-blue-50 rounded border-l-2 border-blue-200" title={application.coach_notes}>
                   {application.coach_notes.length > 100 
                     ? `${application.coach_notes.substring(0, 100)}...` 
@@ -138,9 +164,9 @@ const JobApplicationRow = ({
                 </div>
               </div>
             ) : isCoachView ? (
-              <span className="text-gray-400 italic">No notes</span>
+              <span className="text-gray-400 italic text-sm">No notes</span>
             ) : (
-              <span className="text-gray-400 italic">No coach feedback yet</span>
+              <span className="text-gray-400 italic text-sm">No coach feedback yet</span>
             )}
           </div>
         )}

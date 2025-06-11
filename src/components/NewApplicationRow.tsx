@@ -83,9 +83,17 @@ const NewApplicationRow = ({
       </TableCell>
       <TableCell>
         <Textarea
+          value={newApplicationData.menteeNotes || ''}
+          onChange={(e) => setNewApplicationData(prev => ({ ...prev, menteeNotes: e.target.value }))}
+          placeholder="Add your notes..."
+          className="w-full min-h-[60px]"
+        />
+      </TableCell>
+      <TableCell>
+        <Textarea
           value={newApplicationData.coachNotes || ''}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
-          placeholder="Notes"
+          placeholder="Coach notes"
           className="w-full min-h-[60px]"
         />
       </TableCell>

@@ -1,8 +1,7 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { JobApplication } from '@/types/jobApplications';
-import MenteeCard from './grid/MenteeCard';
-import EmptyState from './grid/EmptyState';
+import ApplicationItem from './grid/ApplicationItem';
 
 interface MenteeApplicationsGridProps {
   applications: JobApplication[];
@@ -10,53 +9,40 @@ interface MenteeApplicationsGridProps {
   onDeleteApplication?: (applicationId: string) => void;
 }
 
-interface GroupedApplications {
-  [menteeId: string]: {
-    menteeInfo: {
-      id: string;
-      first_name: string;
-      last_name: string;
-    };
-    applications: JobApplication[];
-  };
-}
-
-const MenteeApplicationsGrid = ({ applications, onViewDetails, onDeleteApplication }: MenteeApplicationsGridProps) => {
-  const groupedApplications = useMemo(() => {
-    const grouped: GroupedApplications = {};
-    
-    applications.forEach((application) => {
-      const menteeId = application.mentee_id;
-      if (!grouped[menteeId]) {
-        grouped[menteeId] = {
-          menteeInfo: {
-            id: menteeId,
-            first_name: application.profiles?.first_name || 'Unknown',
-            last_name: application.profiles?.last_name || 'User'
-          },
-          applications: []
-        };
-      }
-      grouped[menteeId].applications.push(application);
-    });
-
-    return grouped;
-  }, [applications]);
-
-  if (Object.keys(groupedApplications).length === 0) {
-    return <EmptyState type="no-applications" />;
+const MenteeApplicationsGrid = ({ 
+  applications, 
+  onViewDetails, 
+  onDeleteApplication 
+}: MenteeApplicationsGridProps) => {
+  if (applications.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">No applications found for this mentee.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {Object.entries(groupedApplications).map(([menteeId, data]) => (
-        <MenteeCard
-          key={menteeId}
-          menteeInfo={data.menteeInfo}
-          applications={data.applications}
-          onViewDetails={onViewDetails}
-          onDeleteApplication={onDeleteApplication}
-        />
+    <div className="space-y-3">
+      {applications.map((application) => (
+        <div key={application.id} className="bg-white p-4 rounded-lg border">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h4 className="font-medium text-gray-900">{application.job_title}</h4>
+              <p className="text-sm text-gray-600">{application.company_name}</p>
+            </div>
+            <div className="text-right">
+              <span className="text-xs text-gray-500">Applied</span>
+              <p className="text-sm font-medium">{new Date(application.date_applied).toLocaleDateString()}</p>
+            </div>
+          </div>
+          
+          <ApplicationItem
+            application={application}
+            onViewDetails={onViewDetails}
+            onDeleteApplication={onDeleteApplication}
+          />
+        </div>
       ))}
     </div>
   );

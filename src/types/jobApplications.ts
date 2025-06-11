@@ -1,3 +1,4 @@
+
 export interface JobApplication {
   id: string;
   mentee_id: string;
@@ -8,6 +9,7 @@ export interface JobApplication {
   interview_stage: string | null;
   recruiter_name: string | null;
   coach_notes: string | null;
+  mentee_notes: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +22,7 @@ export interface NewJobApplicationData {
   interviewStage?: string;
   recruiterName?: string;
   coachNotes?: string;
+  menteeNotes?: string;
 }
 
 export interface JobApplicationsHookReturn {
