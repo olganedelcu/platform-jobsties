@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp, AlertCircle } from 'lucide-react';
 import { Mentee } from '@/hooks/useMentees';
 import MenteeProgressItem from './MenteeProgressItem';
 import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
@@ -52,6 +52,12 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
             <span>{averageProgress}% avg progress</span>
           </div>
           <span>{mentees.length} total mentees</span>
+        </div>
+        
+        {/* Debug info - remove when real data is working */}
+        <div className="flex items-center space-x-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+          <AlertCircle className="h-3 w-3" />
+          <span>Note: Currently showing sample progress data for demonstration</span>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
