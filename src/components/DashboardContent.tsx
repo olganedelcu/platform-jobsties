@@ -63,7 +63,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
         </div>
       </div>
 
-      <DashboardQuickLinks />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
@@ -92,6 +91,7 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
           />
         </div>
       </div>
+      <DashboardQuickLinks />
     </main>
   );
 };
