@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, User, Upload, ArrowRight } from 'lucide-react';
+import { BookOpen, Upload, ArrowRight } from 'lucide-react';
 
 const DashboardQuickLinks = () => {
   const navigate = useNavigate();
@@ -16,14 +16,6 @@ const DashboardQuickLinks = () => {
       action: () => navigate('/course'),
       buttonText: 'Start Learning',
       color: 'from-green-600 to-teal-600'
-    },
-    {
-      title: 'Complete Your Profile',
-      description: 'Add your details and preferences to get personalized recommendations',
-      icon: User,
-      action: () => navigate('/profile'),
-      buttonText: 'Update Profile',
-      color: 'from-blue-600 to-cyan-600'
     },
     {
       title: 'Track Your Progress',
@@ -44,7 +36,7 @@ const DashboardQuickLinks = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             return (
