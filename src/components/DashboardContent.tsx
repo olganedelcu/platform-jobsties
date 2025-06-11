@@ -1,25 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Play, 
-  TrendingUp,
-  Building2,
-  BookOpen,
-  Target
-} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
+import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
+import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
+import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
 
 interface DashboardContentProps {
   user: any;
@@ -61,162 +50,35 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Good morning, {firstName}
-            </h1>
-            <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
-          </div>
-          <Avatar className="h-14 w-14">
-            <AvatarImage src={user?.user_metadata?.avatar_url} alt={firstName} />
-            <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-              <User className="h-7 w-7" />
-            </AvatarFallback>
-          </Avatar>
-        </div>
-      </div>
+      <DashboardHeader user={user} firstName={firstName} />
 
-      {/* Quick Links */}
       <DashboardQuickLinks />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-8">
-          {/* Career Progress */}
-          <Card className="border border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">Career Progress</h3>
-                <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                  Live
-                </Badge>
-              </div>
-              
-              <div className="text-4xl font-bold text-blue-600 mb-3">{courseProgress}%</div>
-              <Progress value={courseProgress} className="mb-4 h-3" />
-              <div className="text-sm text-gray-500 mb-6">Course completion</div>
+          <CareerProgressCard
+            courseProgress={courseProgress}
+            onCVOptimizedClick={handleCVOptimizedClick}
+            onInterviewPrepClick={handleInterviewPrepClick}
+            onSalaryNegotiationClick={handleSalaryNegotiationClick}
+          />
 
-              {/* Progress Icons */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center cursor-pointer" onClick={handleCVOptimizedClick}>
-                  <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-green-200 transition-colors">
-                    <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                  </div>
-                  <div className="text-sm text-gray-700 font-medium">CV Optimized</div>
-                </div>
-                <div className="text-center cursor-pointer" onClick={handleInterviewPrepClick}>
-                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-blue-200 transition-colors">
-                    <Clock className="w-7 h-7 text-blue-600" />
-                  </div>
-                  <div className="text-sm text-gray-700 font-medium">Interview Prep</div>
-                </div>
-                <div className="text-center cursor-pointer" onClick={handleSalaryNegotiationClick}>
-                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-gray-200 transition-colors">
-                    <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
-                  </div>
-                  <div className="text-sm text-gray-700 font-medium">Salary Negotiation</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card className="border border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">Recent Activity</h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => navigate('/tracker')}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  View All
-                </Button>
-              </div>
-              
-              {recentApplications.length > 0 ? (
-                <div className="space-y-3">
-                  {recentApplications.map((application) => (
-                    <div key={application.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Building2 className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{application.job_title}</div>
-                        <div className="text-sm text-gray-600">{application.company_name}</div>
-                        <div className="text-xs text-gray-500">
-                          Applied {format(new Date(application.date_applied), 'MMM dd, yyyy')}
-                        </div>
-                      </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${
-                          application.application_status === 'applied' ? 'bg-blue-50 text-blue-700' :
-                          application.application_status === 'interviewing' ? 'bg-purple-50 text-purple-700' :
-                          application.application_status === 'offer' ? 'bg-green-50 text-green-700' :
-                          'bg-gray-50 text-gray-700'
-                        }`}
-                      >
-                        {application.application_status.replace('_', ' ').toUpperCase()}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-                    <TrendingUp className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <div className="text-gray-600 mb-2">No recent activity</div>
-                  <div className="text-sm text-gray-500 mb-4">Start applying to jobs to see your activity here</div>
-                  <Button 
-                    onClick={() => navigate('/tracker')} 
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Add Application
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <RecentActivityCard
+            recentApplications={recentApplications}
+            onViewAll={() => navigate('/tracker')}
+            onAddApplication={() => navigate('/tracker')}
+          />
         </div>
 
         {/* Right Column */}
         <div className="space-y-8">
-          {/* Next Session */}
-          <Card className="border border-gray-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-blue-600" />
-                </div>
-                <span className="font-semibold text-gray-900 text-lg">Coming up</span>
-              </div>
-              <div className="text-sm text-gray-600 mb-2">Feature in development</div>
-              <div className="text-sm font-semibold text-blue-600 mb-4">Stay tuned!</div>
-              <div className="flex justify-end">
-                <Button size="sm" className="bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-xl" disabled>
-                  <Play className="w-4 h-4 fill-current" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <UpcomingSessionsCard />
 
-          {/* Applications */}
-          <div className="text-center py-6 bg-white rounded-2xl border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/tracker')}>
-            <div className="text-4xl font-bold text-blue-600 mb-2">{applicationsThisMonth}</div>
-            <div className="text-sm text-gray-600 mb-4">Applications this month</div>
-            <div className="flex justify-center gap-1">
-              {[...Array(Math.min(applicationsThisMonth, 12))].map((_, i) => (
-                <div key={i} className="w-1.5 h-8 bg-blue-500 rounded-full"></div>
-              ))}
-            </div>
-          </div>
+          <ApplicationsStatsCard
+            applicationsThisMonth={applicationsThisMonth}
+            onClick={() => navigate('/tracker')}
+          />
         </div>
       </div>
     </main>
