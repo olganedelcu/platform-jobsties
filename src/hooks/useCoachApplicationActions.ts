@@ -1,7 +1,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { JobApplication } from '@/types/jobApplications';
-import { updateCoachMenteeApplication } from '@/services/coachApplicationsService';
+import { updateCoachMenteeApplication, deleteCoachMenteeApplication } from '@/services/coachApplicationsService';
 
 export const useCoachApplicationActions = (
   applications: JobApplication[],
@@ -29,7 +29,28 @@ export const useCoachApplicationActions = (
     }
   };
 
+  const handleDeleteApplication = async (applicationId: string): Promise<void> => {
+    try {
+      await deleteCoachMenteeApplication(applicationId);
+      await refetchApplications();
+      
+      toast({
+        title: "Application Deleted",
+        description: "The application has been removed from your view.",
+      });
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete application. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return {
-    handleUpdateApplication
+    handleUpdateApplication,
+    handleDeleteApplication
   };
 };

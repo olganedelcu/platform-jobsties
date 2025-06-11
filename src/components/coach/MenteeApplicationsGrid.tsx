@@ -5,13 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Calendar, Building2, User, Briefcase, Search, Eye } from 'lucide-react';
+import { Calendar, Building2, User, Briefcase, Search, Eye, Trash2 } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
 
 interface MenteeApplicationsGridProps {
   applications: JobApplication[];
   onViewDetails?: (application: JobApplication) => void;
+  onDeleteApplication?: (applicationId: string) => void;
 }
 
 interface GroupedApplications {
@@ -25,7 +26,7 @@ interface GroupedApplications {
   };
 }
 
-const MenteeApplicationsGrid = ({ applications, onViewDetails }: MenteeApplicationsGridProps) => {
+const MenteeApplicationsGrid = ({ applications, onViewDetails, onDeleteApplication }: MenteeApplicationsGridProps) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const groupedApplications = useMemo(() => {
@@ -181,16 +182,28 @@ const MenteeApplicationsGrid = ({ applications, onViewDetails }: MenteeApplicati
                         <Badge className={`text-xs ${getStatusColor(application.application_status)}`}>
                           {application.application_status.replace('_', ' ').toUpperCase()}
                         </Badge>
-                        {onViewDetails && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onViewDetails(application)}
-                            className="flex items-center space-x-1"
-                          >
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                        )}
+                        <div className="flex items-center space-x-1">
+                          {onViewDetails && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewDetails(application)}
+                              className="flex items-center space-x-1"
+                            >
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                          )}
+                          {onDeleteApplication && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onDeleteApplication(application.id)}
+                              className="flex items-center space-x-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

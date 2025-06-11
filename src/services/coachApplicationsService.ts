@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication } from '@/types/jobApplications';
 
@@ -151,6 +152,36 @@ export const updateCoachMenteeApplication = async (applicationId: string, update
     console.log('Application updated successfully');
   } catch (error) {
     console.error('Error in updateCoachMenteeApplication:', error);
+    throw error;
+  }
+};
+
+export const deleteCoachMenteeApplication = async (applicationId: string): Promise<void> => {
+  try {
+    // Get the current authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('Error getting current user:', userError);
+      throw new Error('User not authenticated');
+    }
+
+    console.log('Deleting application:', applicationId);
+
+    // Delete the job application
+    const { error: deleteError } = await supabase
+      .from('job_applications')
+      .delete()
+      .eq('id', applicationId);
+
+    if (deleteError) {
+      console.error('Error deleting job application:', deleteError);
+      throw deleteError;
+    }
+
+    console.log('Application deleted successfully');
+  } catch (error) {
+    console.error('Error in deleteCoachMenteeApplication:', error);
     throw error;
   }
 };

@@ -3,16 +3,17 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Building2, User, Briefcase, Phone, Eye } from 'lucide-react';
+import { Calendar, Building2, User, Briefcase, Phone, Eye, Trash2 } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
 
 interface MenteeApplicationsListProps {
   applications: JobApplication[];
   onViewDetails?: (application: JobApplication) => void;
+  onDeleteApplication?: (applicationId: string) => void;
 }
 
-const MenteeApplicationsList = ({ applications, onViewDetails }: MenteeApplicationsListProps) => {
+const MenteeApplicationsList = ({ applications, onViewDetails, onDeleteApplication }: MenteeApplicationsListProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
@@ -69,17 +70,30 @@ const MenteeApplicationsList = ({ applications, onViewDetails }: MenteeApplicati
                 <Badge className={getStatusColor(application.application_status)}>
                   {application.application_status.replace('_', ' ').toUpperCase()}
                 </Badge>
-                {onViewDetails && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onViewDetails(application)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>View Details</span>
-                  </Button>
-                )}
+                <div className="flex items-center space-x-1">
+                  {onViewDetails && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onViewDetails(application)}
+                      className="flex items-center space-x-1"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>View Details</span>
+                    </Button>
+                  )}
+                  {onDeleteApplication && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onDeleteApplication(application.id)}
+                      className="flex items-center space-x-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span>Remove</span>
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </CardHeader>

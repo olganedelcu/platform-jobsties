@@ -11,7 +11,7 @@ import { Grid, List } from 'lucide-react';
 
 const ApplicationsContent = () => {
   const { applications, loading, refetchApplications } = useCoachApplications();
-  const { handleUpdateApplication } = useCoachApplicationActions(applications, refetchApplications);
+  const { handleUpdateApplication, handleDeleteApplication } = useCoachApplicationActions(applications, refetchApplications);
   
   // State preservation using localStorage
   const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(() => {
@@ -77,6 +77,14 @@ const ApplicationsContent = () => {
     }
   };
 
+  const handleApplicationDelete = async (applicationId: string) => {
+    await handleDeleteApplication(applicationId);
+    // If the deleted application was selected, go back to list
+    if (selectedApplication && selectedApplication.id === applicationId) {
+      setSelectedApplication(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4">
@@ -138,11 +146,13 @@ const ApplicationsContent = () => {
             <MenteeApplicationsGrid 
               applications={applications} 
               onViewDetails={handleViewDetails}
+              onDeleteApplication={handleApplicationDelete}
             />
           ) : (
             <MenteeApplicationsList 
               applications={applications} 
               onViewDetails={handleViewDetails}
+              onDeleteApplication={handleApplicationDelete}
             />
           )}
         </>
