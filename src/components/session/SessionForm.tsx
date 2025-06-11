@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useCoachAvailability } from '@/hooks/useCoachAvailability';
 import AvailabilityIndicator from './AvailabilityIndicator';
 import SessionBasicDetails from './SessionBasicDetails';
@@ -25,6 +25,9 @@ interface SessionFormProps {
 }
 
 const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: SessionFormProps) => {
+  const [availableTimesForSelectedDate, setAvailableTimesForSelectedDate] = useState<string[]>([]);
+  const [isSelectedDateAvailable, setIsSelectedDateAvailable] = useState<boolean>(false);
+  
   // Use the availability hook without a specific coach ID to get default Ana availability
   const {
     availability,
@@ -34,19 +37,25 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
     getAvailableTimesForDate
   } = useCoachAvailability();
 
-  const availableTimesForSelectedDate = useMemo(() => {
-    if (sessionData.date) {
-      return getAvailableTimesForDate(sessionData.date);
-    }
-    return [];
-  }, [sessionData.date, getAvailableTimesForDate]);
+  // Load availability for selected date
+  useEffect(() => {
+    const loadAvailability = async () => {
+      if (sessionData.date) {
+        const [dateAvailable, availableTimes] = await Promise.all([
+          isDateAvailable(sessionData.date),
+          getAvailableTimesForDate(sessionData.date)
+        ]);
+        
+        setIsSelectedDateAvailable(dateAvailable);
+        setAvailableTimesForSelectedDate(availableTimes);
+      } else {
+        setIsSelectedDateAvailable(false);
+        setAvailableTimesForSelectedDate([]);
+      }
+    };
 
-  const isSelectedDateAvailable = useMemo(() => {
-    if (sessionData.date) {
-      return isDateAvailable(sessionData.date);
-    }
-    return false;
-  }, [sessionData.date, isDateAvailable]);
+    loadAvailability();
+  }, [sessionData.date, isDateAvailable, getAvailableTimesForDate]);
 
   // Filter time slots to only show available times (already filtered for booked sessions)
   const timeSlots = useMemo(() => {

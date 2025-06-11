@@ -12,14 +12,42 @@ serve(async (req) => {
   }
 
   try {
-    const { code, redirectUri } = await req.json()
+    const { action } = await req.json()
     
+    if (action === 'get_auth_url') {
+      // For now, return a placeholder URL that explains what needs to be done
+      // This prevents the 500 error and gives users clear instructions
+      const authUrl = 'https://console.cloud.google.com/apis/credentials'
+      
+      return new Response(
+        JSON.stringify({ 
+          auth_url: authUrl,
+          message: 'Please set up Google OAuth credentials first'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        },
+      )
+    }
+
     const googleClientId = Deno.env.get('GOOGLE_CLIENT_ID')
     const googleClientSecret = Deno.env.get('GOOGLE_CLIENT_SECRET')
     
     if (!googleClientId || !googleClientSecret) {
-      throw new Error('Google OAuth credentials not configured')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Google OAuth credentials not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Supabase secrets.',
+          setup_required: true
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        },
+      )
     }
+
+    const { code, redirectUri } = await req.json()
 
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',

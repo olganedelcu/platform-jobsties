@@ -20,7 +20,7 @@ interface CalendarEvent {
   google_event_id: string;
 }
 
-interface CalendarSettings {
+interface CalendarSettingsType {
   google_calendar_connected: boolean;
   sync_enabled: boolean;
   last_sync_at?: string;
@@ -33,7 +33,7 @@ interface CoachCalendarProps {
 const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [settings, setSettings] = useState<CalendarSettings>({
+  const [settings, setSettings] = useState<CalendarSettingsType>({
     google_calendar_connected: false,
     sync_enabled: false
   });
