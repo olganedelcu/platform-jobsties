@@ -18,10 +18,14 @@ export const useDraftManagement = () => {
   
   const hasRestoredDrafts = useRef(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
 
-  // Clean up expired drafts on mount
+  // Clean up expired drafts on mount (only once)
   useEffect(() => {
-    cleanupExpiredDrafts();
+    if (!isInitialized.current) {
+      cleanupExpiredDrafts();
+      isInitialized.current = true;
+    }
   }, []);
 
   // Cross-tab synchronization
@@ -81,6 +85,11 @@ export const useDraftManagement = () => {
   }, [editingId, editData, debouncedSave]);
 
   const handleEdit = useCallback((application: JobApplication) => {
+    // Prevent re-editing the same application unless it's really a new edit session
+    if (editingId === application.id && Object.keys(editData).length > 0) {
+      return; // Already editing this application
+    }
+
     // First check if there's an existing draft
     const existingDraft = loadDraftFromLocalStorage(application.id);
     
@@ -106,7 +115,7 @@ export const useDraftManagement = () => {
       });
       setHasAutoSavedDraft(false);
     }
-  }, []);
+  }, [editingId, editData]);
 
   const handleSave = useCallback(async (applicationId: string, onUpdateApplication: (id: string, updates: Partial<JobApplication>) => Promise<void>) => {
     try {
@@ -122,14 +131,13 @@ export const useDraftManagement = () => {
   }, [editData]);
 
   const handleCancel = useCallback(() => {
-    const currentEditingId = editingId;
     setEditingId(null);
     setEditData({});
     setShowRestorationBanner(false);
     setHasAutoSavedDraft(false);
     
     // Don't clear draft on cancel - keep it for potential restoration
-  }, [editingId]);
+  }, []);
 
   const handleDiscardDraft = useCallback(() => {
     if (editingId) {
