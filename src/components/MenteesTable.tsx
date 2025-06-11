@@ -4,10 +4,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Mentee } from '@/hooks/useMentees';
 import { JobApplication } from '@/types/jobApplications';
-import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
 import { getMenteeApplications, getMenteeCVFiles } from '@/utils/menteeTableUtils';
 import MenteeInfoCell from './MenteeInfoCell';
-import MenteeProgressCell from './MenteeProgressCell';
 import MenteeApplicationsCell from './MenteeApplicationsCell';
 import MenteeCVFilesCell from './MenteeCVFilesCell';
 import MenteeNotesCell from './MenteeNotesCell';
@@ -27,21 +25,6 @@ interface MenteesTableProps {
 }
 
 const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMentee }: MenteesTableProps) => {
-  const menteeIds = mentees.map(m => m.id);
-  const { getMenteeProgress } = useMenteeProgressStats(menteeIds);
-
-  // Debug logging for the table view
-  React.useEffect(() => {
-    if (mentees.length > 0) {
-      console.log('=== MENTEES TABLE PROGRESS DEBUG ===');
-      mentees.forEach(mentee => {
-        const progress = getMenteeProgress(mentee.id);
-        console.log(`Table - Mentee ${mentee.first_name} ${mentee.last_name} (${mentee.id}):`, progress);
-      });
-      console.log('=== END TABLE DEBUG ===');
-    }
-  }, [mentees, getMenteeProgress]);
-
   return (
     <Card>
       <CardContent className="p-0">
@@ -49,7 +32,6 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
           <TableHeader>
             <TableRow>
               <TableHead>Mentee</TableHead>
-              <TableHead>Course Progress</TableHead>
               <TableHead>Applications</TableHead>
               <TableHead>CV Files</TableHead>
               <TableHead>Notes</TableHead>
@@ -59,22 +41,11 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
             {mentees.map((mentee) => {
               const menteeApplications = getMenteeApplications(mentee.id, applications);
               const menteeCVFiles = getMenteeCVFiles(mentee.id, cvFiles);
-              const progress = getMenteeProgress(mentee.id);
 
               return (
                 <TableRow key={mentee.id}>
                   <TableCell>
                     <MenteeInfoCell mentee={mentee} />
-                  </TableCell>
-                  
-                  <TableCell>
-                    <MenteeProgressCell 
-                      overallProgress={progress.overallProgress}
-                      completedModules={progress.completedModules}
-                      totalModules={progress.totalModules}
-                      hasRealData={progress.hasRealData}
-                      emailConfirmed={progress.emailConfirmed}
-                    />
                   </TableCell>
 
                   <TableCell>
