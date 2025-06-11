@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Calendar,
   Users, 
-  MessageSquare, 
   Settings, 
   BookOpen, 
   FileUp, 
@@ -45,11 +44,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       path: '/coach/calendar', 
       label: 'Calendar', 
       icon: Calendar 
-    },
-    { 
-      path: '/coach/chat', 
-      label: 'Messages', 
-      icon: MessageSquare 
     },
     { 
       path: '/coach/cv-upload', 
@@ -92,7 +86,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {navItems.slice(0, 6).map((item) => {
+            {navItems.slice(0, 5).map((item) => {
               const Icon = item.icon;
               return (
                 <Link

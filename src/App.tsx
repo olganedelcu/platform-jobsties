@@ -24,7 +24,6 @@ import Mentees from "./pages/coach/Mentees";
 import Applications from "./pages/coach/Applications";
 import CoachSessions from "./pages/coach/CoachSessions";
 import CoachCalendar from "./pages/coach/CoachCalendar";
-import CoachChat from "./pages/coach/CoachChat";
 import CVUpload from "./pages/coach/CVUpload";
 import CoachTodos from "./pages/coach/CoachTodos";
 import CoachProfile from "./pages/coach/CoachProfile";
@@ -57,7 +56,6 @@ const App = () => (
           <Route path="/coach/applications" element={<ProtectedCoachRoute><Applications /></ProtectedCoachRoute>} />
           <Route path="/coach/sessions" element={<ProtectedCoachRoute><CoachSessions /></ProtectedCoachRoute>} />
           <Route path="/coach/calendar" element={<ProtectedCoachRoute><CoachCalendar /></ProtectedCoachRoute>} />
-          <Route path="/coach/chat" element={<ProtectedCoachRoute><CoachChat /></ProtectedCoachRoute>} />
           <Route path="/coach/cv-upload" element={<ProtectedCoachRoute><CVUpload /></ProtectedCoachRoute>} />
           <Route path="/coach/todos" element={<ProtectedCoachRoute><CoachTodos /></ProtectedCoachRoute>} />
           <Route path="/coach/profile" element={<ProtectedCoachRoute><CoachProfile /></ProtectedCoachRoute>} />
