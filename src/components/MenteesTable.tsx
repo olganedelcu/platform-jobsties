@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Mentee } from '@/hooks/useMentees';
 import { JobApplication } from '@/types/jobApplications';
-import { useMenteeProgress } from '@/hooks/useMenteeProgress';
+import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
 import { getMenteeApplications, getMenteeCVFiles } from '@/utils/menteeTableUtils';
 import MenteeInfoCell from './MenteeInfoCell';
 import MenteeProgressCell from './MenteeProgressCell';
@@ -28,18 +28,19 @@ interface MenteesTableProps {
 
 const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMentee }: MenteesTableProps) => {
   const menteeIds = mentees.map(m => m.id);
-  const { progressData } = useMenteeProgress(menteeIds);
+  const { getMenteeProgress } = useMenteeProgressStats(menteeIds);
 
-  const getMenteeProgress = (menteeId: string) => {
-    const data = progressData.find(p => p.menteeId === menteeId);
-    return data || {
-      overallProgress: 0,
-      completedModules: 0,
-      totalModules: 5,
-      hasRealData: false,
-      emailConfirmed: false
-    };
-  };
+  // Debug logging for the table view
+  React.useEffect(() => {
+    if (mentees.length > 0) {
+      console.log('=== MENTEES TABLE PROGRESS DEBUG ===');
+      mentees.forEach(mentee => {
+        const progress = getMenteeProgress(mentee.id);
+        console.log(`Table - Mentee ${mentee.first_name} ${mentee.last_name} (${mentee.id}):`, progress);
+      });
+      console.log('=== END TABLE DEBUG ===');
+    }
+  }, [mentees, getMenteeProgress]);
 
   return (
     <Card>

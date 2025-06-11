@@ -23,6 +23,21 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
     totalMentees
   } = useMenteeProgressStats(menteeIds);
 
+  // Debug logging
+  React.useEffect(() => {
+    if (!progressLoading && mentees.length > 0) {
+      console.log('=== COACH DASHBOARD PROGRESS DEBUG ===');
+      console.log('Mentees:', mentees.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+      console.log('Progress stats:', { averageProgress, menteesWithRealData, totalMentees });
+      
+      mentees.forEach(mentee => {
+        const progress = getMenteeProgress(mentee.id);
+        console.log(`Mentee ${mentee.first_name} ${mentee.last_name} (${mentee.id}):`, progress);
+      });
+      console.log('=== END DEBUG ===');
+    }
+  }, [mentees, progressLoading, averageProgress, menteesWithRealData, getMenteeProgress]);
+
   if (loading || progressLoading) {
     return (
       <Card className="border border-gray-200 shadow-sm">
