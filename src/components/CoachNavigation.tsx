@@ -80,7 +80,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 alt="JobSties Logo" 
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-gray-900">Jobsties Coach</span>
+              <span className="text-xl font-bold text-gray-900">Coach</span>
             </Link>
           </div>
 
