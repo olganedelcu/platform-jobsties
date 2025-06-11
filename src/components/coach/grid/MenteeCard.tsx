@@ -19,9 +19,9 @@ interface MenteeCardProps {
 }
 
 const MenteeCard = ({ menteeInfo, applications, onViewDetails, onDeleteApplication }: MenteeCardProps) => {
-  const recentApplications = applications
-    .sort((a, b) => new Date(b.date_applied).getTime() - new Date(a.date_applied).getTime())
-    .slice(0, 3);
+  // Show all applications, sorted by most recent first
+  const sortedApplications = applications
+    .sort((a, b) => new Date(b.date_applied).getTime() - new Date(a.date_applied).getTime());
 
   return (
     <Card className="overflow-hidden">
@@ -50,9 +50,9 @@ const MenteeCard = ({ menteeInfo, applications, onViewDetails, onDeleteApplicati
       </CardHeader>
 
       <CardContent className="p-4">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Recent Applications</h4>
-        <div className="space-y-3">
-          {recentApplications.map((application) => (
+        <h4 className="text-sm font-medium text-gray-700 mb-3">All Applications</h4>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {sortedApplications.map((application) => (
             <ApplicationItem
               key={application.id}
               application={application}
@@ -62,11 +62,9 @@ const MenteeCard = ({ menteeInfo, applications, onViewDetails, onDeleteApplicati
           ))}
         </div>
 
-        {applications.length > 3 && (
-          <div className="mt-3 pt-3 border-t text-center">
-            <span className="text-xs text-gray-500">
-              +{applications.length - 3} more application{applications.length - 3 !== 1 ? 's' : ''}
-            </span>
+        {applications.length === 0 && (
+          <div className="text-center py-4 text-gray-500 text-sm">
+            No applications yet
           </div>
         )}
       </CardContent>

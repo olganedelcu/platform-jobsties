@@ -1,169 +1,112 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
-import { useCoachApplicationActions } from '@/hooks/useCoachApplicationActions';
-import MenteeApplicationsList from '@/components/coach/MenteeApplicationsList';
-import MenteeApplicationsGrid from '@/components/coach/MenteeApplicationsGrid';
-import ApplicationDetailView from '@/components/coach/ApplicationDetailView';
+import { useMentees } from '@/hooks/useMentees';
 import { Button } from '@/components/ui/button';
-import { JobApplication } from '@/types/jobApplications';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Grid, List } from 'lucide-react';
+import MenteeApplicationsGrid from './MenteeApplicationsGrid';
+import MenteeApplicationsList from './MenteeApplicationsList';
+import MenteeApplicationsSearch from './MenteeApplicationsSearch';
 
 const ApplicationsContent = () => {
-  const { applications, loading, refetchApplications } = useCoachApplications();
-  const { handleUpdateApplication, handleDeleteApplication } = useCoachApplicationActions(applications, refetchApplications);
-  
-  // State preservation using localStorage
-  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(() => {
-    try {
-      const saved = localStorage.getItem('coach-applications-selected');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-  
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
-    try {
-      const saved = localStorage.getItem('coach-applications-view-mode');
-      return saved ? JSON.parse(saved) : 'grid';
-    } catch {
-      return 'grid';
-    }
-  });
+  const { applications, loading: applicationsLoading } = useCoachApplications();
+  const { mentees, loading: menteesLoading } = useMentees();
+  const [activeTab, setActiveTab] = useState('grid');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Save state to localStorage whenever it changes
-  useEffect(() => {
-    try {
-      localStorage.setItem('coach-applications-selected', JSON.stringify(selectedApplication));
-    } catch (error) {
-      console.error('Failed to save selected application to localStorage:', error);
-    }
-  }, [selectedApplication]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('coach-applications-view-mode', JSON.stringify(viewMode));
-    } catch (error) {
-      console.error('Failed to save view mode to localStorage:', error);
-    }
-  }, [viewMode]);
-
-  // Clean up localStorage when component unmounts
-  useEffect(() => {
-    return () => {
-      try {
-        localStorage.removeItem('coach-applications-selected');
-        localStorage.removeItem('coach-applications-view-mode');
-      } catch (error) {
-        console.error('Failed to clean up localStorage:', error);
-      }
-    };
-  }, []);
-
-  const handleViewDetails = (application: JobApplication) => {
-    setSelectedApplication(application);
-  };
-
-  const handleBackToList = () => {
-    setSelectedApplication(null);
-  };
-
-  const handleApplicationUpdate = async (applicationId: string, updates: Partial<JobApplication>) => {
-    await handleUpdateApplication(applicationId, updates);
-    // Update the selected application with the new data
-    if (selectedApplication && selectedApplication.id === applicationId) {
-      setSelectedApplication(prev => prev ? { ...prev, ...updates } : null);
-    }
-  };
-
-  const handleApplicationDelete = async (applicationId: string) => {
-    console.log('Deleting application:', applicationId);
-    try {
-      await handleDeleteApplication(applicationId);
-      // If the deleted application was selected, go back to list
-      if (selectedApplication && selectedApplication.id === applicationId) {
-        setSelectedApplication(null);
-      }
-      console.log('Application deleted successfully');
-    } catch (error) {
-      console.error('Error deleting application:', error);
-    }
-  };
-
-  if (loading) {
+  if (applicationsLoading || menteesLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="text-center py-12">
-          <p className="text-lg">Loading applications...</p>
-        </div>
-      </div>
+      <main className="max-w-7xl mx-auto py-8 px-6">
+        <div className="text-center">Loading applications...</div>
+      </main>
     );
   }
 
-  return (
-    <div className="container mx-auto py-8 px-4">
-      {selectedApplication ? (
-        <ApplicationDetailView 
-          application={selectedApplication} 
-          onBack={handleBackToList}
-          onUpdate={handleApplicationUpdate}
-        />
-      ) : (
-        <>
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold">Mentee Job Applications</h1>
-                <p className="text-gray-600 mt-2">
-                  View your mentees' job applications and track their progress
-                </p>
-                {applications.length > 0 && (
-                  <div className="mt-4 text-sm text-gray-500">
-                    Showing {applications.length} application{applications.length !== 1 ? 's' : ''}
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="flex items-center space-x-2"
-                >
-                  <Grid className="h-4 w-4" />
-                  <span>Grid</span>
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="flex items-center space-x-2"
-                >
-                  <List className="h-4 w-4" />
-                  <span>List</span>
-                </Button>
-              </div>
-            </div>
-          </div>
+  // Group applications by mentee
+  const applicationsByMentee = applications.reduce((acc, app) => {
+    if (!acc[app.mentee_id]) {
+      acc[app.mentee_id] = [];
+    }
+    acc[app.mentee_id].push(app);
+    return acc;
+  }, {} as Record<string, typeof applications>);
 
-          {viewMode === 'grid' ? (
-            <MenteeApplicationsGrid 
-              applications={applications} 
-              onViewDetails={handleViewDetails}
-              onDeleteApplication={handleApplicationDelete}
-            />
-          ) : (
-            <MenteeApplicationsList 
-              applications={applications} 
-              onViewDetails={handleViewDetails}
-              onDeleteApplication={handleApplicationDelete}
-            />
-          )}
-        </>
+  // Filter mentees based on search term
+  const filteredMentees = mentees.filter(mentee => {
+    if (!searchTerm) return true;
+    const fullName = `${mentee.first_name} ${mentee.last_name}`.toLowerCase();
+    return fullName.includes(searchTerm.toLowerCase());
+  });
+
+  // Only show mentees that have applications and match the search
+  const menteesWithApplications = filteredMentees.filter(
+    mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
+  );
+
+  const totalMenteesWithApplications = mentees.filter(
+    mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
+  ).length;
+
+  return (
+    <main className="max-w-7xl mx-auto py-8 px-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Mentee Applications</h1>
+        <p className="text-gray-600 mt-2">Track and manage your mentees' job applications</p>
+      </div>
+
+      <MenteeApplicationsSearch
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        totalMentees={totalMenteesWithApplications}
+        filteredMentees={menteesWithApplications.length}
+      />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <div className="flex items-center justify-between">
+          <TabsList className="grid w-64 grid-cols-2">
+            <TabsTrigger value="grid" className="flex items-center space-x-2">
+              <Grid className="h-4 w-4" />
+              <span>Grid View</span>
+            </TabsTrigger>
+            <TabsTrigger value="list" className="flex items-center space-x-2">
+              <List className="h-4 w-4" />
+              <span>List View</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="grid" className="space-y-6">
+          <MenteeApplicationsGrid
+            mentees={menteesWithApplications}
+            applicationsByMentee={applicationsByMentee}
+          />
+        </TabsContent>
+
+        <TabsContent value="list" className="space-y-6">
+          <MenteeApplicationsList
+            mentees={menteesWithApplications}
+            applicationsByMentee={applicationsByMentee}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {menteesWithApplications.length === 0 && !searchTerm && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 mb-4">No applications found</div>
+          <div className="text-sm text-gray-400">Your mentees haven't submitted any applications yet</div>
+        </div>
       )}
-    </div>
+
+      {menteesWithApplications.length === 0 && searchTerm && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 mb-4">No mentees found matching "{searchTerm}"</div>
+          <Button variant="outline" onClick={() => setSearchTerm('')}>
+            Clear search
+          </Button>
+        </div>
+      )}
+    </main>
   );
 };
 
