@@ -40,10 +40,20 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
   const currentWeekRecs = getCurrentWeekRecommendations();
   const previousWeeksRecs = getPreviousWeeksRecommendations();
 
+  const handleViewJob = (jobLink: string) => {
+    console.log('Opening job link:', jobLink);
+    if (jobLink) {
+      window.open(jobLink, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
+    console.log('Marking as applied:', recommendation);
     setAddingToTracker(recommendation.id);
     try {
       await markAsApplied(recommendation);
+    } catch (error) {
+      console.error('Error marking as applied:', error);
     } finally {
       setAddingToTracker(null);
     }
@@ -67,8 +77,13 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(recommendation.job_link, '_blank')}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleViewJob(recommendation.job_link);
+            }}
             className="flex items-center gap-2"
+            type="button"
           >
             <ExternalLink className="h-4 w-4" />
             View Job
@@ -76,9 +91,14 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
           <Button
             variant="default"
             size="sm"
-            onClick={() => handleMarkAsApplied(recommendation)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleMarkAsApplied(recommendation);
+            }}
             disabled={addingToTracker === recommendation.id}
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            type="button"
           >
             {addingToTracker === recommendation.id ? (
               <>
