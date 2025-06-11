@@ -24,6 +24,19 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('Submitting session data:', sessionData);
+    
+    // Validate required fields
+    if (!sessionData.sessionType || !sessionData.date || !sessionData.time) {
+      console.error('Missing required fields:', {
+        sessionType: sessionData.sessionType,
+        date: sessionData.date,
+        time: sessionData.time
+      });
+      return;
+    }
+    
     onSchedule(sessionData);
   };
 
@@ -43,7 +56,10 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <SessionTypeSelector
               value={sessionData.sessionType}
-              onChange={(value) => setSessionData({...sessionData, sessionType: value})}
+              onChange={(value) => {
+                console.log('Session type changed to:', value);
+                setSessionData({...sessionData, sessionType: value});
+              }}
             />
           </div>
 
@@ -51,7 +67,10 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
           {sessionData.sessionType && (
             <SessionForm
               sessionData={sessionData}
-              onSessionDataChange={setSessionData}
+              onSessionDataChange={(newData) => {
+                console.log('Session data changed:', newData);
+                setSessionData(newData);
+              }}
               onSubmit={handleSubmit}
               onCancel={onCancel}
             />

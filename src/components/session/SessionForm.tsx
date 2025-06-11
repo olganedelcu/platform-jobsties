@@ -28,6 +28,8 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
   const [availableTimesForSelectedDate, setAvailableTimesForSelectedDate] = useState<string[]>([]);
   const [isSelectedDateAvailable, setIsSelectedDateAvailable] = useState<boolean>(false);
   
+  console.log('SessionForm rendering with data:', sessionData);
+  
   // Use the availability hook without a specific coach ID to get default Ana availability
   const {
     availability,
@@ -37,17 +39,37 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
     getAvailableTimesForDate
   } = useCoachAvailability();
 
+  console.log('Availability hook data:', {
+    availability: availability.length,
+    blockedDates: blockedDates.length,
+    loading: availabilityLoading
+  });
+
   // Load availability for selected date
   useEffect(() => {
     const loadAvailability = async () => {
       if (sessionData.date) {
-        const [dateAvailable, availableTimes] = await Promise.all([
-          isDateAvailable(sessionData.date),
-          getAvailableTimesForDate(sessionData.date)
-        ]);
+        console.log('Loading availability for date:', sessionData.date);
         
-        setIsSelectedDateAvailable(dateAvailable);
-        setAvailableTimesForSelectedDate(availableTimes);
+        try {
+          const [dateAvailable, availableTimes] = await Promise.all([
+            isDateAvailable(sessionData.date),
+            getAvailableTimesForDate(sessionData.date)
+          ]);
+          
+          console.log('Availability results:', {
+            dateAvailable,
+            availableTimesCount: availableTimes.length,
+            availableTimes: availableTimes.slice(0, 5) // Log first 5 times
+          });
+          
+          setIsSelectedDateAvailable(dateAvailable);
+          setAvailableTimesForSelectedDate(availableTimes);
+        } catch (error) {
+          console.error('Error loading availability:', error);
+          setIsSelectedDateAvailable(false);
+          setAvailableTimesForSelectedDate([]);
+        }
       } else {
         setIsSelectedDateAvailable(false);
         setAvailableTimesForSelectedDate([]);
@@ -60,10 +82,12 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
   // Filter time slots to only show available times (already filtered for booked sessions)
   const timeSlots = useMemo(() => {
     if (availableTimesForSelectedDate.length > 0) {
+      console.log('Using available times from hook:', availableTimesForSelectedDate.length);
       return availableTimesForSelectedDate;
     }
     
     // Fallback to default time slots if no availability data
+    console.log('Using fallback time slots');
     return [
       '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
       '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
@@ -72,6 +96,7 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
   }, [availableTimesForSelectedDate]);
 
   const updateSessionData = (field: keyof SessionFormData, value: string) => {
+    console.log(`Updating ${field} to:`, value);
     onSessionDataChange({
       ...sessionData,
       [field]: value
@@ -81,6 +106,7 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
   // Clear time selection when date changes and it's not available
   useEffect(() => {
     if (sessionData.date && !isSelectedDateAvailable && sessionData.time) {
+      console.log('Date not available, clearing time selection');
       updateSessionData('time', '');
     }
   }, [sessionData.date, isSelectedDateAvailable]);
@@ -97,6 +123,14 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
   const minDate = new Date().toISOString().split('T')[0];
 
   const isFormValid = !(!sessionData.sessionType || !sessionData.date || !sessionData.time || !isSelectedDateAvailable);
+  
+  console.log('Form validation:', {
+    sessionType: sessionData.sessionType,
+    date: sessionData.date,
+    time: sessionData.time,
+    isDateAvailable: isSelectedDateAvailable,
+    isFormValid
+  });
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">

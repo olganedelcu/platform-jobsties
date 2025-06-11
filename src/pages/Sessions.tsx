@@ -36,6 +36,7 @@ const Sessions = () => {
           return;
         }
         
+        console.log('User authenticated:', session.user.id);
         setUser(session.user);
       } catch (error) {
         console.error('Auth check error:', error);
@@ -72,10 +73,26 @@ const Sessions = () => {
   };
 
   const handleScheduleSession = async (sessionData: any) => {
-    await handleAddSession(sessionData);
-    setShowScheduleDialog(false);
-    // Force refresh of the entire component to update availability
-    setSessionRefreshKey(prev => prev + 1);
+    console.log('Scheduling session with data:', sessionData);
+    
+    try {
+      await handleAddSession(sessionData);
+      setShowScheduleDialog(false);
+      // Force refresh of the entire component to update availability
+      setSessionRefreshKey(prev => prev + 1);
+      
+      toast({
+        title: "Success",
+        description: "Session scheduled successfully!",
+      });
+    } catch (error) {
+      console.error('Error scheduling session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to schedule session. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleReschedule = (sessionId: string) => {
@@ -128,7 +145,10 @@ const Sessions = () => {
               <ScheduleSession 
                 key={sessionRefreshKey} // Force remount to refresh availability
                 onSchedule={handleScheduleSession}
-                onCancel={() => setShowScheduleDialog(false)}
+                onCancel={() => {
+                  console.log('Cancelling session scheduling');
+                  setShowScheduleDialog(false);
+                }}
                 userId={user?.id}
               />
             </DialogContent>

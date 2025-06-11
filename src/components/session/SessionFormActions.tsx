@@ -8,22 +8,23 @@ interface SessionFormActionsProps {
 }
 
 const SessionFormActions = ({ isFormValid, onCancel }: SessionFormActionsProps) => {
+  console.log('SessionFormActions - isFormValid:', isFormValid);
+  
   return (
-    <div className="flex space-x-4 pt-4">
-      <Button
-        type="submit"
-        className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-        disabled={!isFormValid}
-      >
-        Schedule Session
-      </Button>
-      <Button
-        type="button"
-        variant="outline"
+    <div className="flex justify-end space-x-4 pt-4">
+      <Button 
+        type="button" 
+        variant="outline" 
         onClick={onCancel}
-        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
       >
         Cancel
+      </Button>
+      <Button 
+        type="submit" 
+        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+        disabled={!isFormValid}
+      >
+        {isFormValid ? 'Schedule Session' : 'Please complete all fields'}
       </Button>
     </div>
   );
