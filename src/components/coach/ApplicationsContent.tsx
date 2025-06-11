@@ -78,10 +78,16 @@ const ApplicationsContent = () => {
   };
 
   const handleApplicationDelete = async (applicationId: string) => {
-    await handleDeleteApplication(applicationId);
-    // If the deleted application was selected, go back to list
-    if (selectedApplication && selectedApplication.id === applicationId) {
-      setSelectedApplication(null);
+    console.log('Deleting application:', applicationId);
+    try {
+      await handleDeleteApplication(applicationId);
+      // If the deleted application was selected, go back to list
+      if (selectedApplication && selectedApplication.id === applicationId) {
+        setSelectedApplication(null);
+      }
+      console.log('Application deleted successfully');
+    } catch (error) {
+      console.error('Error deleting application:', error);
     }
   };
 

@@ -25,6 +25,15 @@ const ApplicationItem = ({ application, onViewDetails, onDeleteApplication }: Ap
     }
   };
 
+  const handleDelete = () => {
+    console.log('ApplicationItem: Delete button clicked for application:', application.id);
+    if (onDeleteApplication) {
+      onDeleteApplication(application.id);
+    } else {
+      console.warn('ApplicationItem: onDeleteApplication prop is not provided');
+    }
+  };
+
   return (
     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
       <div className="flex-1 min-w-0">
@@ -66,7 +75,7 @@ const ApplicationItem = ({ application, onViewDetails, onDeleteApplication }: Ap
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onDeleteApplication(application.id)}
+              onClick={handleDelete}
               className="flex items-center space-x-1 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <Trash2 className="h-3 w-3" />
