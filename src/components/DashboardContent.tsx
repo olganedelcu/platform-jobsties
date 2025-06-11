@@ -60,12 +60,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             </h1>
             <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
           </div>
-          <Avatar className="h-14 w-14">
-            <AvatarImage src={user?.user_metadata?.avatar_url} alt={firstName} />
-            <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
-              <User className="h-7 w-7" />
-            </AvatarFallback>
-          </Avatar>
         </div>
       </div>
 
@@ -86,9 +80,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             onViewAll={() => navigate('/tracker')}
             onAddApplication={() => navigate('/tracker')}
           />
-
-          {/* Quick Links Section */}
-          <DashboardQuickLinks />
         </div>
 
         {/* Right Column */}
