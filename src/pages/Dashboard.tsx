@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
-import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import { Loader2 } from 'lucide-react';
+import DashboardContent from '@/components/DashboardContent';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -76,18 +76,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
-      
-      <main className="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Welcome, {user.user_metadata?.first_name}!
-          </h1>
-          <p className="text-gray-600 mt-2">Your career development dashboard</p>
-        </div>
-
-        {/* Quick Links Section */}
-        <DashboardQuickLinks />
-      </main>
+      <DashboardContent user={user} />
     </div>
   );
 };
