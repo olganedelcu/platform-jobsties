@@ -81,10 +81,12 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/coach/mentees" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Ana Coach Portal</span>
+              <img 
+                src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
+                alt="JobSties Logo" 
+                className="h-8 w-auto"
+              />
+              <span className="text-xl font-bold text-gray-900">Jobsties Coach</span>
             </Link>
           </div>
 
@@ -107,6 +109,15 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 </Link>
               );
             })}
+            
+            {/* Coach Portal Link */}
+            <Link
+              to="/dashboard"
+              className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span>Coach Portal</span>
+            </Link>
             
             <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
               <span className="text-sm text-gray-600">
@@ -157,6 +168,17 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 </Link>
               );
             })}
+            
+            {/* Coach Portal Link for Mobile */}
+            <Link
+              to="/dashboard"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <BarChart3 className="h-5 w-5" />
+              <span>Coach Portal</span>
+            </Link>
+            
             <div className="px-3 py-2 border-t mt-4">
               <div className="text-sm text-gray-600 mb-2">
                 {user?.user_metadata?.first_name || user?.email}
