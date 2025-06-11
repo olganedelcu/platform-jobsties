@@ -51,13 +51,25 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      {/* Simplified Header without avatar */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Good morning, {firstName}
-        </h1>
-        <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
+      {/* Header with avatar */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Good morning, {firstName}
+            </h1>
+            <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
+          </div>
+          <Avatar className="h-14 w-14">
+            <AvatarImage src={user?.user_metadata?.avatar_url} alt={firstName} />
+            <AvatarFallback className="bg-blue-100 text-blue-600 text-lg">
+              <User className="h-7 w-7" />
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
+
+      <DashboardQuickLinks />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
