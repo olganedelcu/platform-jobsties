@@ -5,8 +5,7 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 import { courseModules } from '@/data/courseModules';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { User } from 'lucide-react';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
@@ -61,17 +60,7 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      {/* Header with avatar */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Good morning, {firstName}
-            </h1>
-            <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
-          </div>
-        </div>
-      </div>
+      <DashboardHeader user={user} firstName={firstName} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
