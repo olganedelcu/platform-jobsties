@@ -43,7 +43,7 @@ const CVUploadForm = ({
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Upload className="h-5 w-5" />
-          <span>Upload New CV</span>
+          <span>Upload Documents</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -65,21 +65,24 @@ const CVUploadForm = ({
         </div>
 
         <div>
-          <Label htmlFor="cv-file">CV File (PDF only)</Label>
+          <Label htmlFor="cv-file">Document File (PDF, DOC, DOCX, TXT)</Label>
           <Input
             id="cv-file"
             type="file"
-            accept=".pdf"
+            accept=".pdf,.doc,.docx,.txt"
             onChange={handleFileChange}
             disabled={!selectedMentee || uploadingFile}
             className="mt-1"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Supported formats: PDF, DOC, DOCX, TXT
+          </p>
         </div>
 
         {uploadingFile && (
           <div className="text-center py-4">
             <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
-            <p className="text-sm text-gray-600 mt-2">Uploading CV...</p>
+            <p className="text-sm text-gray-600 mt-2">Uploading document...</p>
           </div>
         )}
       </CardContent>

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Trash2, User } from 'lucide-react';
+import { FileText, Download, Trash2, FileType } from 'lucide-react';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,6 +32,21 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
     if (!bytes) return 'Unknown size';
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(2)} MB`;
+  };
+
+  const getFileType = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return { type: 'PDF', color: 'bg-red-100 text-red-800', icon: 'text-red-500' };
+      case 'doc':
+      case 'docx':
+        return { type: 'DOC', color: 'bg-blue-100 text-blue-800', icon: 'text-blue-500' };
+      case 'txt':
+        return { type: 'TXT', color: 'bg-gray-100 text-gray-800', icon: 'text-gray-500' };
+      default:
+        return { type: 'FILE', color: 'bg-gray-100 text-gray-800', icon: 'text-gray-500' };
+    }
   };
 
   const handleDownload = async (filePath: string, fileName: string) => {
@@ -98,8 +113,8 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
     <Card className="mt-8">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <FileText className="h-5 w-5" />
-          <span>Uploaded CV Files</span>
+          <FileType className="h-5 w-5" />
+          <span>Uploaded Documents</span>
           {cvFiles.length > 0 && (
             <Badge variant="secondary" className="ml-2">
               {cvFiles.length}
@@ -111,8 +126,8 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
         {cvFiles.length === 0 ? (
           <div className="text-center py-8">
             <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No CV files uploaded yet</h3>
-            <p className="text-gray-500">Upload CV files for your mentees to get started</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No documents uploaded yet</h3>
+            <p className="text-gray-500">Upload documents for your mentees to get started</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -127,48 +142,56 @@ const CVFilesList = ({ cvFiles, onDeleteCV }: CVFilesListProps) => {
                     </Avatar>
                     <div>
                       <h3 className="font-medium text-gray-900">{menteeData.name}</h3>
-                      <p className="text-sm text-gray-500">{menteeData.files.length} CV file(s)</p>
+                      <p className="text-sm text-gray-500">{menteeData.files.length} document(s)</p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="p-4 space-y-3">
-                  {menteeData.files.map((cvFile) => (
-                    <div key={cvFile.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-shrink-0">
-                          <FileText className="h-8 w-8 text-red-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {cvFile.file_name}
-                          </p>
-                          <div className="flex items-center space-x-4 text-xs text-gray-400 mt-1">
-                            <span>{formatFileSize(cvFile.file_size)}</span>
-                            <span>Uploaded {format(new Date(cvFile.uploaded_at), 'MMM d, yyyy')}</span>
+                  {menteeData.files.map((cvFile) => {
+                    const fileType = getFileType(cvFile.file_name);
+                    return (
+                      <div key={cvFile.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex-shrink-0">
+                            <FileText className={`h-8 w-8 ${fileType.icon}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {cvFile.file_name}
+                              </p>
+                              <Badge className={fileType.color}>
+                                {fileType.type}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center space-x-4 text-xs text-gray-400">
+                              <span>{formatFileSize(cvFile.file_size)}</span>
+                              <span>Uploaded {format(new Date(cvFile.uploaded_at), 'MMM d, yyyy')}</span>
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownload(cvFile.file_url, cvFile.file_name)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onDeleteCV(cvFile.id, cvFile.file_url)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownload(cvFile.file_url, cvFile.file_name)}
-                          className="text-blue-600 hover:text-blue-700"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onDeleteCV(cvFile.id, cvFile.file_url)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}

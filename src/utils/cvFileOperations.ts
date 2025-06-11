@@ -3,6 +3,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Mentee } from '@/hooks/useMentees';
 
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain'
+];
+
+const getFileExtension = (file: File): string => {
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.pdf')) return 'pdf';
+  if (name.endsWith('.doc')) return 'doc';
+  if (name.endsWith('.docx')) return 'docx';
+  if (name.endsWith('.txt')) return 'txt';
+  return 'unknown';
+};
+
 export const uploadCVFile = async (
   file: File,
   selectedMentee: string,
@@ -19,10 +35,10 @@ export const uploadCVFile = async (
     return;
   }
 
-  if (file.type !== 'application/pdf') {
+  if (!ALLOWED_FILE_TYPES.includes(file.type)) {
     toast({
       title: "Error",
-      description: "Please upload a PDF file only.",
+      description: "Please upload a PDF, DOC, DOCX, or TXT file only.",
       variant: "destructive"
     });
     return;
@@ -35,8 +51,8 @@ export const uploadCVFile = async (
       throw new Error('User not authenticated');
     }
 
-    // Generate unique file name
-    const fileExt = 'pdf';
+    // Generate unique file name with correct extension
+    const fileExt = getFileExtension(file);
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
@@ -57,7 +73,7 @@ export const uploadCVFile = async (
 
     console.log('File uploaded successfully to storage');
 
-    // Save CV record to database with the storage file path
+    // Save document record to database with the storage file path
     const { error: dbError } = await supabase
       .from('cv_files')
       .insert({
@@ -77,13 +93,13 @@ export const uploadCVFile = async (
       throw dbError;
     }
 
-    console.log('CV record saved to database');
+    console.log('Document record saved to database');
 
     const mentee = mentees.find(m => m.id === selectedMentee);
     
     toast({
       title: "Success",
-      description: `CV uploaded successfully for ${mentee?.first_name} ${mentee?.last_name}`,
+      description: `Document uploaded successfully for ${mentee?.first_name} ${mentee?.last_name}`,
     });
 
     // Call the success callback function
@@ -93,7 +109,7 @@ export const uploadCVFile = async (
     console.error('Upload error:', error);
     toast({
       title: "Error",
-      description: error.message || "Failed to upload CV file.",
+      description: error.message || "Failed to upload document.",
       variant: "destructive"
     });
     return false;
@@ -109,7 +125,7 @@ export const deleteCVFile = async (
   toast: ReturnType<typeof useToast>['toast']
 ) => {
   try {
-    console.log('Deleting CV file:', cvId, 'at path:', filePath);
+    console.log('Deleting document:', cvId, 'at path:', filePath);
 
     // Delete from database
     const { error: dbError } = await supabase
@@ -122,7 +138,7 @@ export const deleteCVFile = async (
       throw dbError;
     }
 
-    console.log('CV record deleted from database');
+    console.log('Document record deleted from database');
 
     // Delete from storage using the stored file path
     const { error: storageError } = await supabase.storage
@@ -138,7 +154,7 @@ export const deleteCVFile = async (
 
     toast({
       title: "Success",
-      description: "CV file deleted successfully.",
+      description: "Document deleted successfully.",
     });
 
     // Call the success callback function
@@ -148,7 +164,7 @@ export const deleteCVFile = async (
     console.error('Delete error:', error);
     toast({
       title: "Error",
-      description: error.message || "Failed to delete CV file.",
+      description: error.message || "Failed to delete document.",
       variant: "destructive"
     });
     return false;
