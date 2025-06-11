@@ -9,130 +9,90 @@ export const useAuthState = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const hasInitialized = useRef(false);
+  const isCheckingUser = useRef(false);
 
   useEffect(() => {
     const checkUser = async () => {
+      if (isCheckingUser.current) return;
+      isCheckingUser.current = true;
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
         console.log('Initial session check:', session);
         
-        if (!session) {
-          setLoading(false);
-          // Only redirect to login if we're not already on a public page
-          if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
-            // Check if user was on a protected page that should preserve state
-            const protectedPaths = ['/coach/applications', '/tracker', '/coach/mentees'];
-            const isOnProtectedPath = protectedPaths.some(path => location.pathname.startsWith(path));
-            
-            if (!isOnProtectedPath) {
-              navigate('/login');
-            }
-          }
-          return;
-        }
-        
-        setUser(session.user);
+        setUser(session?.user || null);
         setLoading(false);
         hasInitialized.current = true;
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setLoading(false);
-        // Only redirect to login if we're not already on a public page
-        if (location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
-          // Don't redirect if user is on a page that should preserve state
+
+        // Handle redirects only after user state is set
+        if (!session) {
           const protectedPaths = ['/coach/applications', '/tracker', '/coach/mentees'];
           const isOnProtectedPath = protectedPaths.some(path => location.pathname.startsWith(path));
           
-          if (!isOnProtectedPath) {
+          if (!isOnProtectedPath && location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup') {
             navigate('/login');
           }
         }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setUser(null);
+        setLoading(false);
+        hasInitialized.current = true;
+      } finally {
+        isCheckingUser.current = false;
       }
     };
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // Only log and process significant auth events, not every state check
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           console.log('Auth state changed:', event, session?.user?.user_metadata);
         }
         
         if (session?.user) {
-          // Only update user state if it's actually different or if we haven't initialized
           const isDifferentUser = !user || user.id !== session.user.id;
           if (isDifferentUser || !hasInitialized.current) {
             setUser(session.user);
             setLoading(false);
             hasInitialized.current = true;
             
-            // Only redirect on actual SIGNED_IN event (login/signup), not on page reload or token refresh
+            // Only redirect on actual SIGNED_IN event
             if (event === 'SIGNED_IN' && isDifferentUser) {
-              // Check if user is already on a valid page for their role
               const currentPath = location.pathname;
               const userRole = session.user.user_metadata?.role;
               
               // Don't redirect if already on the correct dashboard
-              if (userRole === 'COACH' && currentPath.startsWith('/coach/')) {
-                return; // Stay on current coach page
-              }
-              if (userRole !== 'COACH' && (currentPath === '/dashboard' || currentPath === '/tracker')) {
-                return; // Stay on current mentee page
-              }
-              
-              try {
-                // First check the user's role from metadata for faster response
-                const userRoleFromMetadata = session.user.user_metadata?.role;
-                console.log('User role from metadata:', userRoleFromMetadata);
-                
-                if (userRoleFromMetadata === 'COACH') {
-                  console.log('Redirecting to coach dashboard (from metadata)');
-                  navigate('/coach/mentees');
-                } else {
-                  console.log('Redirecting to mentee dashboard (from metadata)');
-                  navigate('/dashboard');
-                }
-                
-                // Optional: Verify with database in background (no await to avoid blocking)
-                setTimeout(async () => {
-                  try {
-                    const { data: profile, error } = await supabase
-                      .from('profiles')
-                      .select('role')
-                      .eq('id', session.user.id)
-                      .single();
+              const isOnCorrectPage = (
+                (userRole === 'COACH' && currentPath.startsWith('/coach/')) ||
+                (userRole !== 'COACH' && (currentPath === '/dashboard' || currentPath === '/tracker'))
+              );
 
-                    console.log('Profile verification result:', { profile, error });
-                    
-                    // Only redirect if role differs from metadata
-                    if (!error && profile.role !== userRoleFromMetadata) {
-                      if (profile.role === 'COACH') {
-                        navigate('/coach/mentees');
-                      } else {
-                        navigate('/dashboard');
-                      }
-                    }
-                  } catch (error) {
-                    console.error('Background role verification error:', error);
+              if (!isOnCorrectPage) {
+                try {
+                  const userRoleFromMetadata = session.user.user_metadata?.role;
+                  console.log('User role from metadata:', userRoleFromMetadata);
+                  
+                  if (userRoleFromMetadata === 'COACH') {
+                    console.log('Redirecting to coach dashboard (from metadata)');
+                    navigate('/coach/mentees');
+                  } else {
+                    console.log('Redirecting to mentee dashboard (from metadata)');
+                    navigate('/dashboard');
                   }
-                }, 100);
-                
-              } catch (error) {
-                console.error('Error during role check:', error);
-                // If there's an error, use metadata as fallback
-                const userRoleFromMetadata = session.user.user_metadata?.role;
-                if (userRoleFromMetadata === 'COACH') {
-                  console.log('Redirecting to coach dashboard (error fallback)');
-                  navigate('/coach/mentees');
-                } else {
-                  console.log('Redirecting to mentee dashboard (error fallback)');
-                  navigate('/dashboard');
+                } catch (error) {
+                  console.error('Error during role check:', error);
+                  const userRoleFromMetadata = session.user.user_metadata?.role;
+                  if (userRoleFromMetadata === 'COACH') {
+                    navigate('/coach/mentees');
+                  } else {
+                    navigate('/dashboard');
+                  }
                 }
               }
             }
           }
         } else {
-          // Only update state if we actually had a user before
           if (user || !hasInitialized.current) {
             setUser(null);
             setLoading(false);
@@ -140,7 +100,6 @@ export const useAuthState = () => {
           }
           
           if (event === 'SIGNED_OUT') {
-            // Clear any preserved state when signing out
             try {
               localStorage.removeItem('coach-applications-selected');
               localStorage.removeItem('coach-applications-view-mode');
@@ -154,14 +113,16 @@ export const useAuthState = () => {
       }
     );
 
-    checkUser();
+    // Only check user if not already initialized
+    if (!hasInitialized.current) {
+      checkUser();
+    }
 
     return () => subscription.unsubscribe();
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, user]);
 
   const handleSignOut = async () => {
     try {
-      // Clear localStorage before signing out
       try {
         localStorage.removeItem('coach-applications-selected');
         localStorage.removeItem('coach-applications-view-mode');

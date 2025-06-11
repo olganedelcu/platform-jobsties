@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { JobApplication } from '@/types/jobApplications';
@@ -19,6 +20,7 @@ export const useDraftManagement = () => {
   const hasRestoredDrafts = useRef(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialized = useRef(false);
+  const lastEditingId = useRef<string | null>(null);
 
   // Clean up expired drafts on mount (only once)
   useEffect(() => {
@@ -28,7 +30,7 @@ export const useDraftManagement = () => {
     }
   }, []);
 
-  // Cross-tab synchronization
+  // Cross-tab synchronization with improved stability
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key && e.key.startsWith('unsaved_application_') && editingId) {
@@ -53,7 +55,7 @@ export const useDraftManagement = () => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [editingId]);
 
-  // Debounced save to localStorage
+  // Debounced save to localStorage with better error handling
   const debouncedSave = useCallback((applicationId: string, formData: Partial<JobApplication>) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -62,16 +64,23 @@ export const useDraftManagement = () => {
     saveTimeoutRef.current = setTimeout(() => {
       try {
         if (applicationId && Object.keys(formData).length > 0) {
-          saveDraftToLocalStorage(applicationId, formData);
-          setHasAutoSavedDraft(true);
+          const hasActualData = Object.values(formData).some(value => 
+            value !== null && value !== undefined && value !== ''
+          );
+          
+          if (hasActualData) {
+            saveDraftToLocalStorage(applicationId, formData);
+            setHasAutoSavedDraft(true);
+            console.log('Draft auto-saved for application:', applicationId);
+          }
         }
       } catch (error) {
         console.error('Error saving draft:', error);
       }
-    }, 500); // 500ms debounce as requested
+    }, 500);
   }, []);
 
-  // Save draft changes to localStorage whenever editData changes (debounced)
+  // Save draft changes to localStorage whenever editData changes
   useEffect(() => {
     if (editingId && Object.keys(editData).length > 0) {
       debouncedSave(editingId, editData);
@@ -85,16 +94,19 @@ export const useDraftManagement = () => {
   }, [editingId, editData, debouncedSave]);
 
   const handleEdit = useCallback((application: JobApplication) => {
-    // Prevent re-editing the same application unless it's really a new edit session
-    if (editingId === application.id && Object.keys(editData).length > 0) {
-      return; // Already editing this application
+    console.log('Starting edit for application:', application.id);
+    
+    // Reset restoration flag if editing a different application
+    if (lastEditingId.current !== application.id) {
+      hasRestoredDrafts.current = false;
+      lastEditingId.current = application.id;
     }
 
-    // First check if there's an existing draft
+    // Check if there's an existing draft
     const existingDraft = loadDraftFromLocalStorage(application.id);
     
     if (existingDraft && !hasRestoredDrafts.current) {
-      // Restore from draft
+      console.log('Restoring draft for application:', application.id);
       setEditingId(application.id);
       setEditData(existingDraft.formData);
       setShowRestorationBanner(true);
@@ -102,7 +114,7 @@ export const useDraftManagement = () => {
       setHasAutoSavedDraft(true);
       hasRestoredDrafts.current = true;
     } else {
-      // Use current application data
+      console.log('Using current application data for:', application.id);
       setEditingId(application.id);
       setEditData({
         company_name: application.company_name,
@@ -115,22 +127,26 @@ export const useDraftManagement = () => {
       });
       setHasAutoSavedDraft(false);
     }
-  }, [editingId, editData]);
+  }, []);
 
   const handleSave = useCallback(async (applicationId: string, onUpdateApplication: (id: string, updates: Partial<JobApplication>) => Promise<void>) => {
     try {
+      console.log('Saving application:', applicationId);
       await onUpdateApplication(applicationId, editData);
       setEditingId(null);
       setEditData({});
       setShowRestorationBanner(false);
       setHasAutoSavedDraft(false);
       clearDraftFromLocalStorage(applicationId);
+      hasRestoredDrafts.current = false;
+      lastEditingId.current = null;
     } catch (error) {
       console.error('Error saving application:', error);
     }
   }, [editData]);
 
   const handleCancel = useCallback(() => {
+    console.log('Cancelling edit');
     setEditingId(null);
     setEditData({});
     setShowRestorationBanner(false);
@@ -141,9 +157,11 @@ export const useDraftManagement = () => {
 
   const handleDiscardDraft = useCallback(() => {
     if (editingId) {
+      console.log('Discarding draft for application:', editingId);
       clearDraftFromLocalStorage(editingId);
       setShowRestorationBanner(false);
       setHasAutoSavedDraft(false);
+      hasRestoredDrafts.current = false;
       
       toast({
         title: "Draft Discarded",
@@ -157,6 +175,7 @@ export const useDraftManagement = () => {
   }, []);
 
   const handleEditDataChange = useCallback((updates: Partial<JobApplication>) => {
+    console.log('Edit data changing:', updates);
     setEditData(prev => ({ ...prev, ...updates }));
   }, []);
 

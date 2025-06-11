@@ -9,6 +9,9 @@ import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
 
 const Tracker = () => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
+  const [isPageReady, setIsPageReady] = useState(false);
+
+  // Use job applications data hook only when user is available
   const {
     applications,
     loading: applicationsLoading,
@@ -18,10 +21,7 @@ const Tracker = () => {
   } = useJobApplicationsData(user);
 
   // Preserve scroll position
-  const [isPageReady, setIsPageReady] = useState(false);
-
   useEffect(() => {
-    // Restore scroll position when page loads
     const savedScrollPosition = localStorage.getItem('tracker-scroll-position');
     if (savedScrollPosition) {
       setTimeout(() => {
@@ -32,7 +32,6 @@ const Tracker = () => {
   }, []);
 
   useEffect(() => {
-    // Save scroll position periodically
     const handleScroll = () => {
       try {
         localStorage.setItem('tracker-scroll-position', window.scrollY.toString());
@@ -47,7 +46,7 @@ const Tracker = () => {
     };
   }, []);
 
-  // Only clean up scroll position on unmount, NOT drafts
+  // Clean up scroll position on unmount
   useEffect(() => {
     return () => {
       try {
@@ -66,7 +65,6 @@ const Tracker = () => {
     );
   }
 
-  // If no user but not loading, show message without redirecting
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
