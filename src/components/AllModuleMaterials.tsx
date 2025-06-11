@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ModuleFiles from '@/components/ModuleFiles';
+import MenteeCVFiles from '@/components/MenteeCVFiles';
 
 interface AllModuleMaterialsProps {
   userId: string;
@@ -17,11 +18,7 @@ const AllModuleMaterials = ({ userId }: AllModuleMaterialsProps) => {
       </div>
       
       <div className="space-y-6">
-        <ModuleFiles 
-          userId={userId} 
-          moduleType="cv_optimization" 
-          title="CV Optimization" 
-        />
+        <MenteeCVFiles userId={userId} />
         <ModuleFiles 
           userId={userId} 
           moduleType="linkedin" 

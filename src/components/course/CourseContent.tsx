@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseModule from '@/components/course/CourseModule';
 import ModuleFiles from '@/components/ModuleFiles';
+import MenteeCVFiles from '@/components/MenteeCVFiles';
 import { courseModules } from '@/data/courseModules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 
@@ -100,11 +101,7 @@ const CourseContent = ({ userId }: CourseContentProps) => {
         </p>
         
         <div className="space-y-6">
-          <ModuleFiles 
-            userId={userId} 
-            moduleType="cv_optimization" 
-            title="CV Optimization" 
-          />
+          <MenteeCVFiles userId={userId} />
           <ModuleFiles 
             userId={userId} 
             moduleType="linkedin" 
