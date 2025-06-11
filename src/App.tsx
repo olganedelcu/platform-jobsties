@@ -3,33 +3,31 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Showcase from "./pages/Showcase";
 import SignUp from "./pages/SignUp";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Sessions from "./pages/Sessions";
 import Tracker from "./pages/Tracker";
 import Course from "./pages/Course";
-import Showcase from "./pages/Showcase";
-import NotFound from "./pages/NotFound";
-import ChatPage from "./pages/ChatPage";
-
-// Coach pages
-import CoachLogin from "./pages/CoachLogin";
 import CoachSignUp from "./pages/CoachSignUp";
-import HomeCoach from "./pages/HomeCoach";
+import CoachLogin from "./pages/CoachLogin";
 import CoachDashboard from "./pages/CoachDashboard";
-import Mentees from "./pages/coach/Mentees";
-import Applications from "./pages/coach/Applications";
-import CoachSessions from "./pages/coach/CoachSessions";
-import CoachCalendar from "./pages/coach/CoachCalendar";
 import CVUpload from "./pages/coach/CVUpload";
-import CoachTodos from "./pages/coach/CoachTodos";
-import CoachProfile from "./pages/coach/CoachProfile";
+import CoachSessions from "./pages/coach/CoachSessions";
+import Mentees from "./pages/coach/Mentees";
 import CoachSettings from "./pages/coach/CoachSettings";
-
-import ProtectedCoachRoute from "./components/ProtectedCoachRoute";
+import CoachProfile from "./pages/coach/CoachProfile";
+import CoachTodos from "./pages/coach/CoachTodos";
+import Applications from "./pages/coach/Applications";
+import CoachCalendar from "./pages/coach/CoachCalendar";
+import JobRecommendations from "./pages/coach/JobRecommendations";
+import BackupManagementPage from "./pages/coach/BackupManagement";
+import ChatPage from "./pages/ChatPage";
+import NotFound from "./pages/NotFound";
+import HomeCoach from "./pages/HomeCoach";
 
 const queryClient = new QueryClient();
 
@@ -40,29 +38,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/showcase" element={<Showcase />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Showcase />} />
           <Route path="/signup" element={<SignUp />} />
-          
-          {/* Coach routes */}
-          <Route path="/coach" element={<HomeCoach />} />
-          <Route path="/coach/login" element={<CoachLogin />} />
-          <Route path="/coach/signup" element={<CoachSignUp />} />
-          
-          {/* Protected coach routes */}
-          <Route path="/coach/dashboard" element={<ProtectedCoachRoute><CoachDashboard /></ProtectedCoachRoute>} />
-          <Route path="/coach/mentees" element={<ProtectedCoachRoute><Mentees /></ProtectedCoachRoute>} />
-          <Route path="/coach/applications" element={<ProtectedCoachRoute><Applications /></ProtectedCoachRoute>} />
-          <Route path="/coach/sessions" element={<ProtectedCoachRoute><CoachSessions /></ProtectedCoachRoute>} />
-          <Route path="/coach/calendar" element={<ProtectedCoachRoute><CoachCalendar /></ProtectedCoachRoute>} />
-          <Route path="/coach/cv-upload" element={<ProtectedCoachRoute><CVUpload /></ProtectedCoachRoute>} />
-          <Route path="/coach/todos" element={<ProtectedCoachRoute><CoachTodos /></ProtectedCoachRoute>} />
-          <Route path="/coach/profile" element={<ProtectedCoachRoute><CoachProfile /></ProtectedCoachRoute>} />
-          <Route path="/coach/settings" element={<ProtectedCoachRoute><CoachSettings /></ProtectedCoachRoute>} />
-          
-          {/* Mentee routes */}
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/sessions" element={<Sessions />} />
@@ -70,7 +48,22 @@ const App = () => (
           <Route path="/course" element={<Course />} />
           <Route path="/chat" element={<ChatPage />} />
           
-          {/* 404 route */}
+          {/* Coach Routes */}
+          <Route path="/coach" element={<HomeCoach />} />
+          <Route path="/coach/signup" element={<CoachSignUp />} />
+          <Route path="/coach/login" element={<CoachLogin />} />
+          <Route path="/coach/mentees" element={<Mentees />} />
+          <Route path="/coach/dashboard" element={<CoachDashboard />} />
+          <Route path="/coach/cv-upload" element={<CVUpload />} />
+          <Route path="/coach/sessions" element={<CoachSessions />} />
+          <Route path="/coach/settings" element={<CoachSettings />} />
+          <Route path="/coach/profile" element={<CoachProfile />} />
+          <Route path="/coach/todos" element={<CoachTodos />} />
+          <Route path="/coach/applications" element={<Applications />} />
+          <Route path="/coach/calendar" element={<CoachCalendar />} />
+          <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
+          <Route path="/coach/backup" element={<BackupManagementPage />} />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

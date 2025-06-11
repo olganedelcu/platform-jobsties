@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   CheckSquare,
-  BarChart3
+  BarChart3,
+  Database
 } from 'lucide-react';
 
 interface CoachNavigationProps {
@@ -54,6 +55,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       path: '/coach/todos', 
       label: 'Tasks', 
       icon: CheckSquare 
+    },
+    { 
+      path: '/coach/backup', 
+      label: 'Backup', 
+      icon: Database 
     },
     { 
       path: '/coach/profile', 

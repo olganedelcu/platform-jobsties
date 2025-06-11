@@ -9,6 +9,78 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      backup_configurations: {
+        Row: {
+          backup_type: string
+          config_data: Json | null
+          created_at: string
+          id: string
+          is_enabled: boolean
+          retention_days: number
+          schedule_cron: string
+          updated_at: string
+        }
+        Insert: {
+          backup_type: string
+          config_data?: Json | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          retention_days?: number
+          schedule_cron: string
+          updated_at?: string
+        }
+        Update: {
+          backup_type?: string
+          config_data?: Json | null
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          retention_days?: number
+          schedule_cron?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      backup_logs: {
+        Row: {
+          backup_location: string | null
+          backup_type: string
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          file_size: number | null
+          id: string
+          metadata: Json | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          backup_location?: string | null
+          backup_type: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          backup_location?: string | null
+          backup_type?: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_size?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       coach_availability: {
         Row: {
           coach_id: string
@@ -712,6 +784,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_backup_statistics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          backup_type: string
+          last_backup: string
+          success_rate: number
+          total_size: number
+          backup_count: number
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -725,6 +807,17 @@ export type Database = {
       hide_application: {
         Args: { coach_user_id: string; app_id: string }
         Returns: undefined
+      }
+      log_backup_operation: {
+        Args: {
+          p_backup_type: string
+          p_status: string
+          p_backup_location?: string
+          p_file_size?: number
+          p_error_message?: string
+          p_metadata?: Json
+        }
+        Returns: string
       }
     }
     Enums: {
