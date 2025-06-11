@@ -10,15 +10,15 @@ const JobApplicationsTableHeader = ({ showCoachNotesColumn = true }: JobApplicat
   return (
     <TableHeader>
       <TableRow>
-        <TableHead>Date Applied</TableHead>
-        <TableHead>Company</TableHead>
-        <TableHead>Position</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Interview Stage</TableHead>
-        <TableHead>Recruiter</TableHead>
-        <TableHead>My Notes</TableHead>
-        {showCoachNotesColumn && <TableHead>Coach Feedback</TableHead>}
-        <TableHead>Actions</TableHead>
+        <TableHead className="w-32">Date Applied</TableHead>
+        <TableHead className="w-40">Company</TableHead>
+        <TableHead className="w-40">Position</TableHead>
+        <TableHead className="w-32">Status</TableHead>
+        <TableHead className="w-32">Interview Stage</TableHead>
+        <TableHead className="w-40">Recruiter</TableHead>
+        <TableHead className="w-64">My Notes</TableHead>
+        {showCoachNotesColumn && <TableHead className="w-64">Coach Feedback</TableHead>}
+        <TableHead className="w-24">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );

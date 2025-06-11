@@ -23,7 +23,7 @@ const NewApplicationRow = ({
 }: NewApplicationRowProps) => {
   return (
     <TableRow className="bg-blue-50">
-      <TableCell>
+      <TableCell className="w-32">
         <Input
           type="date"
           value={newApplicationData.dateApplied}
@@ -31,7 +31,7 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-40">
         <Input
           value={newApplicationData.companyName}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, companyName: e.target.value }))}
@@ -39,7 +39,7 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-40">
         <Input
           value={newApplicationData.jobTitle}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobTitle: e.target.value }))}
@@ -47,7 +47,7 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-32">
         <Select
           value={newApplicationData.applicationStatus}
           onValueChange={(value) => setNewApplicationData(prev => ({ ...prev, applicationStatus: value }))}
@@ -65,7 +65,7 @@ const NewApplicationRow = ({
           </SelectContent>
         </Select>
       </TableCell>
-      <TableCell>
+      <TableCell className="w-32">
         <Input
           value={newApplicationData.interviewStage || ''}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, interviewStage: e.target.value }))}
@@ -73,7 +73,7 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-40">
         <Input
           value={newApplicationData.recruiterName || ''}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, recruiterName: e.target.value }))}
@@ -81,7 +81,7 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-64">
         <Textarea
           value={newApplicationData.menteeNotes || ''}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, menteeNotes: e.target.value }))}
@@ -89,7 +89,7 @@ const NewApplicationRow = ({
           className="w-full min-h-[60px]"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-64">
         <Textarea
           value={newApplicationData.coachNotes || ''}
           onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
@@ -97,7 +97,7 @@ const NewApplicationRow = ({
           className="w-full min-h-[60px]"
         />
       </TableCell>
-      <TableCell>
+      <TableCell className="w-24">
         <div className="flex gap-1">
           <Button size="sm" onClick={onSave}>
             <Save className="h-3 w-3" />

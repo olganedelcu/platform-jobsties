@@ -52,7 +52,7 @@ const JobApplicationRow = ({
   if (isEditing) {
     return (
       <TableRow className="bg-yellow-50">
-        <TableCell>
+        <TableCell className="w-32">
           {isCoachView ? (
             <div className="text-sm">
               {format(new Date(application.date_applied), 'MMM dd, yyyy')}
@@ -66,7 +66,7 @@ const JobApplicationRow = ({
             />
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-40">
           {isCoachView ? (
             <div className="text-sm font-medium">{application.company_name}</div>
           ) : (
@@ -77,7 +77,7 @@ const JobApplicationRow = ({
             />
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-40">
           {isCoachView ? (
             <div className="text-sm">{application.job_title}</div>
           ) : (
@@ -88,7 +88,7 @@ const JobApplicationRow = ({
             />
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-32">
           {isCoachView ? (
             <Badge className={getStatusColor(application.application_status)}>
               {application.application_status.replace('_', ' ').toUpperCase()}
@@ -112,7 +112,7 @@ const JobApplicationRow = ({
             </Select>
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-32">
           {isCoachView ? (
             <div className="text-sm">{application.interview_stage || '-'}</div>
           ) : (
@@ -123,9 +123,9 @@ const JobApplicationRow = ({
             />
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-40">
           {isCoachView ? (
-            <div className="text-sm">{application.recruiter_name || '-'}</div>
+            <div className="text-sm break-words">{application.recruiter_name || '-'}</div>
           ) : (
             <Input
               value={editData.recruiter_name || application.recruiter_name || ''}
@@ -134,7 +134,7 @@ const JobApplicationRow = ({
             />
           )}
         </TableCell>
-        <TableCell>
+        <TableCell className="w-64">
           <Textarea
             value={editData.mentee_notes !== undefined ? editData.mentee_notes : (application.mentee_notes || '')}
             onChange={(e) => onEditDataChange({ mentee_notes: e.target.value })}
@@ -143,7 +143,7 @@ const JobApplicationRow = ({
             disabled={isCoachView}
           />
         </TableCell>
-        <TableCell>
+        <TableCell className="w-64">
           <Textarea
             value={editData.coach_notes !== undefined ? editData.coach_notes : (application.coach_notes || '')}
             onChange={(e) => onEditDataChange({ coach_notes: e.target.value })}
@@ -152,7 +152,7 @@ const JobApplicationRow = ({
             disabled={!isCoachView}
           />
         </TableCell>
-        <TableCell>
+        <TableCell className="w-24">
           <div className="flex gap-1">
             <Button size="sm" onClick={() => onSave(application.id)}>
               <Save className="h-3 w-3" />
@@ -168,18 +168,22 @@ const JobApplicationRow = ({
 
   return (
     <TableRow className="hover:bg-gray-50">
-      <TableCell>{format(new Date(application.date_applied), 'MMM dd, yyyy')}</TableCell>
-      <TableCell className="font-medium">{application.company_name}</TableCell>
-      <TableCell>{application.job_title}</TableCell>
-      <TableCell>
+      <TableCell className="w-32">{format(new Date(application.date_applied), 'MMM dd, yyyy')}</TableCell>
+      <TableCell className="w-40 font-medium">{application.company_name}</TableCell>
+      <TableCell className="w-40">{application.job_title}</TableCell>
+      <TableCell className="w-32">
         <Badge className={getStatusColor(application.application_status)}>
           {application.application_status.replace('_', ' ').toUpperCase()}
         </Badge>
       </TableCell>
-      <TableCell>{application.interview_stage || '-'}</TableCell>
-      <TableCell>{application.recruiter_name || '-'}</TableCell>
-      <TableCell>
-        <div className="max-w-xs">
+      <TableCell className="w-32">{application.interview_stage || '-'}</TableCell>
+      <TableCell className="w-40">
+        <div className="break-words">
+          {application.recruiter_name || '-'}
+        </div>
+      </TableCell>
+      <TableCell className="w-64">
+        <div className="break-words">
           {application.mentee_notes ? (
             <div className="text-sm text-gray-700 bg-green-50 p-2 rounded border-l-2 border-green-400">
               {application.mentee_notes}
@@ -189,8 +193,8 @@ const JobApplicationRow = ({
           )}
         </div>
       </TableCell>
-      <TableCell>
-        <div className="max-w-xs">
+      <TableCell className="w-64">
+        <div className="break-words">
           {application.coach_notes ? (
             <div className="text-sm text-gray-700 p-2 rounded bg-blue-50 border-l-2 border-blue-400">
               {application.coach_notes}
@@ -200,7 +204,7 @@ const JobApplicationRow = ({
           )}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="w-24">
         <div className="flex gap-1">
           <Button
             size="sm"
