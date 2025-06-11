@@ -33,13 +33,13 @@ const MenteeApplicationsList = ({
   if (applications.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">No applications found.</p>
+        <p className="text-gray-600">No applications found for this mentee.</p>
       </div>
     );
   }
 
   return (
-    <div className="border rounded-lg bg-white">
+    <div className="border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
@@ -49,14 +49,12 @@ const MenteeApplicationsList = ({
             <TableHead>Status</TableHead>
             <TableHead>Interview Stage</TableHead>
             <TableHead>Recruiter</TableHead>
-            <TableHead>Mentee Notes</TableHead>
-            <TableHead>Coach Notes</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {applications.map((application) => (
-            <TableRow key={application.id} className="hover:bg-gray-50">
+            <TableRow key={application.id}>
               <TableCell>
                 {format(new Date(application.date_applied), 'MMM dd, yyyy')}
               </TableCell>
@@ -71,28 +69,6 @@ const MenteeApplicationsList = ({
               </TableCell>
               <TableCell>{application.interview_stage || '-'}</TableCell>
               <TableCell>{application.recruiter_name || '-'}</TableCell>
-              <TableCell>
-                <div className="max-w-xs">
-                  {application.mentee_notes ? (
-                    <div className="text-sm text-gray-700 bg-green-50 p-2 rounded border-l-2 border-green-400">
-                      {application.mentee_notes}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400 text-sm">-</span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="max-w-xs">
-                  {application.coach_notes ? (
-                    <div className="text-sm text-gray-700 p-2 rounded bg-blue-50 border-l-2 border-blue-400">
-                      {application.coach_notes}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400 text-sm">-</span>
-                  )}
-                </div>
-              </TableCell>
               <TableCell>
                 <div className="flex items-center space-x-2">
                   {onViewDetails && (
