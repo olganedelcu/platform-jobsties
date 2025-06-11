@@ -3,11 +3,11 @@ import React from 'react';
 import { useMentees } from '@/hooks/useMentees';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import { useCVFiles } from '@/hooks/useCVFiles';
+import { useMenteeNotes } from '@/hooks/useMenteeNotes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Users, Mail, User, Search, FileText, Briefcase, TrendingUp } from 'lucide-react';
+import { Users, Mail, Search, FileText, Briefcase, TrendingUp, StickyNote } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -17,11 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import MenteeNotesCell from '@/components/MenteeNotesCell';
 
 const MenteesContent = () => {
   const { mentees, loading } = useMentees();
   const { applications } = useCoachApplications();
   const { cvFiles } = useCVFiles();
+  const { updateNote, getNoteForMentee, loading: notesLoading } = useMenteeNotes();
   const [searchTerm, setSearchTerm] = React.useState('');
 
   // Filter mentees based on search term
@@ -51,7 +53,7 @@ const MenteesContent = () => {
     };
   };
 
-  if (loading) {
+  if (loading || notesLoading) {
     return (
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
         <div className="flex items-center justify-between mb-8">
@@ -137,7 +139,7 @@ const MenteesContent = () => {
                         <TableHead className="text-center">Active/Interviews</TableHead>
                         <TableHead className="text-center">CV Files</TableHead>
                         <TableHead className="text-center">Progress</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead className="min-w-[250px]">Notes</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -198,12 +200,11 @@ const MenteesContent = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Button variant="outline" size="sm">
-                                  <User className="h-4 w-4 mr-1" />
-                                  View Profile
-                                </Button>
-                              </div>
+                              <MenteeNotesCell
+                                menteeId={mentee.id}
+                                initialNote={getNoteForMentee(mentee.id)}
+                                onSave={updateNote}
+                              />
                             </TableCell>
                           </TableRow>
                         );

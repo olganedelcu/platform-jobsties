@@ -484,6 +484,33 @@ export type Database = {
         }
         Relationships: []
       }
+      mentee_notes: {
+        Row: {
+          coach_id: string
+          created_at: string
+          id: string
+          mentee_id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string
+          id?: string
+          mentee_id: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string
+          id?: string
+          mentee_id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
