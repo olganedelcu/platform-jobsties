@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Users, ArrowRight } from 'lucide-react';
 import { Mentee } from '@/hooks/useMentees';
-import { useMenteeProgress } from '@/hooks/useMenteeProgress';
+import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
+import MenteeProgressItem from './MenteeProgressItem';
 
 interface MenteesCardProps {
   mentees: Mentee[];
@@ -16,7 +16,7 @@ interface MenteesCardProps {
 
 const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
   const menteeIds = mentees.map(m => m.id);
-  const { progressData, loading: progressLoading } = useMenteeProgress(menteeIds);
+  const { loading: progressLoading, getMenteeProgress, averageProgress } = useMenteeProgressStats(menteeIds);
 
   if (loading || progressLoading) {
     return (
@@ -35,18 +35,6 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
       </Card>
     );
   }
-
-  const getMenteeProgress = (menteeId: string) => {
-    return progressData.find(p => p.menteeId === menteeId) || {
-      overallProgress: 0,
-      completedModules: 0,
-      totalModules: 5
-    };
-  };
-
-  const averageProgress = progressData.length > 0 
-    ? Math.round(progressData.reduce((sum, p) => sum + p.overallProgress, 0) / progressData.length)
-    : 0;
 
   return (
     <Card className="border border-gray-200 shadow-sm">
@@ -81,29 +69,13 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
               {mentees.slice(0, 3).map((mentee) => {
                 const progress = getMenteeProgress(mentee.id);
                 return (
-                  <div key={mentee.id} className="flex items-center space-x-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs">
-                        {mentee.first_name[0]}{mentee.last_name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {mentee.first_name} {mentee.last_name}
-                        </p>
-                        <span className="text-xs text-gray-500">
-                          {progress.overallProgress}%
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Progress value={progress.overallProgress} className="h-1 flex-1" />
-                        <span className="text-xs text-gray-400">
-                          {progress.completedModules}/{progress.totalModules}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <MenteeProgressItem
+                    key={mentee.id}
+                    mentee={mentee}
+                    overallProgress={progress.overallProgress}
+                    completedModules={progress.completedModules}
+                    totalModules={progress.totalModules}
+                  />
                 );
               })}
             </div>
