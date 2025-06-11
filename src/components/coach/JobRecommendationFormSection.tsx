@@ -52,7 +52,7 @@ const JobRecommendationFormSection = ({
             </SelectTrigger>
             <SelectContent>
               {mentees.length === 0 ? (
-                <SelectItem value="" disabled>No mentees found</SelectItem>
+                <SelectItem value="no-mentees-placeholder" disabled>No mentees found</SelectItem>
               ) : (
                 mentees.map((mentee) => (
                   <SelectItem key={mentee.id} value={mentee.id}>
@@ -117,7 +117,7 @@ const JobRecommendationFormSection = ({
         <Button 
           type="submit" 
           className="flex-1 bg-indigo-600 hover:bg-indigo-700"
-          disabled={!selectedMentee}
+          disabled={!selectedMentee || selectedMentee === "no-mentees-placeholder"}
         >
           <Send className="h-4 w-4 mr-2" />
           Send {getValidRecommendations().length} Recommendation(s)
