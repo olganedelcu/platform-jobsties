@@ -4,20 +4,11 @@ import { useMentees } from '@/hooks/useMentees';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import { useCVFiles } from '@/hooks/useCVFiles';
 import { useMenteeNotes } from '@/hooks/useMenteeNotes';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Users, Mail, Search, FileText, Briefcase, TrendingUp, StickyNote } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import MenteeNotesCell from '@/components/MenteeNotesCell';
+import { Card, CardContent } from '@/components/ui/card';
+import MenteesHeader from '@/components/MenteesHeader';
+import MenteesSearchBar from '@/components/MenteesSearchBar';
+import MenteesTable from '@/components/MenteesTable';
+import MenteesEmptyState from '@/components/MenteesEmptyState';
 
 const MenteesContent = () => {
   const { mentees, loading } = useMentees();
@@ -31,27 +22,6 @@ const MenteesContent = () => {
     `${mentee.first_name} ${mentee.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     mentee.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  // Helper function to get mentee statistics
-  const getMenteeStats = (menteeId: string) => {
-    const menteeApplications = applications.filter(app => app.mentee_id === menteeId);
-    const menteeCVs = cvFiles.filter(cv => cv.mentee_id === menteeId);
-    
-    const totalApplications = menteeApplications.length;
-    const activeApplications = menteeApplications.filter(app => 
-      !['rejected', 'withdrawn'].includes(app.application_status)
-    ).length;
-    const interviewStage = menteeApplications.filter(app => 
-      app.application_status === 'interviewing'
-    ).length;
-    
-    return {
-      totalApplications,
-      activeApplications,
-      interviewStage,
-      cvCount: menteeCVs.length
-    };
-  };
 
   if (loading || notesLoading) {
     return (
@@ -76,145 +46,24 @@ const MenteesContent = () => {
 
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Mentees</h1>
-          <p className="text-gray-500 mt-2">Manage and track your assigned mentees with detailed progress information</p>
-        </div>
-        
-        <Badge variant="outline" className="text-lg px-4 py-2">
-          {mentees.length} mentee{mentees.length !== 1 ? 's' : ''} assigned
-        </Badge>
-      </div>
+      <MenteesHeader menteeCount={mentees.length} />
 
       {mentees.length === 0 ? (
-        <Card>
-          <CardContent className="py-16">
-            <div className="text-center">
-              <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No assigned mentees</h3>
-              <p className="text-gray-500 mb-4">New mentees will be automatically assigned to you when they sign up</p>
-            </div>
-          </CardContent>
-        </Card>
+        <MenteesEmptyState type="no-mentees" />
       ) : (
         <div className="space-y-6">
-          {/* Search Bar */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search mentees by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <MenteesSearchBar 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+          />
 
-          {/* Enhanced Mentees Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Users className="h-5 w-5" />
-                <span>All Mentees ({filteredMentees.length})</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {filteredMentees.length === 0 ? (
-                <div className="text-center py-8">
-                  <Search className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No mentees found matching your search</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Mentee</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead className="text-center">Applications</TableHead>
-                        <TableHead className="text-center">Active/Interviews</TableHead>
-                        <TableHead className="text-center">CV Files</TableHead>
-                        <TableHead className="text-center">Progress</TableHead>
-                        <TableHead className="min-w-[250px]">Notes</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredMentees.map((mentee) => {
-                        const stats = getMenteeStats(mentee.id);
-                        const progressPercentage = stats.totalApplications > 0 
-                          ? Math.round((stats.interviewStage / stats.totalApplications) * 100) 
-                          : 0;
-                        
-                        return (
-                          <TableRow key={mentee.id}>
-                            <TableCell>
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 w-10">
-                                  <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm">
-                                    {mentee.first_name[0]}{mentee.last_name[0]}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-medium text-gray-900">
-                                    {mentee.first_name} {mentee.last_name}
-                                  </p>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center space-x-2">
-                                <Mail className="h-4 w-4 text-gray-400" />
-                                <span className="text-gray-700">{mentee.email}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex items-center justify-center space-x-1">
-                                <Briefcase className="h-4 w-4 text-blue-500" />
-                                <span className="font-semibold text-blue-600">{stats.totalApplications}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex items-center justify-center space-x-2">
-                                <Badge variant={stats.activeApplications > 0 ? "default" : "secondary"} className="text-xs">
-                                  {stats.activeApplications} Active
-                                </Badge>
-                                <Badge variant={stats.interviewStage > 0 ? "default" : "outline"} className="text-xs">
-                                  {stats.interviewStage} Interviews
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex items-center justify-center space-x-1">
-                                <FileText className="h-4 w-4 text-green-500" />
-                                <span className="font-semibold text-green-600">{stats.cvCount}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <div className="flex items-center justify-center space-x-1">
-                                <TrendingUp className="h-4 w-4 text-purple-500" />
-                                <span className="font-semibold text-purple-600">{progressPercentage}%</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <MenteeNotesCell
-                                menteeId={mentee.id}
-                                initialNote={getNoteForMentee(mentee.id)}
-                                onSave={updateNote}
-                              />
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <MenteesTable
+            mentees={filteredMentees}
+            applications={applications}
+            cvFiles={cvFiles}
+            updateNote={updateNote}
+            getNoteForMentee={getNoteForMentee}
+          />
         </div>
       )}
     </main>
