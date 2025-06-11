@@ -20,11 +20,11 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
 
     console.log('Using current user as coach:', user.id);
     
-    // Get ALL mentees from profiles table
+    // Get ALL mentees from profiles table - check for both 'mentee' and 'MENTEE'
     const { data: allMentees, error: menteesError } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email')
-      .eq('role', 'mentee');
+      .or('role.eq.mentee,role.eq.MENTEE');
 
     if (menteesError) {
       console.error('Error fetching mentees:', menteesError);

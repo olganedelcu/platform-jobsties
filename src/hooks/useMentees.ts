@@ -34,11 +34,11 @@ export const useMentees = () => {
 
       console.log('Current user ID:', user.id);
 
-      // First, get ALL mentees from the profiles table
+      // First, get ALL mentees from the profiles table - check for both 'mentee' and 'MENTEE'
       const { data: allMentees, error: menteesError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email')
-        .eq('role', 'mentee');
+        .or('role.eq.mentee,role.eq.MENTEE');
 
       console.log('All mentees from profiles table:', allMentees);
 
