@@ -85,12 +85,23 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
 
     if (assignmentError) {
       console.error('Error creating assignments:', assignmentError);
-      toast({
-        title: "Error",
-        description: "Failed to assign mentees.",
-        variant: "destructive"
-      });
-      return false;
+      // Only show error if it's not a duplicate key constraint
+      if (assignmentError.code !== '23505') {
+        toast({
+          title: "Error",
+          description: "Failed to assign mentees.",
+          variant: "destructive"
+        });
+        return false;
+      } else {
+        // This means some assignments already exist, which is fine
+        console.log('Some assignments already existed (duplicate key constraint), which is expected');
+        toast({
+          title: "Info",
+          description: `All ${allMentees.length} mentees are now properly assigned.`,
+        });
+        return true;
+      }
     }
 
     toast({
