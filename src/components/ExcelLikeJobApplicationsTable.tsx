@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus } from 'lucide-react';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 import { format } from 'date-fns';
@@ -119,48 +120,50 @@ const ExcelLikeJobApplicationsTable = ({
         </div>
       )}
       
-      <div className="overflow-x-auto">
-        <Table>
-          <JobApplicationsTableHeader showCoachNotesColumn={true} />
-          <TableBody>
-            {!isCoachView && isAddingNew && (
-              <NewApplicationRow
-                newApplicationData={newApplicationData}
-                setNewApplicationData={setNewApplicationData}
-                onSave={handleSaveNew}
-                onCancel={handleCancelNew}
-              />
-            )}
-            
-            {applications.map((application) => (
-              <JobApplicationRow
-                key={application.id}
-                application={application}
-                isEditing={editingId === application.id}
-                editData={editData}
-                onEdit={handleEdit}
-                onSave={handleSaveApplication}
-                onCancel={handleCancel}
-                onDelete={onDeleteApplication}
-                onEditDataChange={handleEditDataChange}
-                isAddingNew={isAddingNew}
-                isCoachView={isCoachView}
-              />
-            ))}
-            
-            {applications.length === 0 && !isAddingNew && (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                  {isCoachView 
-                    ? "No applications found for this mentee." 
-                    : "No job applications found. Click \"Add Application\" to get started!"
-                  }
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <ScrollArea className="h-[600px]">
+        <div className="overflow-x-auto">
+          <Table>
+            <JobApplicationsTableHeader showCoachNotesColumn={true} />
+            <TableBody>
+              {!isCoachView && isAddingNew && (
+                <NewApplicationRow
+                  newApplicationData={newApplicationData}
+                  setNewApplicationData={setNewApplicationData}
+                  onSave={handleSaveNew}
+                  onCancel={handleCancelNew}
+                />
+              )}
+              
+              {applications.map((application) => (
+                <JobApplicationRow
+                  key={application.id}
+                  application={application}
+                  isEditing={editingId === application.id}
+                  editData={editData}
+                  onEdit={handleEdit}
+                  onSave={handleSaveApplication}
+                  onCancel={handleCancel}
+                  onDelete={onDeleteApplication}
+                  onEditDataChange={handleEditDataChange}
+                  isAddingNew={isAddingNew}
+                  isCoachView={isCoachView}
+                />
+              ))}
+              
+              {applications.length === 0 && !isAddingNew && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                    {isCoachView 
+                      ? "No applications found for this mentee." 
+                      : "No job applications found. Click \"Add Application\" to get started!"
+                    }
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
