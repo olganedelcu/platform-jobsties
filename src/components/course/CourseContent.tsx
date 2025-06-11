@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
@@ -103,6 +102,11 @@ const CourseContent = ({ userId }: CourseContentProps) => {
         <div className="space-y-6">
           <ModuleFiles 
             userId={userId} 
+            moduleType="cv_optimization" 
+            title="CV Optimization" 
+          />
+          <ModuleFiles 
+            userId={userId} 
             moduleType="linkedin" 
             title="LinkedIn & Cover Letter" 
           />
@@ -115,6 +119,11 @@ const CourseContent = ({ userId }: CourseContentProps) => {
             userId={userId} 
             moduleType="interview_preparation" 
             title="Interview Preparation" 
+          />
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="feedback" 
+            title="Feedback & Next Steps" 
           />
         </div>
       </section>

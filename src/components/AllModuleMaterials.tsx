@@ -19,6 +19,11 @@ const AllModuleMaterials = ({ userId }: AllModuleMaterialsProps) => {
       <div className="space-y-6">
         <ModuleFiles 
           userId={userId} 
+          moduleType="cv_optimization" 
+          title="CV Optimization" 
+        />
+        <ModuleFiles 
+          userId={userId} 
           moduleType="linkedin" 
           title="LinkedIn & Cover Letter" 
         />
@@ -31,6 +36,11 @@ const AllModuleMaterials = ({ userId }: AllModuleMaterialsProps) => {
           userId={userId} 
           moduleType="interview_preparation" 
           title="Interview Preparation" 
+        />
+        <ModuleFiles 
+          userId={userId} 
+          moduleType="feedback" 
+          title="Feedback & Next Steps" 
         />
       </div>
     </div>

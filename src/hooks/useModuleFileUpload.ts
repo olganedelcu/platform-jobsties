@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -12,7 +11,7 @@ export const useModuleFileUpload = () => {
   const uploadModuleFile = async (
     file: File,
     menteeId: string,
-    moduleType: 'linkedin' | 'job_search_strategy' | 'interview_preparation'
+    moduleType: 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback'
   ) => {
     if (!file || !menteeId) {
       toast({

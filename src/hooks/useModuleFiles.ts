@@ -7,7 +7,7 @@ export interface ModuleFile {
   id: string;
   mentee_id: string;
   coach_id: string;
-  module_type: 'linkedin' | 'job_search_strategy' | 'interview_preparation';
+  module_type: 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback';
   file_name: string;
   file_url: string;
   file_size?: number;
@@ -17,7 +17,7 @@ export interface ModuleFile {
 
 interface UseModuleFilesParams {
   userId: string;
-  moduleType?: 'linkedin' | 'job_search_strategy' | 'interview_preparation';
+  moduleType?: 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback';
 }
 
 export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => {
@@ -49,7 +49,7 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
       // Type assertion to ensure module_type matches our interface
       const typedFiles = (data || []).map(file => ({
         ...file,
-        module_type: file.module_type as 'linkedin' | 'job_search_strategy' | 'interview_preparation'
+        module_type: file.module_type as 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback'
       }));
 
       setFiles(typedFiles);

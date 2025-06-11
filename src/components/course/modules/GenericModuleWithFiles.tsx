@@ -4,7 +4,7 @@ import ModuleFiles from '@/components/ModuleFiles';
 
 interface GenericModuleWithFilesProps {
   userId: string;
-  moduleType: 'linkedin' | 'job_search_strategy' | 'interview_preparation';
+  moduleType: 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback';
   title: string;
   description: string;
 }

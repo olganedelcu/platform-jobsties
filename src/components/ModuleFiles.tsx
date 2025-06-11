@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useModuleFiles } from '@/hooks/useModuleFiles';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 interface ModuleFilesProps {
   userId: string;
-  moduleType: 'linkedin' | 'job_search_strategy' | 'interview_preparation';
+  moduleType: 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback';
   title: string;
 }
 
