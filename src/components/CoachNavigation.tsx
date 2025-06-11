@@ -35,16 +35,16 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       label: 'Applications', 
       icon: BarChart3 
     },
-    { 
-      path: '/coach/sessions', 
-      label: 'Sessions', 
-      icon: BookOpen 
-    },
-    { 
-      path: '/coach/calendar', 
-      label: 'Calendar', 
-      icon: Calendar 
-    },
+    // { 
+    //   path: '/coach/sessions', 
+    //   label: 'Sessions', 
+    //   icon: BookOpen 
+    // },
+    // { 
+    //   path: '/coach/calendar', 
+    //   label: 'Calendar', 
+    //   icon: Calendar 
+    // },
     { 
       path: '/coach/cv-upload', 
       label: 'CV Upload', 
