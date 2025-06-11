@@ -11,30 +11,25 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-export const saveDraftToLocalStorage = (editingId: string, editData: any) => {
+interface LocalDraft {
+  formData: any;
+  lastUpdated: string;
+  applicationId: string;
+}
+
+export const saveDraftToLocalStorage = (applicationId: string, formData: any) => {
   try {
-    if (!editingId || !editData || Object.keys(editData).length === 0) {
+    if (!applicationId || !formData || Object.keys(formData).length === 0) {
       return;
     }
 
-    const savedDrafts = localStorage.getItem('tracker-draft-changes');
-    let drafts = {};
-    
-    if (savedDrafts) {
-      try {
-        drafts = JSON.parse(savedDrafts);
-      } catch (error) {
-        console.error('Error parsing saved drafts:', error);
-        drafts = {};
-      }
-    }
-    
-    drafts[editingId] = {
-      data: editData,
-      timestamp: Date.now()
+    const draft: LocalDraft = {
+      formData,
+      lastUpdated: new Date().toISOString(),
+      applicationId
     };
     
-    localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
+    localStorage.setItem(`unsaved_application_${applicationId}`, JSON.stringify(draft));
   } catch (error) {
     console.error('Error saving draft to localStorage:', error);
   }
@@ -42,60 +37,98 @@ export const saveDraftToLocalStorage = (editingId: string, editData: any) => {
 
 export const clearDraftFromLocalStorage = (applicationId: string) => {
   try {
-    const savedDrafts = localStorage.getItem('tracker-draft-changes');
-    if (!savedDrafts) return;
-    
-    const drafts = JSON.parse(savedDrafts);
-    delete drafts[applicationId];
-    
-    if (Object.keys(drafts).length > 0) {
-      localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
-    } else {
-      localStorage.removeItem('tracker-draft-changes');
-    }
+    localStorage.removeItem(`unsaved_application_${applicationId}`);
   } catch (error) {
     console.error('Error clearing draft from localStorage:', error);
   }
 };
 
-export const loadDraftsFromLocalStorage = () => {
+export const loadDraftFromLocalStorage = (applicationId: string): LocalDraft | null => {
   try {
-    const savedDrafts = localStorage.getItem('tracker-draft-changes');
-    if (!savedDrafts) return {};
+    const draftData = localStorage.getItem(`unsaved_application_${applicationId}`);
+    if (!draftData) return null;
     
-    const drafts = JSON.parse(savedDrafts);
-    const now = Date.now();
-    const cleanedDrafts = {};
+    const draft: LocalDraft = JSON.parse(draftData);
     
-    // Check if drafts are still valid (within 24 hours)
-    Object.keys(drafts).forEach(applicationId => {
-      const draft = drafts[applicationId];
-      if (draft && draft.timestamp) {
-        const timeDiff = now - draft.timestamp;
-        const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        
-        if (timeDiff <= twentyFourHours) {
-          cleanedDrafts[applicationId] = draft;
+    // Check if draft is still valid (within 7 days)
+    const draftDate = new Date(draft.lastUpdated);
+    const now = new Date();
+    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+    
+    if (now.getTime() - draftDate.getTime() > sevenDaysInMs) {
+      localStorage.removeItem(`unsaved_application_${applicationId}`);
+      return null;
+    }
+    
+    return draft;
+  } catch (error) {
+    console.error('Error loading draft from localStorage:', error);
+    return null;
+  }
+};
+
+export const getAllDrafts = (): LocalDraft[] => {
+  try {
+    const drafts: LocalDraft[] = [];
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('unsaved_application_')) {
+        const draftData = localStorage.getItem(key);
+        if (draftData) {
+          try {
+            const draft: LocalDraft = JSON.parse(draftData);
+            
+            // Check if draft is still valid (within 7 days)
+            const draftDate = new Date(draft.lastUpdated);
+            const now = new Date();
+            const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+            
+            if (now.getTime() - draftDate.getTime() <= sevenDaysInMs) {
+              drafts.push(draft);
+            } else {
+              localStorage.removeItem(key);
+            }
+          } catch (parseError) {
+            console.error('Error parsing draft:', parseError);
+            localStorage.removeItem(key);
+          }
         }
       }
-    });
+    }
     
-    // Update localStorage with cleaned drafts
-    if (Object.keys(cleanedDrafts).length > 0) {
-      localStorage.setItem('tracker-draft-changes', JSON.stringify(cleanedDrafts));
-      return cleanedDrafts;
-    } else {
-      localStorage.removeItem('tracker-draft-changes');
-      return {};
+    return drafts;
+  } catch (error) {
+    console.error('Error getting all drafts:', error);
+    return [];
+  }
+};
+
+export const cleanupExpiredDrafts = () => {
+  try {
+    const now = new Date();
+    const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
+    
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('unsaved_application_')) {
+        const draftData = localStorage.getItem(key);
+        if (draftData) {
+          try {
+            const draft: LocalDraft = JSON.parse(draftData);
+            const draftDate = new Date(draft.lastUpdated);
+            
+            if (now.getTime() - draftDate.getTime() > sevenDaysInMs) {
+              localStorage.removeItem(key);
+            }
+          } catch (parseError) {
+            console.error('Error parsing draft for cleanup:', parseError);
+            localStorage.removeItem(key);
+          }
+        }
+      }
     }
   } catch (error) {
-    console.error('Error loading draft changes:', error);
-    // Clean up corrupted data
-    try {
-      localStorage.removeItem('tracker-draft-changes');
-    } catch (cleanupError) {
-      console.error('Error cleaning up corrupted draft data:', cleanupError);
-    }
-    return {};
+    console.error('Error cleaning up expired drafts:', error);
   }
 };

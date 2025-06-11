@@ -8,6 +8,8 @@ import { format } from 'date-fns';
 import JobApplicationsTableHeader from '@/components/JobApplicationsTableHeader';
 import JobApplicationRow from '@/components/JobApplicationRow';
 import NewApplicationRow from '@/components/NewApplicationRow';
+import DraftRestorationBanner from '@/components/DraftRestorationBanner';
+import AutoSaveIndicator from '@/components/AutoSaveIndicator';
 import { useDraftManagement } from '@/hooks/useDraftManagement';
 
 interface ExcelLikeJobApplicationsTableProps {
@@ -37,10 +39,15 @@ const ExcelLikeJobApplicationsTable = ({
   const {
     editingId,
     editData,
+    showRestorationBanner,
+    restorationTimestamp,
+    hasAutoSavedDraft,
     handleEdit,
     handleSave,
     handleCancel,
-    handleEditDataChange
+    handleEditDataChange,
+    handleDiscardDraft,
+    handleDismissBanner
   } = useDraftManagement();
 
   const handleAddNew = () => {
@@ -83,12 +90,25 @@ const ExcelLikeJobApplicationsTable = ({
   return (
     <div className="bg-white rounded-lg border shadow-sm">
       <div className="p-4 border-b flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Job Applications Tracker</h2>
+        <div className="flex items-center">
+          <h2 className="text-lg font-semibold">Job Applications Tracker</h2>
+          <AutoSaveIndicator isVisible={hasAutoSavedDraft && !!editingId} />
+        </div>
         <Button onClick={handleAddNew} disabled={isAddingNew} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Add Application
         </Button>
       </div>
+
+      {showRestorationBanner && (
+        <div className="p-4 pb-0">
+          <DraftRestorationBanner
+            lastUpdated={restorationTimestamp}
+            onDismiss={handleDismissBanner}
+            onDiscard={handleDiscardDraft}
+          />
+        </div>
+      )}
       
       <div className="overflow-x-auto">
         <Table>
