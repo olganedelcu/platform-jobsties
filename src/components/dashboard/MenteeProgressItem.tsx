@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Mentee } from '@/hooks/useMentees';
-import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
+import { CheckCircle2, Mail, BookOpen } from 'lucide-react';
 
 interface MenteeProgressItemProps {
   mentee: Mentee;
@@ -23,6 +23,33 @@ const MenteeProgressItem = ({
   hasRealData = false,
   emailConfirmed = false
 }: MenteeProgressItemProps) => {
+  const getBadgeInfo = () => {
+    if (!emailConfirmed) {
+      return {
+        icon: Mail,
+        text: "Unconfirmed",
+        className: "text-amber-600 border-amber-200"
+      };
+    }
+    
+    if (!hasRealData) {
+      return {
+        icon: BookOpen,
+        text: "Not started",
+        className: "text-blue-600 border-blue-200"
+      };
+    }
+    
+    return {
+      icon: CheckCircle2,
+      text: "In progress",
+      className: "text-green-600 border-green-200"
+    };
+  };
+
+  const badgeInfo = getBadgeInfo();
+  const IconComponent = badgeInfo.icon;
+
   return (
     <div className="flex items-center space-x-3">
       <Avatar className="h-8 w-8">
@@ -36,24 +63,10 @@ const MenteeProgressItem = ({
             <p className="text-sm font-medium text-gray-900 truncate">
               {mentee.first_name} {mentee.last_name}
             </p>
-            {!emailConfirmed && (
-              <Badge variant="outline" className="text-xs text-amber-600 border-amber-200">
-                <Mail className="h-3 w-3 mr-1" />
-                Unconfirmed
-              </Badge>
-            )}
-            {!hasRealData && emailConfirmed && (
-              <Badge variant="outline" className="text-xs text-gray-500">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                No progress
-              </Badge>
-            )}
-            {hasRealData && (
-              <Badge variant="outline" className="text-xs text-green-600 border-green-200">
-                <CheckCircle2 className="h-3 w-3 mr-1" />
-                Active
-              </Badge>
-            )}
+            <Badge variant="outline" className={`text-xs ${badgeInfo.className}`}>
+              <IconComponent className="h-3 w-3 mr-1" />
+              {badgeInfo.text}
+            </Badge>
           </div>
           <span className="text-xs text-gray-500">
             {overallProgress}%

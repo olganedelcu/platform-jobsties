@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, TrendingUp, BookOpen, CheckCircle2, Mail } from 'lucide-react';
 import { Mentee } from '@/hooks/useMentees';
 import MenteeProgressItem from './MenteeProgressItem';
 import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
@@ -35,6 +35,17 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
     );
   }
 
+  // Calculate different status counts
+  const menteesNotStarted = mentees.filter(m => {
+    const progress = getMenteeProgress(m.id);
+    return progress.emailConfirmed && !progress.hasRealData;
+  }).length;
+
+  const unconfirmedMentees = mentees.filter(m => {
+    const progress = getMenteeProgress(m.id);
+    return !progress.emailConfirmed;
+  }).length;
+
   return (
     <Card className="border border-gray-200 shadow-sm">
       <CardHeader className="pb-3">
@@ -61,17 +72,19 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
         </div>
         
         {/* Progress data status */}
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-2 text-green-600">
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="flex items-center space-x-1 text-green-600">
             <CheckCircle2 className="h-3 w-3" />
-            <span>{menteesWithRealData} with real progress data</span>
+            <span>{menteesWithRealData} active</span>
           </div>
-          {totalMentees > menteesWithRealData && (
-            <div className="flex items-center space-x-2 text-amber-600">
-              <XCircle className="h-3 w-3" />
-              <span>{totalMentees - menteesWithRealData} no progress data</span>
-            </div>
-          )}
+          <div className="flex items-center space-x-1 text-blue-600">
+            <BookOpen className="h-3 w-3" />
+            <span>{menteesNotStarted} not started</span>
+          </div>
+          <div className="flex items-center space-x-1 text-amber-600">
+            <Mail className="h-3 w-3" />
+            <span>{unconfirmedMentees} unconfirmed</span>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pt-0">

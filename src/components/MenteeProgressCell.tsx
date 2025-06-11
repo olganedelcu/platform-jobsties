@@ -2,7 +2,7 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2, Mail } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Mail, BookOpen } from 'lucide-react';
 
 interface MenteeProgressCellProps {
   overallProgress: number;
@@ -19,30 +19,44 @@ const MenteeProgressCell = ({
   hasRealData = false,
   emailConfirmed = false
 }: MenteeProgressCellProps) => {
+  const getBadgeInfo = () => {
+    if (!emailConfirmed) {
+      return {
+        icon: Mail,
+        text: "Unconfirmed",
+        variant: "outline" as const,
+        className: "text-amber-600 border-amber-200"
+      };
+    }
+    
+    if (!hasRealData) {
+      return {
+        icon: BookOpen,
+        text: "Not started",
+        variant: "outline" as const,
+        className: "text-blue-600 border-blue-200"
+      };
+    }
+    
+    return {
+      icon: CheckCircle2,
+      text: "In progress",
+      variant: "outline" as const,
+      className: "text-green-600 border-green-200"
+    };
+  };
+
+  const badgeInfo = getBadgeInfo();
+  const IconComponent = badgeInfo.icon;
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium">{overallProgress}%</span>
-        <div className="flex items-center space-x-1">
-          {!emailConfirmed && (
-            <Badge variant="outline" className="text-xs text-amber-600 border-amber-200">
-              <Mail className="h-3 w-3 mr-1" />
-              Unconfirmed
-            </Badge>
-          )}
-          {!hasRealData && emailConfirmed && (
-            <Badge variant="outline" className="text-xs text-gray-500">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              No data
-            </Badge>
-          )}
-          {hasRealData && (
-            <Badge variant="outline" className="text-xs text-green-600 border-green-200">
-              <CheckCircle2 className="h-3 w-3 mr-1" />
-              Active
-            </Badge>
-          )}
-        </div>
+        <Badge variant={badgeInfo.variant} className={`text-xs ${badgeInfo.className}`}>
+          <IconComponent className="h-3 w-3 mr-1" />
+          {badgeInfo.text}
+        </Badge>
       </div>
       <div className="flex justify-between items-center">
         <Progress 

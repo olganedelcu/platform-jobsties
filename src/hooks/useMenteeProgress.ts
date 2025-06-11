@@ -73,7 +73,7 @@ export const useMenteeProgress = (menteeIds: string[]) => {
       // Calculate progress for each mentee
       const progressMap = new Map<string, MenteeProgress>();
       
-      // Initialize all mentees with 0 progress
+      // Initialize all mentees with default values
       menteeIds.forEach(menteeId => {
         const profile = profiles?.find(p => p.id === menteeId);
         progressMap.set(menteeId, {
@@ -86,7 +86,7 @@ export const useMenteeProgress = (menteeIds: string[]) => {
         });
       });
 
-      // Update with actual progress data only if it exists
+      // Process actual progress data if it exists
       if (courseProgress && courseProgress.length > 0) {
         const progressByMentee = courseProgress.reduce((acc, progress) => {
           if (!acc[progress.user_id]) {
@@ -107,17 +107,33 @@ export const useMenteeProgress = (menteeIds: string[]) => {
           console.log(`Mentee ${menteeId} real progress: ${completedModules}/${totalModules} modules, ${overallProgress}% overall`);
 
           const existingData = progressMap.get(menteeId);
-          progressMap.set(menteeId, {
-            ...existingData!,
-            overallProgress,
-            completedModules,
-            totalModules,
-            hasRealData: true
-          });
+          if (existingData) {
+            progressMap.set(menteeId, {
+              ...existingData,
+              overallProgress,
+              completedModules,
+              totalModules,
+              hasRealData: true // Mark as having real data since we found progress records
+            });
+          }
         });
-      } else {
-        console.log('No course progress data found for any mentees');
       }
+
+      // For mentees without course progress data but with confirmed emails, 
+      // let's show them as having confirmed emails but no course progress yet
+      menteeIds.forEach(menteeId => {
+        const profile = profiles?.find(p => p.id === menteeId);
+        const currentData = progressMap.get(menteeId);
+        
+        if (currentData && !currentData.hasRealData && profile) {
+          // They have a confirmed profile but no course progress data yet
+          progressMap.set(menteeId, {
+            ...currentData,
+            emailConfirmed: true,
+            hasRealData: false // Keep as false since no actual course progress exists
+          });
+        }
+      });
 
       const finalProgressData = Array.from(progressMap.values());
       console.log('Final progress data:', finalProgressData);
