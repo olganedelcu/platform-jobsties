@@ -20,6 +20,7 @@ import ChatPage from "./pages/ChatPage";
 import CoachLogin from "./pages/CoachLogin";
 import CoachSignUp from "./pages/CoachSignUp";
 import HomeCoach from "./pages/HomeCoach";
+import CoachDashboard from "./pages/CoachDashboard";
 import Mentees from "./pages/coach/Mentees";
 import Applications from "./pages/coach/Applications";
 import CoachSessions from "./pages/coach/CoachSessions";
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/coach/signup" element={<CoachSignUp />} />
           
           {/* Protected coach routes */}
+          <Route path="/coach/dashboard" element={<ProtectedCoachRoute><CoachDashboard /></ProtectedCoachRoute>} />
           <Route path="/coach/mentees" element={<ProtectedCoachRoute><Mentees /></ProtectedCoachRoute>} />
           <Route path="/coach/applications" element={<ProtectedCoachRoute><Applications /></ProtectedCoachRoute>} />
           <Route path="/coach/sessions" element={<ProtectedCoachRoute><CoachSessions /></ProtectedCoachRoute>} />
