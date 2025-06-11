@@ -67,11 +67,6 @@ const MenteeProgressCell = ({
           {completedModules}/{totalModules} modules
         </span>
       </div>
-      {!hasRealData && (
-        <div className="text-xs text-blue-600">
-          Showing sample progress - matches mentee's course view
-        </div>
-      )}
     </div>
   );
 };
