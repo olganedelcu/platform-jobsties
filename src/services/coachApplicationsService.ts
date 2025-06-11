@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication } from '@/types/jobApplications';
 
@@ -166,7 +165,26 @@ export const deleteCoachMenteeApplication = async (applicationId: string): Promi
       throw new Error('User not authenticated');
     }
 
-    console.log('Deleting application:', applicationId);
+    console.log('Attempting to delete application:', applicationId);
+
+    // First, verify the application exists and get its details
+    const { data: existingApp, error: fetchError } = await supabase
+      .from('job_applications')
+      .select('*')
+      .eq('id', applicationId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching application to delete:', fetchError);
+      throw fetchError;
+    }
+
+    if (!existingApp) {
+      console.log('Application not found:', applicationId);
+      throw new Error('Application not found');
+    }
+
+    console.log('Found application to delete:', existingApp);
 
     // Delete the job application
     const { error: deleteError } = await supabase
@@ -179,7 +197,7 @@ export const deleteCoachMenteeApplication = async (applicationId: string): Promi
       throw deleteError;
     }
 
-    console.log('Application deleted successfully');
+    console.log('Application deleted successfully from database:', applicationId);
   } catch (error) {
     console.error('Error in deleteCoachMenteeApplication:', error);
     throw error;

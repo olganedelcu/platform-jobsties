@@ -31,15 +31,21 @@ export const useCoachApplicationActions = (
 
   const handleDeleteApplication = async (applicationId: string): Promise<void> => {
     try {
+      console.log('Hook: Starting delete process for application:', applicationId);
+      console.log('Hook: Current applications count before delete:', applications.length);
+      
       await deleteCoachMenteeApplication(applicationId);
+      console.log('Hook: Delete service call completed, now refetching...');
+      
       await refetchApplications();
+      console.log('Hook: Refetch completed');
       
       toast({
         title: "Application Deleted",
         description: "The application has been removed from your view.",
       });
     } catch (error) {
-      console.error('Error deleting application:', error);
+      console.error('Hook: Error deleting application:', error);
       toast({
         title: "Error",
         description: "Failed to delete application. Please try again.",
