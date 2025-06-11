@@ -32,6 +32,8 @@ export const useMentees = () => {
         return;
       }
 
+      console.log('Current user ID:', user.id);
+
       // Get the mentees assigned to this coach using the coach_mentee_assignments table
       const { data: assignments, error: assignmentsError } = await supabase
         .from('coach_mentee_assignments')
@@ -46,6 +48,9 @@ export const useMentees = () => {
         `)
         .eq('coach_id', user.id)
         .eq('is_active', true);
+
+      console.log('Assignments query result:', assignments);
+      console.log('Assignments error:', assignmentsError);
 
       if (assignmentsError) {
         console.error('Error fetching coach assignments:', assignmentsError);
@@ -65,8 +70,28 @@ export const useMentees = () => {
         email: assignment.profiles.email
       })) || [];
 
-      console.log('Fetched assigned mentees:', assignedMentees);
+      console.log('Transformed assigned mentees:', assignedMentees);
       setMentees(assignedMentees);
+
+      if (assignedMentees.length === 0) {
+        console.log('No mentees found for this coach. Checking if there are any mentees to assign...');
+        
+        // Check if there are mentees in the profiles table that need to be assigned
+        const { data: allMentees, error: menteesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email')
+          .eq('role', 'mentee');
+
+        console.log('All mentees in profiles table:', allMentees);
+        console.log('Mentees query error:', menteesError);
+
+        if (allMentees && allMentees.length > 0) {
+          toast({
+            title: "Info",
+            description: `Found ${allMentees.length} mentees in the system, but none are assigned to you. Contact your administrator.`,
+          });
+        }
+      }
     } catch (error) {
       console.error('Error fetching mentees:', error);
       toast({
