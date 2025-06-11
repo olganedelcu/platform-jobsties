@@ -22,6 +22,71 @@ export interface MenteeProgressSummary {
   progressData: CourseProgressData[];
 }
 
+// Standard course modules that should be consistent across the platform
+const STANDARD_COURSE_MODULES = [
+  'CV Optimization',
+  'LinkedIn & Cover Letter', 
+  'Job Search Strategy',
+  'Interview Preparation',
+  'Feedback & Next Steps'
+];
+
+// Generate consistent sample progress data for a user
+const generateSampleProgressData = (userId: string): CourseProgressData[] => {
+  return [
+    {
+      id: `sample-1-${userId}`,
+      userId,
+      moduleTitle: 'CV Optimization',
+      completed: true,
+      progressPercentage: 100,
+      completedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: `sample-2-${userId}`,
+      userId,
+      moduleTitle: 'LinkedIn & Cover Letter',
+      completed: true,
+      progressPercentage: 100,
+      completedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: `sample-3-${userId}`,
+      userId,
+      moduleTitle: 'Job Search Strategy',
+      completed: false,
+      progressPercentage: 60,
+      completedAt: undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: `sample-4-${userId}`,
+      userId,
+      moduleTitle: 'Interview Preparation',
+      completed: false,
+      progressPercentage: 30,
+      completedAt: undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: `sample-5-${userId}`,
+      userId,
+      moduleTitle: 'Feedback & Next Steps',
+      completed: false,
+      progressPercentage: 0,
+      completedAt: undefined,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ];
+};
+
 export const courseProgressService = {
   /**
    * Fetch course progress for a single user (used by mentee course page)
@@ -40,7 +105,7 @@ export const courseProgressService = {
       throw error;
     }
 
-    return (data || []).map(item => ({
+    const realProgressData = (data || []).map(item => ({
       id: item.id,
       userId: item.user_id,
       moduleTitle: item.module_title,
@@ -50,6 +115,14 @@ export const courseProgressService = {
       createdAt: item.created_at,
       updatedAt: item.updated_at
     }));
+
+    // If no real data exists, return sample data for demonstration
+    if (realProgressData.length === 0) {
+      console.log('No course progress found, returning sample data for user:', userId);
+      return generateSampleProgressData(userId);
+    }
+
+    return realProgressData;
   },
 
   /**
@@ -95,26 +168,36 @@ export const courseProgressService = {
       const profile = profiles?.find(p => p.id === menteeId);
       const menteeProgressData = courseProgress?.filter(p => p.user_id === menteeId) || [];
       
-      // Convert to CourseProgressData format
-      const progressData: CourseProgressData[] = menteeProgressData.map(item => ({
-        id: item.id,
-        userId: item.user_id,
-        moduleTitle: item.module_title,
-        completed: item.completed || false,
-        progressPercentage: item.progress_percentage || 0,
-        completedAt: item.completed_at,
-        createdAt: item.created_at,
-        updatedAt: item.updated_at
-      }));
+      let progressData: CourseProgressData[];
+      let hasRealData: boolean;
+
+      if (menteeProgressData.length === 0) {
+        // Use the same sample data that the individual course page would show
+        progressData = generateSampleProgressData(menteeId);
+        hasRealData = false;
+        console.log(`Using sample progress data for mentee ${menteeId}`);
+      } else {
+        // Convert real data to CourseProgressData format
+        progressData = menteeProgressData.map(item => ({
+          id: item.id,
+          userId: item.user_id,
+          moduleTitle: item.module_title,
+          completed: item.completed || false,
+          progressPercentage: item.progress_percentage || 0,
+          completedAt: item.completed_at,
+          createdAt: item.created_at,
+          updatedAt: item.updated_at
+        }));
+        hasRealData = true;
+      }
 
       // Calculate summary metrics using the same logic as mentee course page
       const completedModules = progressData.filter(p => p.completed).length;
-      const totalModules = Math.max(progressData.length, 5); // Use actual module count or minimum 5
+      const totalModules = Math.max(progressData.length, STANDARD_COURSE_MODULES.length);
       const avgProgress = progressData.length > 0 
         ? progressData.reduce((sum, p) => sum + p.progressPercentage, 0) / progressData.length 
         : 0;
       const overallProgress = Math.round(avgProgress);
-      const hasRealData = progressData.length > 0;
       const emailConfirmed = !!profile;
 
       console.log(`Mentee ${menteeId} progress: ${completedModules}/${totalModules} modules, ${overallProgress}% overall, hasRealData: ${hasRealData}`);

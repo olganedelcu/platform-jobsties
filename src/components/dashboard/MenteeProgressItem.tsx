@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Mentee } from '@/hooks/useMentees';
-import { CheckCircle2, Mail, BookOpen } from 'lucide-react';
+import { CheckCircle2, Mail, Eye } from 'lucide-react';
 
 interface MenteeProgressItemProps {
   mentee: Mentee;
@@ -34,15 +34,15 @@ const MenteeProgressItem = ({
     
     if (!hasRealData) {
       return {
-        icon: BookOpen,
-        text: "Not started",
+        icon: Eye,
+        text: "Demo",
         className: "text-blue-600 border-blue-200"
       };
     }
     
     return {
       icon: CheckCircle2,
-      text: "In progress",
+      text: "Active",
       className: "text-green-600 border-green-200"
     };
   };
@@ -75,7 +75,7 @@ const MenteeProgressItem = ({
         <div className="flex items-center space-x-2">
           <Progress 
             value={overallProgress} 
-            className={`h-1 flex-1 ${!hasRealData ? 'opacity-50' : ''}`} 
+            className="h-1 flex-1" 
           />
           <span className="text-xs text-gray-400">
             {completedModules}/{totalModules}

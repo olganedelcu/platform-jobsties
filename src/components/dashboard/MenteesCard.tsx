@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp, BookOpen, CheckCircle2, Mail } from 'lucide-react';
+import { Users, TrendingUp, BookOpen, CheckCircle2, Mail, Eye } from 'lucide-react';
 import { Mentee } from '@/hooks/useMentees';
 import MenteeProgressItem from './MenteeProgressItem';
 import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
@@ -51,7 +51,7 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
   }
 
   // Calculate different status counts
-  const menteesNotStarted = mentees.filter(m => {
+  const menteesWithDemo = mentees.filter(m => {
     const progress = getMenteeProgress(m.id);
     return progress.emailConfirmed && !progress.hasRealData;
   }).length;
@@ -93,8 +93,8 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
             <span>{menteesWithRealData} active</span>
           </div>
           <div className="flex items-center space-x-1 text-blue-600">
-            <BookOpen className="h-3 w-3" />
-            <span>{menteesNotStarted} not started</span>
+            <Eye className="h-3 w-3" />
+            <span>{menteesWithDemo} demo progress</span>
           </div>
           <div className="flex items-center space-x-1 text-amber-600">
             <Mail className="h-3 w-3" />

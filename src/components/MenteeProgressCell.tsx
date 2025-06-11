@@ -2,7 +2,7 @@
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2, Mail, BookOpen } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Mail, BookOpen, Eye } from 'lucide-react';
 
 interface MenteeProgressCellProps {
   overallProgress: number;
@@ -31,8 +31,8 @@ const MenteeProgressCell = ({
     
     if (!hasRealData) {
       return {
-        icon: BookOpen,
-        text: "Not started",
+        icon: Eye,
+        text: "Demo progress",
         variant: "outline" as const,
         className: "text-blue-600 border-blue-200"
       };
@@ -40,7 +40,7 @@ const MenteeProgressCell = ({
     
     return {
       icon: CheckCircle2,
-      text: "In progress",
+      text: "Active",
       variant: "outline" as const,
       className: "text-green-600 border-green-200"
     };
@@ -61,12 +61,17 @@ const MenteeProgressCell = ({
       <div className="flex justify-between items-center">
         <Progress 
           value={overallProgress} 
-          className={`h-2 flex-1 mr-2 ${!hasRealData ? 'opacity-50' : ''}`} 
+          className="h-2 flex-1 mr-2" 
         />
         <span className="text-xs text-gray-500">
           {completedModules}/{totalModules} modules
         </span>
       </div>
+      {!hasRealData && (
+        <div className="text-xs text-blue-600">
+          Showing sample progress - matches mentee's course view
+        </div>
+      )}
     </div>
   );
 };
