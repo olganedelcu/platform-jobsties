@@ -3,6 +3,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
+import { useCourseProgress } from '@/hooks/useCourseProgress';
+import { courseModules } from '@/data/courseModules';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
@@ -18,8 +20,16 @@ interface DashboardContentProps {
 const DashboardContent = ({ user }: DashboardContentProps) => {
   const navigate = useNavigate();
   const firstName = user?.user_metadata?.first_name || 'User';
-  const { courseProgress } = useDashboardData(user?.id || '');
   const { applications } = useJobApplicationsData(user);
+  const { progress } = useCourseProgress({ id: user?.id || '' });
+  
+  // Calculate course progress based on completed modules (same as course page)
+  const calculateCourseProgress = () => {
+    const completedModules = progress.filter(p => p.completed).length;
+    return Math.min((completedModules / courseModules.length) * 100, 100);
+  };
+
+  const courseProgress = calculateCourseProgress();
   
   // Calculate applications this month
   const now = new Date();
