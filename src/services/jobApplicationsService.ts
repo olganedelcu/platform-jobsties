@@ -54,8 +54,8 @@ export const updateJobApplication = async (userId: string, applicationId: string
 
 export const deleteJobApplication = async (userId: string, applicationId: string): Promise<void> => {
   const { error } = await supabase
-    .delete()
     .from('job_applications')
+    .delete()
     .eq('id', applicationId)
     .eq('mentee_id', userId);
 
