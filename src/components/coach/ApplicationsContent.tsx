@@ -9,11 +9,12 @@ import { Grid, List } from 'lucide-react';
 import MenteeApplicationsGrid from './MenteeApplicationsGrid';
 import MenteeApplicationsList from './MenteeApplicationsList';
 import MenteeApplicationsSearch from './MenteeApplicationsSearch';
+import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
 
 const ApplicationsContent = () => {
   const { applications, loading: applicationsLoading, refetchApplications } = useCoachApplications();
   const { mentees, loading: menteesLoading } = useMentees();
-  const [activeTab, setActiveTab] = useState('grid');
+  const [activeTab, setActiveTab] = useState('table');
   const [searchTerm, setSearchTerm] = useState('');
 
   const { handleUpdateApplication, handleDeleteApplication } = useCoachApplicationActions(
@@ -21,10 +22,20 @@ const ApplicationsContent = () => {
     refetchApplications
   );
 
+  console.log('ApplicationsContent: Loading state - applications:', applicationsLoading, 'mentees:', menteesLoading);
+  console.log('ApplicationsContent: Applications data:', applications);
+  console.log('ApplicationsContent: Mentees data:', mentees);
+
   if (applicationsLoading || menteesLoading) {
     return (
       <main className="max-w-7xl mx-auto py-8 px-6">
-        <div className="text-center">Loading applications...</div>
+        <div className="text-center">
+          <div className="text-lg">Loading applications...</div>
+          <div className="text-sm text-gray-500 mt-2">
+            Applications loading: {applicationsLoading ? 'Yes' : 'No'} | 
+            Mentees loading: {menteesLoading ? 'Yes' : 'No'}
+          </div>
+        </div>
       </main>
     );
   }
@@ -59,11 +70,17 @@ const ApplicationsContent = () => {
     mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
   ).length;
 
+  console.log('ApplicationsContent: Filtered applications count:', filteredApplications.length);
+  console.log('ApplicationsContent: Total mentees with applications:', totalMenteesWithApplications);
+
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Mentee Applications</h1>
         <p className="text-gray-600 mt-2">Track and manage your mentees' job applications</p>
+        <div className="text-sm text-gray-500 mt-1">
+          Total applications: {applications.length} | Filtered: {filteredApplications.length}
+        </div>
       </div>
 
       <MenteeApplicationsSearch
@@ -75,7 +92,10 @@ const ApplicationsContent = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex items-center justify-between">
-          <TabsList className="grid w-64 grid-cols-2">
+          <TabsList className="grid w-80 grid-cols-3">
+            <TabsTrigger value="table" className="flex items-center space-x-2">
+              <span>Table View</span>
+            </TabsTrigger>
             <TabsTrigger value="grid" className="flex items-center space-x-2">
               <Grid className="h-4 w-4" />
               <span>Grid View</span>
@@ -87,9 +107,22 @@ const ApplicationsContent = () => {
           </TabsList>
         </div>
 
+        <TabsContent value="table" className="space-y-6">
+          <ExcelLikeJobApplicationsTable
+            applications={filteredApplications}
+            onAddApplication={async () => {
+              // Coaches can't add applications, only view/edit
+            }}
+            onUpdateApplication={handleUpdateApplication}
+            onDeleteApplication={handleDeleteApplication}
+            isCoachView={true}
+          />
+        </TabsContent>
+
         <TabsContent value="grid" className="space-y-6">
           <MenteeApplicationsGrid
             applications={filteredApplications}
+            onDeleteApplication={handleDeleteApplication}
           />
         </TabsContent>
 
@@ -101,7 +134,7 @@ const ApplicationsContent = () => {
         </TabsContent>
       </Tabs>
 
-      {menteesWithApplications.length === 0 && !searchTerm && (
+      {applications.length === 0 && !searchTerm && (
         <div className="text-center py-12">
           <div className="text-gray-500 mb-4">No applications found</div>
           <div className="text-sm text-gray-400">Your mentees haven't submitted any applications yet</div>
@@ -114,6 +147,13 @@ const ApplicationsContent = () => {
           <Button variant="outline" onClick={() => setSearchTerm('')}>
             Clear search
           </Button>
+        </div>
+      )}
+
+      {applications.length > 0 && filteredApplications.length === 0 && !searchTerm && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 mb-4">Applications found but none are visible</div>
+          <div className="text-sm text-gray-400">This might be a filtering issue. Total applications: {applications.length}</div>
         </div>
       )}
     </main>

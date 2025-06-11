@@ -11,16 +11,20 @@ export const useCoachApplications = () => {
 
   const fetchApplications = async () => {
     try {
-      console.log('Hook: Starting fetchApplications...');
+      console.log('useCoachApplications: Starting fetchApplications...');
       setLoading(true);
       const applicationsData = await fetchMenteeApplications();
-      console.log('Hook: Fetched applications data:', applicationsData);
-      console.log('Hook: Applications count:', applicationsData.length);
-      console.log('Hook: Application IDs:', applicationsData.map(app => app.id));
+      console.log('useCoachApplications: Fetched applications data:', applicationsData);
+      console.log('useCoachApplications: Applications count:', applicationsData.length);
+      console.log('useCoachApplications: Sample application:', applicationsData[0]);
       setApplications(applicationsData);
-      console.log('Hook: Applications state updated');
+      console.log('useCoachApplications: Applications state updated');
+      
+      if (applicationsData.length === 0) {
+        console.log('useCoachApplications: No applications found - this might be normal if mentees haven\'t added applications yet');
+      }
     } catch (error) {
-      console.error('Error fetching mentee applications:', error);
+      console.error('useCoachApplications: Error fetching mentee applications:', error);
       toast({
         title: "Error",
         description: "Failed to load mentee applications. Please try again.",
@@ -28,7 +32,7 @@ export const useCoachApplications = () => {
       });
     } finally {
       setLoading(false);
-      console.log('Hook: Loading set to false');
+      console.log('useCoachApplications: Loading set to false');
     }
   };
 
