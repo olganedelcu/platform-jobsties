@@ -1,4 +1,3 @@
-
 export interface JobApplication {
   id: string;
   mentee_id: string;
@@ -11,10 +10,6 @@ export interface JobApplication {
   coach_notes: string | null;
   created_at: string;
   updated_at: string;
-  profiles?: {
-    first_name: string;
-    last_name: string;
-  } | null;
 }
 
 export interface NewJobApplicationData {
