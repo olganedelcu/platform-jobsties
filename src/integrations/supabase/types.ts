@@ -652,6 +652,57 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_job_recommendations: {
+        Row: {
+          coach_id: string
+          company_name: string
+          created_at: string
+          id: string
+          job_link: string
+          job_title: string
+          mentee_id: string
+          updated_at: string
+          week_start_date: string
+        }
+        Insert: {
+          coach_id: string
+          company_name: string
+          created_at?: string
+          id?: string
+          job_link: string
+          job_title: string
+          mentee_id: string
+          updated_at?: string
+          week_start_date: string
+        }
+        Update: {
+          coach_id?: string
+          company_name?: string
+          created_at?: string
+          id?: string
+          job_link?: string
+          job_title?: string
+          mentee_id?: string
+          updated_at?: string
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_weekly_job_recommendations_coach"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_weekly_job_recommendations_mentee"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
