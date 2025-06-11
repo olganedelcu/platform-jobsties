@@ -44,6 +44,11 @@ const ApplicationsContent = () => {
     mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
   );
 
+  // Get applications for filtered mentees
+  const filteredApplications = applications.filter(app => 
+    menteesWithApplications.some(mentee => mentee.id === app.mentee_id)
+  );
+
   const totalMenteesWithApplications = mentees.filter(
     mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
   ).length;
@@ -78,8 +83,7 @@ const ApplicationsContent = () => {
 
         <TabsContent value="grid" className="space-y-6">
           <MenteeApplicationsGrid
-            mentees={menteesWithApplications}
-            applicationsByMentee={applicationsByMentee}
+            applications={filteredApplications}
           />
         </TabsContent>
 
