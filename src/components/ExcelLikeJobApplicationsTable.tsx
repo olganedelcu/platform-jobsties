@@ -17,13 +17,15 @@ interface ExcelLikeJobApplicationsTableProps {
   onAddApplication: (applicationData: NewJobApplicationData) => Promise<void>;
   onUpdateApplication: (applicationId: string, updates: Partial<JobApplication>) => Promise<void>;
   onDeleteApplication: (applicationId: string) => Promise<void>;
+  isCoachView?: boolean;
 }
 
 const ExcelLikeJobApplicationsTable = ({ 
   applications, 
   onAddApplication,
   onUpdateApplication, 
-  onDeleteApplication 
+  onDeleteApplication,
+  isCoachView = false
 }: ExcelLikeJobApplicationsTableProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newApplicationData, setNewApplicationData] = useState<NewJobApplicationData>({
@@ -91,13 +93,17 @@ const ExcelLikeJobApplicationsTable = ({
     <div className="bg-white rounded-lg border shadow-sm">
       <div className="p-4 border-b flex items-center justify-between">
         <div className="flex items-center">
-          <h2 className="text-lg font-semibold">Job Applications Tracker</h2>
+          <h2 className="text-lg font-semibold">
+            {isCoachView ? "Mentee Applications" : "Job Applications Tracker"}
+          </h2>
           <AutoSaveIndicator isVisible={hasAutoSavedDraft && !!editingId} />
         </div>
-        <Button onClick={handleAddNew} disabled={isAddingNew} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add Application
-        </Button>
+        {!isCoachView && (
+          <Button onClick={handleAddNew} disabled={isAddingNew} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Application
+          </Button>
+        )}
       </div>
 
       {showRestorationBanner && (
@@ -112,9 +118,9 @@ const ExcelLikeJobApplicationsTable = ({
       
       <div className="overflow-x-auto">
         <Table>
-          <JobApplicationsTableHeader />
+          <JobApplicationsTableHeader showCoachNotesColumn={true} />
           <TableBody>
-            {isAddingNew && (
+            {!isCoachView && isAddingNew && (
               <NewApplicationRow
                 newApplicationData={newApplicationData}
                 setNewApplicationData={setNewApplicationData}
@@ -135,13 +141,17 @@ const ExcelLikeJobApplicationsTable = ({
                 onDelete={onDeleteApplication}
                 onEditDataChange={handleEditDataChange}
                 isAddingNew={isAddingNew}
+                isCoachView={isCoachView}
               />
             ))}
             
             {applications.length === 0 && !isAddingNew && (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                  No job applications found. Click "Add Application" to get started!
+                  {isCoachView 
+                    ? "No applications found for this mentee." 
+                    : "No job applications found. Click \"Add Application\" to get started!"
+                  }
                 </TableCell>
               </TableRow>
             )}

@@ -20,6 +20,7 @@ interface JobApplicationRowProps {
   onDelete: (applicationId: string) => Promise<void>;
   onEditDataChange: (updates: Partial<JobApplication>) => void;
   isAddingNew: boolean;
+  isCoachView?: boolean;
 }
 
 const JobApplicationRow = ({ 
@@ -31,7 +32,8 @@ const JobApplicationRow = ({
   onCancel, 
   onDelete, 
   onEditDataChange,
-  isAddingNew 
+  isAddingNew,
+  isCoachView = false
 }: JobApplicationRowProps) => {
   return (
     <TableRow className="hover:bg-gray-50">
@@ -116,15 +118,30 @@ const JobApplicationRow = ({
         )}
       </TableCell>
       <TableCell>
-        {isEditing ? (
+        {isEditing && isCoachView ? (
           <Textarea
             value={editData.coach_notes || application.coach_notes || ''}
             onChange={(e) => onEditDataChange({ coach_notes: e.target.value })}
             className="w-full min-h-[60px]"
+            placeholder="Add coach notes..."
           />
         ) : (
-          <div className="max-w-xs truncate" title={application.coach_notes || ''}>
-            {application.coach_notes || '-'}
+          <div className="max-w-xs">
+            {application.coach_notes ? (
+              <div className="space-y-1">
+                <div className="text-xs text-gray-500 font-medium">Coach Notes:</div>
+                <div className="text-sm text-gray-700 p-2 bg-blue-50 rounded border-l-2 border-blue-200" title={application.coach_notes}>
+                  {application.coach_notes.length > 100 
+                    ? `${application.coach_notes.substring(0, 100)}...` 
+                    : application.coach_notes
+                  }
+                </div>
+              </div>
+            ) : isCoachView ? (
+              <span className="text-gray-400 italic">No notes</span>
+            ) : (
+              <span className="text-gray-400 italic">No coach feedback yet</span>
+            )}
           </div>
         )}
       </TableCell>

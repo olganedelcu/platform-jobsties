@@ -84,6 +84,8 @@ const Tracker = () => {
     return appDate >= oneWeekAgo;
   }).length;
 
+  const applicationsWithCoachFeedback = applications.filter(app => app.coach_notes && app.coach_notes.trim().length > 0).length;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
@@ -135,8 +137,8 @@ const Tracker = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">This Month</p>
-                  <p className="text-2xl font-bold text-orange-600">{recentApplications}</p>
+                  <p className="text-sm text-gray-600">Coach Feedback</p>
+                  <p className="text-2xl font-bold text-orange-600">{applicationsWithCoachFeedback}</p>
                 </div>
                 <Award className="h-8 w-8 text-orange-600" />
               </div>
@@ -155,6 +157,7 @@ const Tracker = () => {
               onAddApplication={handleAddApplication}
               onUpdateApplication={handleUpdateApplication}
               onDeleteApplication={handleDeleteApplication}
+              isCoachView={false}
             />
           )}
         </div>

@@ -5,7 +5,13 @@ import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 export const fetchJobApplications = async (userId: string): Promise<JobApplication[]> => {
   const { data, error } = await supabase
     .from('job_applications')
-    .select('*')
+    .select(`
+      *,
+      profiles:mentee_id (
+        first_name,
+        last_name
+      )
+    `)
     .eq('mentee_id', userId)
     .order('date_applied', { ascending: false });
 
