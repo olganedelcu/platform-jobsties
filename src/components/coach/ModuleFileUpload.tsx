@@ -29,6 +29,10 @@ const ModuleFileUpload = () => {
     }
   };
 
+  const handleModuleChange = (value: string) => {
+    setSelectedModule(value as 'linkedin' | 'job_search_strategy' | 'interview_preparation');
+  };
+
   const handleUpload = async () => {
     if (!selectedFile || !selectedMentee || !selectedModule) {
       return;
@@ -77,7 +81,7 @@ const ModuleFileUpload = () => {
 
           <div>
             <Label htmlFor="module-select">Select Module</Label>
-            <Select value={selectedModule} onValueChange={setSelectedModule}>
+            <Select value={selectedModule} onValueChange={handleModuleChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose a module" />
               </SelectTrigger>

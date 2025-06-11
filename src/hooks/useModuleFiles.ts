@@ -46,7 +46,13 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
         throw error;
       }
 
-      setFiles(data || []);
+      // Type assertion to ensure module_type matches our interface
+      const typedFiles = (data || []).map(file => ({
+        ...file,
+        module_type: file.module_type as 'linkedin' | 'job_search_strategy' | 'interview_preparation'
+      }));
+
+      setFiles(typedFiles);
     } catch (error: any) {
       console.error('Error fetching module files:', error);
       toast({
