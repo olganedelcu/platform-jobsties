@@ -17,7 +17,7 @@ const Tracker = () => {
     handleDeleteApplication
   } = useJobApplicationsData(user);
 
-  // Preserve scroll position and form state
+  // Preserve scroll position
   const [isPageReady, setIsPageReady] = useState(false);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const Tracker = () => {
     };
   }, []);
 
-  // Clean up on unmount
+  // Only clean up scroll position on unmount, NOT drafts
   useEffect(() => {
     return () => {
       try {

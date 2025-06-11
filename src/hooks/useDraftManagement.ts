@@ -39,30 +39,6 @@ export const useDraftManagement = () => {
     }
   }, [editingId, editData]);
 
-  // Clear draft changes when navigating to dashboard
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      const currentPath = window.location.pathname;
-      if (currentPath === '/dashboard') {
-        localStorage.removeItem('tracker-draft-changes');
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden && window.location.pathname === '/dashboard') {
-        localStorage.removeItem('tracker-draft-changes');
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
   const handleEdit = (application: JobApplication) => {
     setEditingId(application.id);
     setEditData({

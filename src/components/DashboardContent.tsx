@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
@@ -19,6 +19,11 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   const firstName = user?.user_metadata?.first_name || 'User';
   const { courseProgress } = useDashboardData(user?.id || '');
   const { applications } = useJobApplicationsData(user);
+  
+  // Clear draft changes when user navigates to dashboard
+  useEffect(() => {
+    localStorage.removeItem('tracker-draft-changes');
+  }, []);
   
   // Calculate applications this month
   const now = new Date();
