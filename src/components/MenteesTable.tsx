@@ -153,7 +153,7 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
                   <TableCell>
                     <MenteeNotesCell
                       menteeId={mentee.id}
-                      initialNotes={getNoteForMentee(mentee.id)}
+                      initialNote={getNoteForMentee(mentee.id)}
                       onUpdateNote={updateNote}
                     />
                   </TableCell>
