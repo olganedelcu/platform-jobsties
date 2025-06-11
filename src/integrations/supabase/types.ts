@@ -102,6 +102,97 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_calendar_events: {
+        Row: {
+          calendar_id: string
+          coach_id: string
+          created_at: string | null
+          description: string | null
+          end_time: string
+          google_event_id: string
+          id: string
+          is_available_for_booking: boolean | null
+          start_time: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          calendar_id?: string
+          coach_id: string
+          created_at?: string | null
+          description?: string | null
+          end_time: string
+          google_event_id: string
+          id?: string
+          is_available_for_booking?: boolean | null
+          start_time: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          calendar_id?: string
+          coach_id?: string
+          created_at?: string | null
+          description?: string | null
+          end_time?: string
+          google_event_id?: string
+          id?: string
+          is_available_for_booking?: boolean | null
+          start_time?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_calendar_events_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coach_calendar_settings: {
+        Row: {
+          coach_id: string
+          created_at: string | null
+          google_calendar_connected: boolean | null
+          id: string
+          last_sync_at: string | null
+          primary_calendar_id: string | null
+          sync_enabled: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          coach_id: string
+          created_at?: string | null
+          google_calendar_connected?: boolean | null
+          id?: string
+          last_sync_at?: string | null
+          primary_calendar_id?: string | null
+          sync_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          coach_id?: string
+          created_at?: string | null
+          google_calendar_connected?: boolean | null
+          id?: string
+          last_sync_at?: string | null
+          primary_calendar_id?: string | null
+          sync_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_calendar_settings_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_google_tokens: {
         Row: {
           access_token: string
@@ -220,12 +311,14 @@ export type Database = {
       }
       coaching_sessions: {
         Row: {
+          calendar_event_id: string | null
           coach_id: string | null
           created_at: string
           duration: number | null
           google_calendar_id: string | null
           google_event_id: string | null
           id: string
+          is_blocking_event: boolean | null
           meeting_link: string | null
           mentee_id: string
           notes: string | null
@@ -236,12 +329,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calendar_event_id?: string | null
           coach_id?: string | null
           created_at?: string
           duration?: number | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           id?: string
+          is_blocking_event?: boolean | null
           meeting_link?: string | null
           mentee_id: string
           notes?: string | null
@@ -252,12 +347,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calendar_event_id?: string | null
           coach_id?: string | null
           created_at?: string
           duration?: number | null
           google_calendar_id?: string | null
           google_event_id?: string | null
           id?: string
+          is_blocking_event?: boolean | null
           meeting_link?: string | null
           mentee_id?: string
           notes?: string | null
@@ -267,7 +364,15 @@ export type Database = {
           status?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "coaching_sessions_calendar_event_id_fkey"
+            columns: ["calendar_event_id"]
+            isOneToOne: false
+            referencedRelation: "coach_calendar_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_progress: {
         Row: {

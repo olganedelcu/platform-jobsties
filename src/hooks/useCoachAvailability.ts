@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { CoachCalendarService } from '@/services/coachCalendarService';
 
 interface AvailabilitySlot {
   id: string;
@@ -14,8 +15,8 @@ interface UseCoachAvailabilityReturn {
   availability: AvailabilitySlot[];
   blockedDates: string[];
   loading: boolean;
-  isDateAvailable: (date: string) => boolean;
-  getAvailableTimesForDate: (date: string) => string[];
+  isDateAvailable: (date: string) => Promise<boolean>;
+  getAvailableTimesForDate: (date: string) => Promise<string[]>;
 }
 
 export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityReturn => {
@@ -29,22 +30,20 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       fetchAvailability();
       fetchBlockedDates();
     } else {
-      // If no coachId provided, set default availability for Ana
       setDefaultAvailability();
     }
     fetchBookedSessions();
   }, [coachId]);
 
   const setDefaultAvailability = () => {
-    // Default availability pattern: Monday to Friday, 9am to 5pm
     const defaultAvailability = [
-      { id: '0', day_of_week: 0, start_time: '09:00', end_time: '17:00', is_available: false }, // Sunday
-      { id: '1', day_of_week: 1, start_time: '09:00', end_time: '17:00', is_available: true },  // Monday
-      { id: '2', day_of_week: 2, start_time: '09:00', end_time: '17:00', is_available: true },  // Tuesday
-      { id: '3', day_of_week: 3, start_time: '09:00', end_time: '17:00', is_available: true },  // Wednesday
-      { id: '4', day_of_week: 4, start_time: '09:00', end_time: '17:00', is_available: true },  // Thursday
-      { id: '5', day_of_week: 5, start_time: '09:00', end_time: '17:00', is_available: true },  // Friday
-      { id: '6', day_of_week: 6, start_time: '09:00', end_time: '17:00', is_available: false }, // Saturday
+      { id: '0', day_of_week: 0, start_time: '09:00', end_time: '17:00', is_available: false },
+      { id: '1', day_of_week: 1, start_time: '09:00', end_time: '17:00', is_available: true },
+      { id: '2', day_of_week: 2, start_time: '09:00', end_time: '17:00', is_available: true },
+      { id: '3', day_of_week: 3, start_time: '09:00', end_time: '17:00', is_available: true },
+      { id: '4', day_of_week: 4, start_time: '09:00', end_time: '17:00', is_available: true },
+      { id: '5', day_of_week: 5, start_time: '09:00', end_time: '17:00', is_available: true },
+      { id: '6', day_of_week: 6, start_time: '09:00', end_time: '17:00', is_available: false },
     ];
     setAvailability(defaultAvailability);
   };
@@ -53,7 +52,7 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (!coachId) return;
 
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('coach_availability')
         .select('*')
         .eq('coach_id', coachId)
@@ -63,7 +62,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       setAvailability(data || []);
     } catch (error) {
       console.error('Error fetching availability:', error);
-      // Fallback to default availability if fetch fails
       setDefaultAvailability();
     } finally {
       setLoading(false);
@@ -74,7 +72,7 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     if (!coachId) return;
 
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('coach_blocked_dates')
         .select('blocked_date')
         .eq('coach_id', coachId);
@@ -88,9 +86,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
 
   const fetchBookedSessions = async () => {
     try {
-      console.log('Fetching booked sessions to check availability...');
-      
-      // Fetch all confirmed and pending sessions
       const { data: sessions, error } = await supabase
         .from('coaching_sessions')
         .select('session_date, duration')
@@ -101,23 +96,16 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
         return;
       }
 
-      console.log('Found booked sessions:', sessions);
-
-      // Group booked time slots by date
       const bookedSlots: { [key: string]: string[] } = {};
       
       sessions?.forEach(session => {
         const sessionDate = new Date(session.session_date);
-        const dateKey = sessionDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const dateKey = sessionDate.toISOString().split('T')[0];
         
-        // Calculate the time slot
-        const startTime = sessionDate.toTimeString().slice(0, 5); // HH:MM format
-        
-        // Calculate end time based on duration
+        const startTime = sessionDate.toTimeString().slice(0, 5);
         const endTime = new Date(sessionDate.getTime() + (session.duration || 60) * 60000);
         const endTimeString = endTime.toTimeString().slice(0, 5);
         
-        // Generate all 30-minute slots that overlap with this session
         const sessionStart = new Date(`2000-01-01T${startTime}:00`);
         const sessionEnd = new Date(`2000-01-01T${endTimeString}:00`);
         
@@ -125,7 +113,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
           bookedSlots[dateKey] = [];
         }
         
-        // Add time slots that would conflict with this session
         for (let time = new Date(sessionStart); time < sessionEnd; time.setMinutes(time.getMinutes() + 30)) {
           const timeString = time.toTimeString().slice(0, 5);
           if (!bookedSlots[dateKey].includes(timeString)) {
@@ -134,7 +121,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
         }
       });
 
-      console.log('Processed booked time slots:', bookedSlots);
       setBookedTimeSlots(bookedSlots);
       setLoading(false);
     } catch (error) {
@@ -143,53 +129,11 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
     }
   };
 
-  const getSpecificDateAvailability = (date: string): { isAvailable: boolean; times: string[] } => {
-    // Week of June 9th, 2025
-    const specificAvailability: { [key: string]: string[] } = {
-      '2025-06-09': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30'], // Monday 10am-3pm
-      '2025-06-10': ['15:00', '15:30', '16:00', '16:30', '17:00', '17:30'], // Tuesday 3pm-6pm
-      '2025-06-11': ['13:00', '13:30', '14:00', '14:30'], // Wednesday 1pm-3pm
-      '2025-06-12': ['10:30', '11:00', '11:30', '12:00', '12:30'], // Thursday 10:30am-1pm
-      '2025-06-13': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00'], // Friday 10am-4:30pm
-      '2025-06-14': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'], // Saturday 10am-6pm
-      
-      // Following week (June 16-22, 2025) - 10am-1pm and 4pm-7pm
-      '2025-06-16': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Monday
-      '2025-06-17': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Tuesday
-      '2025-06-18': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Wednesday
-      '2025-06-19': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Thursday
-      '2025-06-20': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Friday
-      '2025-06-21': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Saturday
-      '2025-06-22': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30'], // Sunday
-    };
-
-    if (specificAvailability[date]) {
-      // Filter out booked time slots
-      const bookedForDate = bookedTimeSlots[date] || [];
-      const availableTimes = specificAvailability[date].filter(time => !bookedForDate.includes(time));
-      
-      return {
-        isAvailable: availableTimes.length > 0,
-        times: availableTimes
-      };
-    }
-
-    return { isAvailable: false, times: [] };
-  };
-
-  const isDateAvailable = (date: string): boolean => {
-    // Check specific date availability first
-    const specificAvailability = getSpecificDateAvailability(date);
-    if (specificAvailability.times.length > 0) {
-      return true;
-    }
-
-    // Check if date is blocked
+  const isDateAvailable = async (date: string): Promise<boolean> => {
     if (blockedDates.includes(date)) {
       return false;
     }
     
-    // Check regular weekly availability
     const selectedDate = new Date(date);
     const dayOfWeek = selectedDate.getDay();
     const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
@@ -198,19 +142,24 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       return false;
     }
 
-    // Check if there are any available time slots for this date after filtering booked ones
-    const availableTimesForDate = getAvailableTimesForDate(date);
-    return availableTimesForDate.length > 0;
-  };
-
-  const getAvailableTimesForDate = (date: string): string[] => {
-    // Check specific date availability first
-    const specificAvailability = getSpecificDateAvailability(date);
-    if (specificAvailability.isAvailable) {
-      return specificAvailability.times;
+    // Check calendar availability if coach ID is provided
+    if (coachId) {
+      try {
+        const startOfDay = `${date}T00:00:00.000Z`;
+        const endOfDay = `${date}T23:59:59.999Z`;
+        return await CoachCalendarService.checkAvailability(coachId, startOfDay, endOfDay);
+      } catch (error) {
+        console.error('Error checking calendar availability:', error);
+        return false;
+      }
     }
 
-    if (!isDateAvailable(date)) {
+    return true;
+  };
+
+  const getAvailableTimesForDate = async (date: string): Promise<string[]> => {
+    const available = await isDateAvailable(date);
+    if (!available) {
       return [];
     }
 
@@ -223,7 +172,6 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       return [];
     }
 
-    // Generate time slots between start_time and end_time
     const times: string[] = [];
     const startTime = dayAvailability.start_time;
     const endTime = dayAvailability.end_time;
@@ -236,9 +184,31 @@ export const useCoachAvailability = (coachId?: string): UseCoachAvailabilityRetu
       times.push(timeString);
     }
     
-    // Filter out booked time slots for this date
     const bookedForDate = bookedTimeSlots[date] || [];
-    return times.filter(time => !bookedForDate.includes(time));
+    const availableTimes = times.filter(time => !bookedForDate.includes(time));
+
+    // Further filter by checking individual time slots against calendar events
+    if (coachId) {
+      const finalAvailableTimes: string[] = [];
+      
+      for (const time of availableTimes) {
+        const startTime = `${date}T${time}:00.000Z`;
+        const endTime = new Date(new Date(startTime).getTime() + 60 * 60 * 1000).toISOString();
+        
+        try {
+          const isSlotAvailable = await CoachCalendarService.checkAvailability(coachId, startTime, endTime);
+          if (isSlotAvailable) {
+            finalAvailableTimes.push(time);
+          }
+        } catch (error) {
+          console.error('Error checking time slot availability:', error);
+        }
+      }
+      
+      return finalAvailableTimes;
+    }
+
+    return availableTimes;
   };
 
   return {
