@@ -5,17 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, X, Briefcase } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, X, Briefcase, Send } from 'lucide-react';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 import { useMentees } from '@/hooks/useMentees';
 import { format, startOfWeek, addWeeks } from 'date-fns';
 import { useAuthState } from '@/hooks/useAuthState';
+import { useToast } from '@/hooks/use-toast';
 
 const ApplicationsJobRecommendations = () => {
   const { user } = useAuthState();
+  const { toast } = useToast();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [formData, setFormData] = useState({
-    menteeId: '',
     jobTitle: '',
     jobLink: '',
     companyName: '',
@@ -31,27 +34,67 @@ const ApplicationsJobRecommendations = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.menteeId || !formData.jobTitle || !formData.jobLink || !formData.companyName) {
+    if (!formData.jobTitle || !formData.jobLink || !formData.companyName || selectedMentees.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields and select at least one mentee.",
+        variant: "destructive"
+      });
       return;
     }
 
-    await addRecommendation({
-      menteeId: formData.menteeId,
-      jobTitle: formData.jobTitle,
-      jobLink: formData.jobLink,
-      companyName: formData.companyName,
-      weekStartDate: formData.weekStartDate
-    });
+    try {
+      // Send recommendations to all selected mentees
+      const promises = selectedMentees.map(menteeId => 
+        addRecommendation({
+          menteeId,
+          jobTitle: formData.jobTitle,
+          jobLink: formData.jobLink,
+          companyName: formData.companyName,
+          weekStartDate: formData.weekStartDate
+        })
+      );
 
-    // Reset form
-    setFormData({
-      menteeId: '',
-      jobTitle: '',
-      jobLink: '',
-      companyName: '',
-      weekStartDate: format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-    });
-    setIsFormOpen(false);
+      await Promise.all(promises);
+
+      toast({
+        title: "Success",
+        description: `Job recommendation sent to ${selectedMentees.length} mentee(s) successfully.`,
+      });
+
+      // Reset form
+      setFormData({
+        jobTitle: '',
+        jobLink: '',
+        companyName: '',
+        weekStartDate: format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+      });
+      setSelectedMentees([]);
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error('Error sending recommendations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send job recommendations. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleMenteeToggle = (menteeId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedMentees(prev => [...prev, menteeId]);
+    } else {
+      setSelectedMentees(prev => prev.filter(id => id !== menteeId));
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedMentees.length === mentees.length) {
+      setSelectedMentees([]);
+    } else {
+      setSelectedMentees(mentees.map(m => m.id));
+    }
   };
 
   const getWeekOptions = () => {
@@ -78,7 +121,7 @@ const ApplicationsJobRecommendations = () => {
             className="w-full flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700"
           >
             <Briefcase className="h-4 w-4" />
-            Add Job Recommendation for Mentee
+            Send Job Recommendation to Mentees
           </Button>
         </CardContent>
       </Card>
@@ -91,7 +134,7 @@ const ApplicationsJobRecommendations = () => {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Briefcase className="h-5 w-5" />
-            Add Job Recommendation
+            Send Job Recommendation
           </div>
           <Button
             variant="ghost"
@@ -104,45 +147,8 @@ const ApplicationsJobRecommendations = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Job Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="menteeId">Select Mentee</Label>
-              <Select
-                value={formData.menteeId}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, menteeId: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose a mentee" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mentees.map((mentee) => (
-                    <SelectItem key={mentee.id} value={mentee.id}>
-                      {mentee.first_name} {mentee.last_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="weekStartDate">Week</Label>
-              <Select
-                value={formData.weekStartDate}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, weekStartDate: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {getWeekOptions().map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             <div>
               <Label htmlFor="jobTitle">Job Title</Label>
               <Input
@@ -178,9 +184,76 @@ const ApplicationsJobRecommendations = () => {
             />
           </div>
 
+          <div>
+            <Label htmlFor="weekStartDate">Week</Label>
+            <Select
+              value={formData.weekStartDate}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, weekStartDate: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {getWeekOptions().map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Mentee Selection */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Select Mentees</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleSelectAll}
+              >
+                {selectedMentees.length === mentees.length ? 'Deselect All' : 'Select All'}
+              </Button>
+            </div>
+            
+            <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
+              {mentees.length === 0 ? (
+                <p className="text-sm text-gray-500">No mentees found</p>
+              ) : (
+                mentees.map((mentee) => (
+                  <div key={mentee.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`mentee-${mentee.id}`}
+                      checked={selectedMentees.includes(mentee.id)}
+                      onCheckedChange={(checked) => handleMenteeToggle(mentee.id, checked as boolean)}
+                    />
+                    <Label 
+                      htmlFor={`mentee-${mentee.id}`}
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {mentee.first_name} {mentee.last_name}
+                    </Label>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {selectedMentees.length > 0 && (
+              <p className="text-sm text-gray-600">
+                {selectedMentees.length} mentee(s) selected
+              </p>
+            )}
+          </div>
+
           <div className="flex gap-2 pt-4">
-            <Button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700">
-              Send Recommendation
+            <Button 
+              type="submit" 
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+              disabled={selectedMentees.length === 0}
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Send to {selectedMentees.length} Mentee(s)
             </Button>
             <Button
               type="button"

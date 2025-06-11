@@ -51,6 +51,15 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
 
   const addRecommendation = async (recommendationData: NewJobRecommendationData) => {
     try {
+      console.log('Adding recommendation:', {
+        coach_id: userId,
+        mentee_id: recommendationData.menteeId,
+        job_title: recommendationData.jobTitle,
+        job_link: recommendationData.jobLink,
+        company_name: recommendationData.companyName,
+        week_start_date: recommendationData.weekStartDate
+      });
+
       const { data, error } = await supabase
         .from('weekly_job_recommendations')
         .insert({
@@ -69,19 +78,13 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         throw error;
       }
 
+      console.log('Successfully added recommendation:', data);
       setRecommendations(prev => [data, ...prev]);
       
-      toast({
-        title: "Recommendation Added",
-        description: `Job recommendation for ${recommendationData.jobTitle} has been added successfully.`,
-      });
+      return data;
     } catch (error: any) {
       console.error('Error adding job recommendation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add job recommendation. Please try again.",
-        variant: "destructive"
-      });
+      throw error; // Re-throw to let the caller handle it
     }
   };
 
