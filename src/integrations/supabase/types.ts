@@ -599,6 +599,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_hidden_applications: {
+        Args: { coach_user_id: string }
+        Returns: {
+          application_id: string
+        }[]
+      }
+      hide_application: {
+        Args: { coach_user_id: string; app_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

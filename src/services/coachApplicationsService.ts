@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication } from '@/types/jobApplications';
 
@@ -100,27 +99,16 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       return [];
     }
 
-    // Get hidden applications for this coach using raw SQL query to avoid type issues
+    // Get hidden applications for this coach using the new RPC function
     const { data: hiddenApplications, error: hiddenError } = await supabase.rpc('get_hidden_applications', { coach_user_id: user.id });
 
     let hiddenApplicationIds: string[] = [];
     if (hiddenError) {
       console.error('Error fetching hidden applications:', hiddenError);
       // Don't throw error, just continue without filtering
-      // Try alternative approach with direct table query
-      try {
-        const { data: hiddenData } = await supabase
-          .from('coach_hidden_applications' as any)
-          .select('application_id')
-          .eq('coach_id', user.id);
-        
-        hiddenApplicationIds = hiddenData?.map((hidden: any) => hidden.application_id) || [];
-      } catch (e) {
-        console.warn('Could not fetch hidden applications, showing all:', e);
-        hiddenApplicationIds = [];
-      }
+      hiddenApplicationIds = [];
     } else {
-      hiddenApplicationIds = hiddenApplications || [];
+      hiddenApplicationIds = hiddenApplications?.map((hidden: any) => hidden.application_id) || [];
     }
 
     console.log('Hidden application IDs:', hiddenApplicationIds);
@@ -197,26 +185,15 @@ export const hideCoachMenteeApplication = async (applicationId: string): Promise
 
     console.log('Attempting to hide application:', applicationId);
 
-    // Insert into hidden applications table using raw SQL to avoid type issues
+    // Use the RPC function to hide the application
     const { error: hideError } = await supabase.rpc('hide_application', {
       coach_user_id: user.id,
       app_id: applicationId
     });
 
     if (hideError) {
-      console.error('Error with RPC call, trying direct insert:', hideError);
-      // Fallback to direct insert if RPC fails
-      const { error: directInsertError } = await supabase
-        .from('coach_hidden_applications' as any)
-        .insert({
-          coach_id: user.id,
-          application_id: applicationId
-        });
-
-      if (directInsertError) {
-        console.error('Error hiding job application:', directInsertError);
-        throw directInsertError;
-      }
+      console.error('Error hiding job application:', hideError);
+      throw hideError;
     }
 
     console.log('Application hidden successfully from coach view:', applicationId);
