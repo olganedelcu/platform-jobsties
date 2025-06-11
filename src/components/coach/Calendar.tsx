@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CoachCalendarService } from '@/services/coachCalendarService';
 import CalendarSettings from './CalendarSettings';
 import CalendarEventsList from './CalendarEventsList';
+import ManualAvailabilityForm from './ManualAvailabilityForm';
 
 interface CalendarEvent {
   id: string;
@@ -39,6 +40,7 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
   });
   const [loading, setLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showManualForm, setShowManualForm] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -112,6 +114,14 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => setShowManualForm(!showManualForm)}
+          >
+            <CalendarIcon className="h-4 w-4 mr-2" />
+            Add Availability
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowSettings(!showSettings)}
           >
             <Settings className="h-4 w-4 mr-2" />
@@ -165,6 +175,15 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {showManualForm && (
+        <ManualAvailabilityForm
+          onAvailabilityAdded={() => {
+            setShowManualForm(false);
+            loadCalendarData();
+          }}
+        />
+      )}
 
       {showSettings && (
         <CalendarSettings
