@@ -28,33 +28,34 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
   const handleConnectGoogleCalendar = async () => {
     try {
       setLoading(true);
-      const authUrl = await CoachCalendarService.getGoogleAuthUrl();
-      window.open(authUrl, '_blank', 'width=500,height=600');
       
-      // Listen for auth completion
-      const checkConnection = setInterval(async () => {
-        try {
-          const isConnected = await CoachCalendarService.checkGoogleConnection(coachId);
-          if (isConnected) {
-            clearInterval(checkConnection);
-            onSettingsUpdate();
-            toast({
-              title: "Success",
-              description: "Google Calendar connected successfully"
-            });
-          }
-        } catch (error) {
-          console.error('Error checking connection:', error);
-        }
-      }, 2000);
-
-      // Stop checking after 2 minutes
-      setTimeout(() => clearInterval(checkConnection), 120000);
+      // Start the OAuth flow
+      await CoachCalendarService.connectGoogleCalendar();
+      
+      // Check if connection was successful
+      const isConnected = await CoachCalendarService.checkGoogleConnection(coachId);
+      
+      if (isConnected) {
+        // Update calendar settings to reflect connection
+        await CoachCalendarService.updateSyncSettings(coachId, true);
+        onSettingsUpdate();
+        
+        toast({
+          title: "Success",
+          description: "Google Calendar connected successfully! Your calendar will now sync automatically."
+        });
+      } else {
+        toast({
+          title: "Connection incomplete",
+          description: "Please try connecting again or check if you granted all required permissions.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error connecting Google Calendar:', error);
       toast({
         title: "Error",
-        description: "Failed to connect Google Calendar",
+        description: "Failed to connect Google Calendar. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -131,9 +132,10 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
               <Button
                 onClick={handleConnectGoogleCalendar}
                 disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Connect Google Calendar
+                {loading ? 'Connecting...' : 'Connect Google Calendar'}
               </Button>
             )}
           </div>
@@ -142,7 +144,7 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                To use Google Calendar integration, you need to connect your Google account. 
+                Click "Connect Google Calendar" to log into your Google account and grant permission. 
                 This will allow the system to sync your calendar events and prevent double-booking.
               </AlertDescription>
             </Alert>

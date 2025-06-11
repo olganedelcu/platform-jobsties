@@ -31,13 +31,20 @@ export const useCoachCalendar = (coachId: string) => {
   const loadCalendarData = async () => {
     try {
       setLoading(true);
+      
+      // Check if Google Calendar is connected
+      const isGoogleConnected = await CoachCalendarService.checkGoogleConnection(coachId);
+      
       const [calendarSettings, calendarEvents] = await Promise.all([
         CoachCalendarService.getCalendarSettings(coachId),
         CoachCalendarService.getCalendarEvents(coachId)
       ]);
       
-      setSettings(calendarSettings || {
-        google_calendar_connected: false,
+      setSettings({
+        ...calendarSettings,
+        google_calendar_connected: isGoogleConnected
+      } || {
+        google_calendar_connected: isGoogleConnected,
         sync_enabled: false
       });
       setEvents(calendarEvents || []);
