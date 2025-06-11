@@ -72,7 +72,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
   const totalRecommendations = currentWeekRecommendations.length + previousWeeksRecommendations.length;
 
   return (
-    <Card>
+    <Card className="max-h-96">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Briefcase className="h-5 w-5" />
@@ -85,7 +85,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
           </div>
         )}
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 max-h-80 overflow-hidden">
         {/* Current Week Recommendations */}
         <CurrentWeekSection
           currentWeekRecommendations={currentWeekRecommendations}

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import RecommendationCard from './RecommendationCard';
 
@@ -25,18 +26,20 @@ const PreviousWeeksSection = ({
       <Badge variant="outline">{previousWeeksRecommendations.length}</Badge>
     </div>
     
-    <div className="space-y-3 max-h-64 overflow-y-auto">
-      {previousWeeksRecommendations.map((recommendation) => (
-        <RecommendationCard
-          key={recommendation.id}
-          recommendation={recommendation}
-          userTimeZone={userTimeZone}
-          addingToTracker={addingToTracker}
-          onViewJob={onViewJob}
-          onMarkAsApplied={onMarkAsApplied}
-        />
-      ))}
-    </div>
+    <ScrollArea className="h-64">
+      <div className="space-y-3 pr-4">
+        {previousWeeksRecommendations.map((recommendation) => (
+          <RecommendationCard
+            key={recommendation.id}
+            recommendation={recommendation}
+            userTimeZone={userTimeZone}
+            addingToTracker={addingToTracker}
+            onViewJob={onViewJob}
+            onMarkAsApplied={onMarkAsApplied}
+          />
+        ))}
+      </div>
+    </ScrollArea>
   </div>
 );
 

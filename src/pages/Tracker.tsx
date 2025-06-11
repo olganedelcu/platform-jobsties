@@ -84,7 +84,13 @@ const Tracker = () => {
     return appDate >= oneWeekAgo;
   }).length;
 
-  const applicationsWithCoachFeedback = applications.filter(app => app.coach_notes && app.coach_notes.trim().length > 0).length;
+  // Calculate applications this month instead of coach feedback
+  const applicationsThisMonth = applications.filter(app => {
+    const appDate = new Date(app.date_applied);
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
+  }).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -142,8 +148,8 @@ const Tracker = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Coach Feedback</p>
-                  <p className="text-2xl font-bold text-orange-600">{applicationsWithCoachFeedback}</p>
+                  <p className="text-sm text-gray-600">Applications this month</p>
+                  <p className="text-2xl font-bold text-orange-600">{applicationsThisMonth}</p>
                 </div>
                 <Award className="h-8 w-8 text-orange-600" />
               </div>
