@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Building2, Calendar, Briefcase } from 'lucide-react';
+import { ExternalLink, Building2, Calendar, Briefcase, CheckCircle, Plus } from 'lucide-react';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
+import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import { format, startOfWeek } from 'date-fns';
 
@@ -13,7 +14,12 @@ interface WeeklyJobRecommendationsProps {
 }
 
 const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => {
-  const { recommendations, loading } = useJobRecommendations({ userId, isCoach: false });
+  const { recommendations, loading, refetchRecommendations } = useJobRecommendations({ userId, isCoach: false });
+  const { markAsApplied } = useJobRecommendationActions({ 
+    user: { id: userId },
+    onApplicationAdded: refetchRecommendations
+  });
+  const [addingToTracker, setAddingToTracker] = useState<string | null>(null);
 
   // Get current week's recommendations
   const getCurrentWeekRecommendations = () => {
@@ -34,6 +40,15 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
   const currentWeekRecs = getCurrentWeekRecommendations();
   const previousWeeksRecs = getPreviousWeeksRecommendations();
 
+  const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
+    setAddingToTracker(recommendation.id);
+    try {
+      await markAsApplied(recommendation);
+    } finally {
+      setAddingToTracker(null);
+    }
+  };
+
   const RecommendationCard = ({ recommendation }: { recommendation: JobRecommendation }) => (
     <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
@@ -48,15 +63,36 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
             <span>Week of {format(new Date(recommendation.week_start_date), 'MMM dd, yyyy')}</span>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => window.open(recommendation.job_link, '_blank')}
-          className="flex items-center gap-2"
-        >
-          <ExternalLink className="h-4 w-4" />
-          Apply
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(recommendation.job_link, '_blank')}
+            className="flex items-center gap-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            View Job
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => handleMarkAsApplied(recommendation)}
+            disabled={addingToTracker === recommendation.id}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+          >
+            {addingToTracker === recommendation.id ? (
+              <>
+                <Plus className="h-4 w-4 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Mark as Applied
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );
