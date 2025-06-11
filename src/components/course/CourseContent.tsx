@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseModule from '@/components/course/CourseModule';
-import MenteeCVFiles from '@/components/MenteeCVFiles';
+import ModuleFiles from '@/components/ModuleFiles';
 import { courseModules } from '@/data/courseModules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 
@@ -93,13 +93,30 @@ const CourseContent = ({ userId }: CourseContentProps) => {
         ))}
       </div>
 
-      {/* Add the CV Files section for mentees */}
+      {/* Add the Module Materials section for all shared files */}
       <section className="mt-12">
-        <h2 className="text-xl font-semibold mb-4">CV Optimization</h2>
+        <h2 className="text-xl font-semibold mb-4">Module Materials</h2>
         <p className="text-gray-600 mb-6">
-          Access your CV files that have been reviewed by your coach. Download and update them based on the feedback.
+          Access all files and materials that have been shared by your coach across different modules.
         </p>
-        <MenteeCVFiles userId={userId} />
+        
+        <div className="space-y-6">
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="linkedin" 
+            title="LinkedIn & Cover Letter" 
+          />
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="job_search_strategy" 
+            title="Job Search Strategy" 
+          />
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="interview_preparation" 
+            title="Interview Preparation" 
+          />
+        </div>
       </section>
     </main>
   );

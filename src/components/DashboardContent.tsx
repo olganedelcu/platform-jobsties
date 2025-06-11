@@ -12,6 +12,7 @@ import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
+import AllModuleMaterials from '@/components/AllModuleMaterials';
 
 interface DashboardContentProps {
   user: any;
@@ -104,6 +105,11 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
       <div className="mt-8">
         <DashboardQuickLinks />
       </div>
+
+      {/* Add the Module Materials section */}
+      <section className="mt-12">
+        <AllModuleMaterials userId={user?.id || ''} />
+      </section>
     </main>
   );
 };
