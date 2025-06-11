@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MenteeProgress {
@@ -14,20 +14,34 @@ interface MenteeProgress {
 export const useMenteeProgress = (menteeIds: string[]) => {
   const [progressData, setProgressData] = useState<MenteeProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const isFirstLoad = useRef(true);
+  const lastFetchedIds = useRef<string>('');
 
   useEffect(() => {
-    if (menteeIds.length === 0) {
-      setProgressData([]);
-      setLoading(false);
+    const currentIds = menteeIds.sort().join(',');
+    
+    // Prevent refetch if the mentee IDs haven't actually changed
+    if (!isFirstLoad.current && lastFetchedIds.current === currentIds) {
       return;
     }
 
+    if (menteeIds.length === 0) {
+      setProgressData([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    lastFetchedIds.current = currentIds;
+    isFirstLoad.current = false;
     fetchMenteeProgress();
   }, [menteeIds]);
 
   const fetchMenteeProgress = async () => {
     try {
       setLoading(true);
+      setError(null);
       
       console.log('Fetching course progress for mentee IDs:', menteeIds);
       
@@ -39,16 +53,18 @@ export const useMenteeProgress = (menteeIds: string[]) => {
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
+        throw new Error(`Profile fetch error: ${profilesError.message}`);
       }
 
       // Fetch course progress for all mentees
-      const { data: courseProgress, error } = await supabase
+      const { data: courseProgress, error: progressError } = await supabase
         .from('course_progress')
         .select('user_id, completed, progress_percentage, module_title')
         .in('user_id', menteeIds);
 
-      if (error) {
-        console.error('Error fetching mentee progress:', error);
+      if (progressError) {
+        console.error('Error fetching mentee progress:', progressError);
+        throw new Error(`Progress fetch error: ${progressError.message}`);
       }
 
       console.log('Raw course progress data:', courseProgress);
@@ -106,24 +122,30 @@ export const useMenteeProgress = (menteeIds: string[]) => {
       const finalProgressData = Array.from(progressMap.values());
       console.log('Final progress data:', finalProgressData);
       setProgressData(finalProgressData);
-    } catch (error) {
+      setError(null);
+    } catch (error: any) {
       console.error('Error fetching mentee progress:', error);
       
-      // On error, show basic data with no progress
-      const fallbackData = menteeIds.map((menteeId) => ({
-        menteeId,
-        overallProgress: 0,
-        completedModules: 0,
-        totalModules: 5,
-        hasRealData: false,
-        emailConfirmed: false
-      }));
+      // Set error state and don't update progressData to prevent loops
+      setError(error.message || 'Failed to fetch progress data');
       
-      setProgressData(fallbackData);
+      // Only set fallback data if we don't have any data yet
+      if (progressData.length === 0) {
+        const fallbackData = menteeIds.map((menteeId) => ({
+          menteeId,
+          overallProgress: 0,
+          completedModules: 0,
+          totalModules: 5,
+          hasRealData: false,
+          emailConfirmed: false
+        }));
+        
+        setProgressData(fallbackData);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  return { progressData, loading, refetch: fetchMenteeProgress };
+  return { progressData, loading, error, refetch: fetchMenteeProgress };
 };
