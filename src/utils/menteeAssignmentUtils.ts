@@ -2,9 +2,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export const assignAllMenteesToAna = async (toast: ReturnType<typeof useToast>['toast']) => {
+export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof useToast>['toast']) => {
   try {
-    console.log('Starting manual assignment of mentees...');
+    console.log('Starting manual assignment of ALL mentees...');
 
     // Get the current authenticated user (coach)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -20,7 +20,7 @@ export const assignAllMenteesToAna = async (toast: ReturnType<typeof useToast>['
 
     console.log('Using current user as coach:', user.id);
     
-    // Get all mentees from profiles table
+    // Get ALL mentees from profiles table
     const { data: allMentees, error: menteesError } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email')
@@ -30,18 +30,18 @@ export const assignAllMenteesToAna = async (toast: ReturnType<typeof useToast>['
       console.error('Error fetching mentees:', menteesError);
       toast({
         title: "Error",
-        description: "Failed to fetch mentees.",
+        description: "Failed to fetch mentees from profiles.",
         variant: "destructive"
       });
       return false;
     }
 
-    console.log('All mentees found:', allMentees);
+    console.log('All mentees found in profiles:', allMentees);
 
     if (!allMentees || allMentees.length === 0) {
       toast({
         title: "Info",
-        description: "No mentees found in the system.",
+        description: "No mentees found in the profiles table.",
       });
       return true;
     }
@@ -55,24 +55,19 @@ export const assignAllMenteesToAna = async (toast: ReturnType<typeof useToast>['
 
     if (assignmentsError) {
       console.error('Error fetching existing assignments:', assignmentsError);
-      toast({
-        title: "Error",
-        description: "Failed to check existing assignments.",
-        variant: "destructive"
-      });
-      return false;
+      // Continue anyway, we'll assign all mentees
     }
 
     const assignedMenteeIds = existingAssignments?.map(a => a.mentee_id) || [];
     const unassignedMentees = allMentees.filter(m => !assignedMenteeIds.includes(m.id));
 
     console.log('Already assigned mentee IDs:', assignedMenteeIds);
-    console.log('Unassigned mentees:', unassignedMentees);
+    console.log('Unassigned mentees to assign:', unassignedMentees);
 
     if (unassignedMentees.length === 0) {
       toast({
         title: "Info",
-        description: "All mentees are already assigned to you.",
+        description: `All ${allMentees.length} mentees are already assigned to you.`,
       });
       return true;
     }
@@ -100,7 +95,7 @@ export const assignAllMenteesToAna = async (toast: ReturnType<typeof useToast>['
 
     toast({
       title: "Success",
-      description: `Successfully assigned ${assignments.length} mentees to you. Total: ${allMentees.length} mentees.`,
+      description: `Successfully assigned ${assignments.length} mentees. Total: ${allMentees.length} mentees available.`,
     });
     return true;
   } catch (error) {

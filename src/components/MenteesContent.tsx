@@ -12,7 +12,7 @@ import MenteesHeader from '@/components/MenteesHeader';
 import MenteesSearchBar from '@/components/MenteesSearchBar';
 import MenteesTable from '@/components/MenteesTable';
 import MenteesEmptyState from '@/components/MenteesEmptyState';
-import { assignAllMenteesToAna } from '@/utils/menteeAssignmentUtils';
+import { assignAllMenteesToCurrentCoach } from '@/utils/menteeAssignmentUtils';
 
 const MenteesContent = () => {
   const { mentees, loading, fetchMentees } = useMentees();
@@ -31,7 +31,7 @@ const MenteesContent = () => {
 
   const handleAssignMentees = async () => {
     setIsAssigning(true);
-    const success = await assignAllMenteesToAna(toast);
+    const success = await assignAllMenteesToCurrentCoach(toast);
     if (success) {
       await fetchMentees(); // Refresh the mentees list
     }
@@ -70,7 +70,7 @@ const MenteesContent = () => {
             <CardContent className="py-6">
               <div className="text-center">
                 <p className="text-gray-600 mb-4">
-                  If there are mentees in the system that should be assigned to you, click the button below:
+                  If there are mentees in the profiles table that should be displayed, click the button below:
                 </p>
                 <Button 
                   onClick={handleAssignMentees}
@@ -79,7 +79,7 @@ const MenteesContent = () => {
                 >
                   <RefreshCw className={`h-4 w-4 ${isAssigning ? 'animate-spin' : ''}`} />
                   <span>
-                    {isAssigning ? 'Assigning Mentees...' : 'Assign Available Mentees'}
+                    {isAssigning ? 'Loading Mentees...' : 'Load All Mentees from Profiles'}
                   </span>
                 </Button>
               </div>

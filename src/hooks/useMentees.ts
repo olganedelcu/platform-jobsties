@@ -34,121 +34,85 @@ export const useMentees = () => {
 
       console.log('Current user ID:', user.id);
 
-      // First, try to get mentees assigned to this coach
-      const { data: assignments, error: assignmentsError } = await supabase
-        .from('coach_mentee_assignments')
-        .select(`
-          mentee_id,
-          profiles!coach_mentee_assignments_mentee_id_fkey (
-            id,
-            first_name,
-            last_name,
-            email
-          )
-        `)
-        .eq('coach_id', user.id)
-        .eq('is_active', true);
+      // First, get ALL mentees from the profiles table
+      const { data: allMentees, error: menteesError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email')
+        .eq('role', 'mentee');
 
-      console.log('Assignments query result:', assignments);
-      console.log('Assignments error:', assignmentsError);
+      console.log('All mentees from profiles table:', allMentees);
 
-      if (assignmentsError) {
-        console.error('Error fetching coach assignments:', assignmentsError);
+      if (menteesError) {
+        console.error('Error fetching mentees from profiles:', menteesError);
         toast({
           title: "Error",
-          description: "Failed to fetch assigned mentees.",
+          description: "Failed to fetch mentees.",
           variant: "destructive"
         });
         return;
       }
 
-      // Transform the data to match the Mentee interface
-      const assignedMentees = assignments?.map(assignment => ({
-        id: assignment.profiles.id,
-        first_name: assignment.profiles.first_name,
-        last_name: assignment.profiles.last_name,
-        email: assignment.profiles.email
-      })) || [];
+      if (!allMentees || allMentees.length === 0) {
+        console.log('No mentees found in profiles table');
+        setMentees([]);
+        toast({
+          title: "Info",
+          description: "No mentees found in the system.",
+        });
+        return;
+      }
 
-      console.log('Transformed assigned mentees:', assignedMentees);
+      // Get existing assignments for this coach
+      const { data: existingAssignments, error: assignmentsError } = await supabase
+        .from('coach_mentee_assignments')
+        .select('mentee_id')
+        .eq('coach_id', user.id)
+        .eq('is_active', true);
 
-      if (assignedMentees.length === 0) {
-        console.log('No assigned mentees found. Checking for unassigned mentees...');
-        
-        // Get all mentees from profiles table
-        const { data: allMentees, error: menteesError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, email')
-          .eq('role', 'mentee');
+      if (assignmentsError) {
+        console.error('Error fetching existing assignments:', assignmentsError);
+        // Continue anyway, we'll try to assign all mentees
+      }
 
-        console.log('All mentees in profiles table:', allMentees);
-        console.log('Mentees query error:', menteesError);
+      const assignedMenteeIds = existingAssignments?.map(a => a.mentee_id) || [];
+      const unassignedMentees = allMentees.filter(m => !assignedMenteeIds.includes(m.id));
 
-        if (menteesError) {
-          console.error('Error fetching all mentees:', menteesError);
+      console.log('Already assigned mentee IDs:', assignedMenteeIds);
+      console.log('Unassigned mentees that need assignment:', unassignedMentees);
+
+      // If there are unassigned mentees, assign them to the current coach
+      if (unassignedMentees.length > 0) {
+        console.log('Assigning unassigned mentees to current coach...');
+        const newAssignments = unassignedMentees.map(mentee => ({
+          coach_id: user.id,
+          mentee_id: mentee.id,
+          is_active: true
+        }));
+
+        const { error: assignError } = await supabase
+          .from('coach_mentee_assignments')
+          .insert(newAssignments);
+
+        if (assignError) {
+          console.error('Error auto-assigning mentees:', assignError);
           toast({
-            title: "Error",
-            description: "Failed to fetch mentees.",
+            title: "Warning",
+            description: `Could not assign ${unassignedMentees.length} mentees automatically.`,
             variant: "destructive"
           });
-          return;
-        }
-
-        if (allMentees && allMentees.length > 0) {
-          // Check which mentees are not assigned to any coach
-          const { data: existingAssignments } = await supabase
-            .from('coach_mentee_assignments')
-            .select('mentee_id')
-            .eq('is_active', true);
-
-          const assignedMenteeIds = existingAssignments?.map(a => a.mentee_id) || [];
-          const unassignedMentees = allMentees.filter(m => !assignedMenteeIds.includes(m.id));
-
-          console.log('Assigned mentee IDs:', assignedMenteeIds);
-          console.log('Unassigned mentees:', unassignedMentees);
-
-          if (unassignedMentees.length > 0) {
-            // Auto-assign unassigned mentees to current coach
-            console.log('Auto-assigning unassigned mentees to current coach...');
-            const newAssignments = unassignedMentees.map(mentee => ({
-              coach_id: user.id,
-              mentee_id: mentee.id,
-              is_active: true
-            }));
-
-            const { error: assignError } = await supabase
-              .from('coach_mentee_assignments')
-              .insert(newAssignments);
-
-            if (assignError) {
-              console.error('Error auto-assigning mentees:', assignError);
-              // Still set the mentees even if assignment fails
-              setMentees(allMentees);
-            } else {
-              console.log('Successfully auto-assigned mentees');
-              setMentees(allMentees);
-              toast({
-                title: "Success",
-                description: `Assigned ${unassignedMentees.length} mentees to you.`,
-              });
-            }
-          } else {
-            setMentees(assignedMentees);
-            toast({
-              title: "Info",
-              description: "All mentees are already assigned.",
-            });
-          }
         } else {
-          setMentees([]);
+          console.log('Successfully auto-assigned mentees');
           toast({
-            title: "Info",
-            description: "No mentees found in the system.",
+            title: "Success",
+            description: `Assigned ${unassignedMentees.length} new mentees to you.`,
           });
         }
-      } else {
-        setMentees(assignedMentees);
       }
+
+      // Always show ALL mentees from profiles table
+      setMentees(allMentees);
+      console.log('Setting mentees to display:', allMentees);
+
     } catch (error) {
       console.error('Error fetching mentees:', error);
       toast({
