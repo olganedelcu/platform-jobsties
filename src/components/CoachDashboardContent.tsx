@@ -8,6 +8,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import MenteesCard from '@/components/dashboard/MenteesCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
+import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 
 interface CoachDashboardContentProps {
@@ -28,7 +29,12 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
     return new Date(app.date_applied) >= oneWeekAgo;
-  }).length;
+  });
+
+  // Sort recent applications by date (most recent first) - show all of them
+  const sortedRecentApplications = recentApplications.sort((a, b) => 
+    new Date(b.date_applied).getTime() - new Date(a.date_applied).getTime()
+  );
 
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
@@ -46,6 +52,13 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
         <ApplicationsStatsCard
           applicationsThisMonth={totalApplications}
           onClick={() => navigate('/coach/applications')}
+        />
+
+        {/* Recent Activity - Now shows all recent applications */}
+        <RecentActivityCard
+          recentApplications={sortedRecentApplications}
+          onViewAll={() => navigate('/coach/applications')}
+          onAddApplication={() => navigate('/coach/applications')}
         />
 
         {/* Upcoming Sessions */}
@@ -68,7 +81,7 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
 
         <div className="bg-white p-6 rounded-lg border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Recent Activity</h3>
-          <p className="text-3xl font-bold text-purple-600">{recentApplications}</p>
+          <p className="text-3xl font-bold text-purple-600">{recentApplications.length}</p>
           <p className="text-sm text-gray-500 mt-1">Applications this week</p>
         </div>
       </div>
