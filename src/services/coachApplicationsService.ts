@@ -99,6 +99,24 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       return [];
     }
 
+    // Get hidden applications for this coach
+    const { data: hiddenApplications, error: hiddenError } = await supabase
+      .from('coach_hidden_applications')
+      .select('application_id')
+      .eq('coach_id', user.id);
+
+    if (hiddenError) {
+      console.error('Error fetching hidden applications:', hiddenError);
+      // Don't throw error, just continue without filtering
+    }
+
+    const hiddenApplicationIds = hiddenApplications?.map(hidden => hidden.application_id) || [];
+    console.log('Hidden application IDs:', hiddenApplicationIds);
+
+    // Filter out hidden applications
+    const visibleApplications = applications.filter(app => !hiddenApplicationIds.includes(app.id));
+    console.log('Visible applications after filtering:', visibleApplications.length);
+
     // Fetch profile information for each mentee
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
@@ -111,7 +129,7 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
     }
 
     // Combine applications with profile data
-    const applicationsWithProfiles = applications.map(application => ({
+    const applicationsWithProfiles = visibleApplications.map(application => ({
       ...application,
       profiles: profiles?.find(profile => profile.id === application.mentee_id) || null
     }));
@@ -155,7 +173,7 @@ export const updateCoachMenteeApplication = async (applicationId: string, update
   }
 };
 
-export const deleteCoachMenteeApplication = async (applicationId: string): Promise<void> => {
+export const hideCoachMenteeApplication = async (applicationId: string): Promise<void> => {
   try {
     // Get the current authenticated user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -165,41 +183,27 @@ export const deleteCoachMenteeApplication = async (applicationId: string): Promi
       throw new Error('User not authenticated');
     }
 
-    console.log('Attempting to delete application:', applicationId);
+    console.log('Attempting to hide application:', applicationId);
 
-    // First, verify the application exists and get its details
-    const { data: existingApp, error: fetchError } = await supabase
-      .from('job_applications')
-      .select('*')
-      .eq('id', applicationId)
-      .single();
+    // Insert into hidden applications table
+    const { error: hideError } = await supabase
+      .from('coach_hidden_applications')
+      .insert({
+        coach_id: user.id,
+        application_id: applicationId
+      });
 
-    if (fetchError) {
-      console.error('Error fetching application to delete:', fetchError);
-      throw fetchError;
+    if (hideError) {
+      console.error('Error hiding job application:', hideError);
+      throw hideError;
     }
 
-    if (!existingApp) {
-      console.log('Application not found:', applicationId);
-      throw new Error('Application not found');
-    }
-
-    console.log('Found application to delete:', existingApp);
-
-    // Delete the job application
-    const { error: deleteError } = await supabase
-      .from('job_applications')
-      .delete()
-      .eq('id', applicationId);
-
-    if (deleteError) {
-      console.error('Error deleting job application:', deleteError);
-      throw deleteError;
-    }
-
-    console.log('Application deleted successfully from database:', applicationId);
+    console.log('Application hidden successfully from coach view:', applicationId);
   } catch (error) {
-    console.error('Error in deleteCoachMenteeApplication:', error);
+    console.error('Error in hideCoachMenteeApplication:', error);
     throw error;
   }
 };
+
+// Keep the old function name for backward compatibility but make it use the new hide functionality
+export const deleteCoachMenteeApplication = hideCoachMenteeApplication;

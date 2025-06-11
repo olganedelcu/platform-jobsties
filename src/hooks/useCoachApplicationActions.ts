@@ -1,7 +1,7 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { JobApplication } from '@/types/jobApplications';
-import { updateCoachMenteeApplication, deleteCoachMenteeApplication } from '@/services/coachApplicationsService';
+import { updateCoachMenteeApplication, hideCoachMenteeApplication } from '@/services/coachApplicationsService';
 
 export const useCoachApplicationActions = (
   applications: JobApplication[],
@@ -31,28 +31,28 @@ export const useCoachApplicationActions = (
 
   const handleDeleteApplication = async (applicationId: string): Promise<void> => {
     try {
-      console.log('Hook: Starting delete process for application:', applicationId);
-      console.log('Hook: Current applications count before delete:', applications.length);
-      console.log('Hook: Applications before delete:', applications.map(app => ({ id: app.id, company: app.company_name })));
+      console.log('Hook: Starting hide process for application:', applicationId);
+      console.log('Hook: Current applications count before hide:', applications.length);
+      console.log('Hook: Applications before hide:', applications.map(app => ({ id: app.id, company: app.company_name })));
       
-      await deleteCoachMenteeApplication(applicationId);
-      console.log('Hook: Delete service call completed, now refetching...');
+      await hideCoachMenteeApplication(applicationId);
+      console.log('Hook: Hide service call completed, now refetching...');
       
-      // Add a small delay to ensure the database has processed the delete
+      // Add a small delay to ensure the database has processed the hide operation
       await new Promise(resolve => setTimeout(resolve, 100));
       
       await refetchApplications();
       console.log('Hook: Refetch completed');
       
       toast({
-        title: "Application Deleted",
+        title: "Application Hidden",
         description: "The application has been removed from your view.",
       });
     } catch (error) {
-      console.error('Hook: Error deleting application:', error);
+      console.error('Hook: Error hiding application:', error);
       toast({
         title: "Error",
-        description: "Failed to delete application. Please try again.",
+        description: "Failed to remove application from view. Please try again.",
         variant: "destructive",
       });
       throw error;
