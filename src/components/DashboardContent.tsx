@@ -3,8 +3,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { User } from 'lucide-react';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
@@ -50,9 +51,13 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <DashboardHeader user={user} firstName={firstName} />
-
-      <DashboardQuickLinks />
+      {/* Simplified Header without avatar */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Good morning, {firstName}
+        </h1>
+        <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
@@ -69,6 +74,27 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             onViewAll={() => navigate('/tracker')}
             onAddApplication={() => navigate('/tracker')}
           />
+
+          {/* Profile Section */}
+          <div className="flex items-center justify-center p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={user?.user_metadata?.avatar_url} alt={firstName} />
+                <AvatarFallback className="bg-blue-100 text-blue-600 text-xl">
+                  <User className="h-8 w-8" />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
+                </h3>
+                <p className="text-gray-600">{user?.email}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links Section */}
+          <DashboardQuickLinks />
         </div>
 
         {/* Right Column */}
