@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Plus, Save, X } from 'lucide-react';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Plus } from 'lucide-react';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 import { format } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
+import JobApplicationsTableHeader from '@/components/JobApplicationsTableHeader';
+import JobApplicationRow from '@/components/JobApplicationRow';
+import NewApplicationRow from '@/components/NewApplicationRow';
+import { useDraftManagement } from '@/hooks/useDraftManagement';
 
 interface ExcelLikeJobApplicationsTableProps {
   applications: JobApplication[];
@@ -22,9 +23,6 @@ const ExcelLikeJobApplicationsTable = ({
   onUpdateApplication, 
   onDeleteApplication 
 }: ExcelLikeJobApplicationsTableProps) => {
-  const { toast } = useToast();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState<Partial<JobApplication>>({});
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newApplicationData, setNewApplicationData] = useState<NewJobApplicationData>({
     dateApplied: format(new Date(), 'yyyy-MM-dd'),
@@ -36,163 +34,14 @@ const ExcelLikeJobApplicationsTable = ({
     coachNotes: ''
   });
 
-  // Load saved draft changes on component mount
-  useEffect(() => {
-    const savedDrafts = localStorage.getItem('tracker-draft-changes');
-    if (savedDrafts) {
-      try {
-        const drafts = JSON.parse(savedDrafts);
-        const now = Date.now();
-        
-        // Check if drafts are still valid (within reasonable time)
-        Object.keys(drafts).forEach(applicationId => {
-          const draft = drafts[applicationId];
-          const timeDiff = now - draft.timestamp;
-          const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
-          
-          if (timeDiff > oneHour) {
-            // Draft is too old, remove it
-            delete drafts[applicationId];
-          }
-        });
-        
-        // If there are valid drafts, restore the first one
-        const validDrafts = Object.keys(drafts);
-        if (validDrafts.length > 0) {
-          const applicationId = validDrafts[0];
-          const draft = drafts[applicationId];
-          
-          setEditingId(applicationId);
-          setEditData(draft.data);
-          
-          toast({
-            title: "Draft Changes Restored",
-            description: "Your unsaved changes have been restored. Don't forget to save them!",
-          });
-        }
-        
-        // Update localStorage with cleaned drafts
-        if (Object.keys(drafts).length > 0) {
-          localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
-        } else {
-          localStorage.removeItem('tracker-draft-changes');
-        }
-      } catch (error) {
-        console.error('Error loading draft changes:', error);
-        localStorage.removeItem('tracker-draft-changes');
-      }
-    }
-  }, [toast]);
-
-  // Save draft changes to localStorage whenever editData changes
-  useEffect(() => {
-    if (editingId && Object.keys(editData).length > 0) {
-      const savedDrafts = localStorage.getItem('tracker-draft-changes');
-      let drafts = {};
-      
-      if (savedDrafts) {
-        try {
-          drafts = JSON.parse(savedDrafts);
-        } catch (error) {
-          console.error('Error parsing saved drafts:', error);
-        }
-      }
-      
-      drafts[editingId] = {
-        data: editData,
-        timestamp: Date.now()
-      };
-      
-      localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
-    }
-  }, [editingId, editData]);
-
-  // Clear draft changes when navigating to dashboard
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Check if user is navigating to dashboard
-      const currentPath = window.location.pathname;
-      if (currentPath === '/dashboard') {
-        localStorage.removeItem('tracker-draft-changes');
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      // When user comes back to the tab, check if they're on dashboard
-      if (!document.hidden && window.location.pathname === '/dashboard') {
-        localStorage.removeItem('tracker-draft-changes');
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
-  const handleEdit = (application: JobApplication) => {
-    setEditingId(application.id);
-    setEditData({
-      company_name: application.company_name,
-      job_title: application.job_title,
-      application_status: application.application_status,
-      interview_stage: application.interview_stage,
-      recruiter_name: application.recruiter_name,
-      coach_notes: application.coach_notes,
-      date_applied: application.date_applied
-    });
-  };
-
-  const handleSave = async (applicationId: string) => {
-    await onUpdateApplication(applicationId, editData);
-    setEditingId(null);
-    setEditData({});
-    
-    // Clear the saved draft for this application
-    const savedDrafts = localStorage.getItem('tracker-draft-changes');
-    if (savedDrafts) {
-      try {
-        const drafts = JSON.parse(savedDrafts);
-        delete drafts[applicationId];
-        
-        if (Object.keys(drafts).length > 0) {
-          localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
-        } else {
-          localStorage.removeItem('tracker-draft-changes');
-        }
-      } catch (error) {
-        console.error('Error clearing draft:', error);
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    const currentEditingId = editingId;
-    setEditingId(null);
-    setEditData({});
-    
-    // Clear the saved draft for this application
-    if (currentEditingId) {
-      const savedDrafts = localStorage.getItem('tracker-draft-changes');
-      if (savedDrafts) {
-        try {
-          const drafts = JSON.parse(savedDrafts);
-          delete drafts[currentEditingId];
-          
-          if (Object.keys(drafts).length > 0) {
-            localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
-          } else {
-            localStorage.removeItem('tracker-draft-changes');
-          }
-        } catch (error) {
-          console.error('Error clearing draft:', error);
-        }
-      }
-    }
-  };
+  const {
+    editingId,
+    editData,
+    handleEdit,
+    handleSave,
+    handleCancel,
+    handleEditDataChange
+  } = useDraftManagement();
 
   const handleAddNew = () => {
     setIsAddingNew(true);
@@ -227,16 +76,8 @@ const ExcelLikeJobApplicationsTable = ({
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'applied': return 'bg-blue-100 text-blue-800';
-      case 'in_review': return 'bg-yellow-100 text-yellow-800';
-      case 'interviewing': return 'bg-purple-100 text-purple-800';
-      case 'offer': return 'bg-green-100 text-green-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'withdrawn': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const handleSaveApplication = async (applicationId: string) => {
+    await handleSave(applicationId, onUpdateApplication);
   };
 
   return (
@@ -251,229 +92,30 @@ const ExcelLikeJobApplicationsTable = ({
       
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="w-32 font-semibold">Date Applied</TableHead>
-              <TableHead className="w-48 font-semibold">Company</TableHead>
-              <TableHead className="w-48 font-semibold">Job Title</TableHead>
-              <TableHead className="w-32 font-semibold">Status</TableHead>
-              <TableHead className="w-40 font-semibold">Interview Stage</TableHead>
-              <TableHead className="w-40 font-semibold">Recruiter</TableHead>
-              <TableHead className="w-64 font-semibold">Notes</TableHead>
-              <TableHead className="w-32 font-semibold">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+          <JobApplicationsTableHeader />
           <TableBody>
             {isAddingNew && (
-              <TableRow className="bg-blue-50">
-                <TableCell>
-                  <Input
-                    type="date"
-                    value={newApplicationData.dateApplied}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, dateApplied: e.target.value }))}
-                    className="w-full"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={newApplicationData.companyName}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, companyName: e.target.value }))}
-                    placeholder="Company name"
-                    className="w-full"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={newApplicationData.jobTitle}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobTitle: e.target.value }))}
-                    placeholder="Job title"
-                    className="w-full"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Select
-                    value={newApplicationData.applicationStatus}
-                    onValueChange={(value) => setNewApplicationData(prev => ({ ...prev, applicationStatus: value }))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="applied">Applied</SelectItem>
-                      <SelectItem value="in_review">In Review</SelectItem>
-                      <SelectItem value="interviewing">Interviewing</SelectItem>
-                      <SelectItem value="offer">Offer Received</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
-                      <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={newApplicationData.interviewStage || ''}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, interviewStage: e.target.value }))}
-                    placeholder="Interview stage"
-                    className="w-full"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={newApplicationData.recruiterName || ''}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, recruiterName: e.target.value }))}
-                    placeholder="Recruiter name"
-                    className="w-full"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Textarea
-                    value={newApplicationData.coachNotes || ''}
-                    onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
-                    placeholder="Notes"
-                    className="w-full min-h-[60px]"
-                  />
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button size="sm" onClick={handleSaveNew}>
-                      <Save className="h-3 w-3" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleCancelNew}>
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <NewApplicationRow
+                newApplicationData={newApplicationData}
+                setNewApplicationData={setNewApplicationData}
+                onSave={handleSaveNew}
+                onCancel={handleCancelNew}
+              />
             )}
             
             {applications.map((application) => (
-              <TableRow key={application.id} className="hover:bg-gray-50">
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Input
-                      type="date"
-                      value={editData.date_applied || application.date_applied}
-                      onChange={(e) => setEditData(prev => ({ ...prev, date_applied: e.target.value }))}
-                      className="w-full"
-                    />
-                  ) : (
-                    format(new Date(application.date_applied), 'MMM dd, yyyy')
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Input
-                      value={editData.company_name || application.company_name}
-                      onChange={(e) => setEditData(prev => ({ ...prev, company_name: e.target.value }))}
-                      className="w-full"
-                    />
-                  ) : (
-                    <span className="font-medium">{application.company_name}</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Input
-                      value={editData.job_title || application.job_title}
-                      onChange={(e) => setEditData(prev => ({ ...prev, job_title: e.target.value }))}
-                      className="w-full"
-                    />
-                  ) : (
-                    application.job_title
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Select
-                      value={editData.application_status || application.application_status}
-                      onValueChange={(value) => setEditData(prev => ({ ...prev, application_status: value }))}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="applied">Applied</SelectItem>
-                        <SelectItem value="in_review">In Review</SelectItem>
-                        <SelectItem value="interviewing">Interviewing</SelectItem>
-                        <SelectItem value="offer">Offer Received</SelectItem>
-                        <SelectItem value="rejected">Rejected</SelectItem>
-                        <SelectItem value="withdrawn">Withdrawn</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(application.application_status)}`}>
-                      {application.application_status.replace('_', ' ').toUpperCase()}
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Input
-                      value={editData.interview_stage || application.interview_stage || ''}
-                      onChange={(e) => setEditData(prev => ({ ...prev, interview_stage: e.target.value }))}
-                      className="w-full"
-                    />
-                  ) : (
-                    application.interview_stage || '-'
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Input
-                      value={editData.recruiter_name || application.recruiter_name || ''}
-                      onChange={(e) => setEditData(prev => ({ ...prev, recruiter_name: e.target.value }))}
-                      className="w-full"
-                    />
-                  ) : (
-                    application.recruiter_name || '-'
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editingId === application.id ? (
-                    <Textarea
-                      value={editData.coach_notes || application.coach_notes || ''}
-                      onChange={(e) => setEditData(prev => ({ ...prev, coach_notes: e.target.value }))}
-                      className="w-full min-h-[60px]"
-                    />
-                  ) : (
-                    <div className="max-w-xs truncate" title={application.coach_notes || ''}>
-                      {application.coach_notes || '-'}
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    {editingId === application.id ? (
-                      <>
-                        <Button size="sm" onClick={() => handleSave(application.id)}>
-                          <Save className="h-3 w-3" />
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={handleCancel}>
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          onClick={() => handleEdit(application)}
-                          disabled={isAddingNew}
-                        >
-                          Edit
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
-                          onClick={() => onDeleteApplication(application.id)}
-                          disabled={isAddingNew}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
+              <JobApplicationRow
+                key={application.id}
+                application={application}
+                isEditing={editingId === application.id}
+                editData={editData}
+                onEdit={handleEdit}
+                onSave={handleSaveApplication}
+                onCancel={handleCancel}
+                onDelete={onDeleteApplication}
+                onEditDataChange={handleEditDataChange}
+                isAddingNew={isAddingNew}
+              />
             ))}
             
             {applications.length === 0 && !isAddingNew && (
