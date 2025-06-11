@@ -5,21 +5,28 @@ export const useMenteeProgressStats = (menteeIds: string[]) => {
   const { progressData, loading } = useMenteeProgress(menteeIds);
 
   const getMenteeProgress = (menteeId: string) => {
-    return progressData.find(p => p.menteeId === menteeId) || {
+    const data = progressData.find(p => p.menteeId === menteeId);
+    return data || {
       overallProgress: 0,
       completedModules: 0,
-      totalModules: 5
+      totalModules: 5,
+      hasRealData: false,
+      emailConfirmed: false
     };
   };
 
-  const averageProgress = progressData.length > 0 
-    ? Math.round(progressData.reduce((sum, p) => sum + p.overallProgress, 0) / progressData.length)
+  // Only calculate average from mentees with real data
+  const menteesWithRealData = progressData.filter(p => p.hasRealData);
+  const averageProgress = menteesWithRealData.length > 0 
+    ? Math.round(menteesWithRealData.reduce((sum, p) => sum + p.overallProgress, 0) / menteesWithRealData.length)
     : 0;
 
   return {
     progressData,
     loading,
     getMenteeProgress,
-    averageProgress
+    averageProgress,
+    menteesWithRealData: menteesWithRealData.length,
+    totalMentees: progressData.length
   };
 };

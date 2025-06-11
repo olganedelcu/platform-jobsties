@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, TrendingUp, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { Mentee } from '@/hooks/useMentees';
 import MenteeProgressItem from './MenteeProgressItem';
 import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
@@ -15,7 +15,13 @@ interface MenteesCardProps {
 
 const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
   const menteeIds = mentees.map(m => m.id);
-  const { getMenteeProgress, averageProgress, loading: progressLoading } = useMenteeProgressStats(menteeIds);
+  const { 
+    getMenteeProgress, 
+    averageProgress, 
+    loading: progressLoading,
+    menteesWithRealData,
+    totalMentees
+  } = useMenteeProgressStats(menteeIds);
 
   if (loading || progressLoading) {
     return (
@@ -54,10 +60,18 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
           <span>{mentees.length} total mentees</span>
         </div>
         
-        {/* Debug info - remove when real data is working */}
-        <div className="flex items-center space-x-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
-          <AlertCircle className="h-3 w-3" />
-          <span>Note: Currently showing sample progress data for demonstration</span>
+        {/* Progress data status */}
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center space-x-2 text-green-600">
+            <CheckCircle2 className="h-3 w-3" />
+            <span>{menteesWithRealData} with real progress data</span>
+          </div>
+          {totalMentees > menteesWithRealData && (
+            <div className="flex items-center space-x-2 text-amber-600">
+              <XCircle className="h-3 w-3" />
+              <span>{totalMentees - menteesWithRealData} no progress data</span>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -72,6 +86,8 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
                   overallProgress={progress.overallProgress}
                   completedModules={progress.completedModules}
                   totalModules={progress.totalModules}
+                  hasRealData={progress.hasRealData}
+                  emailConfirmed={progress.emailConfirmed}
                 />
               );
             })}

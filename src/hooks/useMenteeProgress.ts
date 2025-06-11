@@ -7,6 +7,8 @@ interface MenteeProgress {
   overallProgress: number;
   completedModules: number;
   totalModules: number;
+  hasRealData: boolean;
+  emailConfirmed: boolean;
 }
 
 export const useMenteeProgress = (menteeIds: string[]) => {
@@ -29,6 +31,16 @@ export const useMenteeProgress = (menteeIds: string[]) => {
       
       console.log('Fetching course progress for mentee IDs:', menteeIds);
       
+      // First, check which users have confirmed emails by looking at profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', menteeIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+
       // Fetch course progress for all mentees
       const { data: courseProgress, error } = await supabase
         .from('course_progress')
@@ -37,25 +49,28 @@ export const useMenteeProgress = (menteeIds: string[]) => {
 
       if (error) {
         console.error('Error fetching mentee progress:', error);
-        return;
       }
 
       console.log('Raw course progress data:', courseProgress);
+      console.log('Profiles data:', profiles);
 
       // Calculate progress for each mentee
       const progressMap = new Map<string, MenteeProgress>();
       
       // Initialize all mentees with 0 progress
       menteeIds.forEach(menteeId => {
+        const profile = profiles?.find(p => p.id === menteeId);
         progressMap.set(menteeId, {
           menteeId,
           overallProgress: 0,
           completedModules: 0,
-          totalModules: 5 // Based on courseModules.length
+          totalModules: 5,
+          hasRealData: false,
+          emailConfirmed: !!profile // If we found a profile, email is likely confirmed
         });
       });
 
-      // Update with actual progress data
+      // Update with actual progress data only if it exists
       if (courseProgress && courseProgress.length > 0) {
         const progressByMentee = courseProgress.reduce((acc, progress) => {
           if (!acc[progress.user_id]) {
@@ -69,37 +84,23 @@ export const useMenteeProgress = (menteeIds: string[]) => {
 
         Object.entries(progressByMentee).forEach(([menteeId, progressArray]) => {
           const completedModules = progressArray.filter(p => p.completed).length;
-          const totalModules = 5; // Based on courseModules.length
+          const totalModules = Math.max(progressArray.length, 5); // Use actual module count or minimum 5
           const avgProgress = progressArray.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / progressArray.length;
           const overallProgress = Math.round(avgProgress);
 
-          console.log(`Mentee ${menteeId} progress: ${completedModules}/${totalModules} modules, ${overallProgress}% overall`);
+          console.log(`Mentee ${menteeId} real progress: ${completedModules}/${totalModules} modules, ${overallProgress}% overall`);
 
+          const existingData = progressMap.get(menteeId);
           progressMap.set(menteeId, {
-            menteeId,
+            ...existingData!,
             overallProgress,
             completedModules,
-            totalModules
+            totalModules,
+            hasRealData: true
           });
         });
       } else {
-        console.log('No course progress data found for mentees');
-        
-        // Since there's no real data, let's create some sample progress for demonstration
-        // This helps show that the UI is working while we debug the data issue
-        menteeIds.forEach((menteeId, index) => {
-          const sampleProgress = [0, 25, 50, 75, 100][index % 5];
-          const sampleCompleted = Math.floor(sampleProgress / 20);
-          
-          progressMap.set(menteeId, {
-            menteeId,
-            overallProgress: sampleProgress,
-            completedModules: sampleCompleted,
-            totalModules: 5
-          });
-        });
-        
-        console.log('Using sample progress data since no real data found');
+        console.log('No course progress data found for any mentees');
       }
 
       const finalProgressData = Array.from(progressMap.values());
@@ -108,12 +109,14 @@ export const useMenteeProgress = (menteeIds: string[]) => {
     } catch (error) {
       console.error('Error fetching mentee progress:', error);
       
-      // Fallback to sample data on error
-      const fallbackData = menteeIds.map((menteeId, index) => ({
+      // On error, show basic data with no progress
+      const fallbackData = menteeIds.map((menteeId) => ({
         menteeId,
-        overallProgress: [0, 30, 60, 85, 100][index % 5],
-        completedModules: [0, 1, 3, 4, 5][index % 5],
-        totalModules: 5
+        overallProgress: 0,
+        completedModules: 0,
+        totalModules: 5,
+        hasRealData: false,
+        emailConfirmed: false
       }));
       
       setProgressData(fallbackData);

@@ -31,10 +31,13 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
   const { progressData } = useMenteeProgress(menteeIds);
 
   const getMenteeProgress = (menteeId: string) => {
-    return progressData.find(p => p.menteeId === menteeId) || {
+    const data = progressData.find(p => p.menteeId === menteeId);
+    return data || {
       overallProgress: 0,
       completedModules: 0,
-      totalModules: 5
+      totalModules: 5,
+      hasRealData: false,
+      emailConfirmed: false
     };
   };
 
@@ -68,6 +71,8 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
                       overallProgress={progress.overallProgress}
                       completedModules={progress.completedModules}
                       totalModules={progress.totalModules}
+                      hasRealData={progress.hasRealData}
+                      emailConfirmed={progress.emailConfirmed}
                     />
                   </TableCell>
 
