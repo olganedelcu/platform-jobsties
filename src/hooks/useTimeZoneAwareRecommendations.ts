@@ -29,23 +29,33 @@ export const useTimeZoneAwareRecommendations = (userId: string): TimeZoneAwareRe
     console.log('Current week start:', format(weekStart, 'yyyy-MM-dd'));
   }, []);
 
-  // Separate current week from previous weeks based on user's local time
+  // Separate current week from previous weeks based on when the recommendation was created
   const getCurrentWeekRecommendations = () => {
     if (!currentWeekStart) return [];
     
+    const weekStart = new Date(currentWeekStart);
+    const weekEnd = addDays(weekStart, 7);
+    
     return recommendations.filter(rec => {
-      const recWeekStart = rec.week_start_date;
-      return recWeekStart === currentWeekStart;
+      const createdDate = new Date(rec.created_at);
+      console.log('Checking recommendation created at:', rec.created_at, 'against current week:', currentWeekStart);
+      
+      return isWithinInterval(createdDate, {
+        start: weekStart,
+        end: weekEnd
+      });
     });
   };
 
   const getPreviousWeeksRecommendations = () => {
     if (!currentWeekStart) return [];
     
+    const weekStart = new Date(currentWeekStart);
+    
     return recommendations.filter(rec => {
-      const recWeekStart = rec.week_start_date;
-      return recWeekStart !== currentWeekStart;
-    }).sort((a, b) => b.week_start_date.localeCompare(a.week_start_date));
+      const createdDate = new Date(rec.created_at);
+      return createdDate < weekStart;
+    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   };
 
   return {

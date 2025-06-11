@@ -80,7 +80,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
             <Calendar className="h-3 w-3" />
-            <span>Week of {format(new Date(recommendation.week_start_date), 'MMM dd, yyyy')}</span>
+            <span>For week of {format(new Date(recommendation.week_start_date), 'MMM dd, yyyy')}</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <Clock className="h-3 w-3" />
@@ -155,7 +155,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
             <Badge variant="secondary">{currentWeekRecommendations.length}</Badge>
             {currentWeekStart && (
               <span className="text-sm text-gray-500">
-                (Week of {format(new Date(currentWeekStart), 'MMM dd, yyyy')})
+                (Added this week starting {format(new Date(currentWeekStart), 'MMM dd, yyyy')})
               </span>
             )}
           </div>
@@ -169,7 +169,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Briefcase className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-              <p>No job recommendations for this week yet.</p>
+              <p>No job recommendations added this week yet.</p>
               <p className="text-sm">Check back soon for new opportunities!</p>
             </div>
           )}
