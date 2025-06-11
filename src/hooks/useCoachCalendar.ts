@@ -41,11 +41,11 @@ export const useCoachCalendar = (coachId: string) => {
       ]);
       
       setSettings({
-        ...calendarSettings,
+        ...(calendarSettings || {
+          google_calendar_connected: isGoogleConnected,
+          sync_enabled: false
+        }),
         google_calendar_connected: isGoogleConnected
-      } || {
-        google_calendar_connected: isGoogleConnected,
-        sync_enabled: false
       });
       setEvents(calendarEvents || []);
     } catch (error) {

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useCoachAvailability } from '@/hooks/useCoachAvailability';
 import AvailabilityIndicator from './AvailabilityIndicator';
 import SessionBasicDetails from './SessionBasicDetails';
@@ -27,6 +27,7 @@ interface SessionFormProps {
 const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: SessionFormProps) => {
   const [availableTimesForSelectedDate, setAvailableTimesForSelectedDate] = useState<string[]>([]);
   const [isSelectedDateAvailable, setIsSelectedDateAvailable] = useState<boolean>(false);
+  const [availabilityLoaded, setAvailabilityLoaded] = useState<boolean>(false);
   
   console.log('SessionForm rendering with data:', sessionData);
   
@@ -45,79 +46,90 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
     loading: availabilityLoading
   });
 
-  // Load availability for selected date
+  // Stabilize the availability loading function
+  const loadAvailabilityForDate = useCallback(async (date: string) => {
+    if (!date) {
+      setIsSelectedDateAvailable(false);
+      setAvailableTimesForSelectedDate([]);
+      setAvailabilityLoaded(true);
+      return;
+    }
+
+    console.log('Loading availability for date:', date);
+    
+    try {
+      const [dateAvailable, availableTimes] = await Promise.all([
+        isDateAvailable(date),
+        getAvailableTimesForDate(date)
+      ]);
+      
+      console.log('Availability results:', {
+        dateAvailable,
+        availableTimesCount: availableTimes.length,
+        availableTimes: availableTimes.slice(0, 5) // Log first 5 times
+      });
+      
+      setIsSelectedDateAvailable(dateAvailable);
+      setAvailableTimesForSelectedDate(availableTimes);
+    } catch (error) {
+      console.error('Error loading availability:', error);
+      setIsSelectedDateAvailable(false);
+      setAvailableTimesForSelectedDate([]);
+    } finally {
+      setAvailabilityLoaded(true);
+    }
+  }, [isDateAvailable, getAvailableTimesForDate]);
+
+  // Load availability for selected date only when the date changes and hooks are ready
   useEffect(() => {
-    const loadAvailability = async () => {
-      if (sessionData.date) {
-        console.log('Loading availability for date:', sessionData.date);
-        
-        try {
-          const [dateAvailable, availableTimes] = await Promise.all([
-            isDateAvailable(sessionData.date),
-            getAvailableTimesForDate(sessionData.date)
-          ]);
-          
-          console.log('Availability results:', {
-            dateAvailable,
-            availableTimesCount: availableTimes.length,
-            availableTimes: availableTimes.slice(0, 5) // Log first 5 times
-          });
-          
-          setIsSelectedDateAvailable(dateAvailable);
-          setAvailableTimesForSelectedDate(availableTimes);
-        } catch (error) {
-          console.error('Error loading availability:', error);
-          setIsSelectedDateAvailable(false);
-          setAvailableTimesForSelectedDate([]);
-        }
-      } else {
-        setIsSelectedDateAvailable(false);
-        setAvailableTimesForSelectedDate([]);
-      }
-    };
+    if (!availabilityLoading) {
+      loadAvailabilityForDate(sessionData.date);
+    }
+  }, [sessionData.date, availabilityLoading, loadAvailabilityForDate]);
 
-    loadAvailability();
-  }, [sessionData.date, isDateAvailable, getAvailableTimesForDate]);
-
-  // Filter time slots to only show available times (already filtered for booked sessions)
+  // Filter time slots to only show available times
   const timeSlots = useMemo(() => {
-    if (availableTimesForSelectedDate.length > 0) {
+    if (availabilityLoaded && availableTimesForSelectedDate.length > 0) {
       console.log('Using available times from hook:', availableTimesForSelectedDate.length);
       return availableTimesForSelectedDate;
     }
     
-    // Fallback to default time slots if no availability data
-    console.log('Using fallback time slots');
-    return [
-      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-      '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
-    ];
-  }, [availableTimesForSelectedDate]);
+    // Fallback to default time slots if no availability data and loading is complete
+    if (availabilityLoaded) {
+      console.log('Using fallback time slots');
+      return [
+        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+        '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
+      ];
+    }
+    
+    return [];
+  }, [availableTimesForSelectedDate, availabilityLoaded]);
 
-  const updateSessionData = (field: keyof SessionFormData, value: string) => {
+  const updateSessionData = useCallback((field: keyof SessionFormData, value: string) => {
     console.log(`Updating ${field} to:`, value);
     onSessionDataChange({
       ...sessionData,
       [field]: value
     });
-  };
+  }, [sessionData, onSessionDataChange]);
 
   // Clear time selection when date changes and it's not available
   useEffect(() => {
-    if (sessionData.date && !isSelectedDateAvailable && sessionData.time) {
+    if (availabilityLoaded && sessionData.date && !isSelectedDateAvailable && sessionData.time) {
       console.log('Date not available, clearing time selection');
       updateSessionData('time', '');
     }
-  }, [sessionData.date, isSelectedDateAvailable]);
+  }, [sessionData.date, isSelectedDateAvailable, sessionData.time, availabilityLoaded, updateSessionData]);
 
   // Clear time selection if the currently selected time is no longer available
   useEffect(() => {
-    if (sessionData.time && sessionData.date && !timeSlots.includes(sessionData.time)) {
+    if (availabilityLoaded && sessionData.time && sessionData.date && !timeSlots.includes(sessionData.time)) {
       console.log('Selected time is no longer available, clearing selection');
       updateSessionData('time', '');
     }
-  }, [sessionData.time, sessionData.date, timeSlots]);
+  }, [sessionData.time, sessionData.date, timeSlots, availabilityLoaded, updateSessionData]);
 
   // Get minimum date (today)
   const minDate = new Date().toISOString().split('T')[0];
@@ -152,7 +164,7 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
       />
 
       {/* Availability Indicator */}
-      {!availabilityLoading && (
+      {availabilityLoaded && (
         <div className="p-4 bg-gray-50 rounded-lg">
           <AvailabilityIndicator
             isAvailable={isSelectedDateAvailable}
