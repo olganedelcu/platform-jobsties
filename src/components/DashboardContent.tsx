@@ -91,9 +91,9 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
           />
         </div>
       </div>
-      <div>
+      <div className="space-y-8">
       <DashboardQuickLinks />
-        </div>
+      </div>
     </main>
   );
 };
