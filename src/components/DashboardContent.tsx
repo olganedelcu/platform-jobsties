@@ -87,24 +87,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             onAddApplication={() => navigate('/tracker')}
           />
 
-          {/* Profile Section */}
-          <div className="flex items-center justify-center p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={user?.user_metadata?.avatar_url} alt={firstName} />
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-xl">
-                  <User className="h-8 w-8" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
-                </h3>
-                <p className="text-gray-600">{user?.email}</p>
-              </div>
-            </div>
-          </div>
-
           {/* Quick Links Section */}
           <DashboardQuickLinks />
         </div>
