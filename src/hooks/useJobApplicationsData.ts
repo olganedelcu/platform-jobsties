@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchJobApplications } from '@/services/jobApplicationsService';
 import { useJobApplicationActions } from '@/hooks/useJobApplicationActions';
@@ -16,12 +16,18 @@ export const useJobApplicationsData = (user: any): JobApplicationsHookReturn => 
     handleDeleteApplication 
   } = useJobApplicationActions(user, applications, setApplications);
 
-  const fetchUserApplications = async () => {
-    if (!user) return;
+  const fetchUserApplications = useCallback(async () => {
+    if (!user?.id) {
+      console.log('No user ID provided, skipping fetch');
+      setLoading(false);
+      return;
+    }
     
     try {
+      console.log('Fetching applications for user:', user.id);
       setLoading(true);
       const applicationsData = await fetchJobApplications(user.id);
+      console.log('Fetched applications:', applicationsData.length);
       setApplications(applicationsData);
     } catch (error) {
       console.error('Error fetching applications:', error);
@@ -33,11 +39,11 @@ export const useJobApplicationsData = (user: any): JobApplicationsHookReturn => 
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, toast]);
 
   useEffect(() => {
     fetchUserApplications();
-  }, [user]);
+  }, [fetchUserApplications]);
 
   return {
     applications,

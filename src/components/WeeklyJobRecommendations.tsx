@@ -15,11 +15,12 @@ interface WeeklyJobRecommendationsProps {
 
 const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => {
   const { recommendations, loading, refetchRecommendations } = useJobRecommendations({ userId, isCoach: false });
-  const { markAsApplied } = useJobRecommendationActions({ 
-    user: { id: userId },
-    onApplicationAdded: refetchRecommendations
-  });
   const [addingToTracker, setAddingToTracker] = useState<string | null>(null);
+
+  // Don't pass refetchRecommendations to prevent infinite loop - let the tracker page handle its own refresh
+  const { markAsApplied } = useJobRecommendationActions({ 
+    user: { id: userId }
+  });
 
   // Get current week's recommendations
   const getCurrentWeekRecommendations = () => {
@@ -42,16 +43,40 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
 
   const handleViewJob = (jobLink: string) => {
     console.log('Opening job link:', jobLink);
-    if (jobLink) {
-      window.open(jobLink, '_blank', 'noopener,noreferrer');
+    
+    if (!jobLink) {
+      console.error('No job link provided');
+      return;
+    }
+
+    // Ensure the URL has a protocol
+    let url = jobLink.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      console.log('Successfully opened URL:', url);
+    } catch (error) {
+      console.error('Error opening job link:', error);
     }
   };
 
   const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
     console.log('Marking as applied:', recommendation);
+    
+    // Prevent multiple clicks
+    if (addingToTracker === recommendation.id) {
+      console.log('Already adding this recommendation, skipping');
+      return;
+    }
+
     setAddingToTracker(recommendation.id);
+    
     try {
       await markAsApplied(recommendation);
+      console.log('Successfully marked as applied');
     } catch (error) {
       console.error('Error marking as applied:', error);
     } finally {
