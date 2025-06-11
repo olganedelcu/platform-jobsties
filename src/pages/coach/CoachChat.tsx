@@ -3,7 +3,8 @@ import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
 import CoachNavigation from '@/components/CoachNavigation';
-import CoachChatList from '@/components/CoachChatList';
+import { Card, CardContent } from '@/components/ui/card';
+import { MessageCircle } from 'lucide-react';
 
 const CoachChat = () => {
   const { user, loading, handleSignOut } = useAuthState();
@@ -26,7 +27,15 @@ const CoachChat = () => {
         <CoachNavigation user={user} onSignOut={handleSignOut} />
         
         <main className="max-w-7xl mx-auto py-8 px-6">
-          <CoachChatList coachId={user.id} />
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Chat Conversations</h2>
+          
+          <Card>
+            <CardContent className="text-center py-12">
+              <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Chat feature has been removed</h3>
+              <p className="text-gray-500">This functionality is no longer available.</p>
+            </CardContent>
+          </Card>
         </main>
       </div>
     </ProtectedCoachRoute>
