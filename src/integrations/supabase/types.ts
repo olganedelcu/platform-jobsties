@@ -511,6 +511,42 @@ export type Database = {
         }
         Relationships: []
       }
+      module_files: {
+        Row: {
+          coach_id: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          mentee_id: string
+          module_type: string
+          updated_at: string
+          uploaded_at: string
+        }
+        Insert: {
+          coach_id: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          mentee_id: string
+          module_type: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Update: {
+          coach_id?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          mentee_id?: string
+          module_type?: string
+          updated_at?: string
+          uploaded_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

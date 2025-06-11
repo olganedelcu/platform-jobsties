@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { EmailNotificationService } from '@/services/emailNotificationService';
 import MenteeCVFiles from '@/components/MenteeCVFiles';
+import ModuleFiles from '@/components/ModuleFiles';
 
 interface CourseModuleContentProps {
   moduleIndex: number;
@@ -98,29 +100,44 @@ const CourseModuleContent = ({
       );
     case 1:
       return (
-        <div>
+        <div className="space-y-6">
           <p className="text-gray-700">
             This module will help you optimize your LinkedIn profile and create compelling cover letters. 
-            Content will be available soon.
+            Your coach may upload resources and templates to help you succeed.
           </p>
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="linkedin" 
+            title="LinkedIn & Cover Letter" 
+          />
         </div>
       );
     case 2:
       return (
-        <div>
+        <div className="space-y-6">
           <p className="text-gray-700">
             Learn effective job search strategies, including where to find opportunities, how to network, 
             and how to tailor your applications for maximum impact.
           </p>
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="job_search_strategy" 
+            title="Job Search Strategy" 
+          />
         </div>
       );
     case 3:
       return (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <p className="text-gray-700">
             Prepare for interviews with comprehensive guidance on common questions, body language, 
             and how to showcase your skills effectively.
           </p>
+          <ModuleFiles 
+            userId={userId} 
+            moduleType="interview_preparation" 
+            title="Interview Preparation" 
+          />
           <div className="flex flex-wrap gap-3">
             {moduleAction === 'Book Call' && onBookCall && (
               <Button 

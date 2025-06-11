@@ -4,6 +4,7 @@ import { useCVUpload } from '@/hooks/useCVUpload';
 import CVUploadForm from '@/components/CVUploadForm';
 import CVMenteesList from '@/components/CVMenteesList';
 import CVFilesList from '@/components/CVFilesList';
+import ModuleFileUpload from '@/components/coach/ModuleFileUpload';
 
 const CVUploadContent = () => {
   const {
@@ -28,11 +29,11 @@ const CVUploadContent = () => {
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">CV Upload Management</h1>
-        <p className="text-gray-600 mt-2">Upload and manage CV files for your mentees</p>
+        <h1 className="text-3xl font-bold text-gray-900">File Upload Management</h1>
+        <p className="text-gray-600 mt-2">Upload and manage CV files and module resources for your mentees</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <CVUploadForm
           mentees={mentees}
           selectedMentee={selectedMentee}
@@ -41,6 +42,10 @@ const CVUploadContent = () => {
           uploadingFile={uploadingFile}
         />
 
+        <ModuleFileUpload />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <CVMenteesList mentees={mentees} />
       </div>
 
