@@ -97,14 +97,17 @@ const ModuleFileUpload = () => {
         </div>
 
         <div>
-          <Label htmlFor="module-file-upload">Upload File (PDF only)</Label>
+          <Label htmlFor="module-file-upload">Document File (PDF, DOC, DOCX, TXT)</Label>
           <input
             id="module-file-upload"
             type="file"
-            accept=".pdf"
+            accept=".pdf,.doc,.docx,.txt"
             onChange={handleFileChange}
             className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Supported formats: PDF, DOC, DOCX, TXT
+          </p>
         </div>
 
         {selectedFile && (

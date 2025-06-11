@@ -1,7 +1,24 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useMentees } from '@/hooks/useMentees';
+
+const ALLOWED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'text/plain'
+];
+
+const getFileExtension = (file: File): string => {
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.pdf')) return 'pdf';
+  if (name.endsWith('.doc')) return 'doc';
+  if (name.endsWith('.docx')) return 'docx';
+  if (name.endsWith('.txt')) return 'txt';
+  return 'unknown';
+};
 
 export const useModuleFileUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -22,10 +39,10 @@ export const useModuleFileUpload = () => {
       return false;
     }
 
-    if (file.type !== 'application/pdf') {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
       toast({
         title: "Error",
-        description: "Please upload a PDF file only.",
+        description: "Please upload a PDF, DOC, DOCX, or TXT file only.",
         variant: "destructive"
       });
       return false;
@@ -40,8 +57,8 @@ export const useModuleFileUpload = () => {
         throw new Error('User not authenticated');
       }
 
-      // Generate unique file name
-      const fileExt = 'pdf';
+      // Generate unique file name with correct extension
+      const fileExt = getFileExtension(file);
       const fileName = `${moduleType}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 

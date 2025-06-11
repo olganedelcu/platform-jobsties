@@ -47,7 +47,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
     // },
     { 
       path: '/coach/cv-upload', 
-      label: 'CV Upload', 
+      label: 'Files Upload', 
       icon: FileUp 
     },
     { 
