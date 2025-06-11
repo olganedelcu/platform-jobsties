@@ -68,15 +68,52 @@ export const useMenteeNotes = () => {
         return;
       }
 
-      const { data, error } = await supabase
+      console.log('Updating note for mentee:', menteeId, 'with text:', noteText);
+
+      // First check if a note already exists
+      const { data: existingNote, error: checkError } = await supabase
         .from('mentee_notes')
-        .upsert({
-          coach_id: user.id,
-          mentee_id: menteeId,
-          notes: noteText
-        })
-        .select()
-        .single();
+        .select('*')
+        .eq('coach_id', user.id)
+        .eq('mentee_id', menteeId)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error checking existing note:', checkError);
+        throw checkError;
+      }
+
+      let data;
+      let error;
+
+      if (existingNote) {
+        // Update existing note
+        console.log('Updating existing note with ID:', existingNote.id);
+        const updateResult = await supabase
+          .from('mentee_notes')
+          .update({ notes: noteText })
+          .eq('id', existingNote.id)
+          .select()
+          .single();
+        
+        data = updateResult.data;
+        error = updateResult.error;
+      } else {
+        // Insert new note
+        console.log('Creating new note');
+        const insertResult = await supabase
+          .from('mentee_notes')
+          .insert({
+            coach_id: user.id,
+            mentee_id: menteeId,
+            notes: noteText
+          })
+          .select()
+          .single();
+        
+        data = insertResult.data;
+        error = insertResult.error;
+      }
 
       if (error) {
         console.error('Error updating mentee note:', error);
@@ -88,9 +125,11 @@ export const useMenteeNotes = () => {
         return;
       }
 
+      console.log('Note updated successfully:', data);
+
       // Update local state
       setNotes(prev => {
-        const existingIndex = prev.findIndex(note => note.mentee_id === menteeId);
+        const existingIndex = prev.findIndex(note => note.mentee_id === menteeId && note.coach_id === user.id);
         if (existingIndex >= 0) {
           const updated = [...prev];
           updated[existingIndex] = data;
