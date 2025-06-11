@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Plus, Save, X } from 'lucide-react';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface ExcelLikeJobApplicationsTableProps {
   applications: JobApplication[];
@@ -22,6 +22,7 @@ const ExcelLikeJobApplicationsTable = ({
   onUpdateApplication, 
   onDeleteApplication 
 }: ExcelLikeJobApplicationsTableProps) => {
+  const { toast } = useToast();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<JobApplication>>({});
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -34,6 +35,103 @@ const ExcelLikeJobApplicationsTable = ({
     recruiterName: '',
     coachNotes: ''
   });
+
+  // Load saved draft changes on component mount
+  useEffect(() => {
+    const savedDrafts = localStorage.getItem('tracker-draft-changes');
+    if (savedDrafts) {
+      try {
+        const drafts = JSON.parse(savedDrafts);
+        const now = Date.now();
+        
+        // Check if drafts are still valid (within reasonable time)
+        Object.keys(drafts).forEach(applicationId => {
+          const draft = drafts[applicationId];
+          const timeDiff = now - draft.timestamp;
+          const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+          
+          if (timeDiff > oneHour) {
+            // Draft is too old, remove it
+            delete drafts[applicationId];
+          }
+        });
+        
+        // If there are valid drafts, restore the first one
+        const validDrafts = Object.keys(drafts);
+        if (validDrafts.length > 0) {
+          const applicationId = validDrafts[0];
+          const draft = drafts[applicationId];
+          
+          setEditingId(applicationId);
+          setEditData(draft.data);
+          
+          toast({
+            title: "Draft Changes Restored",
+            description: "Your unsaved changes have been restored. Don't forget to save them!",
+          });
+        }
+        
+        // Update localStorage with cleaned drafts
+        if (Object.keys(drafts).length > 0) {
+          localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
+        } else {
+          localStorage.removeItem('tracker-draft-changes');
+        }
+      } catch (error) {
+        console.error('Error loading draft changes:', error);
+        localStorage.removeItem('tracker-draft-changes');
+      }
+    }
+  }, [toast]);
+
+  // Save draft changes to localStorage whenever editData changes
+  useEffect(() => {
+    if (editingId && Object.keys(editData).length > 0) {
+      const savedDrafts = localStorage.getItem('tracker-draft-changes');
+      let drafts = {};
+      
+      if (savedDrafts) {
+        try {
+          drafts = JSON.parse(savedDrafts);
+        } catch (error) {
+          console.error('Error parsing saved drafts:', error);
+        }
+      }
+      
+      drafts[editingId] = {
+        data: editData,
+        timestamp: Date.now()
+      };
+      
+      localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
+    }
+  }, [editingId, editData]);
+
+  // Clear draft changes when navigating to dashboard
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Check if user is navigating to dashboard
+      const currentPath = window.location.pathname;
+      if (currentPath === '/dashboard') {
+        localStorage.removeItem('tracker-draft-changes');
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      // When user comes back to the tab, check if they're on dashboard
+      if (!document.hidden && window.location.pathname === '/dashboard') {
+        localStorage.removeItem('tracker-draft-changes');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const handleEdit = (application: JobApplication) => {
     setEditingId(application.id);
@@ -52,11 +150,48 @@ const ExcelLikeJobApplicationsTable = ({
     await onUpdateApplication(applicationId, editData);
     setEditingId(null);
     setEditData({});
+    
+    // Clear the saved draft for this application
+    const savedDrafts = localStorage.getItem('tracker-draft-changes');
+    if (savedDrafts) {
+      try {
+        const drafts = JSON.parse(savedDrafts);
+        delete drafts[applicationId];
+        
+        if (Object.keys(drafts).length > 0) {
+          localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
+        } else {
+          localStorage.removeItem('tracker-draft-changes');
+        }
+      } catch (error) {
+        console.error('Error clearing draft:', error);
+      }
+    }
   };
 
   const handleCancel = () => {
+    const currentEditingId = editingId;
     setEditingId(null);
     setEditData({});
+    
+    // Clear the saved draft for this application
+    if (currentEditingId) {
+      const savedDrafts = localStorage.getItem('tracker-draft-changes');
+      if (savedDrafts) {
+        try {
+          const drafts = JSON.parse(savedDrafts);
+          delete drafts[currentEditingId];
+          
+          if (Object.keys(drafts).length > 0) {
+            localStorage.setItem('tracker-draft-changes', JSON.stringify(drafts));
+          } else {
+            localStorage.removeItem('tracker-draft-changes');
+          }
+        } catch (error) {
+          console.error('Error clearing draft:', error);
+        }
+      }
+    }
   };
 
   const handleAddNew = () => {
