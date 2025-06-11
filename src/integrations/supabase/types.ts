@@ -196,6 +196,35 @@ export type Database = {
         }
         Relationships: []
       }
+      coach_hidden_applications: {
+        Row: {
+          application_id: string
+          coach_id: string
+          hidden_at: string
+          id: string
+        }
+        Insert: {
+          application_id: string
+          coach_id: string
+          hidden_at?: string
+          id?: string
+        }
+        Update: {
+          application_id?: string
+          coach_id?: string
+          hidden_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_hidden_applications_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "job_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coach_mentee_assignments: {
         Row: {
           assigned_at: string
