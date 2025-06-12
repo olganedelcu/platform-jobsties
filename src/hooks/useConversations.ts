@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { ConversationService } from '@/services/conversationService';
 
 export interface Conversation {
   id: string;
@@ -25,73 +26,12 @@ export const useConversations = () => {
     try {
       setLoading(true);
       
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userProfile = await ConversationService.getCurrentUserProfile();
+      if (!userProfile) return;
 
-      // Get user profile to check role
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-      let query = supabase
-        .from('conversations')
-        .select(`
-          *,
-          profiles!conversations_mentee_id_fkey(first_name, last_name)
-        `)
-        .order('updated_at', { ascending: false });
-
-      // If mentee, only show their conversations
-      if (profile?.role === 'MENTEE') {
-        query = query.eq('mentee_id', user.id);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching conversations:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load conversations.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Format conversations with mentee names and get unread counts
-      const formattedConversations = await Promise.all(
-        (data || []).map(async (conv: any) => {
-          const mentee = conv.profiles;
-          const menteeName = mentee ? `${mentee.first_name} ${mentee.last_name}` : 'Unknown';
-
-          // Get last message
-          const { data: lastMessage } = await supabase
-            .from('messages')
-            .select('content, created_at')
-            .eq('conversation_id', conv.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          // Get unread count
-          const { count: unreadCount } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact' })
-            .eq('conversation_id', conv.id)
-            .eq('read_status', false)
-            .neq('sender_id', user.id);
-
-          return {
-            ...conv,
-            mentee_name: menteeName,
-            last_message: lastMessage?.content || '',
-            unread_count: unreadCount || 0
-          };
-        })
-      );
+      const { user, profile } = userProfile;
+      const conversationsData = await ConversationService.fetchConversationsData(user.id, profile?.role || 'MENTEE');
+      const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
 
       setConversations(formattedConversations);
     } catch (error) {
@@ -108,28 +48,10 @@ export const useConversations = () => {
 
   const createConversation = async (subject: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      const userProfile = await ConversationService.getCurrentUserProfile();
+      if (!userProfile) return null;
 
-      const { data, error } = await supabase
-        .from('conversations')
-        .insert({
-          mentee_id: user.id,
-          subject,
-          coach_email: 'ana@jobsties.com'
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating conversation:', error);
-        toast({
-          title: "Error",
-          description: "Failed to create conversation.",
-          variant: "destructive"
-        });
-        return null;
-      }
+      const data = await ConversationService.createNewConversation(userProfile.user.id, subject);
 
       toast({
         title: "Success",
@@ -140,27 +62,18 @@ export const useConversations = () => {
       return data;
     } catch (error) {
       console.error('Error in createConversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create conversation.",
+        variant: "destructive"
+      });
       return null;
     }
   };
 
   const updateConversationStatus = async (conversationId: string, status: 'active' | 'archived' | 'closed') => {
     try {
-      const { error } = await supabase
-        .from('conversations')
-        .update({ status })
-        .eq('id', conversationId);
-
-      if (error) {
-        console.error('Error updating conversation status:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update conversation status.",
-          variant: "destructive"
-        });
-        return;
-      }
-
+      await ConversationService.updateConversationStatus(conversationId, status);
       await fetchConversations();
       toast({
         title: "Success",
@@ -168,13 +81,17 @@ export const useConversations = () => {
       });
     } catch (error) {
       console.error('Error in updateConversationStatus:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update conversation status.",
+        variant: "destructive"
+      });
     }
   };
 
   useEffect(() => {
     fetchConversations();
 
-    // Set up real-time subscription for conversations
     const conversationsChannel = supabase
       .channel('conversations-changes')
       .on(
