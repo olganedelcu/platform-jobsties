@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { ConversationService } from '@/services/conversationService';
 import { Conversation } from './useConversations';
+import { SecureErrorHandler } from '@/utils/errorHandling';
 
 export const useConversationsFetch = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -50,18 +51,23 @@ export const useConversationsFetch = () => {
       console.log('Fetching conversations for authenticated user:', userProfile.user.id);
       const { user, profile } = userProfile;
       
-      // Safely handle role with fallback
-      const userRole = (profile?.role || 'MENTEE').toString();
+      // Safely handle role with fallback and SecureErrorHandler
+      const userRole = SecureErrorHandler.safeStringOperation(profile?.role, 'toLowerCase', 'mentee');
       
       const conversationsData = await ConversationService.fetchConversationsData(user.id, userRole);
       const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
 
-      setConversations(Array.isArray(formattedConversations) ? formattedConversations : []);
+      setConversations(SecureErrorHandler.safeArrayOperation(formattedConversations, []));
     } catch (error) {
       console.error('Error in fetchConversations:', error);
+      const sanitizedError = SecureErrorHandler.handleError(error, {
+        component: 'useConversationsFetch',
+        action: 'fetchConversations'
+      });
+      
       toast({
         title: "Error",
-        description: "Failed to load conversations.",
+        description: sanitizedError.message,
         variant: "destructive"
       });
       // Set empty array on error to prevent further crashes

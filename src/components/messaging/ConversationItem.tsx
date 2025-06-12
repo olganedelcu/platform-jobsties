@@ -2,6 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useNotificationContext } from '@/contexts/NotificationContext';
+import { SecureErrorHandler } from '@/utils/errorHandling';
 
 interface ConversationItemProps {
   conversation: {
@@ -41,13 +42,13 @@ const ConversationItem = ({ conversation, isSelected, onClick }: ConversationIte
     }
   };
 
-  // Safely handle conversation data with fallbacks
+  // Safely handle conversation data with fallbacks using SecureErrorHandler
   const safeConversation = {
-    id: (conversation?.id || '').toString(),
-    subject: (conversation?.subject || 'Untitled Conversation').toString(),
-    coach_email: (conversation?.coach_email || 'Unknown Coach').toString(),
-    updated_at: (conversation?.updated_at || '').toString(),
-    latest_message: (conversation?.latest_message || '').toString()
+    id: SecureErrorHandler.safeStringOperation(conversation?.id, 'trim', ''),
+    subject: SecureErrorHandler.safeStringOperation(conversation?.subject, 'trim', 'Untitled Conversation'),
+    coach_email: SecureErrorHandler.safeStringOperation(conversation?.coach_email, 'trim', 'Unknown Coach'),
+    updated_at: SecureErrorHandler.safeStringOperation(conversation?.updated_at, 'trim', ''),
+    latest_message: SecureErrorHandler.safeStringOperation(conversation?.latest_message, 'trim', '')
   };
 
   return (

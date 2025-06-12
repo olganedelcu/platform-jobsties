@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation } from '@/hooks/useConversations';
+import { SecureErrorHandler } from '@/utils/errorHandling';
 
 export const ConversationService = {
   async getCurrentUserProfile() {
@@ -17,8 +18,8 @@ export const ConversationService = {
   },
 
   async fetchConversationsData(userId: string, userRole: string) {
-    // Ensure userRole is a valid string
-    const safeUserRole = (userRole || '').toLowerCase();
+    // Use SecureErrorHandler for safe string operations
+    const safeUserRole = SecureErrorHandler.safeStringOperation(userRole, 'toLowerCase', 'mentee');
     const safeMenteeRole = 'mentee';
     
     let query = supabase
@@ -40,7 +41,7 @@ export const ConversationService = {
       throw error;
     }
 
-    return data || [];
+    return SecureErrorHandler.safeArrayOperation(data, []);
   },
 
   async getLastMessage(conversationId: string) {
@@ -71,29 +72,47 @@ export const ConversationService = {
   },
 
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
-    if (!Array.isArray(conversationsData) || !userId) {
+    const safeConversationsData = SecureErrorHandler.safeArrayOperation(conversationsData, []);
+    if (!userId || safeConversationsData.length === 0) {
       return [];
     }
 
     return Promise.all(
-      conversationsData.map(async (conv: any) => {
-        // Safely handle profile data with null checks
-        const mentee = conv?.profiles;
-        const firstName = (mentee?.first_name || '').toString();
-        const lastName = (mentee?.last_name || '').toString();
-        const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
+      safeConversationsData.map(async (conv: any) => {
+        try {
+          // Safely handle profile data with comprehensive null checks
+          const mentee = conv?.profiles;
+          const firstName = SecureErrorHandler.safeStringOperation(mentee?.first_name, 'trim', '');
+          const lastName = SecureErrorHandler.safeStringOperation(mentee?.last_name, 'trim', '');
+          const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
 
-        // Safely handle conversation data
-        const conversationId = conv?.id;
-        const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
-        const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
+          // Safely handle conversation data
+          const conversationId = conv?.id;
+          const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
+          const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
 
-        return {
-          ...conv,
-          mentee_name: menteeName,
-          last_message: (lastMessage?.content || '').toString(),
-          unread_count: unreadCount
-        };
+          return {
+            ...conv,
+            mentee_name: menteeName,
+            last_message: SecureErrorHandler.safeStringOperation(lastMessage?.content, 'trim', ''),
+            unread_count: unreadCount
+          };
+        } catch (error) {
+          console.error('Error formatting conversation:', error, conv);
+          // Return a safe fallback conversation
+          return {
+            id: conv?.id || '',
+            mentee_id: conv?.mentee_id || '',
+            coach_email: conv?.coach_email || 'ana@jobsties.com',
+            subject: conv?.subject || 'Untitled Conversation',
+            status: conv?.status || 'active',
+            created_at: conv?.created_at || new Date().toISOString(),
+            updated_at: conv?.updated_at || new Date().toISOString(),
+            mentee_name: 'Unknown',
+            last_message: '',
+            unread_count: 0
+          };
+        }
       })
     );
   },
@@ -108,7 +127,7 @@ export const ConversationService = {
       .from('conversations')
       .insert({
         mentee_id: userId,
-        subject: subject.toString(),
+        subject: SecureErrorHandler.safeStringOperation(subject, 'trim', 'Untitled Conversation'),
         coach_email: 'ana@jobsties.com'
       })
       .select()
