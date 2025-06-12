@@ -14,7 +14,6 @@ import {
   Database,
   MessageCircle
 } from 'lucide-react';
-import NotificationDropdown from './messaging/NotificationDropdown';
 
 interface CoachNavigationProps {
   user: any;
@@ -106,7 +105,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
             })}
             
             <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
-              <NotificationDropdown />
               <span className="text-sm text-gray-600">
                 {user?.user_metadata?.first_name || user?.email}
               </span>
@@ -118,7 +116,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            <NotificationDropdown />
             <Button
               variant="ghost"
               size="sm"

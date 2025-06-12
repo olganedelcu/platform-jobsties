@@ -86,7 +86,7 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
       channelIdRef.current = channelName;
       console.log('Creating messages channel:', channelName);
 
-      const channel =  channel = supabase
+      const channel = supabase
         .channel(channelName, {
           config: {
             broadcast: { self: true },

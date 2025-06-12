@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { LogOut, User, Calendar, FileText, MessageSquare, BookOpen, Target, Users, BarChart3 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import NotificationDropdown from '@/components/messaging/NotificationDropdown';
 
 interface NavigationProps {
   user: any;
@@ -102,8 +101,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <NotificationDropdown />
-          
           <div className="flex items-center space-x-3">
             <Link to="/profile">
               <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
