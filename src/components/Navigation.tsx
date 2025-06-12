@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -40,13 +39,13 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
       if (user?.id) {
         try {
           const { data, error } = await supabase
-            .from('profiles')
-            .select('profile_picture')
-            .eq('id', user.id)
+            .from('user_profiles')
+            .select('profile_picture_url')
+            .eq('user_id', user.id)
             .single();
           
-          if (data?.profile_picture && !error) {
-            setProfilePicture(data.profile_picture);
+          if (data?.profile_picture_url && !error) {
+            setProfilePicture(data.profile_picture_url);
           }
         } catch (error) {
           console.error('Error fetching profile picture:', error);
