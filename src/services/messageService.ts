@@ -159,6 +159,39 @@ export const MessageService = {
     });
   },
 
+  async insertMessage(conversationId: string, senderId: string, senderType: string, content: string) {
+    const { data: message, error } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: conversationId,
+        sender_id: senderId,
+        sender_type: senderType,
+        content: content,
+        message_type: 'text'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error inserting message:', error);
+      throw error;
+    }
+
+    return message;
+  },
+
+  async updateConversationTimestamp(conversationId: string) {
+    const { error } = await supabase
+      .from('conversations')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', conversationId);
+
+    if (error) {
+      console.error('Error updating conversation timestamp:', error);
+      throw error;
+    }
+  },
+
   async sendMessage(conversationId: string, content: string, attachments: File[] = []) {
     if (!conversationId || !content) {
       throw new Error('Conversation ID and content are required');

@@ -13,7 +13,7 @@ export const useConversationsFetch = () => {
   const validateSession = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.access_token?.refresh_token) return false;
+      if (!session?.access_token || !session?.refresh_token) return false;
       
       // Check if session is expired
       const now = Math.floor(Date.now() / 1000);
