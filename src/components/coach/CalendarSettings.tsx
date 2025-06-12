@@ -26,36 +26,42 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
   const { toast } = useToast();
 
   const handleConnectGoogleCalendar = async () => {
+    if (!coachId) {
+      toast({
+        title: "Error",
+        description: "Coach information not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       
-      // Start the OAuth flow
       await CoachCalendarService.connectGoogleCalendar();
       
-      // Check if connection was successful
       const isConnected = await CoachCalendarService.checkGoogleConnection(coachId);
       
       if (isConnected) {
-        // Update calendar settings to reflect connection
         await CoachCalendarService.updateSyncSettings(coachId, true);
         onSettingsUpdate();
         
         toast({
           title: "Success",
-          description: "Google Calendar connected successfully! Your calendar will now sync automatically."
+          description: "Google Calendar connected successfully"
         });
       } else {
         toast({
           title: "Connection incomplete",
-          description: "Please try connecting again or check if you granted all required permissions.",
+          description: "Please try again or check browser permissions",
           variant: "destructive"
         });
       }
     } catch (error) {
-      console.error('Error connecting Google Calendar:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Connection failed';
       toast({
         title: "Error",
-        description: "Failed to connect Google Calendar. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -64,6 +70,15 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
   };
 
   const handleDisconnectGoogleCalendar = async () => {
+    if (!coachId) {
+      toast({
+        title: "Error",
+        description: "Coach information not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       await CoachCalendarService.disconnectGoogleCalendar(coachId);
@@ -73,10 +88,10 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
         description: "Google Calendar disconnected"
       });
     } catch (error) {
-      console.error('Error disconnecting Google Calendar:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Disconnection failed';
       toast({
         title: "Error",
-        description: "Failed to disconnect Google Calendar",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -85,6 +100,15 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
   };
 
   const handleToggleSync = async (enabled: boolean) => {
+    if (!coachId) {
+      toast({
+        title: "Error",
+        description: "Coach information not available",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       await CoachCalendarService.updateSyncSettings(coachId, enabled);
@@ -94,14 +118,24 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
         description: `Auto-sync ${enabled ? 'enabled' : 'disabled'}`
       });
     } catch (error) {
-      console.error('Error updating sync settings:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Settings update failed';
       toast({
         title: "Error",
-        description: "Failed to update sync settings",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const formatLastSyncTime = (lastSyncAt?: string): string => {
+    if (!lastSyncAt) return 'Never';
+    
+    try {
+      return new Date(lastSyncAt).toLocaleString();
+    } catch (error) {
+      return 'Unknown';
     }
   };
 
@@ -126,7 +160,7 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
                 onClick={handleDisconnectGoogleCalendar}
                 disabled={loading}
               >
-                Disconnect
+                {loading ? 'Disconnecting...' : 'Disconnect'}
               </Button>
             ) : (
               <Button
@@ -144,8 +178,8 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Click "Connect Google Calendar" to log into your Google account and grant permission. 
-                This will allow the system to sync your calendar events and prevent double-booking.
+                Click "Connect Google Calendar" to authorize access. 
+                This enables calendar synchronization and prevents scheduling conflicts.
               </AlertDescription>
             </Alert>
           )}
@@ -171,9 +205,9 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
         )}
 
         {/* Last Sync Info */}
-        {settings.google_calendar_connected && settings.last_sync_at && (
+        {settings.google_calendar_connected && (
           <div className="text-sm text-gray-600">
-            Last synchronized: {new Date(settings.last_sync_at).toLocaleString()}
+            Last synchronized: {formatLastSyncTime(settings.last_sync_at)}
           </div>
         )}
       </CardContent>
