@@ -12,6 +12,8 @@ export const updateJobRecommendationStatus = async (
   recommendationId: string, 
   updates: ArchiveJobRecommendationData
 ): Promise<JobRecommendation> => {
+  console.log('Updating job recommendation:', recommendationId, updates);
+  
   const { data, error } = await supabase
     .from('weekly_job_recommendations')
     .update({
@@ -21,15 +23,20 @@ export const updateJobRecommendationStatus = async (
       archived: updates.status === 'applied' || updates.status === 'archived'
     })
     .eq('id', recommendationId)
-    .select()
-    .single();
+    .select();
 
   if (error) {
     console.error('Error updating job recommendation status:', error);
     throw error;
   }
 
-  return data as JobRecommendation;
+  if (!data || data.length === 0) {
+    console.error('No job recommendation found with ID:', recommendationId);
+    throw new Error('Job recommendation not found or you do not have permission to update it');
+  }
+
+  console.log('Successfully updated job recommendation:', data[0]);
+  return data[0] as JobRecommendation;
 };
 
 export const markRecommendationAsApplied = async (
