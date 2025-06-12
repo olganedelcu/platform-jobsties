@@ -50,13 +50,13 @@ export const useConversationsFetch = () => {
       console.log('Fetching conversations for authenticated user:', userProfile.user.id);
       const { user, profile } = userProfile;
       
-      // Keep role in uppercase to match database format
-      const userRole = SecureErrorHandler.safeStringOperation(profile?.role, 'toUpperCase', 'MENTEE');
+      // Simple role handling - keep uppercase to match database format
+      const userRole = profile?.role || 'MENTEE';
       
       const conversationsData = await ConversationService.fetchConversationsData(user.id, userRole);
       const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
 
-      setConversations(SecureErrorHandler.safeArrayOperation(formattedConversations, []));
+      setConversations(formattedConversations || []);
     } catch (error) {
       console.error('Error in fetchConversations:', error);
       const sanitizedError = SecureErrorHandler.handleError(error, {

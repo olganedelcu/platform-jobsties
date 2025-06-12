@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation } from '@/hooks/useConversations';
-import { SecureErrorHandler } from '@/utils/errorHandling';
 
 export const ConversationService = {
   async getCurrentUserProfile() {
@@ -19,9 +18,8 @@ export const ConversationService = {
   async fetchConversationsData(userId: string, userRole: string) {
     console.log('fetchConversationsData called with:', { userId, userRole });
     
-    // Keep role in uppercase format to match database
-    const safeUserRole = SecureErrorHandler.safeStringOperation(userRole, 'toUpperCase', 'MENTEE');
-    const safeMenteeRole = 'MENTEE'; // Database uses uppercase
+    // Simple role handling - keep uppercase to match database
+    const safeUserRole = userRole || 'MENTEE';
     
     console.log('Safe user role:', safeUserRole);
     
@@ -33,7 +31,7 @@ export const ConversationService = {
       `)
       .order('updated_at', { ascending: false });
 
-    if (safeUserRole === safeMenteeRole) {
+    if (safeUserRole === 'MENTEE') {
       query = query.eq('mentee_id', userId);
     }
 
@@ -45,7 +43,7 @@ export const ConversationService = {
     }
 
     console.log('Raw conversations data:', data);
-    return SecureErrorHandler.safeArrayOperation(data, []);
+    return data || [];
   },
 
   async getLastMessage(conversationId: string) {
@@ -78,38 +76,26 @@ export const ConversationService = {
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
     console.log('formatConversations called with:', { conversationsDataLength: conversationsData?.length, userId });
     
-    const safeConversationsData = SecureErrorHandler.safeArrayWithValidation(
-      conversationsData, 
-      (conv) => conv && typeof conv === 'object' && conv.id,
-      []
-    );
-    
-    if (!userId || safeConversationsData.length === 0) {
+    if (!userId || !Array.isArray(conversationsData) || conversationsData.length === 0) {
       return [];
     }
 
     return Promise.all(
-      safeConversationsData.map(async (conv: any, index: number) => {
+      conversationsData.map(async (conv: any, index: number) => {
         try {
           console.log(`Processing conversation ${index}:`, conv);
           
-          // Safely handle profile data with comprehensive null checks
+          // Simple profile handling with null checks
           const mentee = conv?.profiles;
           console.log('Mentee profile:', mentee);
           
-          // Add extra safety checks and logging
-          let firstName = '';
-          let lastName = '';
-          
-          if (mentee && typeof mentee === 'object') {
-            firstName = SecureErrorHandler.safeStringOperation(mentee.first_name, 'trim', '');
-            lastName = SecureErrorHandler.safeStringOperation(mentee.last_name, 'trim', '');
-          }
+          const firstName = mentee?.first_name?.trim() || '';
+          const lastName = mentee?.last_name?.trim() || '';
           
           console.log(`Names extracted - firstName: "${firstName}", lastName: "${lastName}"`);
           const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
 
-          // Safely handle conversation data
+          // Simple conversation data handling
           const conversationId = conv?.id;
           const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
           const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
@@ -117,7 +103,7 @@ export const ConversationService = {
           const formattedConv = {
             ...conv,
             mentee_name: menteeName,
-            last_message: SecureErrorHandler.safeStringOperation(lastMessage?.content, 'trim', ''),
+            last_message: lastMessage?.content?.trim() || '',
             unread_count: unreadCount
           };
           
@@ -129,7 +115,7 @@ export const ConversationService = {
           return {
             id: conv?.id || '',
             mentee_id: conv?.mentee_id || '',
-            coach_email: conv?.coach_email || 'ana@jobsties.com',
+            coach_email: conv?.coach_email || 'ana@jobsites.com',
             subject: conv?.subject || 'Untitled Conversation',
             status: conv?.status || 'active',
             created_at: conv?.created_at || new Date().toISOString(),
@@ -153,7 +139,7 @@ export const ConversationService = {
       .from('conversations')
       .insert({
         mentee_id: userId,
-        subject: SecureErrorHandler.safeStringOperation(subject, 'trim', 'Untitled Conversation'),
+        subject: subject.trim() || 'Untitled Conversation',
         coach_email: 'ana@jobsties.com'
       })
       .select()
