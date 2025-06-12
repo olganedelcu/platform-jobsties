@@ -1,4 +1,3 @@
-
 interface ErrorContext {
   component?: string;
   action?: string;
@@ -222,7 +221,7 @@ class SecureErrorHandler {
     }
   }
 
-  // New helper function to safely process arrays with custom validation
+  // Fixed helper function to safely process arrays with custom validation
   static safeArrayWithValidation<T>(
     value: any, 
     validator: (item: any) => boolean,
@@ -230,14 +229,14 @@ class SecureErrorHandler {
   ): T[] {
     try {
       if (Array.isArray(value)) {
-        return value.filter(item => {
+        return value.filter((item: any) => {
           try {
             return item !== null && item !== undefined && validator(item);
           } catch (validationError) {
             console.warn('Array item validation failed:', validationError, item);
             return false;
           }
-        });
+        }) as T[];
       }
       return fallback;
     } catch (error) {
@@ -246,7 +245,7 @@ class SecureErrorHandler {
     }
   }
 
-  // New helper function to safely find items in arrays
+  // Fixed helper function to safely find items in arrays
   static safeFindInArray<T>(
     array: any[], 
     predicate: (item: T) => boolean,
@@ -258,16 +257,16 @@ class SecureErrorHandler {
       }
       
       const validArray = this.safeArrayOperation(array);
-      const found = validArray.find(item => {
+      const found = validArray.find((item: any) => {
         try {
-          return predicate(item);
+          return predicate(item as T);
         } catch (predicateError) {
           console.warn('Array find predicate failed:', predicateError, item);
           return false;
         }
       });
       
-      return found || fallback;
+      return (found as T) || fallback;
     } catch (error) {
       console.warn('Safe find in array failed:', error);
       return fallback;
