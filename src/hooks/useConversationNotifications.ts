@@ -13,8 +13,14 @@ export const useConversationNotifications = (conversationId: string | null) => {
   const retryCountRef = useRef(0);
   const channelIdRef = useRef<string | null>(null);
 
-  const fetchUnreadCount = useCallback(async () => {
-    if (!conversationId || !isMountedRef.current) {
+  // Stable conversation ID reference to prevent loops
+  const stableConversationId = useRef<string | null>(null);
+  if (stableConversationId.current !== conversationId) {
+    stableConversationId.current = conversationId;
+  }
+
+  const fetchUnreadCount = useCallback(async (targetConversationId: string | null) => {
+    if (!targetConversationId || !isMountedRef.current) {
       if (isMountedRef.current) {
         setUnreadCount(0);
       }
@@ -28,7 +34,7 @@ export const useConversationNotifications = (conversationId: string | null) => {
       const { data, error } = await supabase
         .from('notifications')
         .select('id')
-        .eq('conversation_id', conversationId)
+        .eq('conversation_id', targetConversationId)
         .eq('user_id', user.id)
         .eq('is_read', false);
 
@@ -43,7 +49,7 @@ export const useConversationNotifications = (conversationId: string | null) => {
     } catch (error) {
       console.error('Error in fetchUnreadCount:', error);
     }
-  }, [conversationId]);
+  }, []); // No dependencies - uses parameters only
 
   const cleanup = useCallback(async () => {
     console.log('Cleaning up notification realtime subscription');
@@ -71,9 +77,14 @@ export const useConversationNotifications = (conversationId: string | null) => {
   }, []); // No dependencies to break circular reference
 
   const setupChannel = useCallback(async (targetConversationId: string) => {
-    // Prevent multiple simultaneous subscription attempts
-    if (isSubscribingRef.current || (isSubscribedRef.current && currentConversationRef.current === targetConversationId) || !isMountedRef.current) {
-      console.log('Skipping notification subscription - already subscribing/subscribed to same conversation or unmounted');
+    // Prevent multiple simultaneous subscription attempts or loops
+    if (
+      isSubscribingRef.current || 
+      (isSubscribedRef.current && currentConversationRef.current === targetConversationId) || 
+      !isMountedRef.current ||
+      channelIdRef.current // Already have an active channel
+    ) {
+      console.log('Skipping notification subscription - already subscribing/subscribed or unmounted');
       return;
     }
 
@@ -129,7 +140,7 @@ export const useConversationNotifications = (conversationId: string | null) => {
           (payload) => {
             console.log('Notification change detected:', payload);
             if (isMountedRef.current && currentConversationRef.current === targetConversationId && channelIdRef.current === channelName) {
-              fetchUnreadCount();
+              fetchUnreadCount(targetConversationId);
             }
           }
         )
@@ -188,10 +199,13 @@ export const useConversationNotifications = (conversationId: string | null) => {
         }, retryDelay);
       }
     }
-  }, [cleanup, fetchUnreadCount]); // Both cleanup and fetchUnreadCount are stable
+  }, [cleanup, fetchUnreadCount]); // Stable dependencies
 
+  // Effect for handling conversation changes - separate from setup logic
   useEffect(() => {
-    isMountedRef.current = true;
+    console.log(`Conversation changed to: ${conversationId}`);
+    
+    // Reset retry count on conversation change
     retryCountRef.current = 0;
 
     if (!conversationId) {
@@ -204,32 +218,41 @@ export const useConversationNotifications = (conversationId: string | null) => {
       return;
     }
 
-    // Fetch initial unread count
-    fetchUnreadCount();
-
-    // Only setup if we're switching to a different conversation
-    if (currentConversationRef.current !== conversationId) {
-      console.log('Setting up notification subscription for new conversation:', conversationId);
-      // Small delay to prevent immediate conflicts
-      const initTimeout = setTimeout(() => {
-        if (isMountedRef.current && currentConversationRef.current === conversationId) {
-          setupChannel(conversationId);
-        }
-      }, 150);
-      
-      return () => {
-        clearTimeout(initTimeout);
-      };
+    // Only proceed if conversation actually changed
+    if (currentConversationRef.current === conversationId) {
+      console.log('Same conversation, skipping setup');
+      return;
     }
-  }, [conversationId, setupChannel, fetchUnreadCount]); // Both setupChannel and fetchUnreadCount are now stable
 
+    // Fetch initial unread count
+    fetchUnreadCount(conversationId);
+
+    // Setup subscription with a small delay to prevent immediate conflicts
+    const setupTimeout = setTimeout(() => {
+      if (isMountedRef.current && stableConversationId.current === conversationId) {
+        setupChannel(conversationId);
+      }
+    }, 250);
+    
+    return () => {
+      clearTimeout(setupTimeout);
+    };
+  }, [conversationId]); // Only depend on conversationId
+
+  // Separate effect for cleanup on unmount
   useEffect(() => {
+    isMountedRef.current = true;
+    
     return () => {
       console.log('Cleaning up notification realtime on unmount');
       isMountedRef.current = false;
       cleanup();
     };
-  }, [cleanup]);
+  }, []); // Empty dependency array - only run on mount/unmount
 
-  return { unreadCount, refetchUnreadCount: fetchUnreadCount };
+  const refetchUnreadCount = useCallback(() => {
+    fetchUnreadCount(conversationId);
+  }, [fetchUnreadCount, conversationId]);
+
+  return { unreadCount, refetchUnreadCount };
 };
