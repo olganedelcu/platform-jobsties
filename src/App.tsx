@@ -28,6 +28,7 @@ import Applications from "./pages/coach/Applications";
 import CoachCalendar from "./pages/coach/CoachCalendar";
 import JobRecommendations from "./pages/coach/JobRecommendations";
 import BackupManagementPage from "./pages/coach/BackupManagement";
+import CoachMessages from "./pages/coach/CoachMessages";
 import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 
@@ -83,6 +84,7 @@ const App = () => (
               <Route path="/coach/dashboard" element={<CoachDashboard />} />
               <Route path="/coach/cv-upload" element={<CVUpload />} />
               <Route path="/coach/sessions" element={<CoachSessions />} />
+              <Route path="/coach/messages" element={<CoachMessages />} />
               <Route path="/coach/settings" element={<CoachSettings />} />
               <Route path="/coach/profile" element={<CoachProfile />} />
               <Route path="/coach/todos" element={<CoachTodos />} />
