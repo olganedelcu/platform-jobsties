@@ -159,14 +159,14 @@ async function performFullDatabaseBackup(supabase: any, compress: boolean) {
   const fileName = `database_full_${Date.now()}.json`
   const filePath = `database/${fileName}`
   
-  // Upload to storage with application/json content type
+  // Upload to storage as text/plain to avoid MIME type issues
   const { error: uploadError } = await supabase.storage
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'application/json' }),
+      backupContent,
       {
-        contentType: 'application/json',
+        contentType: 'text/plain',
         upsert: false
       }
     )
@@ -179,7 +179,7 @@ async function performFullDatabaseBackup(supabase: any, compress: boolean) {
   
   return {
     location: filePath,
-    size: new Blob([backupContent]).size,
+    size: new TextEncoder().encode(backupContent).length,
     duration,
     metadata: {
       tables_backed_up: Object.keys(backupData).length,
@@ -239,9 +239,9 @@ async function performIncrementalBackup(supabase: any, compress: boolean) {
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'application/json' }),
+      backupContent,
       {
-        contentType: 'application/json',
+        contentType: 'text/plain',
         upsert: false
       }
     )
@@ -254,7 +254,7 @@ async function performIncrementalBackup(supabase: any, compress: boolean) {
   
   return {
     location: filePath,
-    size: new Blob([backupContent]).size,
+    size: new TextEncoder().encode(backupContent).length,
     duration,
     metadata: {
       tables_backed_up: Object.keys(backupData).length,
@@ -306,9 +306,9 @@ async function performStorageBackup(supabase: any, compress: boolean) {
     .from('backups')
     .upload(
       filePath, 
-      new Blob([manifestContent], { type: 'application/json' }),
+      manifestContent,
       {
-        contentType: 'application/json',
+        contentType: 'text/plain',
         upsert: false
       }
     )
@@ -321,7 +321,7 @@ async function performStorageBackup(supabase: any, compress: boolean) {
   
   return {
     location: filePath,
-    size: new Blob([manifestContent]).size,
+    size: new TextEncoder().encode(manifestContent).length,
     duration,
     metadata: {
       buckets_backed_up: buckets.length,
@@ -371,9 +371,9 @@ async function performCriticalTablesBackup(supabase: any, tables: string[], comp
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'application/json' }),
+      backupContent,
       {
-        contentType: 'application/json',
+        contentType: 'text/plain',
         upsert: false
       }
     )
@@ -386,7 +386,7 @@ async function performCriticalTablesBackup(supabase: any, tables: string[], comp
   
   return {
     location: filePath,
-    size: new Blob([backupContent]).size,
+    size: new TextEncoder().encode(backupContent).length,
     duration,
     metadata: {
       critical_tables_backed_up: Object.keys(backupData).length,
@@ -436,9 +436,9 @@ async function performManualBackup(supabase: any, tables: string[], compress: bo
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'application/json' }),
+      backupContent,
       {
-        contentType: 'application/json',
+        contentType: 'text/plain',
         upsert: false
       }
     )
@@ -451,7 +451,7 @@ async function performManualBackup(supabase: any, tables: string[], compress: bo
   
   return {
     location: filePath,
-    size: new Blob([backupContent]).size,
+    size: new TextEncoder().encode(backupContent).length,
     duration,
     metadata: {
       tables_backed_up: Object.keys(backupData).length,
