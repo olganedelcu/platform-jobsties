@@ -916,6 +916,7 @@ export type Database = {
           coach_id: string
           company_name: string
           created_at: string
+          description: string | null
           id: string
           job_link: string
           job_title: string
@@ -931,6 +932,7 @@ export type Database = {
           coach_id: string
           company_name: string
           created_at?: string
+          description?: string | null
           id?: string
           job_link: string
           job_title: string
@@ -946,6 +948,7 @@ export type Database = {
           coach_id?: string
           company_name?: string
           created_at?: string
+          description?: string | null
           id?: string
           job_link?: string
           job_title?: string
