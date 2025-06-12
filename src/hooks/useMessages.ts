@@ -1,40 +1,43 @@
 
-import { useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMessagesFetch } from './useMessagesFetch';
 import { useMessagesSend } from './useMessagesSend';
 import { useMessagesAttachment } from './useMessagesAttachment';
 import { useMessagesRealtime } from './useMessagesRealtime';
 
-export interface Message {
-  id: string;
-  conversation_id: string;
-  sender_id: string;
-  sender_type: 'mentee' | 'coach';
-  content: string;
-  message_type: 'text' | 'system';
-  read_status: boolean;
-  read_at: string | null;
-  created_at: string;
-  sender_name?: string;
-  attachments?: MessageAttachment[];
-}
-
 export interface MessageAttachment {
   id: string;
   message_id: string;
   file_name: string;
-  file_path: string;
+  file_size: number;
   file_type: string;
-  file_size: number | null;
-  uploaded_at: string;
+  file_url: string;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string | null;
+  sender_type: 'coach' | 'mentee';
+  sender_name?: string;
+  content: string;
+  message_type: string;
+  read_status?: boolean;
+  read_at?: string | null;
+  created_at: string;
+  updated_at: string;
+  attachments?: MessageAttachment[];
 }
 
 export const useMessages = (conversationId: string | null) => {
+  const isMountedRef = useRef(true);
+  
   const {
     messages,
     loading,
     fetchMessages,
-    setMessages
+    setMessages,
+    cleanup: cleanupFetch
   } = useMessagesFetch(conversationId);
 
   const {
@@ -46,17 +49,36 @@ export const useMessages = (conversationId: string | null) => {
     downloadAttachment
   } = useMessagesAttachment();
 
-  const handleMessageReceived = useCallback(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+  // Set up realtime subscription
+  useMessagesRealtime(conversationId, fetchMessages);
 
-  useMessagesRealtime(conversationId, handleMessageReceived);
+  // Fetch messages when conversation changes
+  useEffect(() => {
+    isMountedRef.current = true;
+    
+    if (conversationId) {
+      fetchMessages();
+    } else {
+      setMessages([]);
+    }
+
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [conversationId]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      cleanupFetch();
+    };
+  }, []);
 
   return {
     messages,
     loading,
     sending,
-    fetchMessages,
     sendMessage,
     downloadAttachment
   };
