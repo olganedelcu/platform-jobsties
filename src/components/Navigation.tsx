@@ -18,7 +18,6 @@ import DesktopNavigation from './DesktopNavigation';
 import MobileNavigation from './MobileNavigation';
 import UserProfileSection from './UserProfileSection';
 import MessageNotificationBadge from './messaging/MessageNotificationBadge';
-import NotificationDropdown from './messaging/NotificationDropdown';
 
 interface NavigationProps {
   user: any;
@@ -81,7 +80,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
           <DesktopNavigation navigationItems={navigationItems} />
 
           <div className="hidden md:flex md:items-center md:space-x-4">
-            <NotificationDropdown />
             <UserProfileSection
               user={user}
               profilePicture={profilePicture}
@@ -100,7 +98,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                 <MessageNotificationBadge />
               </Link>
             </div>
-            <NotificationDropdown />
             <Button
               variant="ghost"
               size="sm"
