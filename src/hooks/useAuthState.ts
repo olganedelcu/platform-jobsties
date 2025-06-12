@@ -18,7 +18,6 @@ export const useAuthState = () => {
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session check:', session);
         
         setUser(session?.user || null);
         setLoading(false);
@@ -34,7 +33,6 @@ export const useAuthState = () => {
           }
         }
       } catch (error) {
-        console.error('Auth check error:', error);
         setUser(null);
         setLoading(false);
         hasInitialized.current = true;
@@ -47,7 +45,7 @@ export const useAuthState = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          console.log('Auth state changed:', event, session?.user?.user_metadata);
+          // Silent auth state change tracking
         }
         
         if (session?.user) {
@@ -71,17 +69,13 @@ export const useAuthState = () => {
               if (!isOnCorrectPage) {
                 try {
                   const userRoleFromMetadata = session.user.user_metadata?.role;
-                  console.log('User role from metadata:', userRoleFromMetadata);
                   
                   if (userRoleFromMetadata === 'COACH') {
-                    console.log('Redirecting to coach dashboard (from metadata)');
                     navigate('/coach/mentees');
                   } else {
-                    console.log('Redirecting to mentee dashboard (from metadata)');
                     navigate('/dashboard');
                   }
                 } catch (error) {
-                  console.error('Error during role check:', error);
                   const userRoleFromMetadata = session.user.user_metadata?.role;
                   if (userRoleFromMetadata === 'COACH') {
                     navigate('/coach/mentees');
@@ -105,7 +99,7 @@ export const useAuthState = () => {
               localStorage.removeItem('coach-applications-view-mode');
               localStorage.removeItem('tracker-scroll-position');
             } catch (error) {
-              console.error('Failed to clear localStorage on sign out:', error);
+              // Silent cleanup
             }
             navigate('/');
           }
@@ -128,13 +122,13 @@ export const useAuthState = () => {
         localStorage.removeItem('coach-applications-view-mode');
         localStorage.removeItem('tracker-scroll-position');
       } catch (error) {
-        console.error('Failed to clear localStorage on manual sign out:', error);
+        // Silent cleanup
       }
       
       await supabase.auth.signOut();
       navigate('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      // Silent error handling
     }
   };
 

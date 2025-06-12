@@ -31,8 +31,6 @@ const Login = () => {
     try {
       setIsLoading(true);
       
-      console.log('Attempting login for:', formData.email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
@@ -42,8 +40,6 @@ const Login = () => {
         throw error;
       }
 
-      console.log('Login successful, user data:', data.user);
-
       // Check user role and redirect appropriately
       if (data.user) {
         const { data: profile, error: profileError } = await supabase
@@ -52,10 +48,7 @@ const Login = () => {
           .eq('id', data.user.id)
           .single();
 
-        console.log('User profile after login:', profile);
-
         if (profileError) {
-          console.error('Error fetching profile:', profileError);
           // Fallback to metadata
           const userRole = data.user.user_metadata?.role;
           if (userRole === 'COACH') {
@@ -65,10 +58,8 @@ const Login = () => {
           }
         } else {
           if (profile.role === 'COACH') {
-            console.log('Redirecting coach to coach dashboard');
             navigate('/coach/mentees');
           } else {
-            console.log('Redirecting mentee to dashboard');
             navigate('/dashboard');
           }
         }
@@ -80,7 +71,6 @@ const Login = () => {
       });
       
     } catch (error: any) {
-      console.error('Login error:', error);
       toast({
         title: "Error",
         description: error.message || 'Failed to sign in',

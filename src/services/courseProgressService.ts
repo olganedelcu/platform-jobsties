@@ -92,8 +92,6 @@ export const courseProgressService = {
    * Fetch course progress for a single user (used by mentee course page)
    */
   async fetchUserProgress(userId: string): Promise<CourseProgressData[]> {
-    console.log('Fetching course progress for user:', userId);
-    
     const { data, error } = await supabase
       .from('course_progress')
       .select('*')
@@ -101,7 +99,6 @@ export const courseProgressService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching user course progress:', error);
       throw error;
     }
 
@@ -118,7 +115,6 @@ export const courseProgressService = {
 
     // If no real data exists, return sample data for demonstration
     if (realProgressData.length === 0) {
-      console.log('No course progress found, returning sample data for user:', userId);
       return generateSampleProgressData(userId);
     }
 
@@ -132,8 +128,6 @@ export const courseProgressService = {
     if (menteeIds.length === 0) {
       return [];
     }
-
-    console.log('Fetching course progress for mentees:', menteeIds);
     
     // Fetch profiles to check email confirmation status
     const { data: profiles, error: profilesError } = await supabase
@@ -142,7 +136,6 @@ export const courseProgressService = {
       .in('id', menteeIds);
 
     if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
       throw new Error(`Profile fetch error: ${profilesError.message}`);
     }
 
@@ -154,12 +147,8 @@ export const courseProgressService = {
       .order('created_at', { ascending: false });
 
     if (progressError) {
-      console.error('Error fetching mentee progress:', progressError);
       throw new Error(`Progress fetch error: ${progressError.message}`);
     }
-
-    console.log('Raw course progress data:', courseProgress);
-    console.log('Profiles data:', profiles);
 
     // Process the data for each mentee
     const summaries: MenteeProgressSummary[] = [];
@@ -175,7 +164,6 @@ export const courseProgressService = {
         // Use the same sample data that the individual course page would show
         progressData = generateSampleProgressData(menteeId);
         hasRealData = false;
-        console.log(`Using sample progress data for mentee ${menteeId}`);
       } else {
         // Convert real data to CourseProgressData format
         progressData = menteeProgressData.map(item => ({
@@ -200,8 +188,6 @@ export const courseProgressService = {
       const overallProgress = Math.round(avgProgress);
       const emailConfirmed = !!profile;
 
-      console.log(`Mentee ${menteeId} progress: ${completedModules}/${totalModules} modules, ${overallProgress}% overall, hasRealData: ${hasRealData}`);
-
       summaries.push({
         menteeId,
         overallProgress,
@@ -220,8 +206,6 @@ export const courseProgressService = {
    * Update course progress for a user
    */
   async updateProgress(userId: string, moduleTitle: string, progressPercentage: number, completed?: boolean): Promise<void> {
-    console.log('Updating progress:', { userId, moduleTitle, progressPercentage, completed });
-    
     // Check if progress record exists
     const { data: existingProgress } = await supabase
       .from('course_progress')
