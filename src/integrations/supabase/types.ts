@@ -448,6 +448,44 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          coach_email: string
+          created_at: string | null
+          id: string
+          mentee_id: string | null
+          status: string | null
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          coach_email?: string
+          created_at?: string | null
+          id?: string
+          mentee_id?: string | null
+          status?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          coach_email?: string
+          created_at?: string | null
+          id?: string
+          mentee_id?: string | null
+          status?: string | null
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_progress: {
         Row: {
           completed: boolean | null
@@ -585,6 +623,92 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      message_attachments: {
+        Row: {
+          file_name: string
+          file_path: string
+          file_size: number | null
+          file_type: string
+          id: string
+          message_id: string | null
+          uploaded_at: string | null
+        }
+        Insert: {
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          file_type: string
+          id?: string
+          message_id?: string | null
+          uploaded_at?: string | null
+        }
+        Update: {
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          file_type?: string
+          id?: string
+          message_id?: string | null
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          message_type: string | null
+          read_status: boolean | null
+          sender_id: string | null
+          sender_type: string
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          read_status?: boolean | null
+          sender_id?: string | null
+          sender_type: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          read_status?: boolean | null
+          sender_id?: string | null
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       module_files: {
         Row: {
