@@ -6,6 +6,7 @@ export interface JobRecommendation {
   job_title: string;
   job_link: string;
   company_name: string;
+  description?: string;
   week_start_date: string;
   created_at: string;
   updated_at: string;
@@ -20,5 +21,6 @@ export interface NewJobRecommendationData {
   jobTitle: string;
   jobLink: string;
   companyName: string;
+  description?: string;
   weekStartDate: string;
 }

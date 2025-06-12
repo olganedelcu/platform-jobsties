@@ -64,6 +64,7 @@ const ApplicationsJobRecommendations = () => {
           jobTitle: rec.jobTitle,
           jobLink: rec.jobLink,
           companyName: rec.companyName,
+          description: rec.description,
           weekStartDate
         })
       );

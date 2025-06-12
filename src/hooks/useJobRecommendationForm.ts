@@ -7,6 +7,7 @@ export interface JobRecommendation {
   jobTitle: string;
   jobLink: string;
   companyName: string;
+  description: string;
 }
 
 export const useJobRecommendationForm = () => {
@@ -15,14 +16,14 @@ export const useJobRecommendationForm = () => {
     format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
   );
   const [jobRecommendations, setJobRecommendations] = useState<JobRecommendation[]>([
-    { id: '1', jobTitle: '', jobLink: '', companyName: '' }
+    { id: '1', jobTitle: '', jobLink: '', companyName: '', description: '' }
   ]);
 
   const addNewRecommendation = () => {
     const newId = Date.now().toString();
     setJobRecommendations(prev => [
       ...prev,
-      { id: newId, jobTitle: '', jobLink: '', companyName: '' }
+      { id: newId, jobTitle: '', jobLink: '', companyName: '', description: '' }
     ]);
   };
 
@@ -39,7 +40,7 @@ export const useJobRecommendationForm = () => {
   };
 
   const resetForm = () => {
-    setJobRecommendations([{ id: '1', jobTitle: '', jobLink: '', companyName: '' }]);
+    setJobRecommendations([{ id: '1', jobTitle: '', jobLink: '', companyName: '', description: '' }]);
     setSelectedMentee('');
     setWeekStartDate(format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd'));
   };

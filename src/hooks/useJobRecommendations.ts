@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -57,6 +56,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
           job_title: recommendationData.jobTitle,
           job_link: recommendationData.jobLink,
           company_name: recommendationData.companyName,
+          description: recommendationData.description || null,
           week_start_date: recommendationData.weekStartDate,
           status: 'active', // Default status for new recommendations
           archived: false

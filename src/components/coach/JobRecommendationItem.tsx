@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Trash2 } from 'lucide-react';
 import { JobRecommendation } from '@/hooks/useJobRecommendationForm';
 
@@ -39,7 +40,7 @@ const JobRecommendationItem = ({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         <div>
           <Label htmlFor={`jobTitle-${recommendation.id}`} className="text-xs">
             Job Title
@@ -67,7 +68,7 @@ const JobRecommendationItem = ({
         </div>
       </div>
 
-      <div className="mt-3">
+      <div className="mb-3">
         <Label htmlFor={`jobLink-${recommendation.id}`} className="text-xs">
           Job Application Link
         </Label>
@@ -78,6 +79,20 @@ const JobRecommendationItem = ({
           onChange={(e) => onUpdate(recommendation.id, 'jobLink', e.target.value)}
           placeholder="https://company.com/careers/job-posting"
           className="text-sm"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor={`description-${recommendation.id}`} className="text-xs">
+          Description
+        </Label>
+        <Textarea
+          id={`description-${recommendation.id}`}
+          value={recommendation.description}
+          onChange={(e) => onUpdate(recommendation.id, 'description', e.target.value)}
+          placeholder="Why this job is a good fit for the mentee..."
+          className="text-sm min-h-[80px]"
+          rows={3}
         />
       </div>
     </Card>
