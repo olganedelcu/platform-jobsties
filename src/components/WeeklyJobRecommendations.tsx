@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase, Clock } from 'lucide-react';
 import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions';
 import { useTimeZoneAwareRecommendations } from '@/hooks/useTimeZoneAwareRecommendations';
+import { useJobViewHandler } from '@/hooks/useJobViewHandler';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import CurrentWeekSection from './job-recommendations/CurrentWeekSection';
 import PreviousWeeksSection from './job-recommendations/PreviousWeeksSection';
@@ -27,27 +28,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
     user: { id: userId }
   });
 
-  const handleViewJob = (jobLink: string) => {
-    console.log('Opening job link:', jobLink);
-    
-    if (!jobLink) {
-      console.error('No job link provided');
-      return;
-    }
-
-    // Ensure the URL has a protocol
-    let url = jobLink.trim();
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
-    }
-
-    try {
-      window.open(url, '_blank', 'noopener,noreferrer');
-      console.log('Successfully opened URL:', url);
-    } catch (error) {
-      console.error('Error opening job link:', error);
-    }
-  };
+  const { handleViewJob } = useJobViewHandler();
 
   const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
     console.log('Marking as applied:', recommendation);
