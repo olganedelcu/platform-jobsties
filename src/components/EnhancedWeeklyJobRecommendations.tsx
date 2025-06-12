@@ -41,11 +41,19 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
   const fetchAllRecommendations = async () => {
     setLoading(true);
     try {
+      console.log('Fetching all recommendations for user:', userId);
+      
       const [activeRecs, appliedRecs, allRecs] = await Promise.all([
         fetchRecommendationsByStatus('active'),
         fetchRecommendationsByStatus('applied'),
         fetchRecommendationsByStatus()
       ]);
+
+      console.log('Fetched recommendations:', {
+        active: activeRecs,
+        applied: appliedRecs,
+        all: allRecs
+      });
 
       setRecommendations({
         active: activeRecs,
@@ -83,6 +91,52 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
     }
   };
 
+  // Enhanced handlers with validation
+  const handleMarkAsAppliedWithValidation = async (recommendation: JobRecommendation) => {
+    console.log('Attempting to mark as applied:', recommendation);
+    
+    // Verify the recommendation exists in our current data
+    const exists = recommendations.all.find(rec => rec.id === recommendation.id);
+    if (!exists) {
+      console.error('Recommendation not found in current data:', recommendation.id);
+      // Refresh data and try again
+      await fetchAllRecommendations();
+      return;
+    }
+    
+    await handleMarkAsApplied(recommendation);
+  };
+
+  const handleArchiveWithValidation = async (recommendationId: string) => {
+    console.log('Attempting to archive:', recommendationId);
+    
+    // Verify the recommendation exists in our current data
+    const exists = recommendations.all.find(rec => rec.id === recommendationId);
+    if (!exists) {
+      console.error('Recommendation not found in current data:', recommendationId);
+      // Refresh data and try again
+      await fetchAllRecommendations();
+      return;
+    }
+    
+    await handleArchive(recommendationId);
+  };
+
+  const handleReactivateWithValidation = async (recommendationId: string) => {
+    console.log('Attempting to reactivate:', recommendationId);
+    
+    // Verify the recommendation exists in our current data
+    const exists = recommendations.all.find(rec => rec.id === recommendationId);
+    if (!exists) {
+      console.error('Recommendation not found in current data:', recommendationId);
+      // Refresh data and try again
+      await fetchAllRecommendations();
+      return;
+    }
+    
+    await handleReactivate(recommendationId);
+  };
+
   const renderRecommendationsList = (recs: JobRecommendation[], emptyType: string) => {
     if (loading) {
       return (
@@ -103,9 +157,9 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
             key={recommendation.id}
             recommendation={recommendation}
             onViewJob={handleViewJob}
-            onMarkAsApplied={handleMarkAsApplied}
-            onArchive={handleArchive}
-            onReactivate={handleReactivate}
+            onMarkAsApplied={handleMarkAsAppliedWithValidation}
+            onArchive={handleArchiveWithValidation}
+            onReactivate={handleReactivateWithValidation}
             loading={actionLoading}
           />
         ))}
