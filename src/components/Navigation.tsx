@@ -1,16 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  Calendar, 
-  FileText, 
   BarChart3, 
   User, 
   LogOut, 
   Menu, 
   X,
-  MessageCircle
+  MessageCircle,
+  FileText
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import DesktopNavigation from './DesktopNavigation';
@@ -29,7 +29,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/messages', label: 'Communication', icon: MessageCircle },
     { path: '/tracker', label: 'Tracker', icon: FileText }
   ];
@@ -70,10 +69,9 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
             <Link to="/dashboard" className="flex items-center space-x-2">
               <img 
                 src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                alt="JobSties Logo" 
+                alt="Logo" 
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-gray-900">JobSties</span>
             </Link>
           </div>
 

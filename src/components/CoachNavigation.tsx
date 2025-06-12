@@ -3,10 +3,8 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
-  Calendar,
   Users, 
   Settings, 
-  BookOpen, 
   FileUp, 
   User,
   Menu,
@@ -42,16 +40,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       label: 'Communication', 
       icon: MessageCircle 
     },
-    // { 
-    //   path: '/coach/sessions', 
-    //   label: 'Sessions', 
-    //   icon: BookOpen 
-    // },
-    // { 
-    //   path: '/coach/calendar', 
-    //   label: 'Calendar', 
-    //   icon: Calendar 
-    // },
     { 
       path: '/coach/cv-upload', 
       label: 'Files Upload', 
@@ -89,7 +77,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
             <Link to="/coach/mentees" className="flex items-center space-x-2">
               <img 
                 src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                alt="JobSties Logo" 
+                alt="Logo" 
                 className="h-8 w-auto"
               />
               <span className="text-xl font-bold text-gray-900">Coach</span>

@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Sessions from "./pages/Sessions";
+import Messages from "./pages/Messages";
 import Tracker from "./pages/Tracker";
 import Course from "./pages/Course";
 import CoachSignUp from "./pages/CoachSignUp";
@@ -70,6 +71,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/sessions" element={<Sessions />} />
+              <Route path="/messages" element={<Messages />} />
               <Route path="/tracker" element={<Tracker />} />
               <Route path="/course" element={<Course />} />
               <Route path="/chat" element={<ChatPage />} />
