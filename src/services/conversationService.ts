@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation } from '@/hooks/useConversations';
 import { SecureErrorHandler } from '@/utils/errorHandling';
@@ -18,9 +17,9 @@ export const ConversationService = {
   },
 
   async fetchConversationsData(userId: string, userRole: string) {
-    // Use SecureErrorHandler for safe string operations
-    const safeUserRole = SecureErrorHandler.safeStringOperation(userRole, 'toLowerCase', 'mentee');
-    const safeMenteeRole = 'mentee';
+    // Keep role in uppercase format to match database
+    const safeUserRole = SecureErrorHandler.safeStringOperation(userRole, 'toUpperCase', 'MENTEE');
+    const safeMenteeRole = 'MENTEE'; // Database uses uppercase
     
     let query = supabase
       .from('conversations')

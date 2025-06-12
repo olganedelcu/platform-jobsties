@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Message, MessageAttachment } from '@/hooks/useMessages';
 
@@ -106,9 +105,9 @@ export const MessageService = {
           }
         }
 
-        // Safely handle message type
-        const rawSenderType = (message?.sender_type || '').toString().toLowerCase();
-        if (rawSenderType === 'coach') {
+        // Keep sender type check in uppercase to match database format
+        const rawSenderType = (message?.sender_type || '').toString().toUpperCase();
+        if (rawSenderType === 'COACH') {
           senderType = 'coach';
         }
 
@@ -208,7 +207,8 @@ export const MessageService = {
       .eq('id', user.id)
       .single();
 
-    const senderType = (profile?.role || '').toString().toLowerCase() === 'coach' ? 'coach' : 'mentee';
+    // Keep role comparison in uppercase and store in database format
+    const senderType = (profile?.role || '').toString().toUpperCase() === 'COACH' ? 'COACH' : 'MENTEE';
 
     const { data: message, error } = await supabase
       .from('messages')

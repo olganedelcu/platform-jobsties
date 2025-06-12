@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,8 +50,8 @@ export const useConversationsFetch = () => {
       console.log('Fetching conversations for authenticated user:', userProfile.user.id);
       const { user, profile } = userProfile;
       
-      // Safely handle role with fallback and SecureErrorHandler
-      const userRole = SecureErrorHandler.safeStringOperation(profile?.role, 'toLowerCase', 'mentee');
+      // Keep role in uppercase to match database format
+      const userRole = SecureErrorHandler.safeStringOperation(profile?.role, 'toUpperCase', 'MENTEE');
       
       const conversationsData = await ConversationService.fetchConversationsData(user.id, userRole);
       const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
