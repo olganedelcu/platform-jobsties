@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -9,7 +9,8 @@ import {
   CheckCircle,
   Archive,
   RotateCcw,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import { format } from 'date-fns';
@@ -31,6 +32,10 @@ const EnhancedRecommendationCard = ({
   onReactivate,
   loading
 }: EnhancedRecommendationCardProps) => {
+  const [isMarkingAsApplied, setIsMarkingAsApplied] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
+
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'applied':
@@ -58,6 +63,33 @@ const EnhancedRecommendationCard = ({
   const canMarkAsApplied = recommendation.status === 'active';
   const canArchive = recommendation.status === 'active';
   const canReactivate = recommendation.status === 'archived' || recommendation.status === 'applied';
+
+  const handleMarkAsApplied = async () => {
+    setIsMarkingAsApplied(true);
+    try {
+      await onMarkAsApplied(recommendation);
+    } finally {
+      setIsMarkingAsApplied(false);
+    }
+  };
+
+  const handleArchive = async () => {
+    setIsArchiving(true);
+    try {
+      await onArchive(recommendation.id);
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    setIsReactivating(true);
+    try {
+      await onReactivate(recommendation.id);
+    } finally {
+      setIsReactivating(false);
+    }
+  };
 
   return (
     <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
@@ -105,12 +137,21 @@ const EnhancedRecommendationCard = ({
           <Button
             variant="default"
             size="sm"
-            onClick={() => onMarkAsApplied(recommendation)}
-            disabled={loading}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            onClick={handleMarkAsApplied}
+            disabled={loading || isMarkingAsApplied}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]"
           >
-            <CheckCircle className="h-4 w-4" />
-            Mark Applied
+            {isMarkingAsApplied ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Mark Applied
+              </>
+            )}
           </Button>
         )}
 
@@ -118,11 +159,15 @@ const EnhancedRecommendationCard = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onArchive(recommendation.id)}
-            disabled={loading}
+            onClick={handleArchive}
+            disabled={loading || isArchiving}
             className="flex items-center gap-2"
           >
-            <Archive className="h-4 w-4" />
+            {isArchiving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Archive className="h-4 w-4" />
+            )}
             Archive
           </Button>
         )}
@@ -131,11 +176,15 @@ const EnhancedRecommendationCard = ({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onReactivate(recommendation.id)}
-            disabled={loading}
+            onClick={handleReactivate}
+            disabled={loading || isReactivating}
             className="flex items-center gap-2"
           >
-            <RotateCcw className="h-4 w-4" />
+            {isReactivating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RotateCcw className="h-4 w-4" />
+            )}
             Reactivate
           </Button>
         )}

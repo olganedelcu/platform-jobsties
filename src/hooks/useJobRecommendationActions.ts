@@ -25,6 +25,12 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
       return;
     }
 
+    // Show immediate feedback
+    toast({
+      title: "Adding to tracker...",
+      description: `Adding ${recommendation.job_title} at ${recommendation.company_name} to your applications.`,
+    });
+
     try {
       const applicationData = {
         dateApplied: format(new Date(), 'yyyy-MM-dd'),
