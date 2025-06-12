@@ -9,6 +9,10 @@ export interface JobRecommendation {
   week_start_date: string;
   created_at: string;
   updated_at: string;
+  status?: 'active' | 'applied' | 'archived';
+  applied_date?: string;
+  archived?: boolean;
+  application_stage?: string;
 }
 
 export interface NewJobRecommendationData {

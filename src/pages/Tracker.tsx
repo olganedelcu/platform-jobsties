@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import Navigation from '@/components/Navigation';
 import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
-import WeeklyJobRecommendations from '@/components/WeeklyJobRecommendations';
+import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobRecommendations';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
 
@@ -102,9 +103,9 @@ const Tracker = () => {
           <p className="text-gray-600 mt-2">Track and manage your job applications</p>
         </div>
 
-        {/* Weekly Job Recommendations Section */}
+        {/* Enhanced Job Recommendations Section with Archive System */}
         <div className="mb-8">
-          <WeeklyJobRecommendations userId={user.id} />
+          <EnhancedWeeklyJobRecommendations userId={user.id} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

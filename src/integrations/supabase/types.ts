@@ -726,6 +726,9 @@ export type Database = {
       }
       weekly_job_recommendations: {
         Row: {
+          application_stage: string | null
+          applied_date: string | null
+          archived: boolean | null
           coach_id: string
           company_name: string
           created_at: string
@@ -733,10 +736,14 @@ export type Database = {
           job_link: string
           job_title: string
           mentee_id: string
+          status: string | null
           updated_at: string
           week_start_date: string
         }
         Insert: {
+          application_stage?: string | null
+          applied_date?: string | null
+          archived?: boolean | null
           coach_id: string
           company_name: string
           created_at?: string
@@ -744,10 +751,14 @@ export type Database = {
           job_link: string
           job_title: string
           mentee_id: string
+          status?: string | null
           updated_at?: string
           week_start_date: string
         }
         Update: {
+          application_stage?: string | null
+          applied_date?: string | null
+          archived?: boolean | null
           coach_id?: string
           company_name?: string
           created_at?: string
@@ -755,6 +766,7 @@ export type Database = {
           job_link?: string
           job_title?: string
           mentee_id?: string
+          status?: string | null
           updated_at?: string
           week_start_date?: string
         }

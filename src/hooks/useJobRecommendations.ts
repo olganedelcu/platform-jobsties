@@ -68,7 +68,9 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
           job_title: recommendationData.jobTitle,
           job_link: recommendationData.jobLink,
           company_name: recommendationData.companyName,
-          week_start_date: recommendationData.weekStartDate
+          week_start_date: recommendationData.weekStartDate,
+          status: 'active', // Default status for new recommendations
+          archived: false
         })
         .select()
         .single();
