@@ -178,8 +178,7 @@ const Login = () => {
 
               <div className="text-center mt-6">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '} Contact olga@jobsties.com
-                  </button>
+                  Don't have an account?{' '}Contact olga@jobsties.com
                 </p>
               </div>
             </form>
