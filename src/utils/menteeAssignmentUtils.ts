@@ -4,8 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 
 export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof useToast>['toast']) => {
   try {
-    console.log('Starting manual assignment of ALL mentees...');
-
     // Get the current authenticated user (coach)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
@@ -17,8 +15,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       });
       return false;
     }
-
-    console.log('Using current user as coach:', user.id);
     
     // Get ALL mentees from profiles table - check for both 'mentee' and 'MENTEE'
     const { data: allMentees, error: menteesError } = await supabase
@@ -27,7 +23,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       .or('role.eq.mentee,role.eq.MENTEE');
 
     if (menteesError) {
-      console.error('Error fetching mentees:', menteesError);
       toast({
         title: "Error",
         description: "Failed to fetch mentees from profiles.",
@@ -35,8 +30,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       });
       return false;
     }
-
-    console.log('All mentees found in profiles:', allMentees);
 
     if (!allMentees || allMentees.length === 0) {
       toast({
@@ -54,15 +47,11 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       .eq('is_active', true);
 
     if (assignmentsError) {
-      console.error('Error fetching existing assignments:', assignmentsError);
       // Continue anyway, we'll assign all mentees
     }
 
     const assignedMenteeIds = existingAssignments?.map(a => a.mentee_id) || [];
     const unassignedMentees = allMentees.filter(m => !assignedMenteeIds.includes(m.id));
-
-    console.log('Already assigned mentee IDs:', assignedMenteeIds);
-    console.log('Unassigned mentees to assign:', unassignedMentees);
 
     if (unassignedMentees.length === 0) {
       toast({
@@ -84,7 +73,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       .insert(assignments);
 
     if (assignmentError) {
-      console.error('Error creating assignments:', assignmentError);
       // Only show error if it's not a duplicate key constraint
       if (assignmentError.code !== '23505') {
         toast({
@@ -95,7 +83,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
         return false;
       } else {
         // This means some assignments already exist, which is fine
-        console.log('Some assignments already existed (duplicate key constraint), which is expected');
         toast({
           title: "Info",
           description: `All ${allMentees.length} mentees are now properly assigned.`,
@@ -110,7 +97,6 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
     });
     return true;
   } catch (error) {
-    console.error('Error in manual assignment:', error);
     toast({
       title: "Error",
       description: "Failed to assign mentees.",

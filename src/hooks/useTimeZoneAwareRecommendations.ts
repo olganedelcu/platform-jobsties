@@ -24,9 +24,6 @@ export const useTimeZoneAwareRecommendations = (userId: string): TimeZoneAwareRe
     const now = new Date();
     const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday start
     setCurrentWeekStart(format(weekStart, 'yyyy-MM-dd'));
-    
-    console.log('User timezone:', timeZone);
-    console.log('Current week start:', format(weekStart, 'yyyy-MM-dd'));
   }, []);
 
   // Separate current week from previous weeks based on when the recommendation was created
@@ -38,7 +35,6 @@ export const useTimeZoneAwareRecommendations = (userId: string): TimeZoneAwareRe
     
     return recommendations.filter(rec => {
       const createdDate = new Date(rec.created_at);
-      console.log('Checking recommendation created at:', rec.created_at, 'against current week:', currentWeekStart);
       
       return isWithinInterval(createdDate, {
         start: weekStart,

@@ -32,13 +32,11 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching job recommendations:', error);
         throw error;
       }
 
       setRecommendations((data || []) as JobRecommendation[]);
     } catch (error: any) {
-      console.error('Error fetching job recommendations:', error);
       toast({
         title: "Error",
         description: "Failed to load job recommendations.",
@@ -51,15 +49,6 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
 
   const addRecommendation = async (recommendationData: NewJobRecommendationData) => {
     try {
-      console.log('Adding recommendation:', {
-        coach_id: userId,
-        mentee_id: recommendationData.menteeId,
-        job_title: recommendationData.jobTitle,
-        job_link: recommendationData.jobLink,
-        company_name: recommendationData.companyName,
-        week_start_date: recommendationData.weekStartDate
-      });
-
       const { data, error } = await supabase
         .from('weekly_job_recommendations')
         .insert({
@@ -76,16 +65,13 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         .single();
 
       if (error) {
-        console.error('Error adding job recommendation:', error);
         throw error;
       }
 
-      console.log('Successfully added recommendation:', data);
       setRecommendations(prev => [data as JobRecommendation, ...prev]);
       
       return data;
     } catch (error: any) {
-      console.error('Error adding job recommendation:', error);
       throw error; // Re-throw to let the caller handle it
     }
   };
@@ -98,7 +84,6 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         .eq('id', recommendationId);
 
       if (error) {
-        console.error('Error deleting job recommendation:', error);
         throw error;
       }
 
@@ -109,7 +94,6 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         description: "Job recommendation has been deleted successfully.",
       });
     } catch (error: any) {
-      console.error('Error deleting job recommendation:', error);
       toast({
         title: "Error",
         description: "Failed to delete job recommendation. Please try again.",

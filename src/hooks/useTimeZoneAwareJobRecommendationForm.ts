@@ -24,9 +24,6 @@ export const useTimeZoneAwareJobRecommendationForm = () => {
     
     const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
     setWeekStartDate(format(currentWeekStart, 'yyyy-MM-dd'));
-    
-    console.log('Coach timezone:', timeZone);
-    console.log('Setting week start to:', format(currentWeekStart, 'yyyy-MM-dd'));
   }, []);
 
   const addNewRecommendation = () => {

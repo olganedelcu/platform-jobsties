@@ -55,12 +55,9 @@ export const useMenteeProgress = (menteeIds: string[]) => {
         emailConfirmed: summary.emailConfirmed
       }));
 
-      console.log('Final progress data from service:', formattedData);
       setProgressData(formattedData);
       setError(null);
     } catch (error: any) {
-      console.error('Error fetching mentee progress:', error);
-      
       setError(error.message || 'Failed to fetch progress data');
       
       // Only set fallback data if we don't have any data yet

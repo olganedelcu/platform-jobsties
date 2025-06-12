@@ -18,19 +18,15 @@ export const useJobApplicationsData = (user: any): JobApplicationsHookReturn => 
 
   const fetchUserApplications = useCallback(async () => {
     if (!user?.id) {
-      console.log('No user ID provided, skipping fetch');
       setLoading(false);
       return;
     }
     
     try {
-      console.log('Fetching applications for user:', user.id);
       setLoading(true);
       const applicationsData = await fetchJobApplications(user.id);
-      console.log('Fetched applications:', applicationsData.length);
       setApplications(applicationsData);
     } catch (error) {
-      console.error('Error fetching applications:', error);
       toast({
         title: "Error",
         description: "Failed to load applications. Please try again.",

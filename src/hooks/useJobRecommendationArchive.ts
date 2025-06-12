@@ -37,7 +37,6 @@ export const useJobRecommendationArchive = ({
         onRecommendationUpdated();
       }
     } catch (error) {
-      console.error('Error marking recommendation as applied:', error);
       toast({
         title: "Error",
         description: "Failed to mark recommendation as applied. Please try again.",
@@ -62,7 +61,6 @@ export const useJobRecommendationArchive = ({
         onRecommendationUpdated();
       }
     } catch (error) {
-      console.error('Error archiving recommendation:', error);
       toast({
         title: "Error",
         description: "Failed to archive recommendation. Please try again.",
@@ -87,7 +85,6 @@ export const useJobRecommendationArchive = ({
         onRecommendationUpdated();
       }
     } catch (error) {
-      console.error('Error reactivating recommendation:', error);
       toast({
         title: "Error",
         description: "Failed to reactivate recommendation. Please try again.",

@@ -2,7 +2,6 @@
 export const useJobViewHandler = () => {
   const handleViewJob = (jobLink: string) => {
     if (!jobLink) {
-      console.error('No job link provided');
       return;
     }
 
@@ -14,7 +13,7 @@ export const useJobViewHandler = () => {
     try {
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (error) {
-      console.error('Error opening job link:', error);
+      // Silent fail for security
     }
   };
 

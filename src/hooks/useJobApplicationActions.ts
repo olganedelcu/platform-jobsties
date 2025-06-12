@@ -26,7 +26,6 @@ export const useJobApplicationActions = (
         description: `Your application to ${applicationData.companyName} has been added successfully.`,
       });
     } catch (error) {
-      console.error('Error adding application:', error);
       toast({
         title: "Error",
         description: "Failed to add application. Please try again.",
@@ -55,7 +54,6 @@ export const useJobApplicationActions = (
         description: "Your application has been updated successfully.",
       });
     } catch (error) {
-      console.error('Error updating application:', error);
       toast({
         title: "Error",
         description: "Failed to update application. Please try again.",
@@ -77,7 +75,6 @@ export const useJobApplicationActions = (
         description: "Your application has been deleted successfully.",
       });
     } catch (error) {
-      console.error('Error deleting application:', error);
       toast({
         title: "Error",
         description: "Failed to delete application. Please try again.",
