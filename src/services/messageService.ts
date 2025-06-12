@@ -1,5 +1,6 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import { Message, MessageAttachment } from '@/hooks/useMessages';
+import { Message } from '@/hooks/useMessages';
 
 export const MessageService = {
   async fetchConversationDetails(conversationId: string) {
@@ -55,7 +56,6 @@ export const MessageService = {
   async fetchProfiles(senderIds: string[]) {
     if (!Array.isArray(senderIds) || senderIds.length === 0) return [];
     
-    // Filter out any undefined, null, or empty values from senderIds
     const validSenderIds = senderIds.filter(id => id && typeof id === 'string' && id.trim() !== '');
     
     if (validSenderIds.length === 0) return [];
@@ -70,7 +70,6 @@ export const MessageService = {
       return [];
     }
 
-    // Simple validation - just check for required fields
     const validProfiles = (profiles || []).filter(profile => {
       return profile && 
              typeof profile === 'object' && 
@@ -83,7 +82,6 @@ export const MessageService = {
 
   getCoachProfile(coachEmail: string, profilesData: any[]) {
     try {
-      // Simple null checks
       if (!coachEmail || typeof coachEmail !== 'string') {
         console.log('Invalid coach email provided:', coachEmail);
         return null;
@@ -100,7 +98,6 @@ export const MessageService = {
         return null;
       }
       
-      // Filter out invalid profiles and find match
       const validProfiles = profilesData.filter(profile => {
         return profile && 
                typeof profile === 'object' && 
@@ -111,11 +108,11 @@ export const MessageService = {
       
       console.log('Searching for coach profile with email:', safeCoachEmail);
       console.log('Valid profiles count:', validProfiles.length);
-      console.log('Valid profiles:', validProfiles.map(p => ({ id: p.id, email: p.email })));
       
       const foundProfile = validProfiles.find(profile => {
         try {
-          const profileEmail = profile.email.toLowerCase().trim();
+          const profileEmail = profile.email?.toLowerCase()?.trim();
+          if (!profileEmail) return false;
           console.log('Comparing:', profileEmail, 'with', safeCoachEmail);
           return profileEmail === safeCoachEmail;
         } catch (error) {
@@ -139,14 +136,12 @@ export const MessageService = {
         return [];
       }
       
-      // Filter out invalid messages
       const validMessages = messagesData.filter(message => {
         return message && typeof message === 'object' && message.id;
       });
       
       return validMessages.map((message, index) => {
         try {
-          // Simple sender information handling
           const senderId = message?.sender_id;
           let senderName = 'Unknown';
           let senderType: 'coach' | 'mentee' = 'mentee';
@@ -168,13 +163,11 @@ export const MessageService = {
             }
           }
 
-          // Keep sender type check in uppercase to match database format
-          const rawSenderType = message?.sender_type?.toUpperCase() || '';
-          if (rawSenderType === 'COACH') {
+          const rawSenderType = message?.sender_type;
+          if (rawSenderType && typeof rawSenderType === 'string' && rawSenderType.toUpperCase() === 'COACH') {
             senderType = 'coach';
           }
 
-          // Simple attachments handling
           const messageAttachments = Array.isArray(attachmentsData)
             ? attachmentsData.filter(att => att && att.message_id === message?.id)
             : [];
@@ -202,7 +195,6 @@ export const MessageService = {
           };
         } catch (error) {
           console.error(`Error formatting message ${index}:`, error, message);
-          // Return a safe fallback message
           return {
             id: message?.id?.toString() || Math.random().toString(),
             conversation_id: message?.conversation_id?.toString() || '',
@@ -225,39 +217,6 @@ export const MessageService = {
     }
   },
 
-  async insertMessage(conversationId: string, senderId: string, senderType: string, content: string) {
-    const { data: message, error } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: senderId,
-        sender_type: senderType,
-        content: content,
-        message_type: 'text'
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error inserting message:', error);
-      throw error;
-    }
-
-    return message;
-  },
-
-  async updateConversationTimestamp(conversationId: string) {
-    const { error } = await supabase
-      .from('conversations')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', conversationId);
-
-    if (error) {
-      console.error('Error updating conversation timestamp:', error);
-      throw error;
-    }
-  },
-
   async sendMessage(conversationId: string, content: string, attachments: File[] = []) {
     if (!conversationId || !content) {
       throw new Error('Conversation ID and content are required');
@@ -274,7 +233,6 @@ export const MessageService = {
       .eq('id', user.id)
       .single();
 
-    // Simple role handling - keep uppercase for database format
     const senderType = profile?.role === 'COACH' ? 'COACH' : 'MENTEE';
 
     const { data: message, error } = await supabase
@@ -294,11 +252,11 @@ export const MessageService = {
       throw error;
     }
 
-    // Handle attachments if provided
-    if (Array.isArray(attachments) && attachments.length > 0) {
-      // Process attachments (implementation would depend on your file upload strategy)
-      console.log('Processing attachments:', attachments.length);
-    }
+    // Update conversation timestamp
+    await supabase
+      .from('conversations')
+      .update({ updated_at: new Date().toISOString() })
+      .eq('id', conversationId);
 
     return message;
   }

@@ -13,13 +13,11 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
   const channelIdRef = useRef<string | null>(null);
   const callbackRef = useRef(onMessageReceived);
 
-  // Stable conversation ID reference
   const stableConversationId = useRef<string | null>(null);
   if (stableConversationId.current !== conversationId) {
     stableConversationId.current = conversationId;
   }
 
-  // Update callback ref when it changes
   useEffect(() => {
     callbackRef.current = onMessageReceived;
   }, [onMessageReceived]);
@@ -27,13 +25,11 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
   const cleanup = useCallback(async () => {
     console.log('Cleaning up messages realtime subscription');
     
-    // Clear any pending retry
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
 
-    // Clean up existing channel
     if (channelRef.current) {
       try {
         await supabase.removeChannel(channelRef.current);
@@ -47,21 +43,19 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
     isSubscribedRef.current = false;
     isSubscribingRef.current = false;
     channelIdRef.current = null;
-  }, []); // No dependencies to break circular reference
+  }, []);
 
   const setupChannel = useCallback(async (targetConversationId: string) => {
-    // Prevent multiple simultaneous subscription attempts or loops
     if (
       isSubscribingRef.current || 
       (isSubscribedRef.current && currentConversationRef.current === targetConversationId) || 
       !isMountedRef.current ||
-      channelIdRef.current // Already have an active channel
+      channelIdRef.current
     ) {
       console.log('Skipping messages subscription - already subscribing/subscribed or unmounted');
       return;
     }
 
-    // Check retry limit
     if (retryCountRef.current >= 3) {
       console.log('Max retry attempts reached for messages subscription');
       return;
@@ -72,7 +66,6 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
     currentConversationRef.current = targetConversationId;
 
     try {
-      // Check authentication first
       const { data: { session } } = await supabase.auth.getSession();
       if (!session || !isMountedRef.current) {
         console.log('No session or component unmounted, skipping messages subscription');
@@ -80,7 +73,6 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
         return;
       }
 
-      // Clean up any existing channel first
       await cleanup();
 
       if (!isMountedRef.current || currentConversationRef.current !== targetConversationId) {
@@ -89,13 +81,12 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
         return;
       }
 
-      // Generate unique channel name with timestamp to avoid conflicts
       const timestamp = Date.now();
       const channelName = `messages-${targetConversationId}-${session.user.id}-${timestamp}`;
       channelIdRef.current = channelName;
       console.log('Creating messages channel:', channelName);
 
-      const channel = supabase
+      const channel =  channel = supabase
         .channel(channelName, {
           config: {
             broadcast: { self: true },
@@ -172,13 +163,11 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
         }, retryDelay);
       }
     }
-  }, [cleanup]); // Only cleanup as dependency
+  }, [cleanup]);
 
-  // Effect for handling conversation changes
   useEffect(() => {
     console.log(`Messages conversation changed to: ${conversationId}`);
     
-    // Reset retry count on conversation change
     retryCountRef.current = 0;
 
     if (!conversationId) {
@@ -188,13 +177,11 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
       return;
     }
 
-    // Only proceed if conversation actually changed
     if (currentConversationRef.current === conversationId) {
       console.log('Same conversation for messages, skipping setup');
       return;
     }
 
-    // Setup subscription with a small delay to prevent conflicts
     const setupTimeout = setTimeout(() => {
       if (isMountedRef.current && stableConversationId.current === conversationId) {
         setupChannel(conversationId);
@@ -204,9 +191,8 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
     return () => {
       clearTimeout(setupTimeout);
     };
-  }, [conversationId]); // Only depend on conversationId
+  }, [conversationId]);
 
-  // Separate effect for cleanup on unmount
   useEffect(() => {
     isMountedRef.current = true;
     
@@ -215,5 +201,5 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
       isMountedRef.current = false;
       cleanup();
     };
-  }, []); // Empty dependency array - only run on mount/unmount
+  }, []);
 };

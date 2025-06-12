@@ -12,7 +12,6 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
   const channelIdRef = useRef<string | null>(null);
   const callbackRef = useRef(onConversationChanged);
 
-  // Update callback ref when it changes
   useEffect(() => {
     callbackRef.current = onConversationChanged;
   }, [onConversationChanged]);
@@ -20,13 +19,11 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
   const cleanup = useCallback(async () => {
     console.log('Cleaning up conversations realtime subscription');
     
-    // Clear any pending retry
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
 
-    // Clean up existing channel
     if (channelRef.current) {
       try {
         await supabase.removeChannel(channelRef.current);
@@ -40,16 +37,14 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
     isSubscribedRef.current = false;
     isSubscribingRef.current = false;
     channelIdRef.current = null;
-  }, []); // No dependencies to break circular reference
+  }, []);
 
   const setupChannel = useCallback(async () => {
-    // Prevent multiple simultaneous subscription attempts
     if (isSubscribingRef.current || isSubscribedRef.current || !isMountedRef.current) {
       console.log('Skipping subscription - already subscribing/subscribed or unmounted');
       return;
     }
 
-    // Check retry limit
     if (retryCountRef.current >= 3) {
       console.log('Max retry attempts reached for conversations subscription');
       return;
@@ -59,7 +54,6 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
     isSubscribingRef.current = true;
 
     try {
-      // Check authentication first
       const { data: { session } } = await supabase.auth.getSession();
       if (!session || !isMountedRef.current) {
         console.log('No session or component unmounted, skipping subscription');
@@ -67,7 +61,6 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
         return;
       }
 
-      // Clean up any existing channel first
       await cleanup();
 
       if (!isMountedRef.current) {
@@ -76,7 +69,6 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
         return;
       }
 
-      // Generate unique channel name with timestamp to avoid conflicts
       const timestamp = Date.now();
       const channelName = `conversations-changes-${session.user.id}-${timestamp}`;
       channelIdRef.current = channelName;
@@ -158,14 +150,13 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
         }, retryDelay);
       }
     }
-  }, [cleanup]); // Only cleanup as dependency
+  }, [cleanup]);
 
   useEffect(() => {
     isMountedRef.current = true;
     retryCountRef.current = 0;
     console.log('Initializing conversations realtime subscription');
     
-    // Small delay to prevent immediate conflicts
     const initTimeout = setTimeout(() => {
       if (isMountedRef.current) {
         setupChannel();
@@ -178,5 +169,5 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
       isMountedRef.current = false;
       cleanup();
     };
-  }, []); // Empty dependency array to run only once
+  }, []);
 };

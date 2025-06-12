@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation } from '@/hooks/useConversations';
 
@@ -18,9 +19,7 @@ export const ConversationService = {
   async fetchConversationsData(userId: string, userRole: string) {
     console.log('fetchConversationsData called with:', { userId, userRole });
     
-    // Simple role handling - keep uppercase to match database
     const safeUserRole = userRole || 'MENTEE';
-    
     console.log('Safe user role:', safeUserRole);
     
     let query = supabase
@@ -60,19 +59,6 @@ export const ConversationService = {
     return lastMessage;
   },
 
-  async getUnreadCount(conversationId: string, userId: string) {
-    if (!conversationId || !userId) return 0;
-    
-    const { count: unreadCount } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact' })
-      .eq('conversation_id', conversationId)
-      .eq('read_status', false)
-      .neq('sender_id', userId);
-
-    return unreadCount || 0;
-  },
-
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
     console.log('formatConversations called with:', { conversationsDataLength: conversationsData?.length, userId });
     
@@ -85,7 +71,6 @@ export const ConversationService = {
         try {
           console.log(`Processing conversation ${index}:`, conv);
           
-          // Simple profile handling with null checks
           const mentee = conv?.profiles;
           console.log('Mentee profile:', mentee);
           
@@ -95,23 +80,20 @@ export const ConversationService = {
           console.log(`Names extracted - firstName: "${firstName}", lastName: "${lastName}"`);
           const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
 
-          // Simple conversation data handling
           const conversationId = conv?.id;
           const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
-          const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
 
           const formattedConv = {
             ...conv,
             mentee_name: menteeName,
             last_message: lastMessage?.content?.trim() || '',
-            unread_count: unreadCount
+            unread_count: 0
           };
           
           console.log(`Formatted conversation ${index}:`, formattedConv);
           return formattedConv;
         } catch (error) {
           console.error(`Error formatting conversation ${index}:`, error, conv);
-          // Return a safe fallback conversation
           return {
             id: conv?.id || '',
             mentee_id: conv?.mentee_id || '',
@@ -130,7 +112,6 @@ export const ConversationService = {
   },
 
   async createNewConversation(userId: string, subject: string) {
-    // Validate inputs
     if (!userId || !subject) {
       throw new Error('User ID and subject are required');
     }
