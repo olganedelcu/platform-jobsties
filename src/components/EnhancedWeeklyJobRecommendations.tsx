@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, Clock, CheckSquare, Archive, List } from 'lucide-react';
 import { useJobRecommendationArchive } from '@/hooks/useJobRecommendationArchive';
+import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import EnhancedRecommendationCard from './job-recommendations/EnhancedRecommendationCard';
 import EmptyState from './job-recommendations/EmptyState';
@@ -36,6 +37,15 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
     userId,
     isCoach: false,
     onRecommendationUpdated: () => fetchAllRecommendations()
+  });
+
+  // Use the job recommendation actions hook for adding to job applications
+  const { markAsApplied: addToJobTracker } = useJobRecommendationActions({ 
+    user: { id: userId },
+    onApplicationAdded: () => {
+      console.log('Job application added successfully');
+      fetchAllRecommendations();
+    }
   });
 
   const fetchAllRecommendations = async () => {
@@ -91,30 +101,41 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
     }
   };
 
-  // Enhanced handlers with validation
-  const handleMarkAsAppliedWithValidation = async (recommendation: JobRecommendation) => {
-    console.log('Attempting to mark as applied:', recommendation);
+  // Enhanced handler that both marks as applied AND adds to job tracker
+  const handleMarkAsAppliedWithJobTracker = async (recommendation: JobRecommendation) => {
+    console.log('Attempting to mark as applied and add to job tracker:', recommendation);
     
     // Verify the recommendation exists in our current data
     const exists = recommendations.all.find(rec => rec.id === recommendation.id);
     if (!exists) {
       console.error('Recommendation not found in current data:', recommendation.id);
-      // Refresh data and try again
       await fetchAllRecommendations();
       return;
     }
     
-    await handleMarkAsApplied(recommendation);
+    try {
+      // First, add to job applications tracker
+      console.log('Adding recommendation to job tracker...');
+      await addToJobTracker(recommendation);
+      
+      // Then, mark the recommendation as applied in the recommendations system
+      console.log('Marking recommendation as applied...');
+      await handleMarkAsApplied(recommendation);
+      
+      console.log('Successfully completed both operations');
+    } catch (error) {
+      console.error('Error in combined operation:', error);
+      // If there's an error, still refresh the data to ensure consistency
+      await fetchAllRecommendations();
+    }
   };
 
   const handleArchiveWithValidation = async (recommendationId: string) => {
     console.log('Attempting to archive:', recommendationId);
     
-    // Verify the recommendation exists in our current data
     const exists = recommendations.all.find(rec => rec.id === recommendationId);
     if (!exists) {
       console.error('Recommendation not found in current data:', recommendationId);
-      // Refresh data and try again
       await fetchAllRecommendations();
       return;
     }
@@ -125,11 +146,9 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
   const handleReactivateWithValidation = async (recommendationId: string) => {
     console.log('Attempting to reactivate:', recommendationId);
     
-    // Verify the recommendation exists in our current data
     const exists = recommendations.all.find(rec => rec.id === recommendationId);
     if (!exists) {
       console.error('Recommendation not found in current data:', recommendationId);
-      // Refresh data and try again
       await fetchAllRecommendations();
       return;
     }
@@ -157,7 +176,7 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
             key={recommendation.id}
             recommendation={recommendation}
             onViewJob={handleViewJob}
-            onMarkAsApplied={handleMarkAsAppliedWithValidation}
+            onMarkAsApplied={handleMarkAsAppliedWithJobTracker}
             onArchive={handleArchiveWithValidation}
             onReactivate={handleReactivateWithValidation}
             loading={actionLoading}
