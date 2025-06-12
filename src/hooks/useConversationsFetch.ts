@@ -11,19 +11,24 @@ export const useConversationsFetch = () => {
   const { toast } = useToast();
 
   const validateSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return false;
-    if (!session.user) return false;
-    if (!session.access_token) return false;
-    if (!session.refresh_token) return false;
-    
-    // Check if session is expired
-    const now = Math.floor(Date.now() / 1000);
-    if (session.expires_at && session.expires_at < now) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return false;
+      if (!session.user) return false;
+      if (!session.access_token) return false;
+      if (!session.refresh_token) return false;
+      
+      // Check if session is expired
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at && session.expires_at < now) {
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Session validation error:', error);
       return false;
     }
-    
-    return true;
   };
 
   const fetchConversations = useCallback(async () => {
@@ -50,7 +55,7 @@ export const useConversationsFetch = () => {
       const conversationsData = await ConversationService.fetchConversationsData(user.id, profile?.role || 'MENTEE');
       const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
 
-      setConversations(formattedConversations);
+      setConversations(formattedConversations || []);
     } catch (error) {
       console.error('Error in fetchConversations:', error);
       toast({

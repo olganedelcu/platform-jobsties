@@ -43,17 +43,23 @@ class SecureErrorHandler {
   };
 
   static sanitizeMessage(message: string): string {
-    // Add null/undefined safety checks
+    // Add comprehensive safety checks
     if (!message || typeof message !== 'string') {
       return 'Unknown error occurred';
     }
     
     let sanitized = message;
     
-    // Remove sensitive information
-    this.sensitivePatterns.forEach(pattern => {
-      sanitized = sanitized.replace(pattern, '[REDACTED]');
-    });
+    // Remove sensitive information with error handling
+    try {
+      this.sensitivePatterns.forEach(pattern => {
+        if (pattern && typeof pattern.replace === 'function') {
+          sanitized = sanitized.replace(pattern, '[REDACTED]');
+        }
+      });
+    } catch (patternError) {
+      console.warn('Error applying sensitive pattern filters:', patternError);
+    }
 
     // Limit message length
     if (sanitized.length > 200) {
@@ -64,41 +70,59 @@ class SecureErrorHandler {
   }
 
   static categorizeError(error: Error | any): string {
-    // Add safety checks for error message
-    const message = (error?.message && typeof error.message === 'string') 
-      ? error.message.toLowerCase() 
-      : '';
-    const status = error?.status || error?.code;
+    // Comprehensive safety checks for all error properties
+    let message = '';
+    let status = null;
 
-    if (status === 401 || message.includes('unauthorized')) {
-      return 'UNAUTHORIZED';
+    try {
+      // Safely extract message
+      if (error && typeof error === 'object') {
+        if (error.message && typeof error.message === 'string') {
+          message = error.message.toLowerCase();
+        }
+        // Safely extract status
+        status = error.status || error.code || null;
+      }
+    } catch (extractionError) {
+      console.warn('Error extracting error properties:', extractionError);
+      message = '';
+      status = null;
     }
-    if (status === 403 || message.includes('forbidden')) {
-      return 'FORBIDDEN';
-    }
-    if (status === 404 || message.includes('not found')) {
-      return 'NOT_FOUND';
-    }
-    if (status === 408 || message.includes('timeout')) {
-      return 'TIMEOUT_ERROR';
-    }
-    if (message.includes('network') || message.includes('fetch')) {
-      return 'NETWORK_ERROR';
-    }
-    if (message.includes('validation') || message.includes('invalid')) {
-      return 'VALIDATION_ERROR';
-    }
-    if (message.includes('calendar')) {
-      return 'CALENDAR_ERROR';
-    }
-    if (message.includes('upload') || message.includes('file')) {
-      return 'FILE_UPLOAD_ERROR';
-    }
-    if (message.includes('auth') || message.includes('login')) {
-      return 'AUTHENTICATION_ERROR';
-    }
-    if (message.includes('database') || message.includes('sql')) {
-      return 'DATABASE_ERROR';
+
+    // Safe string operations with additional checks
+    try {
+      if (status === 401 || (message && message.includes('unauthorized'))) {
+        return 'UNAUTHORIZED';
+      }
+      if (status === 403 || (message && message.includes('forbidden'))) {
+        return 'FORBIDDEN';
+      }
+      if (status === 404 || (message && message.includes('not found'))) {
+        return 'NOT_FOUND';
+      }
+      if (status === 408 || (message && message.includes('timeout'))) {
+        return 'TIMEOUT_ERROR';
+      }
+      if (message && (message.includes('network') || message.includes('fetch'))) {
+        return 'NETWORK_ERROR';
+      }
+      if (message && (message.includes('validation') || message.includes('invalid'))) {
+        return 'VALIDATION_ERROR';
+      }
+      if (message && message.includes('calendar')) {
+        return 'CALENDAR_ERROR';
+      }
+      if (message && (message.includes('upload') || message.includes('file'))) {
+        return 'FILE_UPLOAD_ERROR';
+      }
+      if (message && (message.includes('auth') || message.includes('login'))) {
+        return 'AUTHENTICATION_ERROR';
+      }
+      if (message && (message.includes('database') || message.includes('sql'))) {
+        return 'DATABASE_ERROR';
+      }
+    } catch (categorizationError) {
+      console.warn('Error categorizing error:', categorizationError);
     }
     
     return 'SERVER_ERROR';
