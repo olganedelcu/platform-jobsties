@@ -106,15 +106,24 @@ export const MessageService = {
         return profile && 
                typeof profile === 'object' && 
                profile.email && 
-               typeof profile.email === 'string';
+               typeof profile.email === 'string' &&
+               profile.email.trim() !== '';
       });
       
       console.log('Searching for coach profile with email:', safeCoachEmail);
       console.log('Valid profiles count:', validProfiles.length);
+      console.log('Valid profiles:', validProfiles.map(p => ({ id: p.id, email: p.email })));
       
       const foundProfile = validProfiles.find(profile => {
         try {
+          // Double-check that profile.email exists and is a string before processing
+          if (!profile.email || typeof profile.email !== 'string') {
+            console.warn('Profile email is invalid:', profile);
+            return false;
+          }
+          
           const profileEmail = SecureErrorHandler.safeStringOperation(profile.email, 'toLowerCase', '');
+          console.log('Comparing:', profileEmail, 'with', safeCoachEmail);
           return profileEmail === safeCoachEmail;
         } catch (error) {
           console.warn('Error processing profile email:', error, profile);
