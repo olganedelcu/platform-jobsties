@@ -38,11 +38,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const isInitializedRef = useRef(false);
   const mountedRef = useRef(true);
 
+  const validateSession = (session: any) => {
+    if (!session) return false;
+    if (!session.user) return false;
+    if (!session.access_token) return false;
+    if (!session.refresh_token) return false;
+    
+    // Check if session is expired
+    const now = Math.floor(Date.now() / 1000);
+    if (session.expires_at && session.expires_at < now) {
+      return false;
+    }
+    
+    return true;
+  };
+
   const fetchNotifications = useCallback(async (userId: string) => {
     if (!userId || !mountedRef.current) return;
     
     try {
-      console.log('Fetching notifications for user:', userId);
+      console.log('Fetching notifications for authenticated user:', userId);
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -160,7 +175,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     try {
-      console.log('Setting up notification realtime subscription for user:', userId);
+      console.log('Setting up notification realtime subscription for authenticated user:', userId);
       
       const channel = supabase
         .channel(`notifications-${userId}-${Date.now()}`)
@@ -222,12 +237,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (isInitializedRef.current) return;
       
       try {
-        // Get initial session
+        // Get initial session and validate it
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (session?.user && mountedRef.current) {
+        if (session && validateSession(session) && mountedRef.current) {
           const userId = session.user.id;
-          console.log('Initializing notifications for user:', userId);
+          console.log('Initializing notifications for authenticated user:', userId);
           
           setCurrentUserId(userId);
           await fetchNotifications(userId);
@@ -235,22 +250,27 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           
           isInitializedRef.current = true;
         } else {
+          console.log('No valid session found, notifications remain uninitialized');
           setLoading(false);
+          setCurrentUserId(null);
+          setNotifications([]);
         }
 
         // Set up auth listener for subsequent changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Auth state change:', event, session?.user?.id);
+            console.log('Notification context - Auth state change:', event, session?.user?.id);
             
-            if (event === 'SIGNED_OUT' || !session?.user) {
+            if (event === 'SIGNED_OUT' || !session || !validateSession(session)) {
+              console.log('User signed out or invalid session, cleaning up notifications');
               cleanupSubscription();
               setCurrentUserId(null);
               setNotifications([]);
               setLoading(false);
               isInitializedRef.current = false;
-            } else if (event === 'SIGNED_IN' && !isInitializedRef.current) {
+            } else if (event === 'SIGNED_IN' && validateSession(session) && !isInitializedRef.current) {
               const userId = session.user.id;
+              console.log('User signed in, initializing notifications for:', userId);
               setCurrentUserId(userId);
               await fetchNotifications(userId);
               await setupRealtimeSubscription(userId);
