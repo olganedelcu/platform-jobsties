@@ -61,7 +61,7 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
       return true;
     }
 
-    // Create assignments for all unassigned mentees
+    // Create assignments for all unassigned mentees using upsert to prevent duplicates
     const assignments = unassignedMentees.map(mentee => ({
       coach_id: user.id,
       mentee_id: mentee.id,
@@ -70,25 +70,19 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
 
     const { error: assignmentError } = await supabase
       .from('coach_mentee_assignments')
-      .insert(assignments);
+      .upsert(assignments, { 
+        onConflict: 'coach_id,mentee_id',
+        ignoreDuplicates: true 
+      });
 
     if (assignmentError) {
-      // Only show error if it's not a duplicate key constraint
-      if (assignmentError.code !== '23505') {
-        toast({
-          title: "Error",
-          description: "Failed to assign mentees.",
-          variant: "destructive"
-        });
-        return false;
-      } else {
-        // This means some assignments already exist, which is fine
-        toast({
-          title: "Info",
-          description: `All ${allMentees.length} mentees are now properly assigned.`,
-        });
-        return true;
-      }
+      console.error('Assignment error:', assignmentError);
+      toast({
+        title: "Error",
+        description: "Failed to assign mentees.",
+        variant: "destructive"
+      });
+      return false;
     }
 
     toast({
@@ -97,6 +91,7 @@ export const assignAllMenteesToCurrentCoach = async (toast: ReturnType<typeof us
     });
     return true;
   } catch (error) {
+    console.error('Error in assignAllMenteesToCurrentCoach:', error);
     toast({
       title: "Error",
       description: "Failed to assign mentees.",
