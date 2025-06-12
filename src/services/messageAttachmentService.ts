@@ -43,7 +43,7 @@ export const MessageAttachmentService = {
   async downloadAttachment(attachment: MessageAttachment) {
     const { data, error } = await supabase.storage
       .from('message-attachments')
-      .download(attachment.file_path);
+      .download(attachment.file_url);
 
     if (error) {
       console.error('Error downloading attachment:', error);
