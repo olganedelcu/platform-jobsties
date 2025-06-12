@@ -16,6 +16,7 @@ const MessagingInterface = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [showNewConversationDialog, setShowNewConversationDialog] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
 
   const {
     conversations,
@@ -42,6 +43,14 @@ const MessagingInterface = () => {
     getCurrentUser();
   }, []);
 
+  // Calculate total unread count from conversations
+  useEffect(() => {
+    const total = conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+    setTotalUnreadCount(total);
+    console.log('Total unread count from conversations:', total);
+    console.log('Unread count from notifications:', unreadCount);
+  }, [conversations, unreadCount]);
+
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   const handleCreateConversation = async (subject: string, initialMessage?: string) => {
@@ -62,10 +71,35 @@ const MessagingInterface = () => {
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead();
-    // Refresh conversations to update unread counts
-    await fetchConversations();
+    try {
+      // Mark all notifications as read
+      await markAllAsRead();
+      
+      // Also mark all messages as read for the current user
+      if (currentUserId) {
+        const conversationIds = conversations.map(c => c.id);
+        if (conversationIds.length > 0) {
+          const { error } = await supabase
+            .from('messages')
+            .update({ read_status: true })
+            .in('conversation_id', conversationIds)
+            .neq('sender_id', currentUserId);
+          
+          if (error) {
+            console.error('Error marking messages as read:', error);
+          }
+        }
+      }
+      
+      // Refresh conversations to update unread counts
+      await fetchConversations();
+    } catch (error) {
+      console.error('Error in handleMarkAllRead:', error);
+    }
   };
+
+  // Show button if there are unread messages OR notifications
+  const showUpToDateButton = totalUnreadCount > 0 || unreadCount > 0;
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
@@ -74,14 +108,14 @@ const MessagingInterface = () => {
           <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
           <p className="text-gray-500 mt-2">Communicate with your coach</p>
         </div>
-        {unreadCount > 0 && (
+        {showUpToDateButton && (
           <Button 
             onClick={handleMarkAllRead}
             variant="outline"
             className="flex items-center gap-2"
           >
             <CheckCheck className="h-4 w-4" />
-            Up To Date
+            Up To Date ({totalUnreadCount + unreadCount})
           </Button>
         )}
       </div>
