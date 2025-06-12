@@ -6,7 +6,7 @@ import { Conversation } from './useConversations';
 
 export const useConversationsFetch = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed from true to false to prevent initial infinite loading
   const { toast } = useToast();
 
   const fetchConversations = async () => {
@@ -14,7 +14,10 @@ export const useConversationsFetch = () => {
       setLoading(true);
       
       const userProfile = await ConversationService.getCurrentUserProfile();
-      if (!userProfile) return;
+      if (!userProfile) {
+        setLoading(false);
+        return;
+      }
 
       const { user, profile } = userProfile;
       const conversationsData = await ConversationService.fetchConversationsData(user.id, profile?.role || 'MENTEE');

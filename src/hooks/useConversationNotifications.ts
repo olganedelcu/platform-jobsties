@@ -1,9 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useConversationNotifications = (conversationId: string | null) => {
   const [unreadCount, setUnreadCount] = useState(0);
+  const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   const fetchUnreadCount = async () => {
     if (!conversationId) {
@@ -34,27 +36,83 @@ export const useConversationNotifications = (conversationId: string | null) => {
   };
 
   useEffect(() => {
+    if (!conversationId) {
+      setUnreadCount(0);
+      // Clean up channel if no conversation
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+      return;
+    }
+
     fetchUnreadCount();
 
-    // Set up real-time subscription for notifications
-    const notificationsChannel = supabase
-      .channel(`conversation-notifications-${conversationId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `conversation_id=eq.${conversationId}`
-        },
-        () => {
-          fetchUnreadCount();
+    const setupChannel = async () => {
+      // Clean up any existing channel
+      if (channelRef.current) {
+        await supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+
+      try {
+        // Check if user is authenticated before setting up realtime
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.log('No session available for notifications realtime subscription');
+          return;
         }
-      )
-      .subscribe();
+
+        const channel = supabase
+          .channel(`conversation-notifications-${conversationId}`, {
+            config: {
+              broadcast: { self: true },
+              presence: { key: session.user.id }
+            }
+          })
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'notifications',
+              filter: `conversation_id=eq.${conversationId}`
+            },
+            (payload) => {
+              console.log('Notification change detected:', payload);
+              fetchUnreadCount();
+            }
+          )
+          .subscribe((status) => {
+            console.log('Notification subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              isSubscribedRef.current = true;
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.error('Notification subscription failed:', status);
+              isSubscribedRef.current = false;
+              // Retry after a delay
+              setTimeout(setupChannel, 3000);
+            }
+          });
+
+        channelRef.current = channel;
+      } catch (error) {
+        console.error('Error setting up notification realtime:', error);
+        // Retry after a delay
+        setTimeout(setupChannel, 5000);
+      }
+    };
+
+    setupChannel();
 
     return () => {
-      supabase.removeChannel(notificationsChannel);
+      if (channelRef.current && isSubscribedRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
     };
   }, [conversationId]);
 
