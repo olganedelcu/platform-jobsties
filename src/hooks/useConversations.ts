@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { ConversationService } from '@/services/conversationService';
+import React, { useCallback } from 'react';
+import { useConversationsFetch } from './useConversationsFetch';
+import { useConversationsActions } from './useConversationsActions';
+import { useConversationsRealtime } from './useConversationsRealtime';
 
 export interface Conversation {
   id: string;
@@ -18,99 +18,27 @@ export interface Conversation {
 }
 
 export const useConversations = () => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    conversations,
+    loading,
+    fetchConversations
+  } = useConversationsFetch();
 
-  const fetchConversations = async () => {
-    try {
-      setLoading(true);
-      
-      const userProfile = await ConversationService.getCurrentUserProfile();
-      if (!userProfile) return;
-
-      const { user, profile } = userProfile;
-      const conversationsData = await ConversationService.fetchConversationsData(user.id, profile?.role || 'MENTEE');
-      const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
-
-      setConversations(formattedConversations);
-    } catch (error) {
-      console.error('Error in fetchConversations:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load conversations.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createConversation = async (subject: string) => {
-    try {
-      const userProfile = await ConversationService.getCurrentUserProfile();
-      if (!userProfile) return null;
-
-      const data = await ConversationService.createNewConversation(userProfile.user.id, subject);
-
-      toast({
-        title: "Success",
-        description: "Conversation created successfully.",
-      });
-
-      await fetchConversations();
-      return data;
-    } catch (error) {
-      console.error('Error in createConversation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create conversation.",
-        variant: "destructive"
-      });
-      return null;
-    }
-  };
-
-  const updateConversationStatus = async (conversationId: string, status: 'active' | 'archived' | 'closed') => {
-    try {
-      await ConversationService.updateConversationStatus(conversationId, status);
-      await fetchConversations();
-      toast({
-        title: "Success",
-        description: "Conversation status updated.",
-      });
-    } catch (error) {
-      console.error('Error in updateConversationStatus:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update conversation status.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  useEffect(() => {
+  const handleConversationsUpdated = useCallback(() => {
     fetchConversations();
+  }, [fetchConversations]);
 
-    const conversationsChannel = supabase
-      .channel('conversations-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations'
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .subscribe();
+  const {
+    createConversation,
+    updateConversationStatus
+  } = useConversationsActions(handleConversationsUpdated);
 
-    return () => {
-      supabase.removeChannel(conversationsChannel);
-    };
-  }, []);
+  useConversationsRealtime(handleConversationsUpdated);
+
+  // Initialize conversations on mount
+  React.useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
 
   return {
     conversations,
