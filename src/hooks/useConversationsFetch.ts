@@ -13,10 +13,7 @@ export const useConversationsFetch = () => {
   const validateSession = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return false;
-      if (!session.user) return false;
-      if (!session.access_token) return false;
-      if (!session.refresh_token) return false;
+      if (!session?.user?.access_token?.refresh_token) return false;
       
       // Check if session is expired
       const now = Math.floor(Date.now() / 1000);
@@ -44,7 +41,7 @@ export const useConversationsFetch = () => {
       setLoading(true);
       
       const userProfile = await ConversationService.getCurrentUserProfile();
-      if (!userProfile) {
+      if (!userProfile?.user?.id) {
         console.log('No user profile found, user not authenticated');
         setLoading(false);
         return;
@@ -52,10 +49,14 @@ export const useConversationsFetch = () => {
 
       console.log('Fetching conversations for authenticated user:', userProfile.user.id);
       const { user, profile } = userProfile;
-      const conversationsData = await ConversationService.fetchConversationsData(user.id, profile?.role || 'MENTEE');
+      
+      // Safely handle role with fallback
+      const userRole = (profile?.role || 'MENTEE').toString();
+      
+      const conversationsData = await ConversationService.fetchConversationsData(user.id, userRole);
       const formattedConversations = await ConversationService.formatConversations(conversationsData, user.id);
 
-      setConversations(formattedConversations || []);
+      setConversations(Array.isArray(formattedConversations) ? formattedConversations : []);
     } catch (error) {
       console.error('Error in fetchConversations:', error);
       toast({
@@ -63,6 +64,8 @@ export const useConversationsFetch = () => {
         description: "Failed to load conversations.",
         variant: "destructive"
       });
+      // Set empty array on error to prevent further crashes
+      setConversations([]);
     } finally {
       setLoading(false);
     }

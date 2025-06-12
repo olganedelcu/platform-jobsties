@@ -17,6 +17,10 @@ export const ConversationService = {
   },
 
   async fetchConversationsData(userId: string, userRole: string) {
+    // Ensure userRole is a valid string
+    const safeUserRole = (userRole || '').toLowerCase();
+    const safeMenteeRole = 'mentee';
+    
     let query = supabase
       .from('conversations')
       .select(`
@@ -25,7 +29,7 @@ export const ConversationService = {
       `)
       .order('updated_at', { ascending: false });
 
-    if (userRole === 'MENTEE') {
+    if (safeUserRole === safeMenteeRole) {
       query = query.eq('mentee_id', userId);
     }
 
@@ -40,6 +44,8 @@ export const ConversationService = {
   },
 
   async getLastMessage(conversationId: string) {
+    if (!conversationId) return null;
+    
     const { data: lastMessage } = await supabase
       .from('messages')
       .select('content, created_at')
@@ -52,6 +58,8 @@ export const ConversationService = {
   },
 
   async getUnreadCount(conversationId: string, userId: string) {
+    if (!conversationId || !userId) return 0;
+    
     const { count: unreadCount } = await supabase
       .from('messages')
       .select('*', { count: 'exact' })
@@ -63,18 +71,27 @@ export const ConversationService = {
   },
 
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
+    if (!Array.isArray(conversationsData) || !userId) {
+      return [];
+    }
+
     return Promise.all(
       conversationsData.map(async (conv: any) => {
-        const mentee = conv.profiles;
-        const menteeName = mentee ? `${mentee.first_name} ${mentee.last_name}` : 'Unknown';
+        // Safely handle profile data with null checks
+        const mentee = conv?.profiles;
+        const firstName = (mentee?.first_name || '').toString();
+        const lastName = (mentee?.last_name || '').toString();
+        const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
 
-        const lastMessage = await this.getLastMessage(conv.id);
-        const unreadCount = await this.getUnreadCount(conv.id, userId);
+        // Safely handle conversation data
+        const conversationId = conv?.id;
+        const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
+        const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
 
         return {
           ...conv,
           mentee_name: menteeName,
-          last_message: lastMessage?.content || '',
+          last_message: (lastMessage?.content || '').toString(),
           unread_count: unreadCount
         };
       })
@@ -82,11 +99,16 @@ export const ConversationService = {
   },
 
   async createNewConversation(userId: string, subject: string) {
+    // Validate inputs
+    if (!userId || !subject) {
+      throw new Error('User ID and subject are required');
+    }
+
     const { data, error } = await supabase
       .from('conversations')
       .insert({
         mentee_id: userId,
-        subject,
+        subject: subject.toString(),
         coach_email: 'ana@jobsties.com'
       })
       .select()
@@ -101,6 +123,10 @@ export const ConversationService = {
   },
 
   async updateConversationStatus(conversationId: string, status: 'active' | 'archived' | 'closed') {
+    if (!conversationId || !status) {
+      throw new Error('Conversation ID and status are required');
+    }
+
     const { error } = await supabase
       .from('conversations')
       .update({ status })

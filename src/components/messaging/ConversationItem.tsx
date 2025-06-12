@@ -17,17 +17,37 @@ interface ConversationItemProps {
 
 const ConversationItem = ({ conversation, isSelected, onClick }: ConversationItemProps) => {
   const { getConversationUnreadCount } = useNotificationContext();
-  const unreadCount = getConversationUnreadCount(conversation.id);
+  
+  // Safely get unread count with fallback
+  const unreadCount = conversation?.id ? getConversationUnreadCount(conversation.id) : 0;
 
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    try {
+      if (!timestamp) return 'Unknown time';
+      
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      const now = new Date();
+      const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-    if (diffInMinutes < 1) return 'just now';
-    if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hour${Math.floor(diffInMinutes / 60) !== 1 ? 's' : ''} ago`;
-    return date.toLocaleDateString();
+      if (diffInMinutes < 1) return 'just now';
+      if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+      if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hour${Math.floor(diffInMinutes / 60) !== 1 ? 's' : ''} ago`;
+      return date.toLocaleDateString();
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return 'Unknown time';
+    }
+  };
+
+  // Safely handle conversation data with fallbacks
+  const safeConversation = {
+    id: (conversation?.id || '').toString(),
+    subject: (conversation?.subject || 'Untitled Conversation').toString(),
+    coach_email: (conversation?.coach_email || 'Unknown Coach').toString(),
+    updated_at: (conversation?.updated_at || '').toString(),
+    latest_message: (conversation?.latest_message || '').toString()
   };
 
   return (
@@ -40,20 +60,20 @@ const ConversationItem = ({ conversation, isSelected, onClick }: ConversationIte
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-gray-900">{conversation.subject}</h3>
+            <h3 className="font-medium text-gray-900">{safeConversation.subject}</h3>
             {unreadCount > 0 && (
               <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center text-xs">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </Badge>
             )}
           </div>
-          <p className="text-sm text-gray-500">with {conversation.coach_email}</p>
-          {conversation.latest_message && (
-            <p className="text-sm text-gray-600 truncate mt-1">{conversation.latest_message}</p>
+          <p className="text-sm text-gray-500">with {safeConversation.coach_email}</p>
+          {safeConversation.latest_message && (
+            <p className="text-sm text-gray-600 truncate mt-1">{safeConversation.latest_message}</p>
           )}
         </div>
         <div className="text-xs text-gray-400 ml-4">
-          {formatTime(conversation.updated_at)}
+          {formatTime(safeConversation.updated_at)}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 interface ErrorContext {
   component?: string;
   action?: string;
@@ -39,6 +40,8 @@ class SecureErrorHandler {
     CALENDAR_ERROR: 'Calendar operation failed. Please try again.',
     FILE_UPLOAD_ERROR: 'File upload failed. Please try again.',
     AUTHENTICATION_ERROR: 'Authentication failed. Please try again.',
+    DATA_PROCESSING_ERROR: 'Data processing failed. Please try again.',
+    STRING_PROCESSING_ERROR: 'Text processing failed. Please try again.',
   };
 
   static sanitizeMessage(message: string): string {
@@ -120,6 +123,12 @@ class SecureErrorHandler {
       if (message && (message.includes('database') || message.includes('sql'))) {
         return 'DATABASE_ERROR';
       }
+      if (message && (message.includes('tolowercase') || message.includes('undefined') || message.includes('cannot read properties'))) {
+        return 'STRING_PROCESSING_ERROR';
+      }
+      if (message && (message.includes('processing') || message.includes('formatting'))) {
+        return 'DATA_PROCESSING_ERROR';
+      }
     } catch (categorizationError) {
       console.warn('Error categorizing error:', categorizationError);
     }
@@ -164,6 +173,44 @@ class SecureErrorHandler {
       'FILE_UPLOAD_ERROR',
     ];
     return retryableErrors.includes(errorCode);
+  }
+
+  // Helper function to safely process strings
+  static safeStringOperation(value: any, operation: 'toLowerCase' | 'toUpperCase' | 'trim', fallback: string = ''): string {
+    try {
+      if (value === null || value === undefined) {
+        return fallback;
+      }
+      
+      const stringValue = typeof value === 'string' ? value : String(value);
+      
+      switch (operation) {
+        case 'toLowerCase':
+          return stringValue.toLowerCase();
+        case 'toUpperCase':
+          return stringValue.toUpperCase();
+        case 'trim':
+          return stringValue.trim();
+        default:
+          return stringValue;
+      }
+    } catch (error) {
+      console.warn(`Safe string operation failed for ${operation}:`, error);
+      return fallback;
+    }
+  }
+
+  // Helper function to safely process arrays
+  static safeArrayOperation<T>(value: any, fallback: T[] = []): T[] {
+    try {
+      if (Array.isArray(value)) {
+        return value;
+      }
+      return fallback;
+    } catch (error) {
+      console.warn('Safe array operation failed:', error);
+      return fallback;
+    }
   }
 }
 

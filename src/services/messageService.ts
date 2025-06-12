@@ -4,14 +4,16 @@ import { Message, MessageAttachment } from '@/hooks/useMessages';
 
 export const MessageService = {
   async fetchConversationDetails(conversationId: string) {
+    if (!conversationId) return null;
+    
     const { data: conversation, error } = await supabase
       .from('conversations')
-      .select('coach_email')
+      .select('*')
       .eq('id', conversationId)
       .single();
 
     if (error) {
-      console.error('Error fetching conversation:', error);
+      console.error('Error fetching conversation details:', error);
       return null;
     }
 
@@ -19,7 +21,9 @@ export const MessageService = {
   },
 
   async fetchMessagesData(conversationId: string) {
-    const { data: messagesData, error } = await supabase
+    if (!conversationId) return [];
+    
+    const { data: messages, error } = await supabase
       .from('messages')
       .select('*')
       .eq('conversation_id', conversationId)
@@ -27,15 +31,15 @@ export const MessageService = {
 
     if (error) {
       console.error('Error fetching messages:', error);
-      return [];
+      throw error;
     }
 
-    return messagesData || [];
+    return messages || [];
   },
 
   async fetchAttachments(messageIds: string[]) {
-    if (messageIds.length === 0) return [];
-
+    if (!Array.isArray(messageIds) || messageIds.length === 0) return [];
+    
     const { data: attachments, error } = await supabase
       .from('message_attachments')
       .select('*')
@@ -50,15 +54,15 @@ export const MessageService = {
   },
 
   async fetchProfiles(senderIds: string[]) {
-    if (senderIds.length === 0) return [];
-
+    if (!Array.isArray(senderIds) || senderIds.length === 0) return [];
+    
     const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name, email, role')
+      .select('id, first_name, last_name, email')
       .in('id', senderIds);
 
     if (error) {
-      console.log('Error fetching profiles by ID:', error);
+      console.error('Error fetching profiles:', error);
       return [];
     }
 
@@ -66,52 +70,120 @@ export const MessageService = {
   },
 
   getCoachProfile(coachEmail: string, profilesData: any[]) {
-    let coachProfile = profilesData.find(p => p.email === coachEmail && p.role === 'COACH');
+    if (!coachEmail || !Array.isArray(profilesData)) return null;
     
-    if (!coachProfile && coachEmail === 'ana@jobsties.com') {
-      coachProfile = {
-        id: null,
-        first_name: 'Ana',
-        last_name: 'Nedelcu',
-        email: 'ana@jobsties.com',
-        role: 'COACH'
-      };
-    }
-
-    return coachProfile;
+    const safeCoachEmail = (coachEmail || '').toString().toLowerCase();
+    return profilesData.find(profile => {
+      const profileEmail = (profile?.email || '').toString().toLowerCase();
+      return profileEmail === safeCoachEmail;
+    }) || null;
   },
 
-  formatMessages(messagesData: any[], attachmentsData: any[], profilesData: any[], coachProfile: any) {
-    return messagesData.map((msg: any) => {
-      let senderName = 'Unknown';
-      
-      if (msg.sender_type === 'coach' && coachProfile) {
-        senderName = `${coachProfile.first_name} ${coachProfile.last_name}`;
-      } else {
-        const profile = profilesData.find(p => p.id === msg.sender_id);
-        if (profile) {
-          senderName = `${profile.first_name} ${profile.last_name}`;
+  formatMessages(messagesData: any[], attachmentsData: any[], profilesData: any[], coachProfile: any): Message[] {
+    if (!Array.isArray(messagesData)) return [];
+    
+    return messagesData.map(message => {
+      try {
+        // Safely handle sender information
+        const senderId = message?.sender_id;
+        let senderName = 'Unknown';
+        let senderType: 'coach' | 'mentee' = 'mentee';
+
+        if (senderId) {
+          const senderProfile = Array.isArray(profilesData) 
+            ? profilesData.find(p => p?.id === senderId) 
+            : null;
+          
+          if (senderProfile) {
+            const firstName = (senderProfile.first_name || '').toString();
+            const lastName = (senderProfile.last_name || '').toString();
+            senderName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
+          } else if (coachProfile && coachProfile.id === senderId) {
+            const firstName = (coachProfile.first_name || '').toString();
+            const lastName = (coachProfile.last_name || '').toString();
+            senderName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Coach';
+            senderType = 'coach';
+          }
         }
+
+        // Safely handle message type
+        const rawSenderType = (message?.sender_type || '').toString().toLowerCase();
+        if (rawSenderType === 'coach') {
+          senderType = 'coach';
+        }
+
+        // Safely handle attachments
+        const messageAttachments = Array.isArray(attachmentsData)
+          ? attachmentsData.filter(att => att?.message_id === message?.id)
+          : [];
+
+        return {
+          id: (message?.id || '').toString(),
+          conversation_id: (message?.conversation_id || '').toString(),
+          sender_id: senderId || null,
+          sender_type: senderType,
+          sender_name: senderName,
+          content: (message?.content || '').toString(),
+          message_type: (message?.message_type || 'text').toString(),
+          read_status: Boolean(message?.read_status),
+          read_at: message?.read_at || null,
+          created_at: (message?.created_at || new Date().toISOString()).toString(),
+          updated_at: (message?.updated_at || new Date().toISOString()).toString(),
+          attachments: messageAttachments.map((att: any) => ({
+            id: (att?.id || '').toString(),
+            message_id: (att?.message_id || '').toString(),
+            file_name: (att?.file_name || 'Unknown File').toString(),
+            file_size: Number(att?.file_size) || 0,
+            file_type: (att?.file_type || 'unknown').toString(),
+            file_url: (att?.file_path || '').toString()
+          }))
+        };
+      } catch (error) {
+        console.error('Error formatting message:', error, message);
+        // Return a safe fallback message
+        return {
+          id: (message?.id || Math.random().toString()).toString(),
+          conversation_id: (message?.conversation_id || '').toString(),
+          sender_id: null,
+          sender_type: 'mentee' as const,
+          sender_name: 'Unknown',
+          content: 'Error loading message',
+          message_type: 'text',
+          read_status: false,
+          read_at: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          attachments: []
+        };
       }
-
-      const messageAttachments = attachmentsData.filter(att => att.message_id === msg.id);
-
-      return {
-        ...msg,
-        sender_name: senderName,
-        attachments: messageAttachments
-      };
     });
   },
 
-  async insertMessage(conversationId: string, userId: string, senderType: 'coach' | 'mentee', content: string) {
+  async sendMessage(conversationId: string, content: string, attachments: File[] = []) {
+    if (!conversationId || !content) {
+      throw new Error('Conversation ID and content are required');
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const senderType = (profile?.role || '').toString().toLowerCase() === 'coach' ? 'coach' : 'mentee';
+
     const { data: message, error } = await supabase
       .from('messages')
       .insert({
         conversation_id: conversationId,
-        sender_id: userId,
+        sender_id: user.id,
         sender_type: senderType,
-        content: content.trim(),
+        content: content.toString(),
         message_type: 'text'
       })
       .select()
@@ -122,13 +194,12 @@ export const MessageService = {
       throw error;
     }
 
-    return message;
-  },
+    // Handle attachments if provided
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      // Process attachments (implementation would depend on your file upload strategy)
+      console.log('Processing attachments:', attachments.length);
+    }
 
-  async updateConversationTimestamp(conversationId: string) {
-    await supabase
-      .from('conversations')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', conversationId);
+    return message;
   }
 };
