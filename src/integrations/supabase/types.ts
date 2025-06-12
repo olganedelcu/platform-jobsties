@@ -669,6 +669,7 @@ export type Database = {
           created_at: string | null
           id: string
           message_type: string | null
+          read_at: string | null
           read_status: boolean | null
           sender_id: string | null
           sender_type: string
@@ -679,6 +680,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_type?: string | null
+          read_at?: string | null
           read_status?: boolean | null
           sender_id?: string | null
           sender_type: string
@@ -689,6 +691,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_type?: string | null
+          read_at?: string | null
           read_status?: boolean | null
           sender_id?: string | null
           sender_type?: string
@@ -745,6 +748,63 @@ export type Database = {
           uploaded_at?: string
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          content: string | null
+          conversation_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message_id: string | null
+          notification_type: string
+          read_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_id?: string | null
+          notification_type?: string
+          read_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_id?: string | null
+          notification_type?: string
+          read_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +10,7 @@ export interface Message {
   content: string;
   message_type: 'text' | 'system';
   read_status: boolean;
+  read_at: string | null;
   created_at: string;
   sender_name?: string;
   attachments?: MessageAttachment[];
@@ -50,7 +50,7 @@ export const useMessages = (conversationId: string | null) => {
         return;
       }
 
-      // Fetch the messages
+      // Fetch the messages with read_at field
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
         .select('*')
@@ -136,7 +136,7 @@ export const useMessages = (conversationId: string | null) => {
 
       setMessages(formattedMessages);
 
-      // Mark messages as read
+      // Mark messages as read and update read_at timestamp
       await markMessagesAsRead();
     } catch (error) {
       console.error('Error in fetchMessages:', error);
@@ -157,9 +157,15 @@ export const useMessages = (conversationId: string | null) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const now = new Date().toISOString();
+
+      // Update messages to mark as read and set read_at timestamp
       await supabase
         .from('messages')
-        .update({ read_status: true })
+        .update({ 
+          read_status: true,
+          read_at: now
+        })
         .eq('conversation_id', conversationId)
         .neq('sender_id', user.id)
         .eq('read_status', false);
