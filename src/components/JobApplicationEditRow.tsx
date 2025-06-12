@@ -28,8 +28,6 @@ const JobApplicationEditRow = ({
   onCancel,
   onDelete
 }: JobApplicationEditRowProps) => {
-  console.log('JobApplicationEditRow: Rendering application:', application.id, 'isCoachView:', isCoachView);
-
   return (
     <TableRow className="bg-yellow-50">
       <TableCell className="w-32">

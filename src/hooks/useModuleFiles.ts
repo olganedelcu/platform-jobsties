@@ -42,7 +42,6 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching module files:', error);
         throw error;
       }
 
@@ -54,7 +53,6 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
 
       setFiles(typedFiles);
     } catch (error: any) {
-      console.error('Error fetching module files:', error);
       toast({
         title: "Error",
         description: "Failed to load module files.",
@@ -72,7 +70,6 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
         .download(file.file_url);
 
       if (error) {
-        console.error('Download error:', error);
         throw error;
       }
 
@@ -90,7 +87,6 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
         description: `Downloaded ${file.file_name}`,
       });
     } catch (error: any) {
-      console.error('Download error:', error);
       toast({
         title: "Error",
         description: "Failed to download file.",

@@ -32,7 +32,6 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
   const fetchCVFiles = async () => {
     try {
       setLoading(true);
-      console.log('Fetching CV files for mentee:', userId);
       
       // Fetch CV files where mentee_id matches the current user
       const { data, error } = await supabase
@@ -42,7 +41,6 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         .order('uploaded_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching CV files:', error);
         toast({
           title: "Error",
           description: "Failed to load CV files. Please try again.",
@@ -50,8 +48,6 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         });
         return;
       }
-
-      console.log('Fetched CV files:', data);
 
       // After getting CV files, fetch coach information for each file
       const filesWithCoachInfo = await Promise.all(
@@ -64,7 +60,7 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
             .maybeSingle();
 
           if (coachError && coachError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-            console.error('Error fetching coach profile:', coachError);
+            // Error handling without console logging
           }
 
           return {
@@ -76,10 +72,8 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         })
       );
 
-      console.log('Files with coach info:', filesWithCoachInfo);
       setCvFiles(filesWithCoachInfo);
     } catch (error) {
-      console.error('Error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred.",
@@ -98,15 +92,12 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
 
   const handleDownload = async (filePath: string, fileName: string) => {
     try {
-      console.log('Downloading file from path:', filePath);
-      
       // Get the file from Supabase storage
       const { data, error } = await supabase.storage
         .from('cv-files')
         .download(filePath);
 
       if (error) {
-        console.error('Download error:', error);
         toast({
           title: "Error",
           description: "Failed to download file. Please try again.",
@@ -114,8 +105,6 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         });
         return;
       }
-
-      console.log('File downloaded successfully, creating blob URL');
 
       // Create a blob URL and trigger download
       const url = URL.createObjectURL(data);
@@ -132,7 +121,6 @@ const MenteeCVFiles = ({ userId }: MenteeCVFilesProps) => {
         description: "File downloaded successfully.",
       });
     } catch (error) {
-      console.error('Download error:', error);
       toast({
         title: "Error",
         description: "Failed to download file. Please try again.",

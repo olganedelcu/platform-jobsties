@@ -29,8 +29,6 @@ const JobApplicationRow = ({
   isAddingNew,
   isCoachView = false
 }: JobApplicationRowProps) => {
-  console.log('JobApplicationRow: Rendering application:', application.id, 'isCoachView:', isCoachView, 'isEditing:', isEditing);
-
   if (isEditing) {
     return (
       <JobApplicationEditRow

@@ -31,7 +31,6 @@ export const useCVFiles = () => {
         .order('uploaded_at', { ascending: false });
 
       if (cvFilesError) {
-        console.error('Error fetching CV files:', cvFilesError);
         toast({
           title: "Error",
           description: "Failed to fetch CV files",
@@ -51,7 +50,7 @@ export const useCVFiles = () => {
             .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
           if (menteeError && menteeError.code !== 'PGRST116') {
-            console.error('Error fetching mentee profile:', menteeError);
+            // Error handling without console logging
           }
 
           // Get coach info
@@ -62,7 +61,7 @@ export const useCVFiles = () => {
             .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
           if (coachError && coachError.code !== 'PGRST116') {
-            console.error('Error fetching coach profile:', coachError);
+            // Error handling without console logging
           }
 
           return {
@@ -79,7 +78,6 @@ export const useCVFiles = () => {
 
       setCvFiles(formattedFiles);
     } catch (error) {
-      console.error('Error fetching CV files:', error);
       toast({
         title: "Error",
         description: "Failed to fetch CV files",

@@ -56,8 +56,6 @@ export const uploadCVFile = async (
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${user.id}/${fileName}`;
 
-    console.log('Uploading file to path:', filePath);
-
     // Upload file to Supabase storage
     const { error: uploadError } = await supabase.storage
       .from('cv-files')
@@ -67,11 +65,8 @@ export const uploadCVFile = async (
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
       throw uploadError;
     }
-
-    console.log('File uploaded successfully to storage');
 
     // Save document record to database with the storage file path
     const { error: dbError } = await supabase
@@ -85,15 +80,12 @@ export const uploadCVFile = async (
       });
 
     if (dbError) {
-      console.error('Database error:', dbError);
       // If database insert fails, clean up the uploaded file
       await supabase.storage
         .from('cv-files')
         .remove([filePath]);
       throw dbError;
     }
-
-    console.log('Document record saved to database');
 
     const mentee = mentees.find(m => m.id === selectedMentee);
     
@@ -106,7 +98,6 @@ export const uploadCVFile = async (
     onSuccess();
 
   } catch (error: any) {
-    console.error('Upload error:', error);
     toast({
       title: "Error",
       description: error.message || "Failed to upload document.",
@@ -125,8 +116,6 @@ export const deleteCVFile = async (
   toast: ReturnType<typeof useToast>['toast']
 ) => {
   try {
-    console.log('Deleting document:', cvId, 'at path:', filePath);
-
     // Delete from database
     const { error: dbError } = await supabase
       .from('cv_files')
@@ -134,11 +123,8 @@ export const deleteCVFile = async (
       .eq('id', cvId);
 
     if (dbError) {
-      console.error('Database deletion error:', dbError);
       throw dbError;
     }
-
-    console.log('Document record deleted from database');
 
     // Delete from storage using the stored file path
     const { error: storageError } = await supabase.storage
@@ -146,10 +132,7 @@ export const deleteCVFile = async (
       .remove([filePath]);
 
     if (storageError) {
-      console.error('Storage deletion error:', storageError);
       // Don't throw here as the database record is already deleted
-    } else {
-      console.log('File deleted from storage');
     }
 
     toast({
@@ -161,7 +144,6 @@ export const deleteCVFile = async (
     onSuccess();
 
   } catch (error: any) {
-    console.error('Delete error:', error);
     toast({
       title: "Error",
       description: error.message || "Failed to delete document.",

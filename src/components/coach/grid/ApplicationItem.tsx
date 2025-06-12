@@ -26,11 +26,8 @@ const ApplicationItem = ({ application, onViewDetails, onDeleteApplication }: Ap
   };
 
   const handleDelete = () => {
-    console.log('ApplicationItem: Delete button clicked for application:', application.id);
     if (onDeleteApplication) {
       onDeleteApplication(application.id);
-    } else {
-      console.warn('ApplicationItem: onDeleteApplication prop is not provided');
     }
   };
 

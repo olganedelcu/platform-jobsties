@@ -62,8 +62,6 @@ export const useModuleFileUpload = () => {
       const fileName = `${moduleType}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`;
 
-      console.log('Uploading module file to path:', filePath);
-
       // Upload file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('module-files')
@@ -73,11 +71,8 @@ export const useModuleFileUpload = () => {
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
         throw uploadError;
       }
-
-      console.log('Module file uploaded successfully to storage');
 
       // Save module file record to database
       const { error: dbError } = await supabase
@@ -92,15 +87,12 @@ export const useModuleFileUpload = () => {
         });
 
       if (dbError) {
-        console.error('Database error:', dbError);
         // If database insert fails, clean up the uploaded file
         await supabase.storage
           .from('module-files')
           .remove([filePath]);
         throw dbError;
       }
-
-      console.log('Module file record saved to database');
 
       const mentee = mentees.find(m => m.id === menteeId);
       
@@ -111,7 +103,6 @@ export const useModuleFileUpload = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Upload error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to upload module file.",
@@ -125,8 +116,6 @@ export const useModuleFileUpload = () => {
 
   const deleteModuleFile = async (fileId: string, filePath: string) => {
     try {
-      console.log('Deleting module file:', fileId, 'at path:', filePath);
-
       // Delete from database
       const { error: dbError } = await supabase
         .from('module_files')
@@ -134,11 +123,8 @@ export const useModuleFileUpload = () => {
         .eq('id', fileId);
 
       if (dbError) {
-        console.error('Database deletion error:', dbError);
         throw dbError;
       }
-
-      console.log('Module file record deleted from database');
 
       // Delete from storage
       const { error: storageError } = await supabase.storage
@@ -146,10 +132,7 @@ export const useModuleFileUpload = () => {
         .remove([filePath]);
 
       if (storageError) {
-        console.error('Storage deletion error:', storageError);
         // Don't throw here as the database record is already deleted
-      } else {
-        console.log('Module file deleted from storage');
       }
 
       toast({
@@ -159,7 +142,6 @@ export const useModuleFileUpload = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Delete error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete module file.",
