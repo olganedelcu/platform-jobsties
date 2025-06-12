@@ -178,13 +178,7 @@ const Login = () => {
 
               <div className="text-center mt-6">
                 <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => navigate('/signup')}
-                    className="text-indigo-600 hover:text-indigo-500 font-medium"
-                  >
-                    Sign up
+                  Don't have an account?{' '} Contact olga@jobsties.com
                   </button>
                 </p>
               </div>
