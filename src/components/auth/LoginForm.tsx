@@ -60,49 +60,39 @@ const LoginForm = () => {
         console.log('User logged in:', data.user);
         console.log('User metadata:', data.user.user_metadata);
         
-        // Try to sync the user to profiles table if needed
+        // Try to sync the user to profiles table with timeout
         console.log('Attempting to sync user to profiles...');
-        const syncResult = await checkAndSyncCurrentUser();
-        console.log('Profile sync result:', syncResult);
+        
+        // Add a timeout to prevent getting stuck
+        const syncPromise = checkAndSyncCurrentUser();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Profile sync timeout')), 10000)
+        );
         
         try {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-
-          console.log('Profile data:', profile);
-
-          if (profileError) {
-            console.log('Profile error, checking metadata fallback:', profileError);
-            // Fallback to metadata
-            const userRole = data.user.user_metadata?.role;
-            console.log('User role from metadata:', userRole);
-            
-            if (userRole === 'COACH') {
-              navigate('/coach/mentees');
-            } else {
-              navigate('/dashboard');
-            }
-          } else {
-            console.log('User role from profile:', profile.role);
-            if (profile.role === 'COACH') {
-              navigate('/coach/mentees');
-            } else {
-              navigate('/dashboard');
-            }
-          }
-        } catch (profileCheckError) {
-          console.error('Error checking profile:', profileCheckError);
-          // Default to dashboard on profile check error
-          navigate('/dashboard');
+          await Promise.race([syncPromise, timeoutPromise]);
+          console.log('Profile sync completed successfully');
+        } catch (syncError) {
+          console.warn('Profile sync failed or timed out, continuing with login:', syncError);
+          // Continue with login even if profile sync fails
         }
-
+        
+        // Determine redirect based on user role
+        const userRole = data.user.user_metadata?.role;
+        console.log('User role from metadata:', userRole);
+        
+        // Show success message
         toast({
           title: "Success",
           description: "Welcome back!",
         });
+        
+        // Navigate based on role
+        if (userRole === 'COACH') {
+          navigate('/coach/mentees');
+        } else {
+          navigate('/dashboard');
+        }
       }
       
     } catch (error: any) {

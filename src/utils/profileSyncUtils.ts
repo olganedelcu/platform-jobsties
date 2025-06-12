@@ -10,9 +10,9 @@ export const syncUserToProfile = async (userId: string) => {
       .from('profiles')
       .select('id')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to handle no results gracefully
       
-    if (checkError && checkError.code !== 'PGRST116') {
+    if (checkError) {
       console.error('Error checking for existing profile:', checkError);
       return false;
     }
@@ -30,19 +30,28 @@ export const syncUserToProfile = async (userId: string) => {
       return false;
     }
     
-    // Create profile
+    // Create profile with proper error handling
+    const profileData = {
+      id: user.id,
+      first_name: user.user_metadata?.first_name || '',
+      last_name: user.user_metadata?.last_name || '',
+      email: user.email || '',
+      role: user.user_metadata?.role === 'COACH' ? 'COACH' : 'MENTEE'
+    };
+    
+    console.log('Creating profile with data:', profileData);
+    
     const { error: insertError } = await supabase
       .from('profiles')
-      .insert({
-        id: user.id,
-        first_name: user.user_metadata?.first_name || '',
-        last_name: user.user_metadata?.last_name || '',
-        email: user.email || '',
-        role: user.user_metadata?.role === 'COACH' ? 'COACH' : 'MENTEE'
-      });
+      .insert(profileData);
       
     if (insertError) {
       console.error('Error creating profile:', insertError);
+      // If it's a duplicate key error, that's actually fine - profile already exists
+      if (insertError.code === '23505') {
+        console.log('Profile already exists (duplicate key), continuing...');
+        return true;
+      }
       return false;
     }
     
@@ -64,7 +73,9 @@ export const checkAndSyncCurrentUser = async () => {
       return false;
     }
     
-    return await syncUserToProfile(user.id);
+    const syncResult = await syncUserToProfile(user.id);
+    console.log('Profile sync completed:', syncResult);
+    return syncResult;
   } catch (error) {
     console.error('Error in checkAndSyncCurrentUser:', error);
     return false;
