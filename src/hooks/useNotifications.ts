@@ -142,19 +142,19 @@ export const useNotifications = () => {
     fetchNotifications();
 
     // Set up real-time subscription for notifications
-    const { data: { user } } = supabase.auth.getUser();
-    
-    user.then((result) => {
-      if (result.user) {
+    const setupSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
         const notificationsChannel = supabase
-          .channel(`notifications-${result.user.id}`)
+          .channel(`notifications-${user.id}`)
           .on(
             'postgres_changes',
             {
               event: 'INSERT',
               schema: 'public',
               table: 'notifications',
-              filter: `user_id=eq.${result.user.id}`
+              filter: `user_id=eq.${user.id}`
             },
             (payload) => {
               console.log('New notification received:', payload);
@@ -175,7 +175,7 @@ export const useNotifications = () => {
               event: 'UPDATE',
               schema: 'public',
               table: 'notifications',
-              filter: `user_id=eq.${result.user.id}`
+              filter: `user_id=eq.${user.id}`
             },
             (payload) => {
               console.log('Notification updated:', payload);
@@ -198,7 +198,7 @@ export const useNotifications = () => {
               event: 'DELETE',
               schema: 'public',
               table: 'notifications',
-              filter: `user_id=eq.${result.user.id}`
+              filter: `user_id=eq.${user.id}`
             },
             (payload) => {
               console.log('Notification deleted:', payload);
@@ -212,11 +212,14 @@ export const useNotifications = () => {
           )
           .subscribe();
 
+        // Cleanup function
         return () => {
           supabase.removeChannel(notificationsChannel);
         };
       }
-    });
+    };
+
+    setupSubscription();
   }, []);
 
   return {

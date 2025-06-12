@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Check, Trash2, MarkAsUnread } from 'lucide-react';
+import { Bell, Check, Trash2 } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -117,7 +117,7 @@ const NotificationDropdown = () => {
                           markAsRead(notification.id);
                         }}
                       >
-                        <MarkAsUnread className="h-3 w-3" />
+                        <Check className="h-3 w-3" />
                       </Button>
                     )}
                     <Button
