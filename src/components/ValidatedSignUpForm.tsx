@@ -111,14 +111,11 @@ const ValidatedSignUpForm = () => {
       async () => {
         console.log('Submitting validated mentee signup');
         
-        // Get the current origin for email redirect
-        const redirectUrl = `${window.location.origin}/login`;
-        
+        // Create the user with metadata - Supabase will handle email confirmation automatically
         const { data, error } = await supabase.auth.signUp({
           email: formData.email.toLowerCase().trim(),
           password: formData.password,
           options: {
-            emailRedirectTo: redirectUrl,
             data: {
               first_name: formData.firstName.trim(),
               last_name: formData.lastName.trim(),
@@ -134,18 +131,13 @@ const ValidatedSignUpForm = () => {
 
         if (data.user) {
           console.log('User created successfully:', data.user);
+          console.log('Email confirmation status:', data.user.email_confirmed_at);
           
-          if (!data.user.email_confirmed_at) {
-            toast({
-              title: "Account Created Successfully!",
-              description: "Please check your email and click the confirmation link to complete your registration.",
-            });
-          } else {
-            toast({
-              title: "Success!",
-              description: "Your account has been created successfully. You can now log in.",
-            });
-          }
+          // Always show the email confirmation message since Supabase sends confirmation emails by default
+          toast({
+            title: "Account Created Successfully!",
+            description: "Please check your email and click the confirmation link to complete your registration. Don't forget to check your spam folder!",
+          });
           
           navigate('/login');
           return true;
