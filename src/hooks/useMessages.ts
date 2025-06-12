@@ -38,7 +38,19 @@ export const useMessages = (conversationId: string | null) => {
     try {
       setLoading(true);
 
-      // First, fetch the messages
+      // First, get conversation details to know coach_email
+      const { data: conversation, error: conversationError } = await supabase
+        .from('conversations')
+        .select('coach_email')
+        .eq('id', conversationId)
+        .single();
+
+      if (conversationError) {
+        console.error('Error fetching conversation:', conversationError);
+        return;
+      }
+
+      // Fetch the messages
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
         .select('*')
@@ -70,14 +82,15 @@ export const useMessages = (conversationId: string | null) => {
         }
       }
 
-      // Finally, fetch sender names from profiles
+      // Get profiles for mentees and coach
       const senderIds = [...new Set(messagesData?.map(msg => msg.sender_id).filter(Boolean))];
       let profilesData = [];
+      let coachProfile = null;
 
       if (senderIds.length > 0) {
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name')
+          .select('id, first_name, last_name, email, role')
           .in('id', senderIds);
 
         if (!profilesError) {
@@ -85,10 +98,33 @@ export const useMessages = (conversationId: string | null) => {
         }
       }
 
+      // Get coach profile by email if coach_email exists
+      if (conversation.coach_email) {
+        const { data: coach, error: coachError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, email, role')
+          .eq('email', conversation.coach_email)
+          .eq('role', 'COACH')
+          .single();
+
+        if (!coachError && coach) {
+          coachProfile = coach;
+        }
+      }
+
       // Combine the data
       const formattedMessages = (messagesData || []).map((msg: any) => {
-        const profile = profilesData.find(p => p.id === msg.sender_id);
-        const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown';
+        let senderName = 'Unknown';
+        
+        if (msg.sender_type === 'coach' && coachProfile) {
+          senderName = `${coachProfile.first_name} ${coachProfile.last_name}`;
+        } else {
+          const profile = profilesData.find(p => p.id === msg.sender_id);
+          if (profile) {
+            senderName = `${profile.first_name} ${profile.last_name}`;
+          }
+        }
+
         const messageAttachments = attachmentsData.filter(att => att.message_id === msg.id);
 
         return {
