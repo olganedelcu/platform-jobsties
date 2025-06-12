@@ -81,10 +81,11 @@ export const useAllUploadedFiles = () => {
         mentee_name: menteeNames[file.mentee_id] || 'Unknown Mentee'
       }));
 
-      // Format module files
+      // Format module files with proper type assertion for module_type
       const formattedModuleFiles: AllUploadedFile[] = (moduleFilesData || []).map(file => ({
         ...file,
         file_type: 'module' as const,
+        module_type: file.module_type as 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | 'feedback',
         mentee_name: menteeNames[file.mentee_id] || 'Unknown Mentee'
       }));
 
