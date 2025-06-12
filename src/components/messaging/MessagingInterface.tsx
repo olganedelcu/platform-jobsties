@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
+import { useNotifications } from '@/hooks/useNotifications';
 import ConversationsList from './ConversationsList';
 import MessageThread from './MessageThread';
 import MessageInput from './MessageInput';
 import NewConversationDialog from './NewConversationDialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MessageCircle, CheckCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const MessagingInterface = () => {
@@ -29,6 +31,8 @@ const MessagingInterface = () => {
     sendMessage,
     downloadAttachment
   } = useMessages(selectedConversationId);
+
+  const { markAllAsRead, unreadCount } = useNotifications();
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -57,11 +61,29 @@ const MessagingInterface = () => {
     await fetchConversations();
   };
 
+  const handleMarkAllRead = async () => {
+    await markAllAsRead();
+    // Refresh conversations to update unread counts
+    await fetchConversations();
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-500 mt-2">Communicate with your coach</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
+          <p className="text-gray-500 mt-2">Communicate with your coach</p>
+        </div>
+        {unreadCount > 0 && (
+          <Button 
+            onClick={handleMarkAllRead}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <CheckCheck className="h-4 w-4" />
+            Up To Date
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
