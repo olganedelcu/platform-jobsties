@@ -10,6 +10,8 @@ export const useConversationNotifications = (conversationId: string | null) => {
   const isMountedRef = useRef(true);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentConversationRef = useRef<string | null>(null);
+  const retryCountRef = useRef(0);
+  const channelIdRef = useRef<string | null>(null);
 
   const fetchUnreadCount = useCallback(async () => {
     if (!conversationId || !isMountedRef.current) {
@@ -65,12 +67,19 @@ export const useConversationNotifications = (conversationId: string | null) => {
 
     isSubscribedRef.current = false;
     isSubscribingRef.current = false;
+    channelIdRef.current = null;
   }, []);
 
   const setupChannel = useCallback(async (targetConversationId: string) => {
     // Prevent multiple simultaneous subscription attempts
     if (isSubscribingRef.current || (isSubscribedRef.current && currentConversationRef.current === targetConversationId) || !isMountedRef.current) {
-      console.log('Skipping notification subscription - already subscribing or subscribed to same conversation');
+      console.log('Skipping notification subscription - already subscribing/subscribed to same conversation or unmounted');
+      return;
+    }
+
+    // Check retry limit
+    if (retryCountRef.current >= 3) {
+      console.log('Max retry attempts reached for notification subscription');
       return;
     }
 
@@ -90,13 +99,16 @@ export const useConversationNotifications = (conversationId: string | null) => {
       // Clean up any existing channel first
       await cleanup();
 
-      if (!isMountedRef.current) {
-        console.log('Component unmounted during cleanup');
+      if (!isMountedRef.current || currentConversationRef.current !== targetConversationId) {
+        console.log('Component unmounted or conversation changed during cleanup');
         isSubscribingRef.current = false;
         return;
       }
 
-      const channelName = `conversation-notifications-${targetConversationId}-${session.user.id}`;
+      // Generate unique channel name with timestamp to avoid conflicts
+      const timestamp = Date.now();
+      const channelName = `conversation-notifications-${targetConversationId}-${session.user.id}-${timestamp}`;
+      channelIdRef.current = channelName;
       console.log('Creating notification channel:', channelName);
 
       const channel = supabase
@@ -116,7 +128,7 @@ export const useConversationNotifications = (conversationId: string | null) => {
           },
           (payload) => {
             console.log('Notification change detected:', payload);
-            if (isMountedRef.current && currentConversationRef.current === targetConversationId) {
+            if (isMountedRef.current && currentConversationRef.current === targetConversationId && channelIdRef.current === channelName) {
               fetchUnreadCount();
             }
           }
@@ -124,8 +136,8 @@ export const useConversationNotifications = (conversationId: string | null) => {
         .subscribe((status) => {
           console.log('Notification subscription status:', status);
           
-          if (!isMountedRef.current) {
-            console.log('Component unmounted, ignoring status update');
+          if (!isMountedRef.current || channelIdRef.current !== channelName) {
+            console.log('Component unmounted or channel changed, ignoring status update');
             return;
           }
 
@@ -133,6 +145,7 @@ export const useConversationNotifications = (conversationId: string | null) => {
             console.log('Notification subscription successful');
             isSubscribedRef.current = true;
             isSubscribingRef.current = false;
+            retryCountRef.current = 0; // Reset retry count on success
           } else if (status === 'CLOSED') {
             console.log('Notification subscription closed');
             isSubscribedRef.current = false;
@@ -143,14 +156,16 @@ export const useConversationNotifications = (conversationId: string | null) => {
             isSubscribingRef.current = false;
             
             // Only retry if component is still mounted and we're still targeting the same conversation
-            if (isMountedRef.current && currentConversationRef.current === targetConversationId && !retryTimeoutRef.current) {
-              console.log('Scheduling notification retry in 10 seconds...');
+            if (isMountedRef.current && currentConversationRef.current === targetConversationId && retryCountRef.current < 3 && !retryTimeoutRef.current) {
+              retryCountRef.current++;
+              const retryDelay = Math.min(5000 * retryCountRef.current, 30000); // Exponential backoff
+              console.log(`Scheduling notification retry ${retryCountRef.current}/3 in ${retryDelay}ms...`);
               retryTimeoutRef.current = setTimeout(() => {
                 retryTimeoutRef.current = null;
                 if (isMountedRef.current && currentConversationRef.current === targetConversationId) {
                   setupChannel(targetConversationId);
                 }
-              }, 10000);
+              }, retryDelay);
             }
           }
         });
@@ -163,20 +178,23 @@ export const useConversationNotifications = (conversationId: string | null) => {
       isSubscribingRef.current = false;
       
       // Only retry if component is still mounted and we're still targeting the same conversation
-      if (isMountedRef.current && currentConversationRef.current === targetConversationId && !retryTimeoutRef.current) {
-        console.log('Scheduling notification retry due to error in 15 seconds...');
+      if (isMountedRef.current && currentConversationRef.current === targetConversationId && retryCountRef.current < 3 && !retryTimeoutRef.current) {
+        retryCountRef.current++;
+        const retryDelay = Math.min(10000 * retryCountRef.current, 60000); // Exponential backoff
+        console.log(`Scheduling notification retry ${retryCountRef.current}/3 due to error in ${retryDelay}ms...`);
         retryTimeoutRef.current = setTimeout(() => {
           retryTimeoutRef.current = null;
           if (isMountedRef.current && currentConversationRef.current === targetConversationId) {
             setupChannel(targetConversationId);
           }
-        }, 15000);
+        }, retryDelay);
       }
     }
   }, [fetchUnreadCount, cleanup]);
 
   useEffect(() => {
     isMountedRef.current = true;
+    retryCountRef.current = 0;
 
     if (!conversationId) {
       console.log('No conversation selected, cleaning up notification subscription');
@@ -194,7 +212,16 @@ export const useConversationNotifications = (conversationId: string | null) => {
     // Only setup if we're switching to a different conversation
     if (currentConversationRef.current !== conversationId) {
       console.log('Setting up notification subscription for new conversation:', conversationId);
-      setupChannel(conversationId);
+      // Small delay to prevent immediate conflicts
+      const initTimeout = setTimeout(() => {
+        if (isMountedRef.current && currentConversationRef.current === conversationId) {
+          setupChannel(conversationId);
+        }
+      }, 150);
+      
+      return () => {
+        clearTimeout(initTimeout);
+      };
     }
 
     return () => {
