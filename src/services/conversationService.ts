@@ -17,9 +17,13 @@ export const ConversationService = {
   },
 
   async fetchConversationsData(userId: string, userRole: string) {
+    console.log('fetchConversationsData called with:', { userId, userRole });
+    
     // Keep role in uppercase format to match database
     const safeUserRole = SecureErrorHandler.safeStringOperation(userRole, 'toUpperCase', 'MENTEE');
     const safeMenteeRole = 'MENTEE'; // Database uses uppercase
+    
+    console.log('Safe user role:', safeUserRole);
     
     let query = supabase
       .from('conversations')
@@ -40,6 +44,7 @@ export const ConversationService = {
       throw error;
     }
 
+    console.log('Raw conversations data:', data);
     return SecureErrorHandler.safeArrayOperation(data, []);
   },
 
@@ -71,18 +76,36 @@ export const ConversationService = {
   },
 
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
+    console.log('formatConversations called with:', { conversationsDataLength: conversationsData?.length, userId });
+    
     const safeConversationsData = SecureErrorHandler.safeArrayOperation(conversationsData, []);
     if (!userId || safeConversationsData.length === 0) {
       return [];
     }
 
     return Promise.all(
-      safeConversationsData.map(async (conv: any) => {
+      safeConversationsData.map(async (conv: any, index: number) => {
         try {
+          console.log(`Processing conversation ${index}:`, conv);
+          
           // Safely handle profile data with comprehensive null checks
           const mentee = conv?.profiles;
-          const firstName = SecureErrorHandler.safeStringOperation(mentee?.first_name, 'trim', '');
-          const lastName = SecureErrorHandler.safeStringOperation(mentee?.last_name, 'trim', '');
+          console.log('Mentee profile:', mentee);
+          
+          // Add extra safety checks and logging
+          let firstName = '';
+          let lastName = '';
+          
+          if (mentee && typeof mentee === 'object') {
+            if (mentee.first_name !== null && mentee.first_name !== undefined) {
+              firstName = SecureErrorHandler.safeStringOperation(mentee.first_name, 'trim', '');
+            }
+            if (mentee.last_name !== null && mentee.last_name !== undefined) {
+              lastName = SecureErrorHandler.safeStringOperation(mentee.last_name, 'trim', '');
+            }
+          }
+          
+          console.log(`Names extracted - firstName: "${firstName}", lastName: "${lastName}"`);
           const menteeName = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Unknown';
 
           // Safely handle conversation data
@@ -90,14 +113,17 @@ export const ConversationService = {
           const lastMessage = conversationId ? await this.getLastMessage(conversationId) : null;
           const unreadCount = conversationId ? await this.getUnreadCount(conversationId, userId) : 0;
 
-          return {
+          const formattedConv = {
             ...conv,
             mentee_name: menteeName,
             last_message: SecureErrorHandler.safeStringOperation(lastMessage?.content, 'trim', ''),
             unread_count: unreadCount
           };
+          
+          console.log(`Formatted conversation ${index}:`, formattedConv);
+          return formattedConv;
         } catch (error) {
-          console.error('Error formatting conversation:', error, conv);
+          console.error(`Error formatting conversation ${index}:`, error, conv);
           // Return a safe fallback conversation
           return {
             id: conv?.id || '',

@@ -17,6 +17,8 @@ interface ConversationItemProps {
 }
 
 const ConversationItem = ({ conversation, isSelected, onClick }: ConversationItemProps) => {
+  console.log('ConversationItem received conversation:', conversation);
+  
   const { getConversationUnreadCount } = useNotificationContext();
   
   // Safely get unread count with fallback
@@ -24,10 +26,18 @@ const ConversationItem = ({ conversation, isSelected, onClick }: ConversationIte
 
   const formatTime = (timestamp: string) => {
     try {
-      if (!timestamp) return 'Unknown time';
+      console.log('formatTime called with:', timestamp);
+      
+      if (!timestamp) {
+        console.log('No timestamp provided');
+        return 'Unknown time';
+      }
       
       const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return 'Invalid date';
+      if (isNaN(date.getTime())) {
+        console.log('Invalid date:', timestamp);
+        return 'Invalid date';
+      }
       
       const now = new Date();
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -37,7 +47,7 @@ const ConversationItem = ({ conversation, isSelected, onClick }: ConversationIte
       if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hour${Math.floor(diffInMinutes / 60) !== 1 ? 's' : ''} ago`;
       return date.toLocaleDateString();
     } catch (error) {
-      console.error('Error formatting time:', error);
+      console.error('Error formatting time:', error, 'timestamp:', timestamp);
       return 'Unknown time';
     }
   };
@@ -50,6 +60,8 @@ const ConversationItem = ({ conversation, isSelected, onClick }: ConversationIte
     updated_at: SecureErrorHandler.safeStringOperation(conversation?.updated_at, 'trim', ''),
     latest_message: SecureErrorHandler.safeStringOperation(conversation?.latest_message, 'trim', '')
   };
+
+  console.log('Safe conversation data:', safeConversation);
 
   return (
     <div
