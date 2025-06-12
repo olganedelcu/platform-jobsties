@@ -59,8 +59,6 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
 
   const handleDownload = async (file: AllUploadedFile) => {
     try {
-      console.log('Downloading file from path:', file.file_url);
-      
       const bucketName = file.file_type === 'cv' ? 'cv-files' : 'module-files';
       
       // Get the file from Supabase storage
@@ -69,7 +67,6 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
         .download(file.file_url);
 
       if (error) {
-        console.error('Download error:', error);
         toast({
           title: "Error",
           description: "Failed to download file. Please try again.",
@@ -77,8 +74,6 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
         });
         return;
       }
-
-      console.log('File downloaded successfully, creating blob URL');
 
       // Create a blob URL and trigger download
       const url = URL.createObjectURL(data);
@@ -95,7 +90,6 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
         description: "File downloaded successfully.",
       });
     } catch (error) {
-      console.error('Download error:', error);
       toast({
         title: "Error",
         description: "Failed to download file. Please try again.",
@@ -140,7 +134,7 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
             <p className="text-gray-500">Upload documents or module files for your mentees to get started</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-8 max-h-96 overflow-y-auto">
             {Object.entries(filesByMentee).map(([menteeId, menteeData]) => (
               <div key={menteeId} className="border rounded-lg overflow-hidden">
                 <div className="bg-gray-100 p-4 border-b">
@@ -161,7 +155,7 @@ const AllUploadedFilesList = ({ files, onDeleteFile }: AllUploadedFilesListProps
                   {menteeData.files.map((file) => {
                     const fileType = getFileType(file.file_name);
                     return (
-                      <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                      <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors">
                         <div className="flex items-center space-x-4">
                           <div className="flex-shrink-0">
                             <FileText className={`h-8 w-8 ${fileType.icon}`} />

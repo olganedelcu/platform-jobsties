@@ -18,9 +18,11 @@ import {
   XCircle, 
   AlertCircle,
   HardDrive,
-  BarChart3
+  BarChart3,
+  AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 const BackupManagement = () => {
   const {
@@ -37,6 +39,7 @@ const BackupManagement = () => {
 
   const [selectedBackupType, setSelectedBackupType] = useState<string>('database_full');
   const [selectedTables, setSelectedTables] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -77,8 +80,16 @@ const BackupManagement = () => {
         compress: true,
         tables: selectedTables
       });
-    } catch (error) {
-      console.error('Manual backup failed:', error);
+      toast({
+        title: "Success",
+        description: "Backup completed successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Backup failed. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -178,7 +189,7 @@ const BackupManagement = () => {
                 {selectedBackupType === 'manual' && (
                   <div>
                     <label className="block text-sm font-medium mb-2">Select Tables</label>
-                    <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                    <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded p-2">
                       {availableTables.map((table) => (
                         <label key={table} className="flex items-center space-x-2">
                           <input
@@ -228,16 +239,19 @@ const BackupManagement = () => {
               <CardTitle>Recent Backup Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-4 max-h-96 overflow-y-auto">
                 {backupLogs.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">No backup logs found</p>
+                  <div className="text-center py-8">
+                    <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No backup logs found</p>
+                  </div>
                 ) : (
                   backupLogs.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                       <div className="flex items-center gap-4">
                         <Database className="h-8 w-8 text-indigo-600" />
                         <div>
-                          <h4 className="font-medium">{log.backup_type.replace('_', ' ')}</h4>
+                          <h4 className="font-medium capitalize">{log.backup_type.replace('_', ' ')}</h4>
                           <p className="text-sm text-gray-500">
                             Started: {format(new Date(log.started_at), 'MMM dd, yyyy HH:mm')}
                           </p>
@@ -258,7 +272,7 @@ const BackupManagement = () => {
                             </p>
                           )}
                           {log.error_message && (
-                            <p className="text-sm text-red-500 mt-1 max-w-xs truncate">
+                            <p className="text-sm text-red-500 mt-1 max-w-xs truncate" title={log.error_message}>
                               {log.error_message}
                             </p>
                           )}
@@ -304,7 +318,7 @@ const BackupManagement = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Schedule (Cron)</label>
-                      <p className="text-sm text-gray-600">{config.schedule_cron}</p>
+                      <p className="text-sm text-gray-600 font-mono">{config.schedule_cron}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Retention Days</label>
@@ -321,7 +335,7 @@ const BackupManagement = () => {
                   {config.config_data && (
                     <div className="mt-4">
                       <label className="block text-sm font-medium mb-1">Configuration</label>
-                      <pre className="text-xs bg-gray-50 p-2 rounded">
+                      <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
                         {JSON.stringify(config.config_data, null, 2)}
                       </pre>
                     </div>

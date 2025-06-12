@@ -159,10 +159,17 @@ async function performFullDatabaseBackup(supabase: any, compress: boolean) {
   const fileName = `database_full_${Date.now()}.json`
   const filePath = `database/${fileName}`
   
-  // Upload to storage
+  // Upload to storage with correct content type
   const { error: uploadError } = await supabase.storage
     .from('backups')
-    .upload(filePath, new Blob([backupContent], { type: 'application/json' }))
+    .upload(
+      filePath, 
+      new Blob([backupContent], { type: 'text/plain' }), // Changed from application/json to text/plain
+      {
+        contentType: 'text/plain',
+        upsert: false
+      }
+    )
   
   if (uploadError) {
     throw new Error(`Failed to upload backup: ${uploadError.message}`)
@@ -230,7 +237,14 @@ async function performIncrementalBackup(supabase: any, compress: boolean) {
   
   const { error: uploadError } = await supabase.storage
     .from('backups')
-    .upload(filePath, new Blob([backupContent], { type: 'application/json' }))
+    .upload(
+      filePath, 
+      new Blob([backupContent], { type: 'text/plain' }),
+      {
+        contentType: 'text/plain',
+        upsert: false
+      }
+    )
   
   if (uploadError) {
     throw new Error(`Failed to upload incremental backup: ${uploadError.message}`)
@@ -290,7 +304,14 @@ async function performStorageBackup(supabase: any, compress: boolean) {
   
   const { error: uploadError } = await supabase.storage
     .from('backups')
-    .upload(filePath, new Blob([manifestContent], { type: 'application/json' }))
+    .upload(
+      filePath, 
+      new Blob([manifestContent], { type: 'text/plain' }),
+      {
+        contentType: 'text/plain',
+        upsert: false
+      }
+    )
   
   if (uploadError) {
     throw new Error(`Failed to upload storage manifest: ${uploadError.message}`)
@@ -348,7 +369,14 @@ async function performCriticalTablesBackup(supabase: any, tables: string[], comp
   
   const { error: uploadError } = await supabase.storage
     .from('backups')
-    .upload(filePath, new Blob([backupContent], { type: 'application/json' }))
+    .upload(
+      filePath, 
+      new Blob([backupContent], { type: 'text/plain' }),
+      {
+        contentType: 'text/plain',
+        upsert: false
+      }
+    )
   
   if (uploadError) {
     throw new Error(`Failed to upload critical tables backup: ${uploadError.message}`)
@@ -406,7 +434,14 @@ async function performManualBackup(supabase: any, tables: string[], compress: bo
   
   const { error: uploadError } = await supabase.storage
     .from('backups')
-    .upload(filePath, new Blob([backupContent], { type: 'application/json' }))
+    .upload(
+      filePath, 
+      new Blob([backupContent], { type: 'text/plain' }),
+      {
+        contentType: 'text/plain',
+        upsert: false
+      }
+    )
   
   if (uploadError) {
     throw new Error(`Failed to upload manual backup: ${uploadError.message}`)

@@ -4,6 +4,7 @@ import { useAuthState } from '@/hooks/useAuthState';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
 import CoachNavigation from '@/components/CoachNavigation';
 import BackupManagement from '@/components/BackupManagement';
+import BackupErrorBoundary from '@/components/BackupErrorBoundary';
 
 const BackupManagementPage = () => {
   const { user, loading, handleSignOut } = useAuthState();
@@ -25,7 +26,9 @@ const BackupManagementPage = () => {
       <div className="min-h-screen bg-gray-50">
         <CoachNavigation user={user} onSignOut={handleSignOut} />
         <main className="max-w-7xl mx-auto py-8 px-6">
-          <BackupManagement />
+          <BackupErrorBoundary>
+            <BackupManagement />
+          </BackupErrorBoundary>
         </main>
       </div>
     </ProtectedCoachRoute>

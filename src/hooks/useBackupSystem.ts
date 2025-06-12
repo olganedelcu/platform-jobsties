@@ -51,7 +51,6 @@ export const useBackupSystem = () => {
       if (error) throw error;
       setBackupLogs(data || []);
     } catch (error: any) {
-      console.error('Error fetching backup logs:', error);
       toast({
         title: "Error",
         description: "Failed to fetch backup logs",
@@ -70,7 +69,6 @@ export const useBackupSystem = () => {
       if (error) throw error;
       setBackupConfigs(data || []);
     } catch (error: any) {
-      console.error('Error fetching backup configurations:', error);
       toast({
         title: "Error",
         description: "Failed to fetch backup configurations",
@@ -87,7 +85,6 @@ export const useBackupSystem = () => {
       if (error) throw error;
       setBackupStats(data || []);
     } catch (error: any) {
-      console.error('Error fetching backup statistics:', error);
       toast({
         title: "Error",
         description: "Failed to fetch backup statistics",
@@ -103,8 +100,6 @@ export const useBackupSystem = () => {
     setPerforming(true);
     
     try {
-      console.log('Starting backup:', { type, options });
-      
       const { data, error } = await supabase.functions.invoke('backup-system', {
         body: {
           type,
@@ -129,10 +124,10 @@ export const useBackupSystem = () => {
 
       return data.backup;
     } catch (error: any) {
-      console.error('Backup error:', error);
+      const errorMessage = error.message || "Failed to perform backup";
       toast({
         title: "Error",
-        description: error.message || "Failed to perform backup",
+        description: errorMessage,
         variant: "destructive"
       });
       throw error;
@@ -157,7 +152,6 @@ export const useBackupSystem = () => {
 
       await fetchBackupConfigs();
     } catch (error: any) {
-      console.error('Error updating backup config:', error);
       toast({
         title: "Error",
         description: "Failed to update backup configuration",
@@ -190,7 +184,6 @@ export const useBackupSystem = () => {
         description: "Backup file downloaded successfully",
       });
     } catch (error: any) {
-      console.error('Download error:', error);
       toast({
         title: "Error",
         description: "Failed to download backup file",
@@ -245,7 +238,6 @@ export const useBackupSystem = () => {
 
       await fetchBackupLogs();
     } catch (error: any) {
-      console.error('Cleanup error:', error);
       toast({
         title: "Error",
         description: "Failed to clean up old backups",
