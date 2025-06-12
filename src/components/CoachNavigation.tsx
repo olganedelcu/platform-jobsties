@@ -13,7 +13,8 @@ import {
   X,
   CheckSquare,
   BarChart3,
-  Database
+  Database,
+  MessageCircle
 } from 'lucide-react';
 
 interface CoachNavigationProps {
@@ -35,6 +36,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       path: '/coach/applications', 
       label: 'Applications', 
       icon: BarChart3 
+    },
+    { 
+      path: '/messages', 
+      label: 'Communication', 
+      icon: MessageCircle 
     },
     // { 
     //   path: '/coach/sessions', 
@@ -92,7 +98,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
-            {navItems.slice(0, 5).map((item) => {
+            {navItems.slice(0, 6).map((item) => {
               const Icon = item.icon;
               return (
                 <Link

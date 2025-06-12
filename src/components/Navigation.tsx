@@ -1,13 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  BookOpen, 
-  BarChart3
+  Calendar, 
+  FileText, 
+  BarChart3, 
+  User, 
+  LogOut, 
+  Menu, 
+  X,
+  MessageCircle
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import DesktopNavigation from './DesktopNavigation';
 import MobileNavigation from './MobileNavigation';
 import UserProfileSection from './UserProfileSection';
+import MessageNotificationBadge from './messaging/MessageNotificationBadge';
 
 interface NavigationProps {
   user: any;
@@ -15,46 +25,56 @@ interface NavigationProps {
 }
 
 const Navigation = ({ user, onSignOut }: NavigationProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
-
-  // Listen for profile updates
-  useEffect(() => {
-    const handleProfileUpdate = (event: any) => {
-      if (event.detail?.profilePicture) {
-        setProfilePicture(event.detail.profilePicture);
-      }
-    };
-
-    window.addEventListener('profileUpdated', handleProfileUpdate);
-    return () => window.removeEventListener('profileUpdated', handleProfileUpdate);
-  }, []);
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { path: '/course', label: 'Course', icon: BookOpen },
-    { path: '/tracker', label: 'Tracker', icon: BarChart3 },
+    { path: '/sessions', label: 'Sessions', icon: Calendar },
+    { path: '/messages', label: 'Communication', icon: MessageCircle },
+    { path: '/tracker', label: 'Tracker', icon: FileText }
   ];
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (user?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('profile_picture')
+            .eq('id', user.id)
+            .single();
+          
+          if (data?.profile_picture && !error) {
+            setProfilePicture(data.profile_picture);
+          }
+        } catch (error) {
+          console.error('Error fetching profile picture:', error);
+        }
+      }
+    };
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+    fetchProfilePicture();
+  }, [user?.id]);
+
+  const getInitials = (firstName?: string, lastName?: string) => {
+    const first = firstName?.charAt(0)?.toUpperCase() || '';
+    const last = lastName?.charAt(0)?.toUpperCase() || '';
+    return `${first}${last}` || 'U';
   };
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center">
+            <Link to="/dashboard" className="flex items-center space-x-2">
               <img 
                 src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
                 alt="JobSties Logo" 
                 className="h-8 w-auto"
               />
+              <span className="text-xl font-bold text-gray-900">JobSties</span>
             </Link>
           </div>
 
@@ -67,17 +87,40 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
             getInitials={getInitials}
           />
 
-          <MobileNavigation
-            navigationItems={navigationItems}
-            user={user}
-            profilePicture={profilePicture}
-            isMobileMenuOpen={isMobileMenuOpen}
-            onToggleMobileMenu={toggleMobileMenu}
-            onSignOut={onSignOut}
-            getInitials={getInitials}
-          />
+          <div className="md:hidden flex items-center space-x-2">
+            <div className="relative">
+              <Link
+                to="/messages"
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <MessageCircle className="h-5 w-5 text-gray-600" />
+                <MessageNotificationBadge />
+              </Link>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
+
+      <MobileNavigation
+        isOpen={mobileMenuOpen}
+        navigationItems={navigationItems}
+        user={user}
+        profilePicture={profilePicture}
+        onSignOut={onSignOut}
+        onClose={() => setMobileMenuOpen(false)}
+        getInitials={getInitials}
+      />
     </nav>
   );
 };

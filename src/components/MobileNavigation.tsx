@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Menu, X, LogOut, LucideIcon } from 'lucide-react';
+import { LucideIcon, LogOut } from 'lucide-react';
+import MessageNotificationBadge from './messaging/MessageNotificationBadge';
 
 interface NavigationItem {
   path: string;
@@ -12,54 +13,56 @@ interface NavigationItem {
 }
 
 interface MobileNavigationProps {
+  isOpen: boolean;
   navigationItems: NavigationItem[];
   user: any;
   profilePicture: string | null;
-  isMobileMenuOpen: boolean;
-  onToggleMobileMenu: () => void;
   onSignOut: () => void;
-  getInitials: (firstName: string, lastName: string) => string;
+  onClose: () => void;
+  getInitials: (firstName?: string, lastName?: string) => string;
 }
 
 const MobileNavigation = ({
+  isOpen,
   navigationItems,
   user,
   profilePicture,
-  isMobileMenuOpen,
-  onToggleMobileMenu,
   onSignOut,
+  onClose,
   getInitials
 }: MobileNavigationProps) => {
-  const location = useLocation();
+  if (!isOpen) return null;
 
   return (
-    <>
-      {/* Mobile menu button */}
-      <div className="md:hidden flex items-center">
-        <Button
-          variant="ghost"
-          onClick={onToggleMobileMenu}
-          className="text-gray-700"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </Button>
-      </div>
-
-      {/* Mobile Navigation Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 py-4">
+    <div className="md:hidden">
+      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+        {navigationItems.map((item) => {
+          const IconComponent = item.icon;
+          const isMessages = item.path === '/messages';
+          
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 relative"
+              onClick={onClose}
+            >
+              <IconComponent className="h-5 w-5" />
+              <span>{item.label}</span>
+              {isMessages && <MessageNotificationBadge />}
+            </Link>
+          );
+        })}
+        
+        <div className="px-3 py-2 border-t mt-4">
           <Link
             to="/profile"
-            onClick={() => onToggleMobileMenu()}
-            className="flex items-center space-x-3 px-3 py-2 mb-4 hover:bg-gray-50 rounded-md transition-colors"
+            className="flex items-center space-x-3 mb-3"
+            onClick={onClose}
           >
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={profilePicture || undefined} />
-              <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+              <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs">
                 {getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name)}
               </AvatarFallback>
             </Avatar>
@@ -71,38 +74,18 @@ const MobileNavigation = ({
             </div>
           </Link>
           
-          <div className="space-y-2">
-            {navigationItems.map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => onToggleMobileMenu()}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === item.path
-                      ? 'text-indigo-600 bg-indigo-50'
-                      : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <IconComponent className="h-4 w-4 mr-2" />
-                  {item.label}
-                </Link>
-              );
-            })}
-            
-            <Button
-              variant="ghost"
-              onClick={onSignOut}
-              className="w-full justify-start text-gray-700 hover:text-red-600 px-3 py-2"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
+          <Button
+            onClick={onSignOut}
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-gray-700 hover:text-red-600"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 
