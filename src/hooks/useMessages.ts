@@ -38,18 +38,15 @@ export const useMessages = (conversationId: string | null) => {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
+      // First, fetch the messages
+      const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
-        .select(`
-          *,
-          message_attachments(*),
-          profiles!messages_sender_id_fkey(first_name, last_name)
-        `)
+        .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching messages:', error);
+      if (messagesError) {
+        console.error('Error fetching messages:', messagesError);
         toast({
           title: "Error",
           description: "Failed to load messages.",
@@ -58,14 +55,46 @@ export const useMessages = (conversationId: string | null) => {
         return;
       }
 
-      const formattedMessages = (data || []).map((msg: any) => {
-        const sender = msg.profiles;
-        const senderName = sender ? `${sender.first_name} ${sender.last_name}` : 'Unknown';
+      // Then fetch the attachments for all messages
+      const messageIds = messagesData?.map(msg => msg.id) || [];
+      let attachmentsData = [];
+      
+      if (messageIds.length > 0) {
+        const { data: attachments, error: attachmentsError } = await supabase
+          .from('message_attachments')
+          .select('*')
+          .in('message_id', messageIds);
+
+        if (!attachmentsError) {
+          attachmentsData = attachments || [];
+        }
+      }
+
+      // Finally, fetch sender names from profiles
+      const senderIds = [...new Set(messagesData?.map(msg => msg.sender_id).filter(Boolean))];
+      let profilesData = [];
+
+      if (senderIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', senderIds);
+
+        if (!profilesError) {
+          profilesData = profiles || [];
+        }
+      }
+
+      // Combine the data
+      const formattedMessages = (messagesData || []).map((msg: any) => {
+        const profile = profilesData.find(p => p.id === msg.sender_id);
+        const senderName = profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown';
+        const messageAttachments = attachmentsData.filter(att => att.message_id === msg.id);
 
         return {
           ...msg,
           sender_name: senderName,
-          attachments: msg.message_attachments || []
+          attachments: messageAttachments
         };
       });
 
@@ -75,6 +104,11 @@ export const useMessages = (conversationId: string | null) => {
       await markMessagesAsRead();
     } catch (error) {
       console.error('Error in fetchMessages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load messages.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
