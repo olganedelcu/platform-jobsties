@@ -33,6 +33,17 @@ export const updateJobRecommendationStatus = async (
 
   console.log('Found existing recommendation:', existingRec);
 
+  // Get current user to verify permissions
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    console.error('Authentication error:', userError);
+    throw new Error('User not authenticated');
+  }
+
+  console.log('Current user:', user.id);
+  console.log('Recommendation mentee_id:', existingRec.mentee_id);
+  console.log('Recommendation coach_id:', existingRec.coach_id);
+
   // Now perform the update
   const { data, error } = await supabase
     .from('weekly_job_recommendations')
@@ -52,6 +63,8 @@ export const updateJobRecommendationStatus = async (
 
   if (!data || data.length === 0) {
     console.error('No job recommendation updated. This might be a permissions issue.');
+    console.log('User ID:', user.id);
+    console.log('Attempting to update recommendation:', recommendationId);
     throw new Error('Failed to update job recommendation. Please check your permissions.');
   }
 
