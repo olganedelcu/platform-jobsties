@@ -10,7 +10,8 @@ import {
   Menu, 
   X,
   MessageCircle,
-  FileText
+  FileText,
+  BookOpen
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import DesktopNavigation from './DesktopNavigation';
@@ -31,6 +32,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/messages', label: 'Communication', icon: MessageCircle },
+    { path: '/course', label: 'Course', icon: BookOpen },
     { path: '/tracker', label: 'Tracker', icon: FileText }
   ];
 
