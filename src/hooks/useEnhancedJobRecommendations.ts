@@ -55,7 +55,7 @@ export const useEnhancedJobRecommendations = ({ userId }: UseEnhancedJobRecommen
         all: allRecs
       });
     } catch (error) {
-      // Silent error handling to prevent console pollution
+      // Error handling without console logging
     } finally {
       setLoading(false);
     }

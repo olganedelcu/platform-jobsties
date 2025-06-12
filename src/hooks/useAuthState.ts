@@ -45,7 +45,7 @@ export const useAuthState = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          // Silent auth state change tracking
+          // Auth state change tracking
         }
         
         if (session?.user) {
@@ -99,7 +99,7 @@ export const useAuthState = () => {
               localStorage.removeItem('coach-applications-view-mode');
               localStorage.removeItem('tracker-scroll-position');
             } catch (error) {
-              // Silent cleanup
+              // Cleanup error - silent
             }
             navigate('/');
           }
@@ -122,13 +122,13 @@ export const useAuthState = () => {
         localStorage.removeItem('coach-applications-view-mode');
         localStorage.removeItem('tracker-scroll-position');
       } catch (error) {
-        // Silent cleanup
+        // Cleanup error - silent
       }
       
       await supabase.auth.signOut();
       navigate('/');
     } catch (error) {
-      // Silent error handling
+      // Sign out error - silent
     }
   };
 

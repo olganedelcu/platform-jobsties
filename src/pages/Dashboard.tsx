@@ -25,7 +25,6 @@ const Dashboard = () => {
         
         setUser(session.user);
       } catch (error) {
-        console.error('Auth check error:', error);
         navigate('/login');
       } finally {
         setLoading(false);
@@ -54,7 +53,11 @@ const Dashboard = () => {
       });
       navigate('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 

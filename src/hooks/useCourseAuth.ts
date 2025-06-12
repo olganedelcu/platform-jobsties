@@ -20,7 +20,6 @@ export const useCourseAuth = () => {
         
         setUser(session.user);
       } catch (error) {
-        console.error('Auth check error:', error);
         navigate('/login');
       } finally {
         setLoading(false);

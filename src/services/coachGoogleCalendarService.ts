@@ -18,7 +18,6 @@ export class CoachGoogleCalendarService {
       .single();
 
     if (error || !data) {
-      console.error('No coach tokens found:', error);
       return null;
     }
 
@@ -90,7 +89,6 @@ export class CoachGoogleCalendarService {
         const refreshedTokens = await this.refreshCoachAccessToken(tokens.refresh_token);
         return refreshedTokens.access_token;
       } catch (error) {
-        console.error('Failed to refresh coach token:', error);
         return null;
       }
     }
