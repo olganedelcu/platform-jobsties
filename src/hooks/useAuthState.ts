@@ -17,9 +17,15 @@ export const useAuthState = () => {
       isCheckingUser.current = true;
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        setUser(session?.user || null);
+        if (error) {
+          console.error('Auth session error:', error);
+          setUser(null);
+        } else {
+          setUser(session?.user || null);
+        }
+        
         setLoading(false);
         hasInitialized.current = true;
 
@@ -33,6 +39,7 @@ export const useAuthState = () => {
           }
         }
       } catch (error) {
+        console.error('Error checking user:', error);
         setUser(null);
         setLoading(false);
         hasInitialized.current = true;
@@ -44,9 +51,7 @@ export const useAuthState = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          // Auth state change tracking
-        }
+        console.log('Auth state change:', event, session?.user?.id);
         
         if (session?.user) {
           const isDifferentUser = !user || user.id !== session.user.id;
@@ -76,6 +81,7 @@ export const useAuthState = () => {
                     navigate('/dashboard');
                   }
                 } catch (error) {
+                  console.error('Navigation error:', error);
                   const userRoleFromMetadata = session.user.user_metadata?.role;
                   if (userRoleFromMetadata === 'COACH') {
                     navigate('/coach/mentees');
@@ -128,7 +134,7 @@ export const useAuthState = () => {
       await supabase.auth.signOut();
       navigate('/');
     } catch (error) {
-      // Sign out error - silent
+      console.error('Sign out error:', error);
     }
   };
 

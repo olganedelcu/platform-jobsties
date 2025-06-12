@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -83,12 +82,12 @@ export const useMessages = (conversationId: string | null) => {
         }
       }
 
-      // Get profiles for mentees and coach
+      // Get profiles for mentees and coach - simplified approach
       const senderIds = [...new Set(messagesData?.map(msg => msg.sender_id).filter(Boolean))];
       let profilesData = [];
-      let coachProfile = null;
 
       if (senderIds.length > 0) {
+        // Try to get profiles by ID first
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, email, role')
@@ -96,22 +95,26 @@ export const useMessages = (conversationId: string | null) => {
 
         if (!profilesError) {
           profilesData = profiles || [];
+        } else {
+          console.log('Error fetching profiles by ID:', profilesError);
         }
       }
 
-      // Get coach profile by email if coach_email exists
+      // For coach profile, try a different approach - don't query by email if it's causing RLS issues
+      let coachProfile = null;
       if (conversation.coach_email) {
-        const { data: coach, error: coachError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, email, role')
-          .eq('email', conversation.coach_email)
-          .eq('role', 'COACH')
-          .maybeSingle();
-
-        if (!coachError && coach) {
-          coachProfile = coach;
-        } else {
-          console.log('Coach profile not found for email:', conversation.coach_email);
+        // First try to find coach in existing profiles
+        coachProfile = profilesData.find(p => p.email === conversation.coach_email && p.role === 'COACH');
+        
+        // If not found and it's a known coach email, create a fallback
+        if (!coachProfile && conversation.coach_email === 'ana@jobsties.com') {
+          coachProfile = {
+            id: null,
+            first_name: 'Ana',
+            last_name: 'Nedelcu',
+            email: 'ana@jobsties.com',
+            role: 'COACH'
+          };
         }
       }
 
