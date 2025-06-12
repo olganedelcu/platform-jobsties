@@ -54,7 +54,6 @@ const FeedbackModule = ({ userId }: FeedbackModuleProps) => {
         throw new Error('Unable to find user profile');
       }
     } catch (error) {
-      console.error('Error sending feedback:', error);
       toast({
         title: "Error",
         description: "Failed to send feedback. Please try again.",

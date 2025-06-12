@@ -12,8 +12,6 @@ export const updateJobRecommendationStatus = async (
   recommendationId: string, 
   updates: ArchiveJobRecommendationData
 ): Promise<JobRecommendation> => {
-  console.log('Updating job recommendation:', recommendationId, updates);
-  
   // First, let's verify the recommendation exists and get user info
   const { data: existingRec, error: fetchError } = await supabase
     .from('weekly_job_recommendations')
@@ -22,27 +20,18 @@ export const updateJobRecommendationStatus = async (
     .maybeSingle();
 
   if (fetchError) {
-    console.error('Error fetching job recommendation:', fetchError);
     throw fetchError;
   }
 
   if (!existingRec) {
-    console.error('Job recommendation not found:', recommendationId);
     throw new Error(`Job recommendation with ID ${recommendationId} not found`);
   }
-
-  console.log('Found existing recommendation:', existingRec);
 
   // Get current user to verify permissions
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
-    console.error('Authentication error:', userError);
     throw new Error('User not authenticated');
   }
-
-  console.log('Current user:', user.id);
-  console.log('Recommendation mentee_id:', existingRec.mentee_id);
-  console.log('Recommendation coach_id:', existingRec.coach_id);
 
   // Now perform the update
   const { data, error } = await supabase
@@ -57,18 +46,13 @@ export const updateJobRecommendationStatus = async (
     .select();
 
   if (error) {
-    console.error('Error updating job recommendation status:', error);
     throw error;
   }
 
   if (!data || data.length === 0) {
-    console.error('No job recommendation updated. This might be a permissions issue.');
-    console.log('User ID:', user.id);
-    console.log('Attempting to update recommendation:', recommendationId);
     throw new Error('Failed to update job recommendation. Please check your permissions.');
   }
 
-  console.log('Successfully updated job recommendation:', data[0]);
   return data[0] as JobRecommendation;
 };
 
@@ -100,8 +84,6 @@ export const fetchJobRecommendationsByStatus = async (
   status?: 'active' | 'applied' | 'archived',
   isCoach: boolean = false
 ): Promise<JobRecommendation[]> => {
-  console.log('Fetching job recommendations:', { userId, status, isCoach });
-  
   let query = supabase
     .from('weekly_job_recommendations')
     .select('*')
@@ -120,10 +102,8 @@ export const fetchJobRecommendationsByStatus = async (
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching job recommendations by status:', error);
     throw error;
   }
 
-  console.log('Fetched job recommendations:', data);
   return (data || []) as JobRecommendation[];
 };

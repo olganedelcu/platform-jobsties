@@ -78,7 +78,6 @@ const ApplicationsJobRecommendations = () => {
       resetForm();
       setIsFormOpen(false);
     } catch (error) {
-      console.error('Error sending recommendations:', error);
       toast({
         title: "Error",
         description: "Failed to send job recommendations. Please try again.",
