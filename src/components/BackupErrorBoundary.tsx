@@ -31,14 +31,15 @@ class BackupErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       errorId,
-      errorMessage: error.message
+      errorMessage: error.message || 'Unknown error'
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Sanitize error for logging
+    const errorMessage = error.message || 'Unknown error';
     const sanitizedError = {
-      message: error.message.replace(/\b[\w-]+@[\w.-]+\.\w+\b/g, '[EMAIL_REDACTED]'),
+      message: errorMessage.replace(/\b[\w-]+@[\w.-]+\.\w+\b/g, '[EMAIL_REDACTED]'),
       stack: error.stack?.split('\n').slice(0, 3).join('\n'),
       errorId: this.state.errorId,
       timestamp: new Date().toISOString(),

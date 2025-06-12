@@ -32,8 +32,9 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Sanitize error for logging - remove sensitive information
+    const errorMessage = error.message || 'Unknown error';
     const sanitizedError = {
-      message: error.message.replace(/\b[\w-]+@[\w.-]+\.\w+\b/g, '[EMAIL_REDACTED]'),
+      message: errorMessage.replace(/\b[\w-]+@[\w.-]+\.\w+\b/g, '[EMAIL_REDACTED]'),
       stack: error.stack?.split('\n').slice(0, 3).join('\n'), // Limit stack trace
       errorId: this.state.errorId,
       timestamp: new Date().toISOString(),
