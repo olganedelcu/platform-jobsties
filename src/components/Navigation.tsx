@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Calendar, FileText, MessageSquare, BookOpen, Target, Users, BarChart3 } from 'lucide-react';
+import { LogOut, User, Calendar, FileText, BookOpen, Target, Users, BarChart3 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -68,10 +68,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                   <Calendar className="h-4 w-4" />
                   Sessions
                 </Link>
-                <Link to="/messages" className={getLinkClass('/messages')}>
-                  <MessageSquare className="h-4 w-4" />
-                  Messages
-                </Link>
               </>
             ) : (
               <>
@@ -90,10 +86,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
                 <Link to="/course" className={getLinkClass('/course')}>
                   <BookOpen className="h-4 w-4" />
                   Course
-                </Link>
-                <Link to="/messages" className={getLinkClass('/messages')}>
-                  <MessageSquare className="h-4 w-4" />
-                  Messages
                 </Link>
               </>
             )}

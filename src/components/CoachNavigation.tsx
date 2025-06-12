@@ -11,8 +11,7 @@ import {
   X,
   CheckSquare,
   BarChart3,
-  Database,
-  MessageCircle
+  Database
 } from 'lucide-react';
 
 interface CoachNavigationProps {
@@ -34,11 +33,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       path: '/coach/applications', 
       label: 'Applications', 
       icon: BarChart3 
-    },
-    { 
-      path: '/messages', 
-      label: 'Communication', 
-      icon: MessageCircle 
     },
     { 
       path: '/coach/cv-upload', 
