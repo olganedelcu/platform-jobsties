@@ -159,14 +159,14 @@ async function performFullDatabaseBackup(supabase: any, compress: boolean) {
   const fileName = `database_full_${Date.now()}.json`
   const filePath = `database/${fileName}`
   
-  // Upload to storage with correct content type
+  // Upload to storage with application/json content type
   const { error: uploadError } = await supabase.storage
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'text/plain' }), // Changed from application/json to text/plain
+      new Blob([backupContent], { type: 'application/json' }),
       {
-        contentType: 'text/plain',
+        contentType: 'application/json',
         upsert: false
       }
     )
@@ -239,9 +239,9 @@ async function performIncrementalBackup(supabase: any, compress: boolean) {
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'text/plain' }),
+      new Blob([backupContent], { type: 'application/json' }),
       {
-        contentType: 'text/plain',
+        contentType: 'application/json',
         upsert: false
       }
     )
@@ -306,9 +306,9 @@ async function performStorageBackup(supabase: any, compress: boolean) {
     .from('backups')
     .upload(
       filePath, 
-      new Blob([manifestContent], { type: 'text/plain' }),
+      new Blob([manifestContent], { type: 'application/json' }),
       {
-        contentType: 'text/plain',
+        contentType: 'application/json',
         upsert: false
       }
     )
@@ -371,9 +371,9 @@ async function performCriticalTablesBackup(supabase: any, tables: string[], comp
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'text/plain' }),
+      new Blob([backupContent], { type: 'application/json' }),
       {
-        contentType: 'text/plain',
+        contentType: 'application/json',
         upsert: false
       }
     )
@@ -436,9 +436,9 @@ async function performManualBackup(supabase: any, tables: string[], compress: bo
     .from('backups')
     .upload(
       filePath, 
-      new Blob([backupContent], { type: 'text/plain' }),
+      new Blob([backupContent], { type: 'application/json' }),
       {
-        contentType: 'text/plain',
+        contentType: 'application/json',
         upsert: false
       }
     )
