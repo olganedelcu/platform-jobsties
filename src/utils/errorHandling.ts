@@ -175,15 +175,23 @@ class SecureErrorHandler {
     return retryableErrors.includes(errorCode);
   }
 
-  // Helper function to safely process strings
+  // Helper function to safely process strings with enhanced error handling
   static safeStringOperation(value: any, operation: 'toLowerCase' | 'toUpperCase' | 'trim', fallback: string = ''): string {
     try {
       if (value === null || value === undefined) {
         return fallback;
       }
       
-      const stringValue = typeof value === 'string' ? value : String(value);
+      // Convert to string safely
+      let stringValue: string;
+      try {
+        stringValue = typeof value === 'string' ? value : String(value);
+      } catch (conversionError) {
+        console.warn(`Failed to convert value to string:`, value, conversionError);
+        return fallback;
+      }
       
+      // Apply the operation safely
       switch (operation) {
         case 'toLowerCase':
           return stringValue.toLowerCase();
@@ -195,20 +203,73 @@ class SecureErrorHandler {
           return stringValue;
       }
     } catch (error) {
-      console.warn(`Safe string operation failed for ${operation}:`, error);
+      console.warn(`Safe string operation failed for ${operation}:`, error, 'value:', value);
       return fallback;
     }
   }
 
-  // Helper function to safely process arrays
+  // Enhanced helper function to safely process arrays with filtering
   static safeArrayOperation<T>(value: any, fallback: T[] = []): T[] {
     try {
       if (Array.isArray(value)) {
-        return value;
+        // Filter out null, undefined, and invalid entries
+        return value.filter(item => item !== null && item !== undefined);
       }
       return fallback;
     } catch (error) {
       console.warn('Safe array operation failed:', error);
+      return fallback;
+    }
+  }
+
+  // New helper function to safely process arrays with custom validation
+  static safeArrayWithValidation<T>(
+    value: any, 
+    validator: (item: any) => boolean,
+    fallback: T[] = []
+  ): T[] {
+    try {
+      if (Array.isArray(value)) {
+        return value.filter(item => {
+          try {
+            return item !== null && item !== undefined && validator(item);
+          } catch (validationError) {
+            console.warn('Array item validation failed:', validationError, item);
+            return false;
+          }
+        });
+      }
+      return fallback;
+    } catch (error) {
+      console.warn('Safe array with validation failed:', error);
+      return fallback;
+    }
+  }
+
+  // New helper function to safely find items in arrays
+  static safeFindInArray<T>(
+    array: any[], 
+    predicate: (item: T) => boolean,
+    fallback: T | null = null
+  ): T | null {
+    try {
+      if (!Array.isArray(array)) {
+        return fallback;
+      }
+      
+      const validArray = this.safeArrayOperation(array);
+      const found = validArray.find(item => {
+        try {
+          return predicate(item);
+        } catch (predicateError) {
+          console.warn('Array find predicate failed:', predicateError, item);
+          return false;
+        }
+      });
+      
+      return found || fallback;
+    } catch (error) {
+      console.warn('Safe find in array failed:', error);
       return fallback;
     }
   }

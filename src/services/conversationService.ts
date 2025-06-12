@@ -78,7 +78,12 @@ export const ConversationService = {
   async formatConversations(conversationsData: any[], userId: string): Promise<Conversation[]> {
     console.log('formatConversations called with:', { conversationsDataLength: conversationsData?.length, userId });
     
-    const safeConversationsData = SecureErrorHandler.safeArrayOperation(conversationsData, []);
+    const safeConversationsData = SecureErrorHandler.safeArrayWithValidation(
+      conversationsData, 
+      (conv) => conv && typeof conv === 'object' && conv.id,
+      []
+    );
+    
     if (!userId || safeConversationsData.length === 0) {
       return [];
     }
@@ -97,12 +102,8 @@ export const ConversationService = {
           let lastName = '';
           
           if (mentee && typeof mentee === 'object') {
-            if (mentee.first_name !== null && mentee.first_name !== undefined) {
-              firstName = SecureErrorHandler.safeStringOperation(mentee.first_name, 'trim', '');
-            }
-            if (mentee.last_name !== null && mentee.last_name !== undefined) {
-              lastName = SecureErrorHandler.safeStringOperation(mentee.last_name, 'trim', '');
-            }
+            firstName = SecureErrorHandler.safeStringOperation(mentee.first_name, 'trim', '');
+            lastName = SecureErrorHandler.safeStringOperation(mentee.last_name, 'trim', '');
           }
           
           console.log(`Names extracted - firstName: "${firstName}", lastName: "${lastName}"`);
