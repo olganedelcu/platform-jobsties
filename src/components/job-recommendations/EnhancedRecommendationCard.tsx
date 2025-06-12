@@ -35,6 +35,7 @@ const EnhancedRecommendationCard = ({
   const [isMarkingAsApplied, setIsMarkingAsApplied] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const [isReactivating, setIsReactivating] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -63,6 +64,12 @@ const EnhancedRecommendationCard = ({
   const canMarkAsApplied = recommendation.status === 'active';
   const canArchive = recommendation.status === 'active';
   const canReactivate = recommendation.status === 'archived' || recommendation.status === 'applied';
+
+  // Truncate description if it's longer than 100 characters
+  const shouldTruncate = recommendation.description && recommendation.description.length > 100;
+  const displayDescription = shouldTruncate && !showFullDescription 
+    ? recommendation.description?.substring(0, 100) + '...'
+    : recommendation.description;
 
   const handleMarkAsApplied = async () => {
     setIsMarkingAsApplied(true);
@@ -114,9 +121,26 @@ const EnhancedRecommendationCard = ({
           </div>
           
           {recommendation.applied_date && (
-            <div className="flex items-center gap-2 text-xs text-green-600">
+            <div className="flex items-center gap-2 text-xs text-green-600 mb-3">
               <CheckCircle className="h-3 w-3" />
               <span>Applied on {format(new Date(recommendation.applied_date), 'MMM dd, yyyy')}</span>
+            </div>
+          )}
+
+          {/* Description Section */}
+          {recommendation.description && (
+            <div className="mb-3">
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {displayDescription}
+              </p>
+              {shouldTruncate && (
+                <button
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                  className="text-xs text-blue-600 hover:text-blue-800 mt-1 font-medium"
+                >
+                  {showFullDescription ? 'Show less' : 'More...'}
+                </button>
+              )}
             </div>
           )}
         </div>
