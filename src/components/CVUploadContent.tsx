@@ -3,7 +3,7 @@ import React from 'react';
 import { useCVUpload } from '@/hooks/useCVUpload';
 import CVUploadForm from '@/components/CVUploadForm';
 import CVMenteesList from '@/components/CVMenteesList';
-import CVFilesList from '@/components/CVFilesList';
+import AllUploadedFilesList from '@/components/AllUploadedFilesList';
 import ModuleFileUpload from '@/components/coach/ModuleFileUpload';
 
 const CVUploadContent = () => {
@@ -12,10 +12,10 @@ const CVUploadContent = () => {
     setSelectedMentee,
     uploadingFile,
     mentees,
-    cvFiles,
+    allFiles,
     loading,
     handleFileUpload,
-    handleDeleteCV
+    handleDeleteFile
   } = useCVUpload();
 
   if (loading) {
@@ -49,9 +49,9 @@ const CVUploadContent = () => {
         <CVMenteesList mentees={mentees} />
       </div>
 
-      <CVFilesList 
-        cvFiles={cvFiles}
-        onDeleteCV={handleDeleteCV}
+      <AllUploadedFilesList 
+        files={allFiles}
+        onDeleteFile={handleDeleteFile}
       />
     </main>
   );
