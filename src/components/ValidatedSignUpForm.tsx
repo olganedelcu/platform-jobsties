@@ -109,27 +109,43 @@ const ValidatedSignUpForm = () => {
   const onSubmit = async (formData: SignUpFormData) => {
     const success = await executeWithErrorHandling(
       async () => {
-        console.log('Submitting mentee signup with validated data');
+        console.log('Submitting validated mentee signup');
+        
+        // Get the current origin for email redirect
+        const redirectUrl = `${window.location.origin}/login`;
         
         const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
+          email: formData.email.toLowerCase().trim(),
           password: formData.password,
           options: {
+            emailRedirectTo: redirectUrl,
             data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
+              first_name: formData.firstName.trim(),
+              last_name: formData.lastName.trim(),
               role: 'MENTEE'
             }
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
 
         if (data.user) {
-          toast({
-            title: "Success",
-            description: "Account created successfully! Please check your email to confirm your account.",
-          });
+          console.log('User created successfully:', data.user);
+          
+          if (!data.user.email_confirmed_at) {
+            toast({
+              title: "Account Created Successfully!",
+              description: "Please check your email and click the confirmation link to complete your registration.",
+            });
+          } else {
+            toast({
+              title: "Success!",
+              description: "Your account has been created successfully. You can now log in.",
+            });
+          }
           
           navigate('/login');
           return true;
@@ -145,7 +161,7 @@ const ValidatedSignUpForm = () => {
 
     if (!success) {
       toast({
-        title: "Error",
+        title: "Signup Failed",
         description: "Failed to create account. Please try again.",
         variant: "destructive"
       });

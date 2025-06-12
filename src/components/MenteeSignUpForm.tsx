@@ -30,6 +30,7 @@ const MenteeSignUpForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Basic validation
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Error",
@@ -48,11 +49,19 @@ const MenteeSignUpForm = () => {
       return;
     }
 
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your first and last name",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       
-      console.log('Submitting mentee signup with role:', formData.role);
-      console.log('Full form data:', {
+      console.log('Submitting mentee signup with data:', {
         email: formData.email,
         first_name: formData.firstName,
         last_name: formData.lastName,
@@ -84,18 +93,18 @@ const MenteeSignUpForm = () => {
       }
 
       if (data.user) {
-        console.log('User created with metadata:', data.user.user_metadata);
+        console.log('User created successfully:', data.user);
         
-        // Check if email confirmation is required
+        // Show success message based on email confirmation status
         if (!data.user.email_confirmed_at) {
           toast({
-            title: "Account Created",
-            description: "Please check your email and click the confirmation link to activate your account.",
+            title: "Account Created Successfully!",
+            description: "Please check your email and click the confirmation link to complete your registration.",
           });
         } else {
           toast({
-            title: "Success",
-            description: "Account created successfully! You can now log in.",
+            title: "Success!",
+            description: "Your account has been created successfully. You can now log in.",
           });
         }
         
@@ -105,14 +114,16 @@ const MenteeSignUpForm = () => {
     } catch (error: any) {
       console.error('Signup error:', error);
       
-      let errorMessage = 'Failed to create account';
+      let errorMessage = 'Failed to create account. Please try again.';
       
-      if (error.message?.includes('already registered')) {
+      if (error.message?.includes('already registered') || error.message?.includes('already been registered')) {
         errorMessage = 'An account with this email already exists. Please try logging in instead.';
       } else if (error.message?.includes('Invalid email')) {
         errorMessage = 'Please enter a valid email address.';
       } else if (error.message?.includes('Password')) {
         errorMessage = 'Password must be at least 6 characters long.';
+      } else if (error.message?.includes('Email rate limit exceeded')) {
+        errorMessage = 'Too many signup attempts. Please wait a moment and try again.';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -150,6 +161,16 @@ const MenteeSignUpForm = () => {
             className="text-indigo-600 hover:text-indigo-500 font-medium"
           >
             Sign in
+          </button>
+        </p>
+        <p className="text-sm text-gray-600 mt-2">
+          Are you a coach?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/coach-signup')}
+            className="text-purple-600 hover:text-purple-500 font-medium"
+          >
+            Sign up as coach
           </button>
         </p>
       </div>
