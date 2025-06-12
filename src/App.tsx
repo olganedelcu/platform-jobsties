@@ -1,3 +1,4 @@
+
 import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,7 +29,6 @@ import JobRecommendations from "./pages/coach/JobRecommendations";
 import BackupManagementPage from "./pages/coach/BackupManagement";
 import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
-import HomeCoach from "./pages/HomeCoach";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,7 +75,6 @@ const App = () => (
               <Route path="/chat" element={<ChatPage />} />
               
               {/* Coach Routes */}
-              <Route path="/coach" element={<HomeCoach />} />
               <Route path="/coach/signup" element={<CoachSignUp />} />
               <Route path="/coach/login" element={<CoachLogin />} />
               <Route path="/coach/mentees" element={<Mentees />} />
