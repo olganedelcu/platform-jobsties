@@ -11,6 +11,12 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
   const currentConversationRef = useRef<string | null>(null);
   const retryCountRef = useRef(0);
   const channelIdRef = useRef<string | null>(null);
+  const callbackRef = useRef(onMessageReceived);
+
+  // Update callback ref when it changes
+  useEffect(() => {
+    callbackRef.current = onMessageReceived;
+  }, [onMessageReceived]);
 
   const cleanup = useCallback(async () => {
     console.log('Cleaning up messages realtime subscription');
@@ -35,7 +41,7 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
     isSubscribedRef.current = false;
     isSubscribingRef.current = false;
     channelIdRef.current = null;
-  }, []);
+  }, []); // No dependencies to break circular reference
 
   const setupChannel = useCallback(async (targetConversationId: string) => {
     // Prevent multiple simultaneous subscription attempts
@@ -96,7 +102,7 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
           (payload) => {
             console.log('New message received:', payload);
             if (isMountedRef.current && currentConversationRef.current === targetConversationId && channelIdRef.current === channelName) {
-              onMessageReceived();
+              callbackRef.current();
             }
           }
         )
@@ -112,7 +118,7 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
             console.log('Messages subscription successful');
             isSubscribedRef.current = true;
             isSubscribingRef.current = false;
-            retryCountRef.current = 0; // Reset retry count on success
+            retryCountRef.current = 0;
           } else if (status === 'CLOSED') {
             console.log('Messages subscription closed');
             isSubscribedRef.current = false;
@@ -122,10 +128,9 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
             isSubscribedRef.current = false;
             isSubscribingRef.current = false;
             
-            // Only retry if component is still mounted and we're still targeting the same conversation
             if (isMountedRef.current && currentConversationRef.current === targetConversationId && retryCountRef.current < 3 && !retryTimeoutRef.current) {
               retryCountRef.current++;
-              const retryDelay = Math.min(5000 * retryCountRef.current, 30000); // Exponential backoff
+              const retryDelay = Math.min(5000 * retryCountRef.current, 30000);
               console.log(`Scheduling messages retry ${retryCountRef.current}/3 in ${retryDelay}ms...`);
               retryTimeoutRef.current = setTimeout(() => {
                 retryTimeoutRef.current = null;
@@ -144,10 +149,9 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
       console.error('Error setting up messages realtime:', error);
       isSubscribingRef.current = false;
       
-      // Only retry if component is still mounted and we're still targeting the same conversation
       if (isMountedRef.current && currentConversationRef.current === targetConversationId && retryCountRef.current < 3 && !retryTimeoutRef.current) {
         retryCountRef.current++;
-        const retryDelay = Math.min(10000 * retryCountRef.current, 60000); // Exponential backoff
+        const retryDelay = Math.min(10000 * retryCountRef.current, 60000);
         console.log(`Scheduling messages retry ${retryCountRef.current}/3 due to error in ${retryDelay}ms...`);
         retryTimeoutRef.current = setTimeout(() => {
           retryTimeoutRef.current = null;
@@ -157,7 +161,7 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
         }, retryDelay);
       }
     }
-  }, [onMessageReceived, cleanup]);
+  }, [cleanup]); // Only cleanup as dependency
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -184,11 +188,13 @@ export const useMessagesRealtime = (conversationId: string | null, onMessageRece
         clearTimeout(initTimeout);
       };
     }
+  }, [conversationId, setupChannel]); // setupChannel is now stable
 
+  useEffect(() => {
     return () => {
       console.log('Cleaning up messages realtime on unmount');
       isMountedRef.current = false;
       cleanup();
     };
-  }, [conversationId, setupChannel, cleanup]);
+  }, [cleanup]);
 };

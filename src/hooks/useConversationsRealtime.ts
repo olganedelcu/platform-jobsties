@@ -10,6 +10,12 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const retryCountRef = useRef(0);
   const channelIdRef = useRef<string | null>(null);
+  const callbackRef = useRef(onConversationChanged);
+
+  // Update callback ref when it changes
+  useEffect(() => {
+    callbackRef.current = onConversationChanged;
+  }, [onConversationChanged]);
 
   const cleanup = useCallback(async () => {
     console.log('Cleaning up conversations realtime subscription');
@@ -34,7 +40,7 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
     isSubscribedRef.current = false;
     isSubscribingRef.current = false;
     channelIdRef.current = null;
-  }, []);
+  }, []); // No dependencies to break circular reference
 
   const setupChannel = useCallback(async () => {
     // Prevent multiple simultaneous subscription attempts
@@ -93,7 +99,7 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
           (payload) => {
             console.log('Conversation change detected:', payload);
             if (isMountedRef.current && channelIdRef.current === channelName) {
-              onConversationChanged();
+              callbackRef.current();
             }
           }
         )
@@ -109,7 +115,7 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
             console.log('Conversations subscription successful');
             isSubscribedRef.current = true;
             isSubscribingRef.current = false;
-            retryCountRef.current = 0; // Reset retry count on success
+            retryCountRef.current = 0;
           } else if (status === 'CLOSED') {
             console.log('Conversations subscription closed');
             isSubscribedRef.current = false;
@@ -119,10 +125,9 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
             isSubscribedRef.current = false;
             isSubscribingRef.current = false;
             
-            // Only retry if component is still mounted and we haven't exceeded retry attempts
             if (isMountedRef.current && retryCountRef.current < 3 && !retryTimeoutRef.current) {
               retryCountRef.current++;
-              const retryDelay = Math.min(5000 * retryCountRef.current, 30000); // Exponential backoff
+              const retryDelay = Math.min(5000 * retryCountRef.current, 30000);
               console.log(`Scheduling retry ${retryCountRef.current}/3 in ${retryDelay}ms...`);
               retryTimeoutRef.current = setTimeout(() => {
                 retryTimeoutRef.current = null;
@@ -141,10 +146,9 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
       console.error('Error setting up conversations realtime:', error);
       isSubscribingRef.current = false;
       
-      // Only retry if component is still mounted and we haven't exceeded retry attempts
       if (isMountedRef.current && retryCountRef.current < 3 && !retryTimeoutRef.current) {
         retryCountRef.current++;
-        const retryDelay = Math.min(10000 * retryCountRef.current, 60000); // Exponential backoff
+        const retryDelay = Math.min(10000 * retryCountRef.current, 60000);
         console.log(`Scheduling retry ${retryCountRef.current}/3 due to error in ${retryDelay}ms...`);
         retryTimeoutRef.current = setTimeout(() => {
           retryTimeoutRef.current = null;
@@ -154,7 +158,7 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
         }, retryDelay);
       }
     }
-  }, [onConversationChanged, cleanup]);
+  }, [cleanup]); // Only cleanup as dependency
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -174,5 +178,5 @@ export const useConversationsRealtime = (onConversationChanged: () => void) => {
       isMountedRef.current = false;
       cleanup();
     };
-  }, [setupChannel, cleanup]);
+  }, []); // Empty dependency array to run only once
 };
