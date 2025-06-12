@@ -31,10 +31,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
   const { handleViewJob } = useJobViewHandler();
 
   const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
-    console.log('Marking as applied:', recommendation);
-    
     if (addingToTracker === recommendation.id) {
-      console.log('Already adding this recommendation, skipping');
       return;
     }
 
@@ -42,9 +39,8 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
     
     try {
       await markAsApplied(recommendation);
-      console.log('Successfully marked as applied');
     } catch (error) {
-      console.error('Error marking as applied:', error);
+      // Error handling is done in the hook
     } finally {
       setAddingToTracker(null);
     }

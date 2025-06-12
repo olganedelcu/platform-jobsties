@@ -14,8 +14,6 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
   const { handleAddApplication } = useJobApplicationsData(user);
 
   const markAsApplied = async (recommendation: JobRecommendation) => {
-    console.log('Starting markAsApplied for:', recommendation.id);
-    
     if (!user) {
       toast({
         title: "Error",
@@ -24,12 +22,6 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
       });
       return;
     }
-
-    // Show immediate feedback
-    toast({
-      title: "Adding to tracker...",
-      description: `Adding ${recommendation.job_title} at ${recommendation.company_name} to your applications.`,
-    });
 
     try {
       // Get the current week start date
@@ -43,28 +35,27 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
         menteeNotes: `Applied via Coach Recommendation from week of ${format(currentWeekStart, 'MMM dd, yyyy')}`
       };
 
-      console.log('Adding application with data:', applicationData);
       await handleAddApplication(applicationData);
       
       toast({
-        title: "Success",
-        description: `${recommendation.job_title} at ${recommendation.company_name} has been added to your tracker.`,
+        title: "Added to tracker",
+        description: `${recommendation.job_title} at ${recommendation.company_name}`,
+        className: "fixed top-4 right-4 w-80 max-w-sm"
       });
 
       // Only call the callback if it exists and after successful addition
       if (onApplicationAdded) {
-        console.log('Calling onApplicationAdded callback');
         // Use setTimeout to prevent immediate re-render issues
         setTimeout(() => {
           onApplicationAdded();
         }, 100);
       }
     } catch (error) {
-      console.error('Error adding application from recommendation:', error);
       toast({
         title: "Error",
         description: "Failed to add job to tracker. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
+        className: "fixed top-4 right-4 w-80 max-w-sm"
       });
       throw error; // Re-throw to let the component handle the error state
     }
