@@ -3,6 +3,7 @@ import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import Navigation from '@/components/Navigation';
 import MessagingInterface from '@/components/messaging/MessagingInterface';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 import { Loader2 } from 'lucide-react';
 
 const Messages = () => {
@@ -24,10 +25,12 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation user={user} onSignOut={handleSignOut} />
-      <MessagingInterface />
-    </div>
+    <NotificationProvider>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation user={user} onSignOut={handleSignOut} />
+        <MessagingInterface />
+      </div>
+    </NotificationProvider>
   );
 };
 

@@ -1,23 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  BarChart3, 
-  User, 
-  LogOut, 
-  Menu, 
-  X,
-  MessageCircle,
-  FileText
-} from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import DesktopNavigation from './DesktopNavigation';
-import MobileNavigation from './MobileNavigation';
-import UserProfileSection from './UserProfileSection';
-import MessageNotificationBadge from './messaging/MessageNotificationBadge';
-import NotificationDropdown from './messaging/NotificationDropdown';
+import { LogOut, User, Calendar, FileText, MessageSquare, BookOpen, Target, Users, BarChart3 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import NotificationDropdown from '@/components/messaging/NotificationDropdown';
+import { NotificationProvider } from '@/contexts/NotificationContext';
 
 interface NavigationProps {
   user: any;
@@ -25,105 +13,111 @@ interface NavigationProps {
 }
 
 const Navigation = ({ user, onSignOut }: NavigationProps) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const location = useLocation();
+  const isCoach = user?.user_metadata?.role === 'COACH';
 
-  const navigationItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { path: '/messages', label: 'Communication', icon: MessageCircle },
-    { path: '/tracker', label: 'Tracker', icon: FileText }
-  ];
+  const getInitials = (email: string) => {
+    return email.split('@')[0].substring(0, 2).toUpperCase();
+  };
 
-  useEffect(() => {
-    const fetchProfilePicture = async () => {
-      if (user?.id) {
-        try {
-          const { data, error } = await supabase
-            .from('user_profiles')
-            .select('profile_picture_url')
-            .eq('user_id', user.id)
-            .single();
-          
-          if (data?.profile_picture_url && !error) {
-            setProfilePicture(data.profile_picture_url);
-          }
-        } catch (error) {
-          console.error('Error fetching profile picture:', error);
-        }
-      }
-    };
-
-    fetchProfilePicture();
-  }, [user?.id]);
-
-  const getInitials = (firstName?: string, lastName?: string) => {
-    const first = firstName?.charAt(0)?.toUpperCase() || '';
-    const last = lastName?.charAt(0)?.toUpperCase() || '';
-    return `${first}${last}` || 'U';
+  const getLinkClass = (path: string) => {
+    const isActive = location.pathname === path;
+    return `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+      isActive 
+        ? 'bg-blue-100 text-blue-700' 
+        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+    }`;
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                alt="Logo" 
-                className="h-8 w-auto"
-              />
+    <NotificationProvider>
+      <nav className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-8">
+            <Link to={isCoach ? "/coach" : "/dashboard"} className="text-xl font-bold text-blue-600">
+              Jobsties
             </Link>
-          </div>
-
-          <DesktopNavigation navigationItems={navigationItems} />
-
-          <div className="hidden md:flex md:items-center md:space-x-4">
-            <NotificationDropdown />
-            <UserProfileSection
-              user={user}
-              profilePicture={profilePicture}
-              onSignOut={onSignOut}
-              getInitials={getInitials}
-            />
-          </div>
-
-          <div className="md:hidden flex items-center space-x-2">
-            <div className="relative">
-              <Link
-                to="/messages"
-                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <MessageCircle className="h-5 w-5 text-gray-600" />
-                <MessageNotificationBadge />
-              </Link>
-            </div>
-            <NotificationDropdown />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
+            
+            <div className="hidden md:flex items-center space-x-1">
+              {isCoach ? (
+                <>
+                  <Link to="/coach" className={getLinkClass('/coach')}>
+                    <BarChart3 className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <Link to="/coach/mentees" className={getLinkClass('/coach/mentees')}>
+                    <Users className="h-4 w-4" />
+                    Mentees
+                  </Link>
+                  <Link to="/coach/applications" className={getLinkClass('/coach/applications')}>
+                    <FileText className="h-4 w-4" />
+                    Applications
+                  </Link>
+                  <Link to="/coach/job-recommendations" className={getLinkClass('/coach/job-recommendations')}>
+                    <Target className="h-4 w-4" />
+                    Job Recommendations
+                  </Link>
+                  <Link to="/coach/sessions" className={getLinkClass('/coach/sessions')}>
+                    <Calendar className="h-4 w-4" />
+                    Sessions
+                  </Link>
+                  <Link to="/messages" className={getLinkClass('/messages')}>
+                    <MessageSquare className="h-4 w-4" />
+                    Messages
+                  </Link>
+                </>
               ) : (
-                <Menu className="h-6 w-6" />
+                <>
+                  <Link to="/dashboard" className={getLinkClass('/dashboard')}>
+                    <BarChart3 className="h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  <Link to="/tracker" className={getLinkClass('/tracker')}>
+                    <FileText className="h-4 w-4" />
+                    Job Tracker
+                  </Link>
+                  <Link to="/sessions" className={getLinkClass('/sessions')}>
+                    <Calendar className="h-4 w-4" />
+                    Sessions
+                  </Link>
+                  <Link to="/course" className={getLinkClass('/course')}>
+                    <BookOpen className="h-4 w-4" />
+                    Course
+                  </Link>
+                  <Link to="/messages" className={getLinkClass('/messages')}>
+                    <MessageSquare className="h-4 w-4" />
+                    Messages
+                  </Link>
+                </>
               )}
-            </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <NotificationDropdown />
+            
+            <div className="flex items-center space-x-3">
+              <Link to="/profile">
+                <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all">
+                  <AvatarFallback className="bg-blue-100 text-blue-700">
+                    {getInitials(user?.email || '')}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSignOut}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-
-      <MobileNavigation
-        isOpen={mobileMenuOpen}
-        navigationItems={navigationItems}
-        user={user}
-        profilePicture={profilePicture}
-        onSignOut={onSignOut}
-        onClose={() => setMobileMenuOpen(false)}
-        getInitials={getInitials}
-      />
-    </nav>
+      </nav>
+    </NotificationProvider>
   );
 };
 

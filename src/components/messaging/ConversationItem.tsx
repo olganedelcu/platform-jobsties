@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useConversationNotifications } from '@/hooks/useConversationNotifications';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 interface ConversationItemProps {
   conversation: {
@@ -16,7 +16,8 @@ interface ConversationItemProps {
 }
 
 const ConversationItem = ({ conversation, isSelected, onClick }: ConversationItemProps) => {
-  const { unreadCount } = useConversationNotifications(conversation.id);
+  const { getConversationUnreadCount } = useNotificationContext();
+  const unreadCount = getConversationUnreadCount(conversation.id);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Check, Trash2, Mail } from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ const NotificationDropdown = () => {
     markAsRead, 
     markAllAsRead, 
     deleteNotification 
-  } = useNotifications();
+  } = useNotificationContext();
   const navigate = useNavigate();
 
   const handleNotificationClick = async (notification: any) => {
@@ -53,7 +53,7 @@ const NotificationDropdown = () => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="end" className="w-80 bg-white z-50">
         <div className="flex items-center justify-between p-3 border-b">
           <h4 className="font-semibold">Notifications</h4>
           {unreadCount > 0 && (

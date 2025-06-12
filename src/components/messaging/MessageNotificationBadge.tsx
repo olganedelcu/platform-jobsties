@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 const MessageNotificationBadge = () => {
-  const { unreadCount } = useNotifications();
+  const { unreadCount } = useNotificationContext();
 
   if (unreadCount === 0) {
     return null;
