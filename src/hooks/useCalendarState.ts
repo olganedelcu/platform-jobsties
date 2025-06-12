@@ -60,27 +60,6 @@ export const useCalendarState = (coachId: string) => {
     }
   };
 
-  const handleSyncCalendar = async () => {
-    try {
-      setLoading(true);
-      await CoachCalendarService.syncWithGoogleCalendar(coachId);
-      await loadCalendarData();
-      toast({
-        title: "Success",
-        description: "Calendar synced successfully"
-      });
-    } catch (error) {
-      console.error('Error syncing calendar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sync calendar",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getEventsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
     return events.filter(event => {
@@ -100,7 +79,6 @@ export const useCalendarState = (coachId: string) => {
     showManualForm,
     setShowManualForm,
     loadCalendarData,
-    handleSyncCalendar,
     getEventsForDate
   };
 };
