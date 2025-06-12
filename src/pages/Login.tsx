@@ -28,52 +28,95 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Error",
+        description: "Please enter both email and password",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       
+      console.log('Attempting login with email:', formData.email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
+        email: formData.email.toLowerCase().trim(),
         password: formData.password
       });
 
+      console.log('Login response:', { data, error });
+
       if (error) {
+        console.error('Login error:', error);
         throw error;
       }
 
       // Check user role and redirect appropriately
       if (data.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
+        console.log('User logged in:', data.user);
+        console.log('User metadata:', data.user.user_metadata);
+        
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', data.user.id)
+            .single();
 
-        if (profileError) {
-          // Fallback to metadata
-          const userRole = data.user.user_metadata?.role;
-          if (userRole === 'COACH') {
-            navigate('/coach/mentees');
+          console.log('Profile data:', profile);
+
+          if (profileError) {
+            console.log('Profile error, checking metadata fallback:', profileError);
+            // Fallback to metadata
+            const userRole = data.user.user_metadata?.role;
+            console.log('User role from metadata:', userRole);
+            
+            if (userRole === 'COACH') {
+              navigate('/coach/mentees');
+            } else {
+              navigate('/dashboard');
+            }
           } else {
-            navigate('/dashboard');
+            console.log('User role from profile:', profile.role);
+            if (profile.role === 'COACH') {
+              navigate('/coach/mentees');
+            } else {
+              navigate('/dashboard');
+            }
           }
-        } else {
-          if (profile.role === 'COACH') {
-            navigate('/coach/mentees');
-          } else {
-            navigate('/dashboard');
-          }
+        } catch (profileCheckError) {
+          console.error('Error checking profile:', profileCheckError);
+          // Default to dashboard on profile check error
+          navigate('/dashboard');
         }
-      }
 
-      toast({
-        title: "Success",
-        description: "Welcome back!",
-      });
+        toast({
+          title: "Success",
+          description: "Welcome back!",
+        });
+      }
       
     } catch (error: any) {
+      console.error('Login error details:', error);
+      
+      let errorMessage = 'Failed to sign in';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || 'Failed to sign in',
+        title: "Login Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -136,12 +179,13 @@ const Login = () => {
               <div className="text-center mt-6">
                 <p className="text-sm text-gray-600">
                   Don't have an account?{' '}
-                  Contact <a
-                    href="mailto:olga@jobsties.com"
-                    className="text-indigo-600 hover:text-indigo-500"
+                  <button
+                    type="button"
+                    onClick={() => navigate('/signup')}
+                    className="text-indigo-600 hover:text-indigo-500 font-medium"
                   >
-                    olga@jobsties.com
-                  </a>
+                    Sign up
+                  </button>
                 </p>
               </div>
             </form>

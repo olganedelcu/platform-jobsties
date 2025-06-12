@@ -39,6 +39,15 @@ const MenteeSignUpForm = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       
@@ -50,14 +59,18 @@ const MenteeSignUpForm = () => {
         role: formData.role
       });
       
-      // Create the user with metadata
+      // Get the current origin for email redirect
+      const redirectUrl = `${window.location.origin}/login`;
+      
+      // Create the user with metadata and proper email redirect
       const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
+        email: formData.email.toLowerCase().trim(),
         password: formData.password,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
             role: formData.role
           }
         }
@@ -66,41 +79,47 @@ const MenteeSignUpForm = () => {
       console.log('Signup response:', { data, error });
 
       if (error) {
+        console.error('Signup error:', error);
         throw error;
       }
 
       if (data.user) {
         console.log('User created with metadata:', data.user.user_metadata);
         
-        // Wait a moment for the trigger to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Verify the profile was created with the correct role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
-          
-        if (profileError) {
-          console.error('Error fetching created profile:', profileError);
+        // Check if email confirmation is required
+        if (!data.user.email_confirmed_at) {
+          toast({
+            title: "Account Created",
+            description: "Please check your email and click the confirmation link to activate your account.",
+          });
         } else {
-          console.log('Created profile with role:', profile.role);
+          toast({
+            title: "Success",
+            description: "Account created successfully! You can now log in.",
+          });
         }
-        
-        toast({
-          title: "Success",
-          description: "Mentee account created successfully! Please check your email to confirm your account.",
-        });
         
         // Redirect to login page after successful signup
         navigate('/login');
       }
     } catch (error: any) {
       console.error('Signup error:', error);
+      
+      let errorMessage = 'Failed to create account';
+      
+      if (error.message?.includes('already registered')) {
+        errorMessage = 'An account with this email already exists. Please try logging in instead.';
+      } else if (error.message?.includes('Invalid email')) {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (error.message?.includes('Password')) {
+        errorMessage = 'Password must be at least 6 characters long.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || 'Failed to create account',
+        title: "Signup Failed",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
