@@ -1,4 +1,3 @@
-
 interface ErrorContext {
   component?: string;
   action?: string;
@@ -53,7 +52,7 @@ class SecureErrorHandler {
     // Remove sensitive information with error handling
     try {
       this.sensitivePatterns.forEach(pattern => {
-        if (pattern && typeof pattern.replace === 'function') {
+        if (pattern && pattern instanceof RegExp) {
           sanitized = sanitized.replace(pattern, '[REDACTED]');
         }
       });
