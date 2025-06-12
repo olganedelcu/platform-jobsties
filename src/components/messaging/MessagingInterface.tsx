@@ -58,15 +58,15 @@ const MessagingInterface = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <div className="mb-8">
+    <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
         <p className="text-gray-500 mt-2">Communicate with your coach</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-4 h-[calc(100vh-200px)] min-h-[500px]">
         {/* Conversations List */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-4 xl:col-span-3 h-full">
           <ConversationsList
             conversations={conversations}
             selectedConversationId={selectedConversationId}
@@ -77,10 +77,10 @@ const MessagingInterface = () => {
         </div>
 
         {/* Message Thread and Input */}
-        <div className="lg:col-span-2 flex flex-col">
+        <div className="lg:col-span-8 xl:col-span-9 flex flex-col h-full">
           {selectedConversationId ? (
-            <>
-              <div className="flex-1">
+            <div className="flex flex-col h-full">
+              <div className="flex-1 min-h-0">
                 <MessageThread
                   messages={messages}
                   loading={messagesLoading}
@@ -89,11 +89,13 @@ const MessagingInterface = () => {
                   currentUserId={currentUserId}
                 />
               </div>
-              <MessageInput
-                onSendMessage={handleSendMessage}
-                sending={sending}
-              />
-            </>
+              <div className="flex-shrink-0">
+                <MessageInput
+                  onSendMessage={handleSendMessage}
+                  sending={sending}
+                />
+              </div>
+            </div>
           ) : (
             <Card className="h-full">
               <CardContent className="flex items-center justify-center h-full">

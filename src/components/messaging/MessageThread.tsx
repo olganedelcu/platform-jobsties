@@ -34,11 +34,11 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <Card className="h-full">
-        <CardHeader>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle>Loading messages...</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
@@ -53,11 +53,11 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <Card className="h-full">
-        <CardHeader>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle>{conversationSubject || 'Conversation'}</CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-64">
+        <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-500">
             <User className="h-12 w-12 mx-auto mb-3 text-gray-300" />
             <p>No messages yet</p>
@@ -76,7 +76,7 @@ const MessageThread = ({
           {conversationSubject || 'Conversation'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto">
+      <CardContent className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
           {messages.map((message) => {
             const isCurrentUser = message.sender_id === currentUserId;
@@ -112,7 +112,7 @@ const MessageThread = ({
                     )}
                   </div>
                   
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                   
                   {message.attachments && message.attachments.length > 0 && (
                     <div className="mt-2 space-y-1">
@@ -123,14 +123,14 @@ const MessageThread = ({
                             isCurrentUser ? 'bg-blue-600' : 'bg-gray-200'
                           }`}
                         >
-                          <Paperclip className="h-3 w-3" />
+                          <Paperclip className="h-3 w-3 flex-shrink-0" />
                           <span className="text-xs truncate flex-1">
                             {attachment.file_name}
                           </span>
                           <Button
                             size="sm"
                             variant="ghost"
-                            className={`h-6 w-6 p-0 ${
+                            className={`h-6 w-6 p-0 flex-shrink-0 ${
                               isCurrentUser ? 'hover:bg-blue-700' : 'hover:bg-gray-300'
                             }`}
                             onClick={() => onDownloadAttachment(attachment)}

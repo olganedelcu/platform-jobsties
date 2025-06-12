@@ -30,11 +30,11 @@ const ConversationsList = ({
 }: ConversationsListProps) => {
   if (loading) {
     return (
-      <Card className="h-full">
-        <CardHeader>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="flex-shrink-0">
           <CardTitle>Conversations</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1">
           <div className="text-center text-gray-500">Loading conversations...</div>
         </CardContent>
       </Card>
@@ -42,8 +42,8 @@ const ConversationsList = ({
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle>Conversations</CardTitle>
           <Button 
@@ -55,13 +55,13 @@ const ConversationsList = ({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1 overflow-hidden">
         {conversations.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
             No conversations yet. Start a new one!
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 overflow-y-auto h-full">
             {conversations.map((conversation) => (
               <ConversationItem
                 key={conversation.id}
