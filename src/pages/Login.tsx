@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { checkAndSyncCurrentUser } from '@/utils/profileSyncUtils';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -57,6 +59,11 @@ const Login = () => {
       if (data.user) {
         console.log('User logged in:', data.user);
         console.log('User metadata:', data.user.user_metadata);
+        
+        // Try to sync the user to profiles table if needed
+        console.log('Attempting to sync user to profiles...');
+        const syncResult = await checkAndSyncCurrentUser();
+        console.log('Profile sync result:', syncResult);
         
         try {
           const { data: profile, error: profileError } = await supabase
