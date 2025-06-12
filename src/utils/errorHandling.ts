@@ -1,6 +1,6 @@
 
 interface ErrorContext {
-  component?: string;  
+  component?: string;
   action?: string;
   userId?: string;
   timestamp?: string;
@@ -37,28 +37,20 @@ class SecureErrorHandler {
     SERVER_ERROR: 'Service temporarily unavailable. Please try again later.',
     TIMEOUT_ERROR: 'Request timed out. Please try again.',
     DATABASE_ERROR: 'Data operation failed. Please try again.',
+    CALENDAR_ERROR: 'Calendar operation failed. Please try again.',
+    FILE_UPLOAD_ERROR: 'File upload failed. Please try again.',
     AUTHENTICATION_ERROR: 'Authentication failed. Please try again.',
-    DATA_PROCESSING_ERROR: 'Data processing failed. Please try again.',
-    STRING_PROCESSING_ERROR: 'Text processing failed. Please try again.',
   };
 
   static sanitizeMessage(message: string): string {
-    if (!message || typeof message !== 'string') {
-      return 'Unknown error occurred';
-    }
-    
     let sanitized = message;
     
-    try {
-      this.sensitivePatterns.forEach(pattern => {
-        if (pattern && pattern instanceof RegExp) {
-          sanitized = sanitized.replace(pattern, '[REDACTED]');
-        }
-      });
-    } catch (patternError) {
-      console.warn('Error applying sensitive pattern filters:', patternError);
-    }
+    // Remove sensitive information
+    this.sensitivePatterns.forEach(pattern => {
+      sanitized = sanitized.replace(pattern, '[REDACTED]');
+    });
 
+    // Limit message length
     if (sanitized.length > 200) {
       sanitized = sanitized.substring(0, 197) + '...';
     }
@@ -67,55 +59,38 @@ class SecureErrorHandler {
   }
 
   static categorizeError(error: Error | any): string {
-    let message = '';
-    let status = null;
+    const message = error?.message?.toLowerCase() || '';
+    const status = error?.status || error?.code;
 
-    try {
-      if (error && typeof error === 'object') {
-        if (error.message && typeof error.message === 'string') {
-          message = error.message.toLowerCase();
-        }
-        status = error.status || error.code || null;
-      }
-    } catch (extractionError) {
-      console.warn('Error extracting error properties:', extractionError);
-      message = '';
-      status = null;
+    if (status === 401 || message.includes('unauthorized')) {
+      return 'UNAUTHORIZED';
     }
-
-    try {
-      if (status === 401 || (message && message.includes('unauthorized'))) {
-        return 'UNAUTHORIZED';
-      }
-      if (status === 403 || (message && message.includes('forbidden'))) {
-        return 'FORBIDDEN';
-      }
-      if (status === 404 || (message && message.includes('not found'))) {
-        return 'NOT_FOUND';
-      }
-      if (status === 408 || (message && message.includes('timeout'))) {
-        return 'TIMEOUT_ERROR';
-      }
-      if (message && (message.includes('network') || message.includes('fetch'))) {
-        return 'NETWORK_ERROR';
-      }
-      if (message && (message.includes('validation') || message.includes('invalid'))) {
-        return 'VALIDATION_ERROR';
-      }
-      if (message && (message.includes('auth') || message.includes('login'))) {
-        return 'AUTHENTICATION_ERROR';
-      }
-      if (message && (message.includes('database') || message.includes('sql'))) {
-        return 'DATABASE_ERROR';
-      }
-      if (message && (message.includes('tolowercase') || message.includes('undefined') || message.includes('cannot read properties'))) {
-        return 'STRING_PROCESSING_ERROR';
-      }
-      if (message && (message.includes('processing') || message.includes('formatting'))) {
-        return 'DATA_PROCESSING_ERROR';
-      }
-    } catch (categorizationError) {
-      console.warn('Error categorizing error:', categorizationError);
+    if (status === 403 || message.includes('forbidden')) {
+      return 'FORBIDDEN';
+    }
+    if (status === 404 || message.includes('not found')) {
+      return 'NOT_FOUND';
+    }
+    if (status === 408 || message.includes('timeout')) {
+      return 'TIMEOUT_ERROR';
+    }
+    if (message.includes('network') || message.includes('fetch')) {
+      return 'NETWORK_ERROR';
+    }
+    if (message.includes('validation') || message.includes('invalid')) {
+      return 'VALIDATION_ERROR';
+    }
+    if (message.includes('calendar')) {
+      return 'CALENDAR_ERROR';
+    }
+    if (message.includes('upload') || message.includes('file')) {
+      return 'FILE_UPLOAD_ERROR';
+    }
+    if (message.includes('auth') || message.includes('login')) {
+      return 'AUTHENTICATION_ERROR';
+    }
+    if (message.includes('database') || message.includes('sql')) {
+      return 'DATABASE_ERROR';
     }
     
     return 'SERVER_ERROR';
@@ -126,6 +101,7 @@ class SecureErrorHandler {
     const errorCode = this.categorizeError(error);
     const userFriendlyMessage = this.errorMessages[errorCode] || 'An unexpected error occurred.';
 
+    // Log sanitized error for debugging (in production, send to monitoring service)
     const logData = {
       errorId,
       code: errorCode,
@@ -134,7 +110,7 @@ class SecureErrorHandler {
         ...context,
         timestamp: new Date().toISOString(),
       },
-      stack: error?.stack?.split('\n').slice(0, 3).join('\n'),
+      stack: error?.stack?.split('\n').slice(0, 3).join('\n'), // Limited stack trace
     };
 
     console.error('Handled Error:', logData);
@@ -153,6 +129,8 @@ class SecureErrorHandler {
       'TIMEOUT_ERROR',
       'SERVER_ERROR',
       'DATABASE_ERROR',
+      'CALENDAR_ERROR',
+      'FILE_UPLOAD_ERROR',
     ];
     return retryableErrors.includes(errorCode);
   }
