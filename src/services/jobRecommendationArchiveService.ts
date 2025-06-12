@@ -29,7 +29,7 @@ export const updateJobRecommendationStatus = async (
     throw error;
   }
 
-  return data;
+  return data as JobRecommendation;
 };
 
 export const markRecommendationAsApplied = async (
@@ -82,5 +82,5 @@ export const fetchJobRecommendationsByStatus = async (
     throw error;
   }
 
-  return data || [];
+  return (data || []) as JobRecommendation[];
 };

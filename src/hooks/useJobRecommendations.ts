@@ -36,7 +36,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         throw error;
       }
 
-      setRecommendations(data || []);
+      setRecommendations((data || []) as JobRecommendation[]);
     } catch (error: any) {
       console.error('Error fetching job recommendations:', error);
       toast({
@@ -81,7 +81,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
       }
 
       console.log('Successfully added recommendation:', data);
-      setRecommendations(prev => [data, ...prev]);
+      setRecommendations(prev => [data as JobRecommendation, ...prev]);
       
       return data;
     } catch (error: any) {

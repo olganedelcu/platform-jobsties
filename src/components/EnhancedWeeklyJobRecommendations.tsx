@@ -7,7 +7,7 @@ import { Briefcase, Clock, CheckSquare, Archive, List } from 'lucide-react';
 import { useJobRecommendationArchive } from '@/hooks/useJobRecommendationArchive';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import EnhancedRecommendationCard from './job-recommendations/EnhancedRecommendationCard';
-import { EmptyState } from './job-recommendations/EmptyState';
+import EmptyState from './job-recommendations/EmptyState';
 
 interface EnhancedWeeklyJobRecommendationsProps {
   userId: string;
@@ -35,7 +35,7 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
   } = useJobRecommendationArchive({
     userId,
     isCoach: false,
-    onRecommendationUpdated: fetchAllRecommendations
+    onRecommendationUpdated: () => fetchAllRecommendations()
   });
 
   const fetchAllRecommendations = async () => {
