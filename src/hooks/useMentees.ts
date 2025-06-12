@@ -34,11 +34,11 @@ export const useMentees = () => {
 
       console.log('Current user ID:', user.id);
 
-      // First, get ALL mentees from the profiles table - check for both 'mentee' and 'MENTEE'
+      // Get ALL mentees from the profiles table - check for both 'mentee' and 'MENTEE' (case insensitive)
       const { data: allMentees, error: menteesError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email')
-        .or('role.eq.mentee,role.eq.MENTEE');
+        .select('id, first_name, last_name, email, role')
+        .ilike('role', 'mentee'); // Case insensitive search
 
       console.log('All mentees from profiles table:', allMentees);
 
@@ -115,9 +115,16 @@ export const useMentees = () => {
         }
       }
 
-      // Always show ALL mentees from profiles table
-      setMentees(allMentees);
-      console.log('Setting mentees to display:', allMentees);
+      // Return only the mentee data without the role field for the component
+      const menteeData = allMentees.map(({ id, first_name, last_name, email }) => ({
+        id,
+        first_name,
+        last_name,
+        email
+      }));
+
+      setMentees(menteeData);
+      console.log('Setting mentees to display:', menteeData);
 
     } catch (error) {
       console.error('Error fetching mentees:', error);
