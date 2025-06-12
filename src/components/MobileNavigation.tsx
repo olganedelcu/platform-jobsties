@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LucideIcon, LogOut } from 'lucide-react';
-import MessageNotificationBadge from './messaging/MessageNotificationBadge';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface NavigationItem {
   path: string;
@@ -31,6 +31,8 @@ const MobileNavigation = ({
   onClose,
   getInitials
 }: MobileNavigationProps) => {
+  const { unreadCount } = useNotifications();
+
   if (!isOpen) return null;
 
   return (
@@ -49,7 +51,11 @@ const MobileNavigation = ({
             >
               <IconComponent className="h-5 w-5" />
               <span>{item.label}</span>
-              {isMessages && <MessageNotificationBadge />}
+              {isMessages && unreadCount > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
