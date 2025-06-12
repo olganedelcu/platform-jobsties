@@ -18,11 +18,6 @@ const UserProfileSection = ({
   onSignOut,
   getInitials
 }: UserProfileSectionProps) => {
-  // Add safety checks for user data
-  const firstName = user?.user_metadata?.first_name || '';
-  const lastName = user?.user_metadata?.last_name || '';
-  const email = user?.email || '';
-
   return (
     <div className="hidden md:flex md:items-center md:space-x-4">
       <Link
@@ -32,14 +27,14 @@ const UserProfileSection = ({
         <Avatar className="h-8 w-8">
           <AvatarImage src={profilePicture || undefined} />
           <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs">
-            {getInitials(firstName, lastName)}
+            {getInitials(user?.user_metadata?.first_name, user?.user_metadata?.last_name)}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
           <span className="text-sm font-medium text-gray-900">
-            {firstName} {lastName}
+            {user?.user_metadata?.first_name} {user?.user_metadata?.last_name}
           </span>
-          <span className="text-xs text-gray-500">{email}</span>
+          <span className="text-xs text-gray-500">{user?.email}</span>
         </div>
       </Link>
       

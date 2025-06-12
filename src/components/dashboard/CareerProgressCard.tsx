@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Target, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Clock } from 'lucide-react';
 
 interface CareerProgressCardProps {
   courseProgress: number;
@@ -12,60 +12,47 @@ interface CareerProgressCardProps {
   onSalaryNegotiationClick: () => void;
 }
 
-const CareerProgressCard = ({
-  courseProgress,
-  onCVOptimizedClick,
-  onInterviewPrepClick,
-  onSalaryNegotiationClick
+const CareerProgressCard = ({ 
+  courseProgress, 
+  onCVOptimizedClick, 
+  onInterviewPrepClick, 
+  onSalaryNegotiationClick 
 }: CareerProgressCardProps) => {
   return (
-    <Card className="shadow-sm border border-gray-200">
+    <Card className="border border-gray-200 shadow-sm">
       <CardContent className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-            <TrendingUp className="h-5 w-5 text-indigo-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Career Progress</h3>
-            <p className="text-sm text-gray-600">Track your development journey</p>
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-gray-900">Career Progress</h3>
+          <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
+            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            Live
+          </Badge>
         </div>
+        
+        <div className="text-4xl font-bold text-blue-600 mb-3">{courseProgress}%</div>
+        <Progress value={courseProgress} className="mb-4 h-3" />
+        <div className="text-sm text-gray-500 mb-6">Course completion</div>
 
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Course Completion</span>
-            <span className="text-sm font-semibold text-indigo-600">{Math.round(courseProgress)}%</span>
+        {/* Progress Icons */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center cursor-pointer" onClick={onCVOptimizedClick}>
+            <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-green-200 transition-colors">
+              <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+            </div>
+            <div className="text-sm text-gray-700 font-medium">CV Optimized</div>
           </div>
-          <Progress value={courseProgress} className="h-2" />
-        </div>
-
-        <div className="space-y-3">
-          <Button 
-            variant="outline" 
-            className="w-full justify-start border-gray-200 hover:bg-gray-50"
-            onClick={onCVOptimizedClick}
-          >
-            <BookOpen className="h-4 w-4 mr-3 text-indigo-600" />
-            <span className="text-gray-700">CV Optimization</span>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="w-full justify-start border-gray-200 hover:bg-gray-50"
-            onClick={onInterviewPrepClick}
-          >
-            <Target className="h-4 w-4 mr-3 text-green-600" />
-            <span className="text-gray-700">Interview Preparation</span>
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            className="w-full justify-start border-gray-200 hover:bg-gray-50"
-            onClick={onSalaryNegotiationClick}
-          >
-            <TrendingUp className="h-4 w-4 mr-3 text-purple-600" />
-            <span className="text-gray-700">Salary Negotiation</span>
-          </Button>
+          <div className="text-center cursor-pointer" onClick={onInterviewPrepClick}>
+            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-blue-200 transition-colors">
+              <Clock className="w-7 h-7 text-blue-600" />
+            </div>
+            <div className="text-sm text-gray-700 font-medium">Interview Prep</div>
+          </div>
+          <div className="text-center cursor-pointer" onClick={onSalaryNegotiationClick}>
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-gray-200 transition-colors">
+              <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+            </div>
+            <div className="text-sm text-gray-700 font-medium">Salary Negotiation</div>
+          </div>
         </div>
       </CardContent>
     </Card>

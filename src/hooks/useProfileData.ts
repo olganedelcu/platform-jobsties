@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,22 +37,16 @@ export const useProfileData = (user: any) => {
     try {
       setLoading(true);
       
-      // Try to get from user_profiles table, but handle RLS errors gracefully
-      let userProfile = null;
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
+      // First try to get from user_profiles table
+      const { data: userProfile, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-        if (error && error.code !== 'PGRST116') {
-          console.log('User profiles RLS restriction or other error:', error);
-        } else if (data) {
-          userProfile = data;
-        }
-      } catch (error) {
-        console.log('Error accessing user_profiles table:', error);
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 is "not found" error, which is expected for new users
+        console.error('Error fetching profile:', error);
       }
 
       if (userProfile) {
@@ -66,7 +61,7 @@ export const useProfileData = (user: any) => {
         });
         setProfilePicture(userProfile.profile_picture_url);
       } else {
-        // Fallback to user metadata for new users or when RLS blocks access
+        // Fallback to user metadata for new users
         setProfileData({
           firstName: user?.user_metadata?.first_name || '',
           lastName: user?.user_metadata?.last_name || '',
@@ -78,14 +73,10 @@ export const useProfileData = (user: any) => {
       }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
-      // Fallback to user metadata if everything fails
-      setProfileData({
-        firstName: user?.user_metadata?.first_name || '',
-        lastName: user?.user_metadata?.last_name || '',
-        email: user?.email || '',
-        location: '',
-        phone: '',
-        about: ''
+      toast({
+        title: "Error",
+        description: "Failed to load profile data.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);

@@ -7,12 +7,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import { NotificationProvider } from "@/contexts/NotificationContext";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Sessions from "./pages/Sessions";
+import Messages from "./pages/Messages";
 import Tracker from "./pages/Tracker";
 import Course from "./pages/Course";
 import CoachSignUp from "./pages/CoachSignUp";
@@ -28,6 +28,7 @@ import Applications from "./pages/coach/Applications";
 import CoachCalendar from "./pages/coach/CoachCalendar";
 import JobRecommendations from "./pages/coach/JobRecommendations";
 import BackupManagementPage from "./pages/coach/BackupManagement";
+import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -59,41 +60,41 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <NotificationProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/sessions" element={<Sessions />} />
-                <Route path="/tracker" element={<Tracker />} />
-                <Route path="/course" element={<Course />} />
-                
-                {/* Coach Routes */}
-                <Route path="/coach/signup" element={<CoachSignUp />} />
-                <Route path="/coach/login" element={<CoachLogin />} />
-                <Route path="/coach/mentees" element={<Mentees />} />
-                <Route path="/coach/dashboard" element={<CoachDashboard />} />
-                <Route path="/coach/cv-upload" element={<CVUpload />} />
-                <Route path="/coach/sessions" element={<CoachSessions />} />
-                <Route path="/coach/settings" element={<CoachSettings />} />
-                <Route path="/coach/profile" element={<CoachProfile />} />
-                <Route path="/coach/todos" element={<CoachTodos />} />
-                <Route path="/coach/applications" element={<Applications />} />
-                <Route path="/coach/calendar" element={<CoachCalendar />} />
-                <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
-                <Route path="/coach/backup" element={<BackupManagementPage />} />
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </NotificationProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/sessions" element={<Sessions />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/tracker" element={<Tracker />} />
+              <Route path="/course" element={<Course />} />
+              <Route path="/chat" element={<ChatPage />} />
+              
+              {/* Coach Routes */}
+              <Route path="/coach/signup" element={<CoachSignUp />} />
+              <Route path="/coach/login" element={<CoachLogin />} />
+              <Route path="/coach/mentees" element={<Mentees />} />
+              <Route path="/coach/dashboard" element={<CoachDashboard />} />
+              <Route path="/coach/cv-upload" element={<CVUpload />} />
+              <Route path="/coach/sessions" element={<CoachSessions />} />
+              <Route path="/coach/settings" element={<CoachSettings />} />
+              <Route path="/coach/profile" element={<CoachProfile />} />
+              <Route path="/coach/todos" element={<CoachTodos />} />
+              <Route path="/coach/applications" element={<Applications />} />
+              <Route path="/coach/calendar" element={<CoachCalendar />} />
+              <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
+              <Route path="/coach/backup" element={<BackupManagementPage />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>

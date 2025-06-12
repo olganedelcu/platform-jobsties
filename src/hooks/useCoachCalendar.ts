@@ -13,39 +13,39 @@ interface CalendarEvent {
   google_event_id: string;
 }
 
-interface CalendarSettingsType {
+interface CalendarSettings {
   google_calendar_connected: boolean;
   sync_enabled: boolean;
   last_sync_at?: string;
 }
 
-export const useCalendarState = (coachId: string) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+export const useCoachCalendar = (coachId: string) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [settings, setSettings] = useState<CalendarSettingsType>({
+  const [settings, setSettings] = useState<CalendarSettings>({
     google_calendar_connected: false,
     sync_enabled: false
   });
-  const [loading, setLoading] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showManualForm, setShowManualForm] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  useEffect(() => {
-    loadCalendarData();
-  }, [coachId]);
 
   const loadCalendarData = async () => {
     try {
       setLoading(true);
+      
+      // Check if Google Calendar is connected
+      const isGoogleConnected = await CoachCalendarService.checkGoogleConnection(coachId);
+      
       const [calendarSettings, calendarEvents] = await Promise.all([
         CoachCalendarService.getCalendarSettings(coachId),
         CoachCalendarService.getCalendarEvents(coachId)
       ]);
       
-      setSettings(calendarSettings || {
-        google_calendar_connected: false,
-        sync_enabled: false
+      setSettings({
+        ...(calendarSettings || {
+          google_calendar_connected: isGoogleConnected,
+          sync_enabled: false
+        }),
+        google_calendar_connected: isGoogleConnected
       });
       setEvents(calendarEvents || []);
     } catch (error) {
@@ -60,9 +60,17 @@ export const useCalendarState = (coachId: string) => {
     }
   };
 
-  const handleSyncCalendar = async () => {
+  const checkAvailability = async (startTime: string, endTime: string): Promise<boolean> => {
     try {
-      setLoading(true);
+      return await CoachCalendarService.checkAvailability(coachId, startTime, endTime);
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      return false;
+    }
+  };
+
+  const syncCalendar = async () => {
+    try {
       await CoachCalendarService.syncWithGoogleCalendar(coachId);
       await loadCalendarData();
       toast({
@@ -76,31 +84,21 @@ export const useCalendarState = (coachId: string) => {
         description: "Failed to sync calendar",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const getEventsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    return events.filter(event => {
-      const eventDate = new Date(event.start_time).toISOString().split('T')[0];
-      return eventDate === dateStr;
-    });
-  };
+  useEffect(() => {
+    if (coachId) {
+      loadCalendarData();
+    }
+  }, [coachId]);
 
   return {
-    selectedDate,
-    setSelectedDate,
     events,
     settings,
     loading,
-    showSettings,
-    setShowSettings,
-    showManualForm,
-    setShowManualForm,
     loadCalendarData,
-    handleSyncCalendar,
-    getEventsForDate
+    checkAvailability,
+    syncCalendar
   };
 };

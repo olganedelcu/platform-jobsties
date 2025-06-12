@@ -1,17 +1,21 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon, Settings } from 'lucide-react';
+import { Calendar as CalendarIcon, Settings, RefreshCw } from 'lucide-react';
 
 interface CalendarHeaderProps {
   onAddAvailability: () => void;
   onShowSettings: () => void;
+  onSyncCalendar: () => void;
+  isGoogleConnected: boolean;
   loading: boolean;
 }
 
 const CalendarHeader = ({ 
   onAddAvailability, 
   onShowSettings, 
+  onSyncCalendar, 
+  isGoogleConnected, 
   loading 
 }: CalendarHeaderProps) => {
   return (
@@ -25,7 +29,6 @@ const CalendarHeader = ({
           variant="outline"
           size="sm"
           onClick={onAddAvailability}
-          disabled={loading}
         >
           <CalendarIcon className="h-4 w-4 mr-2" />
           Add Availability
@@ -34,11 +37,21 @@ const CalendarHeader = ({
           variant="outline"
           size="sm"
           onClick={onShowSettings}
-          disabled={loading}
         >
           <Settings className="h-4 w-4 mr-2" />
           Settings
         </Button>
+        {isGoogleConnected && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSyncCalendar}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Sync
+          </Button>
+        )}
       </div>
     </div>
   );

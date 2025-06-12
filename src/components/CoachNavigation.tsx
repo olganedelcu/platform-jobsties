@@ -11,8 +11,10 @@ import {
   X,
   CheckSquare,
   BarChart3,
-  Database
+  Database,
+  MessageCircle
 } from 'lucide-react';
+import NotificationDropdown from './messaging/NotificationDropdown';
 
 interface CoachNavigationProps {
   user: any;
@@ -33,6 +35,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       path: '/coach/applications', 
       label: 'Applications', 
       icon: BarChart3 
+    },
+    { 
+      path: '/messages', 
+      label: 'Communication', 
+      icon: MessageCircle 
     },
     { 
       path: '/coach/cv-upload', 
@@ -99,6 +106,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
             })}
             
             <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
+              <NotificationDropdown />
               <span className="text-sm text-gray-600">
                 {user?.user_metadata?.first_name || user?.email}
               </span>
@@ -110,6 +118,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
+            <NotificationDropdown />
             <Button
               variant="ghost"
               size="sm"

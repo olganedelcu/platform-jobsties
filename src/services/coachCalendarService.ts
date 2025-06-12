@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { SecureErrorHandler } from '@/utils/errorHandling';
 
@@ -43,12 +42,7 @@ export class CoachCalendarService {
         throw new Error(sanitizedError.message);
       }
 
-      // Always return disconnected state since Google Calendar is removed
-      return {
-        google_calendar_connected: false,
-        sync_enabled: false,
-        last_sync_at: data?.last_sync_at
-      };
+      return data;
     } catch (error) {
       const sanitizedError = SecureErrorHandler.handleError(
         error,
@@ -131,6 +125,220 @@ export class CoachCalendarService {
     }
   }
 
+  static async getGoogleAuthUrl(): Promise<string> {
+    try {
+      const { data, error } = await supabase.functions.invoke('google-oauth', {
+        body: { action: 'get_auth_url' }
+      });
+
+      if (error) {
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+        );
+        throw new Error(sanitizedError.message);
+      }
+
+      if (!data?.auth_url || typeof data.auth_url !== 'string') {
+        const error = SecureErrorHandler.handleError(
+          new Error('Invalid OAuth URL received'),
+          { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+        );
+        throw new Error(error.message);
+      }
+
+      return data.auth_url;
+    } catch (error) {
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+      );
+      throw new Error(sanitizedError.message);
+    }
+  }
+
+  static async connectGoogleCalendar(): Promise<void> {
+    try {
+      const authUrl = await this.getGoogleAuthUrl();
+      
+      const popup = window.open(
+        authUrl,
+        'google-oauth',
+        'width=500,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      if (!popup) {
+        const error = SecureErrorHandler.handleError(
+          new Error('Popup blocked'),
+          { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+        );
+        throw new Error(error.message);
+      }
+
+      return new Promise((resolve, reject) => {
+        const checkClosed = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkClosed);
+            setTimeout(resolve, 1000);
+          }
+        }, 1000);
+
+        setTimeout(() => {
+          clearInterval(checkClosed);
+          if (!popup.closed) {
+            popup.close();
+          }
+          const error = SecureErrorHandler.handleError(
+            new Error('OAuth timeout'),
+            { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+          );
+          reject(new Error(error.message));
+        }, 300000);
+      });
+    } catch (error) {
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
+    }
+  }
+
+  static async checkGoogleConnection(coachId?: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('coach_google_tokens')
+        .select('access_token, expires_at')
+        .eq('coach_email', 'ana@jobsties.com')
+        .maybeSingle();
+
+      if (error || !data?.access_token) {
+        return false;
+      }
+
+      const expiresAt = new Date(data.expires_at);
+      const now = new Date();
+      
+      return expiresAt.getTime() > now.getTime();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static async disconnectGoogleCalendar(coachId: string): Promise<void> {
+    if (!coachId || typeof coachId !== 'string') {
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+      );
+      throw new Error(error.message);
+    }
+
+    try {
+      await supabase
+        .from('coach_google_tokens')
+        .delete()
+        .eq('coach_email', 'ana@jobsties.com');
+
+      const { error } = await supabase
+        .from('coach_calendar_settings')
+        .update({
+          google_calendar_connected: false,
+          sync_enabled: false,
+          last_sync_at: null
+        })
+        .eq('coach_id', coachId);
+
+      if (error) {
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+        );
+        throw new Error(sanitizedError.message);
+      }
+
+      await supabase
+        .from('coach_calendar_events')
+        .delete()
+        .eq('coach_id', coachId);
+    } catch (error) {
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
+    }
+  }
+
+  static async updateSyncSettings(coachId: string, syncEnabled: boolean): Promise<void> {
+    if (!coachId || typeof coachId !== 'string') {
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(error.message);
+    }
+
+    if (typeof syncEnabled !== 'boolean') {
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid sync status'),
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(error.message);
+    }
+
+    try {
+      const { error } = await supabase
+        .from('coach_calendar_settings')
+        .update({ sync_enabled: syncEnabled })
+        .eq('coach_id', coachId);
+
+      if (error) {
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+        );
+        throw new Error(sanitizedError.message);
+      }
+    } catch (error) {
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(sanitizedError.message);
+    }
+  }
+
+  static async syncWithGoogleCalendar(coachId: string): Promise<void> {
+    if (!coachId || typeof coachId !== 'string') {
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+      );
+      throw new Error(error.message);
+    }
+
+    try {
+      const { error } = await supabase.functions.invoke('google-calendar-sync', {
+        body: { coach_id: coachId }
+      });
+
+      if (error) {
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+        );
+        throw new Error(sanitizedError.message);
+      }
+    } catch (error) {
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
+    }
+  }
+
   static async checkAvailability(coachId: string, startTime: string, endTime: string): Promise<boolean> {
     if (!coachId || typeof coachId !== 'string') {
       const error = SecureErrorHandler.handleError(
@@ -203,47 +411,6 @@ export class CoachCalendarService {
       const sanitizedError = SecureErrorHandler.handleError(
         error,
         { component: 'CoachCalendarService', action: 'checkAvailability' }
-      );
-      throw new Error(sanitizedError.message);
-    }
-  }
-
-  static async addManualAvailability(coachId: string, eventData: {
-    title: string;
-    description?: string;
-    start_time: string;
-    end_time: string;
-    is_available_for_booking: boolean;
-  }): Promise<void> {
-    if (!coachId || typeof coachId !== 'string') {
-      const error = SecureErrorHandler.handleError(
-        new Error('Invalid coach ID'),
-        { component: 'CoachCalendarService', action: 'addManualAvailability' }
-      );
-      throw new Error(error.message);
-    }
-
-    try {
-      const { error } = await supabase
-        .from('coach_calendar_events')
-        .insert({
-          coach_id: coachId,
-          google_event_id: `manual_${Date.now()}`,
-          calendar_id: 'manual',
-          ...eventData
-        });
-
-      if (error) {
-        const sanitizedError = SecureErrorHandler.handleError(
-          error,
-          { component: 'CoachCalendarService', action: 'addManualAvailability' }
-        );
-        throw new Error(sanitizedError.message);
-      }
-    } catch (error) {
-      const sanitizedError = SecureErrorHandler.handleError(
-        error,
-        { component: 'CoachCalendarService', action: 'addManualAvailability' }
       );
       throw new Error(sanitizedError.message);
     }

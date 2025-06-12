@@ -17,12 +17,14 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
     selectedDate,
     setSelectedDate,
     events,
+    settings,
     loading,
     showSettings,
     setShowSettings,
     showManualForm,
     setShowManualForm,
     loadCalendarData,
+    handleSyncCalendar,
     getEventsForDate
   } = useCalendarState(coachId);
 
@@ -33,10 +35,15 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
       <CalendarHeader
         onAddAvailability={() => setShowManualForm(!showManualForm)}
         onShowSettings={() => setShowSettings(!showSettings)}
+        onSyncCalendar={handleSyncCalendar}
+        isGoogleConnected={settings.google_calendar_connected}
         loading={loading}
       />
 
-      <CalendarConnectionStatus />
+      <CalendarConnectionStatus
+        isConnected={settings.google_calendar_connected}
+        lastSyncAt={settings.last_sync_at}
+      />
 
       {showManualForm && (
         <ManualAvailabilityForm
@@ -47,7 +54,13 @@ const CoachCalendar = ({ coachId }: CoachCalendarProps) => {
         />
       )}
 
-      {showSettings && <CalendarSettings />}
+      {showSettings && (
+        <CalendarSettings
+          settings={settings}
+          onSettingsUpdate={() => loadCalendarData()}
+          coachId={coachId}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CalendarView

@@ -36,29 +36,29 @@ export const useMenteeAssignment = () => {
         is_active: true
       }));
 
-      // Use upsert to handle potential duplicates gracefully
       const { error: assignError } = await supabase
         .from('coach_mentee_assignments')
-        .upsert(newAssignments, { 
-          onConflict: 'coach_id,mentee_id',
-          ignoreDuplicates: true 
-        });
+        .insert(newAssignments);
 
       if (assignError) {
         console.error('Error auto-assigning mentees:', assignError);
-        toast({
-          title: "Warning", 
-          description: `Could not assign ${unassignedMentees.length} mentees automatically.`,
-          variant: "destructive"
-        });
+        // Only show error if it's not a duplicate key constraint
+        if (assignError.code !== '23505') {
+          toast({
+            title: "Warning",
+            description: `Could not assign ${unassignedMentees.length} mentees automatically.`,
+            variant: "destructive"
+          });
+        } else {
+          // This is expected - mentees are already assigned
+          console.log('Some mentees were already assigned (duplicate key constraint), which is expected behavior');
+        }
       } else {
         console.log('Successfully auto-assigned mentees');
-        if (unassignedMentees.length > 0) {
-          toast({
-            title: "Success",
-            description: `Assigned ${unassignedMentees.length} new mentees to you.`,
-          });
-        }
+        toast({
+          title: "Success",
+          description: `Assigned ${unassignedMentees.length} new mentees to you.`,
+        });
       }
     }
   };

@@ -21,7 +21,7 @@ export class AvailabilityUtils {
       return false;
     }
 
-    // Check manual calendar availability if coach ID is provided
+    // Check calendar availability if coach ID is provided
     if (coachId) {
       try {
         const startOfDay = `${date}T00:00:00.000Z`;
@@ -71,7 +71,7 @@ export class AvailabilityUtils {
     const bookedForDate = bookedTimeSlots[date] || [];
     const availableTimes = times.filter(time => !bookedForDate.includes(time));
 
-    // Further filter by checking individual time slots against manual calendar events
+    // Further filter by checking individual time slots against calendar events
     if (coachId) {
       const finalAvailableTimes: string[] = [];
       
