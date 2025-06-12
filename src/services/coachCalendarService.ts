@@ -1,5 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
+import { SecureErrorHandler } from '@/utils/errorHandling';
 
 interface CalendarSettings {
   google_calendar_connected: boolean;
@@ -20,7 +20,11 @@ interface CalendarEvent {
 export class CoachCalendarService {
   static async getCalendarSettings(coachId: string): Promise<CalendarSettings | null> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'), 
+        { component: 'CoachCalendarService', action: 'getCalendarSettings' }
+      );
+      throw new Error(error.message);
     }
 
     try {
@@ -31,18 +35,30 @@ export class CoachCalendarService {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
-        throw new Error('Failed to retrieve calendar settings');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'getCalendarSettings' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
       return data;
     } catch (error) {
-      throw new Error('Calendar settings access failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'getCalendarSettings' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
   static async getCalendarEvents(coachId: string): Promise<CalendarEvent[]> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'getCalendarEvents' }
+      );
+      throw new Error(error.message);
     }
 
     try {
@@ -53,22 +69,38 @@ export class CoachCalendarService {
         .order('start_time', { ascending: true });
 
       if (error) {
-        throw new Error('Failed to retrieve calendar events');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'getCalendarEvents' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
       return data || [];
     } catch (error) {
-      throw new Error('Calendar events access failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'getCalendarEvents' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
   static async updateEventBookability(eventId: string, isBookable: boolean): Promise<void> {
     if (!eventId || typeof eventId !== 'string') {
-      throw new Error('Valid event ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid event ID'),
+        { component: 'CoachCalendarService', action: 'updateEventBookability' }
+      );
+      throw new Error(error.message);
     }
 
     if (typeof isBookable !== 'boolean') {
-      throw new Error('Valid bookability status is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid bookability status'),
+        { component: 'CoachCalendarService', action: 'updateEventBookability' }
+      );
+      throw new Error(error.message);
     }
 
     try {
@@ -78,10 +110,18 @@ export class CoachCalendarService {
         .eq('id', eventId);
 
       if (error) {
-        throw new Error('Failed to update event bookability');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'updateEventBookability' }
+        );
+        throw new Error(sanitizedError.message);
       }
     } catch (error) {
-      throw new Error('Event update failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'updateEventBookability' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
@@ -92,16 +132,28 @@ export class CoachCalendarService {
       });
 
       if (error) {
-        throw new Error('OAuth service unavailable');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
       if (!data?.auth_url || typeof data.auth_url !== 'string') {
-        throw new Error('Invalid OAuth URL received');
+        const error = SecureErrorHandler.handleError(
+          new Error('Invalid OAuth URL received'),
+          { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+        );
+        throw new Error(error.message);
       }
 
       return data.auth_url;
     } catch (error) {
-      throw new Error('Failed to generate OAuth URL');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'getGoogleAuthUrl' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
@@ -116,7 +168,11 @@ export class CoachCalendarService {
       );
 
       if (!popup) {
-        throw new Error('Popup blocked - please allow popups for this site');
+        const error = SecureErrorHandler.handleError(
+          new Error('Popup blocked'),
+          { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+        );
+        throw new Error(error.message);
       }
 
       return new Promise((resolve, reject) => {
@@ -132,11 +188,19 @@ export class CoachCalendarService {
           if (!popup.closed) {
             popup.close();
           }
-          reject(new Error('OAuth timeout - please try again'));
-        }, 300000); // 5 minutes
+          const error = SecureErrorHandler.handleError(
+            new Error('OAuth timeout'),
+            { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+          );
+          reject(new Error(error.message));
+        }, 300000);
       });
     } catch (error) {
-      throw new Error('Google Calendar connection failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'connectGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
@@ -152,7 +216,6 @@ export class CoachCalendarService {
         return false;
       }
 
-      // Check if token is still valid
       const expiresAt = new Date(data.expires_at);
       const now = new Date();
       
@@ -164,17 +227,19 @@ export class CoachCalendarService {
 
   static async disconnectGoogleCalendar(coachId: string): Promise<void> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+      );
+      throw new Error(error.message);
     }
 
     try {
-      // Remove tokens securely
       await supabase
         .from('coach_google_tokens')
         .delete()
         .eq('coach_email', 'ana@jobsties.com');
 
-      // Update settings
       const { error } = await supabase
         .from('coach_calendar_settings')
         .update({
@@ -185,26 +250,41 @@ export class CoachCalendarService {
         .eq('coach_id', coachId);
 
       if (error) {
-        throw new Error('Failed to update calendar settings');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
-      // Clear calendar events
       await supabase
         .from('coach_calendar_events')
         .delete()
         .eq('coach_id', coachId);
     } catch (error) {
-      throw new Error('Failed to disconnect Google Calendar');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'disconnectGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
   static async updateSyncSettings(coachId: string, syncEnabled: boolean): Promise<void> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(error.message);
     }
 
     if (typeof syncEnabled !== 'boolean') {
-      throw new Error('Valid sync status is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid sync status'),
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(error.message);
     }
 
     try {
@@ -214,16 +294,28 @@ export class CoachCalendarService {
         .eq('coach_id', coachId);
 
       if (error) {
-        throw new Error('Failed to update sync settings');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+        );
+        throw new Error(sanitizedError.message);
       }
     } catch (error) {
-      throw new Error('Sync settings update failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'updateSyncSettings' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
   static async syncWithGoogleCalendar(coachId: string): Promise<void> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+      );
+      throw new Error(error.message);
     }
 
     try {
@@ -232,36 +324,58 @@ export class CoachCalendarService {
       });
 
       if (error) {
-        throw new Error('Calendar sync service unavailable');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+        );
+        throw new Error(sanitizedError.message);
       }
     } catch (error) {
-      throw new Error('Calendar synchronization failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'syncWithGoogleCalendar' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 
   static async checkAvailability(coachId: string, startTime: string, endTime: string): Promise<boolean> {
     if (!coachId || typeof coachId !== 'string') {
-      throw new Error('Valid coach ID is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid coach ID'),
+        { component: 'CoachCalendarService', action: 'checkAvailability' }
+      );
+      throw new Error(error.message);
     }
 
     if (!startTime || !endTime) {
-      throw new Error('Valid time range is required');
+      const error = SecureErrorHandler.handleError(
+        new Error('Invalid time range'),
+        { component: 'CoachCalendarService', action: 'checkAvailability' }
+      );
+      throw new Error(error.message);
     }
 
     try {
-      // Validate time format
       const start = new Date(startTime);
       const end = new Date(endTime);
       
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        throw new Error('Invalid time format');
+        const error = SecureErrorHandler.handleError(
+          new Error('Invalid time format'),
+          { component: 'CoachCalendarService', action: 'checkAvailability' }
+        );
+        throw new Error(error.message);
       }
 
       if (start >= end) {
-        throw new Error('Start time must be before end time');
+        const error = SecureErrorHandler.handleError(
+          new Error('Invalid time range'),
+          { component: 'CoachCalendarService', action: 'checkAvailability' }
+        );
+        throw new Error(error.message);
       }
 
-      // Check conflicting events
       const { data: conflicts, error } = await supabase
         .from('coach_calendar_events')
         .select('id')
@@ -270,10 +384,13 @@ export class CoachCalendarService {
         .or(`and(start_time.lte.${startTime},end_time.gt.${startTime}),and(start_time.lt.${endTime},end_time.gte.${endTime}),and(start_time.gte.${startTime},end_time.lte.${endTime})`);
 
       if (error) {
-        throw new Error('Failed to check calendar conflicts');
+        const sanitizedError = SecureErrorHandler.handleError(
+          error,
+          { component: 'CoachCalendarService', action: 'checkAvailability' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
-      // Check existing sessions
       const { data: sessionConflicts, error: sessionError } = await supabase
         .from('coaching_sessions')
         .select('id')
@@ -282,12 +399,20 @@ export class CoachCalendarService {
         .or(`and(session_date.lte.${startTime},session_date.gt.${startTime}),and(session_date.lt.${endTime},session_date.gte.${endTime})`);
 
       if (sessionError) {
-        throw new Error('Failed to check session conflicts');
+        const sanitizedError = SecureErrorHandler.handleError(
+          sessionError,
+          { component: 'CoachCalendarService', action: 'checkAvailability' }
+        );
+        throw new Error(sanitizedError.message);
       }
 
       return (conflicts?.length || 0) === 0 && (sessionConflicts?.length || 0) === 0;
     } catch (error) {
-      throw new Error('Availability check failed');
+      const sanitizedError = SecureErrorHandler.handleError(
+        error,
+        { component: 'CoachCalendarService', action: 'checkAvailability' }
+      );
+      throw new Error(sanitizedError.message);
     }
   }
 }

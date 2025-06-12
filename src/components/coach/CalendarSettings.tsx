@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { CoachCalendarService } from '@/services/coachCalendarService';
 import { AlertCircle, ExternalLink } from 'lucide-react';
 
@@ -24,6 +25,7 @@ interface CalendarSettingsProps {
 const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSettingsProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { executeWithErrorHandling } = useErrorHandler();
 
   const handleConnectGoogleCalendar = async () => {
     if (!coachId) {
@@ -35,38 +37,38 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
       return;
     }
 
-    try {
-      setLoading(true);
-      
-      await CoachCalendarService.connectGoogleCalendar();
-      
-      const isConnected = await CoachCalendarService.checkGoogleConnection(coachId);
-      
-      if (isConnected) {
-        await CoachCalendarService.updateSyncSettings(coachId, true);
-        onSettingsUpdate();
+    setLoading(true);
+    
+    const success = await executeWithErrorHandling(
+      async () => {
+        await CoachCalendarService.connectGoogleCalendar();
         
-        toast({
-          title: "Success",
-          description: "Google Calendar connected successfully"
-        });
-      } else {
-        toast({
-          title: "Connection incomplete",
-          description: "Please try again or check browser permissions",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Connection failed';
+        const isConnected = await CoachCalendarService.checkGoogleConnection(coachId);
+        
+        if (isConnected) {
+          await CoachCalendarService.updateSyncSettings(coachId, true);
+          onSettingsUpdate();
+          return true;
+        } else {
+          throw new Error('Connection verification failed');
+        }
+      },
+      { 
+        component: 'CalendarSettings', 
+        action: 'connectGoogleCalendar',
+        userId: coachId 
+      },
+      { showToast: false }
+    );
+
+    if (success) {
       toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
+        title: "Success",
+        description: "Google Calendar connected successfully"
       });
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   const handleDisconnectGoogleCalendar = async () => {
@@ -79,24 +81,30 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
       return;
     }
 
-    try {
-      setLoading(true);
-      await CoachCalendarService.disconnectGoogleCalendar(coachId);
-      onSettingsUpdate();
+    setLoading(true);
+    
+    const success = await executeWithErrorHandling(
+      async () => {
+        await CoachCalendarService.disconnectGoogleCalendar(coachId);
+        onSettingsUpdate();
+        return true;
+      },
+      { 
+        component: 'CalendarSettings', 
+        action: 'disconnectGoogleCalendar',
+        userId: coachId 
+      },
+      { showToast: false }
+    );
+
+    if (success) {
       toast({
         title: "Success",
         description: "Google Calendar disconnected"
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Disconnection failed';
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   const handleToggleSync = async (enabled: boolean) => {
@@ -109,24 +117,30 @@ const CalendarSettings = ({ settings, onSettingsUpdate, coachId }: CalendarSetti
       return;
     }
 
-    try {
-      setLoading(true);
-      await CoachCalendarService.updateSyncSettings(coachId, enabled);
-      onSettingsUpdate();
+    setLoading(true);
+    
+    const success = await executeWithErrorHandling(
+      async () => {
+        await CoachCalendarService.updateSyncSettings(coachId, enabled);
+        onSettingsUpdate();
+        return true;
+      },
+      { 
+        component: 'CalendarSettings', 
+        action: 'toggleSync',
+        userId: coachId 
+      },
+      { showToast: false }
+    );
+
+    if (success) {
       toast({
         title: "Success",
         description: `Auto-sync ${enabled ? 'enabled' : 'disabled'}`
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Settings update failed';
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   const formatLastSyncTime = (lastSyncAt?: string): string => {
