@@ -31,12 +31,18 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  // Refs to track subscription state and prevent duplicates
   const subscriptionRef = useRef<any>(null);
-  const currentUserIdRef = useRef<string | null>(null);
+  const isInitializedRef = useRef(false);
+  const mountedRef = useRef(true);
 
-  // Stable callback functions using useCallback
   const fetchNotifications = useCallback(async (userId: string) => {
+    if (!userId || !mountedRef.current) return;
+    
     try {
+      console.log('Fetching notifications for user:', userId);
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
@@ -48,7 +54,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
 
-      setNotifications(data || []);
+      if (mountedRef.current) {
+        setNotifications(data || []);
+        setLoading(false);
+      }
     } catch (error) {
       console.error('Error in fetchNotifications:', error);
     }
@@ -70,21 +79,22 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
 
-      setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === notificationId 
-            ? { ...notification, is_read: true, read_at: new Date().toISOString() }
-            : notification
-        )
-      );
+      if (mountedRef.current) {
+        setNotifications(prev => 
+          prev.map(notification => 
+            notification.id === notificationId 
+              ? { ...notification, is_read: true, read_at: new Date().toISOString() }
+              : notification
+          )
+        );
+      }
     } catch (error) {
       console.error('Error in markAsRead:', error);
     }
   }, []);
 
   const markAllAsRead = useCallback(async () => {
-    const userId = currentUserIdRef.current;
-    if (!userId) return;
+    if (!currentUserId) return;
 
     try {
       const { error } = await supabase
@@ -94,7 +104,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           read_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', userId)
+        .eq('user_id', currentUserId)
         .eq('is_read', false);
 
       if (error) {
@@ -102,17 +112,19 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
 
-      setNotifications(prev => 
-        prev.map(notification => ({ 
-          ...notification, 
-          is_read: true, 
-          read_at: new Date().toISOString() 
-        }))
-      );
+      if (mountedRef.current) {
+        setNotifications(prev => 
+          prev.map(notification => ({ 
+            ...notification, 
+            is_read: true, 
+            read_at: new Date().toISOString() 
+          }))
+        );
+      }
     } catch (error) {
       console.error('Error in markAllAsRead:', error);
     }
-  }, []);
+  }, [currentUserId]);
 
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
@@ -126,7 +138,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
 
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      if (mountedRef.current) {
+        setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      }
     } catch (error) {
       console.error('Error in deleteNotification:', error);
     }
@@ -139,69 +153,116 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     ).length;
   }, [notifications]);
 
-  // Initialize and manage subscriptions
+  const setupRealtimeSubscription = useCallback(async (userId: string) => {
+    if (!userId || !mountedRef.current || subscriptionRef.current) {
+      console.log('Skipping notification subscription setup - already exists or invalid state');
+      return;
+    }
+
+    try {
+      console.log('Setting up notification realtime subscription for user:', userId);
+      
+      const channel = supabase
+        .channel(`notifications-${userId}-${Date.now()}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            if (!mountedRef.current) return;
+            
+            console.log('Notification change received:', payload);
+            
+            if (payload.eventType === 'INSERT') {
+              setNotifications(prev => [payload.new as Notification, ...prev]);
+            } else if (payload.eventType === 'UPDATE') {
+              setNotifications(prev => 
+                prev.map(n => n.id === payload.new.id ? payload.new as Notification : n)
+              );
+            } else if (payload.eventType === 'DELETE') {
+              setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Notification subscription status:', status);
+          
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.error('Notification subscription failed:', status);
+            if (subscriptionRef.current && mountedRef.current) {
+              supabase.removeChannel(subscriptionRef.current);
+              subscriptionRef.current = null;
+            }
+          }
+        });
+
+      subscriptionRef.current = channel;
+    } catch (error) {
+      console.error('Error setting up notification subscription:', error);
+    }
+  }, []);
+
+  const cleanupSubscription = useCallback(() => {
+    if (subscriptionRef.current) {
+      console.log('Cleaning up notification subscription');
+      supabase.removeChannel(subscriptionRef.current);
+      subscriptionRef.current = null;
+    }
+  }, []);
+
+  // Single effect to handle auth state and subscription management
   useEffect(() => {
-    let mounted = true;
+    let authListener: any = null;
 
     const initializeNotifications = async () => {
+      if (isInitializedRef.current) return;
+      
       try {
-        console.log('Initializing notification context...');
-        const { data: { user } } = await supabase.auth.getUser();
+        // Get initial session
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (!user || !mounted) {
+        if (session?.user && mountedRef.current) {
+          const userId = session.user.id;
+          console.log('Initializing notifications for user:', userId);
+          
+          setCurrentUserId(userId);
+          await fetchNotifications(userId);
+          await setupRealtimeSubscription(userId);
+          
+          isInitializedRef.current = true;
+        } else {
           setLoading(false);
-          return;
         }
 
-        currentUserIdRef.current = user.id;
-        console.log('Fetching initial notifications for user:', user.id);
-        
-        await fetchNotifications(user.id);
-
-        // Clean up any existing subscription
-        if (subscriptionRef.current) {
-          console.log('Cleaning up existing notification subscription');
-          subscriptionRef.current.unsubscribe();
-          subscriptionRef.current = null;
-        }
-
-        // Set up new subscription
-        console.log('Setting up notification realtime subscription');
-        const channel = supabase
-          .channel(`notifications-${user.id}`)
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'notifications',
-              filter: `user_id=eq.${user.id}`
-            },
-            (payload) => {
-              if (!mounted) return;
-              
-              console.log('Notification change received:', payload);
-              
-              if (payload.eventType === 'INSERT') {
-                setNotifications(prev => [payload.new as Notification, ...prev]);
-              } else if (payload.eventType === 'UPDATE') {
-                setNotifications(prev => 
-                  prev.map(n => n.id === payload.new.id ? payload.new as Notification : n)
-                );
-              } else if (payload.eventType === 'DELETE') {
-                setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
-              }
+        // Set up auth listener for subsequent changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            console.log('Auth state change:', event, session?.user?.id);
+            
+            if (event === 'SIGNED_OUT' || !session?.user) {
+              cleanupSubscription();
+              setCurrentUserId(null);
+              setNotifications([]);
+              setLoading(false);
+              isInitializedRef.current = false;
+            } else if (event === 'SIGNED_IN' && !isInitializedRef.current) {
+              const userId = session.user.id;
+              setCurrentUserId(userId);
+              await fetchNotifications(userId);
+              await setupRealtimeSubscription(userId);
+              isInitializedRef.current = true;
             }
-          )
-          .subscribe((status) => {
-            console.log('Notification subscription status:', status);
-          });
+          }
+        );
 
-        subscriptionRef.current = channel;
-        setLoading(false);
+        authListener = subscription;
       } catch (error) {
         console.error('Error initializing notifications:', error);
-        if (mounted) {
+        if (mountedRef.current) {
           setLoading(false);
         }
       }
@@ -210,14 +271,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     initializeNotifications();
 
     return () => {
-      console.log('Notification context cleanup');
-      mounted = false;
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
+      if (authListener) {
+        authListener.unsubscribe();
       }
+      cleanupSubscription();
+      mountedRef.current = false;
     };
-  }, [fetchNotifications]);
+  }, []); // Empty dependency array - only run once
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
