@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -105,10 +106,12 @@ export const useMessages = (conversationId: string | null) => {
           .select('id, first_name, last_name, email, role')
           .eq('email', conversation.coach_email)
           .eq('role', 'COACH')
-          .single();
+          .maybeSingle();
 
         if (!coachError && coach) {
           coachProfile = coach;
+        } else {
+          console.log('Coach profile not found for email:', conversation.coach_email);
         }
       }
 
