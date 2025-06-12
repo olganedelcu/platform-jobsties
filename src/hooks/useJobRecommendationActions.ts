@@ -10,7 +10,7 @@ interface UseJobRecommendationActionsProps {
 }
 
 export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJobRecommendationActionsProps) => {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const { handleAddApplication } = useJobApplicationsData(user);
 
   const markAsApplied = async (recommendation: JobRecommendation) => {
@@ -22,6 +22,14 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
       });
       return;
     }
+
+    // Show loading toast that persists
+    const loadingToastId = toast({
+      title: "Adding to tracker...",
+      description: `Adding ${recommendation.job_title} at ${recommendation.company_name} to your applications.`,
+      className: "fixed top-4 right-4 w-80 max-w-sm",
+      duration: Infinity // Make it persist until we dismiss it
+    });
 
     try {
       // Get the current week start date
@@ -37,10 +45,17 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
 
       await handleAddApplication(applicationData);
       
+      // Dismiss the loading toast
+      if (loadingToastId) {
+        dismiss(loadingToastId.id);
+      }
+      
+      // Show success toast
       toast({
         title: "Added to tracker",
         description: `${recommendation.job_title} at ${recommendation.company_name}`,
-        className: "fixed top-4 right-4 w-80 max-w-sm"
+        className: "fixed top-4 right-4 w-80 max-w-sm",
+        duration: 4000 // Show success for 4 seconds
       });
 
       // Only call the callback if it exists and after successful addition
@@ -51,6 +66,11 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
         }, 100);
       }
     } catch (error) {
+      // Dismiss the loading toast
+      if (loadingToastId) {
+        dismiss(loadingToastId.id);
+      }
+      
       toast({
         title: "Error",
         description: "Failed to add job to tracker. Please try again.",
