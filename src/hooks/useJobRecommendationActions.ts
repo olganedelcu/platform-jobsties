@@ -2,7 +2,7 @@
 import { useToast } from '@/hooks/use-toast';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import { JobRecommendation } from '@/types/jobRecommendations';
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 interface UseJobRecommendationActionsProps {
   user: any;
@@ -32,12 +32,15 @@ export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJob
     });
 
     try {
+      // Get the current week start date
+      const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday as start of week
+      
       const applicationData = {
         dateApplied: format(new Date(), 'yyyy-MM-dd'),
         companyName: recommendation.company_name,
         jobTitle: recommendation.job_title,
         applicationStatus: 'applied',
-        menteeNotes: `Applied via coach recommendation from week of ${format(new Date(recommendation.week_start_date), 'MMM dd, yyyy')}`
+        menteeNotes: `Applied via Coach Recommendation from week of ${format(currentWeekStart, 'MMM dd, yyyy')}`
       };
 
       console.log('Adding application with data:', applicationData);
