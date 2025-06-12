@@ -16,7 +16,17 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const isCoach = user?.user_metadata?.role === 'COACH';
 
   const getInitials = (email: string) => {
-    return email.split('@')[0].substring(0, 2).toUpperCase();
+    // Add safety checks for undefined/null email
+    if (!email || typeof email !== 'string') {
+      return 'U';
+    }
+    
+    const emailParts = email.split('@');
+    if (!emailParts[0]) {
+      return 'U';
+    }
+    
+    return emailParts[0].substring(0, 2).toUpperCase();
   };
 
   const getLinkClass = (path: string) => {

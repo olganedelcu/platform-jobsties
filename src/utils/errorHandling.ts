@@ -43,6 +43,11 @@ class SecureErrorHandler {
   };
 
   static sanitizeMessage(message: string): string {
+    // Add null/undefined safety checks
+    if (!message || typeof message !== 'string') {
+      return 'Unknown error occurred';
+    }
+    
     let sanitized = message;
     
     // Remove sensitive information
@@ -59,7 +64,10 @@ class SecureErrorHandler {
   }
 
   static categorizeError(error: Error | any): string {
-    const message = error?.message?.toLowerCase() || '';
+    // Add safety checks for error message
+    const message = (error?.message && typeof error.message === 'string') 
+      ? error.message.toLowerCase() 
+      : '';
     const status = error?.status || error?.code;
 
     if (status === 401 || message.includes('unauthorized')) {
