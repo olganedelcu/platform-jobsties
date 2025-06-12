@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useMessagesFetch } from './useMessagesFetch';
 import { useMessagesSend } from './useMessagesSend';
 import { useMessagesAttachment } from './useMessagesAttachment';
@@ -52,7 +52,7 @@ export const useMessages = (conversationId: string | null) => {
   // Set up realtime subscription
   useMessagesRealtime(conversationId, fetchMessages);
 
-  // Fetch messages when conversation changes
+  // Fetch messages when conversation changes - prevent infinite loops
   useEffect(() => {
     isMountedRef.current = true;
     
@@ -65,7 +65,7 @@ export const useMessages = (conversationId: string | null) => {
     return () => {
       isMountedRef.current = false;
     };
-  }, [conversationId]);
+  }, [conversationId]); // Only depend on conversationId
 
   // Cleanup on unmount
   useEffect(() => {
@@ -73,13 +73,16 @@ export const useMessages = (conversationId: string | null) => {
       isMountedRef.current = false;
       cleanupFetch();
     };
-  }, []);
+  }, [cleanupFetch]);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  const returnValue = useMemo(() => ({
     messages,
     loading,
     sending,
     sendMessage,
     downloadAttachment
-  };
+  }), [messages, loading, sending, sendMessage, downloadAttachment]);
+
+  return returnValue;
 };

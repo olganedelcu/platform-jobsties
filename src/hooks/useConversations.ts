@@ -1,5 +1,5 @@
 
-import React, { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useConversationsFetch } from './useConversationsFetch';
 import { useConversationsActions } from './useConversationsActions';
 import { useConversationsRealtime } from './useConversationsRealtime';
@@ -35,16 +35,19 @@ export const useConversations = () => {
 
   useConversationsRealtime(handleConversationsUpdated);
 
-  // Initialize conversations on mount
-  React.useEffect(() => {
+  // Initialize conversations on mount - only once
+  useEffect(() => {
     fetchConversations();
-  }, [fetchConversations]);
+  }, []); // Empty dependency array to prevent infinite loops
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  const returnValue = useMemo(() => ({
     conversations,
     loading,
     fetchConversations,
     createConversation,
     updateConversationStatus
-  };
+  }), [conversations, loading, fetchConversations, createConversation, updateConversationStatus]);
+
+  return returnValue;
 };

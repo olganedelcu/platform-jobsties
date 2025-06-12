@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { MessageService } from '@/services/messageService';
 import { MessageReadService } from '@/services/messageReadService';
@@ -11,7 +11,7 @@ export const useMessagesFetch = (conversationId: string | null) => {
   const isMountedRef = useRef(true);
   const { toast } = useToast();
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!conversationId || !isMountedRef.current) return;
 
     try {
@@ -53,12 +53,12 @@ export const useMessagesFetch = (conversationId: string | null) => {
         setLoading(false);
       }
     }
-  };
+  }, [conversationId, toast]);
 
   // Update the ref when component unmounts
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
     isMountedRef.current = false;
-  };
+  }, []);
 
   return {
     messages,

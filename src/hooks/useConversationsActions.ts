@@ -1,11 +1,12 @@
 
+import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ConversationService } from '@/services/conversationService';
 
 export const useConversationsActions = (onConversationsUpdated: () => void) => {
   const { toast } = useToast();
 
-  const createConversation = async (subject: string) => {
+  const createConversation = useCallback(async (subject: string) => {
     try {
       const userProfile = await ConversationService.getCurrentUserProfile();
       if (!userProfile) return null;
@@ -28,9 +29,9 @@ export const useConversationsActions = (onConversationsUpdated: () => void) => {
       });
       return null;
     }
-  };
+  }, [toast, onConversationsUpdated]);
 
-  const updateConversationStatus = async (conversationId: string, status: 'active' | 'archived' | 'closed') => {
+  const updateConversationStatus = useCallback(async (conversationId: string, status: 'active' | 'archived' | 'closed') => {
     try {
       await ConversationService.updateConversationStatus(conversationId, status);
       await onConversationsUpdated();
@@ -46,7 +47,7 @@ export const useConversationsActions = (onConversationsUpdated: () => void) => {
         variant: "destructive"
       });
     }
-  };
+  }, [toast, onConversationsUpdated]);
 
   return {
     createConversation,

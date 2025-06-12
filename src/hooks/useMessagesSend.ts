@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MessageService } from '@/services/messageService';
@@ -9,7 +9,7 @@ export const useMessagesSend = (conversationId: string | null, onMessageSent: ()
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
 
-  const sendMessage = async (content: string, attachments?: File[]) => {
+  const sendMessage = useCallback(async (content: string, attachments?: File[]) => {
     if (!conversationId || !content.trim()) return;
 
     try {
@@ -52,7 +52,7 @@ export const useMessagesSend = (conversationId: string | null, onMessageSent: ()
     } finally {
       setSending(false);
     }
-  };
+  }, [conversationId, onMessageSent, toast]);
 
   return {
     sending,

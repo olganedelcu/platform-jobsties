@@ -1,15 +1,15 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ConversationService } from '@/services/conversationService';
 import { Conversation } from './useConversations';
 
 export const useConversationsFetch = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(false); // Changed from true to false to prevent initial infinite loading
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -34,7 +34,7 @@ export const useConversationsFetch = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   return {
     conversations,

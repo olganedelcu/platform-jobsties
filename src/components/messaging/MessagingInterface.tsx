@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
 import ConversationsList from './ConversationsList';
@@ -14,6 +14,7 @@ const MessagingInterface = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [showNewConversationDialog, setShowNewConversationDialog] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const {
     conversations,
@@ -40,22 +41,29 @@ const MessagingInterface = () => {
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
-  const handleCreateConversation = async (subject: string, initialMessage?: string) => {
-    const newConversation = await createConversation(subject);
-    if (newConversation && initialMessage) {
-      setSelectedConversationId(newConversation.id);
-      setTimeout(() => {
-        sendMessage(initialMessage);
-      }, 500);
+  const handleCreateConversation = useCallback(async (subject: string, initialMessage?: string) => {
+    setCreating(true);
+    try {
+      const newConversation = await createConversation(subject);
+      if (newConversation) {
+        setSelectedConversationId(newConversation.id);
+        if (initialMessage) {
+          setTimeout(() => {
+            sendMessage(initialMessage);
+          }, 500);
+        }
+      }
+      setShowNewConversationDialog(false);
+    } finally {
+      setCreating(false);
     }
-    setShowNewConversationDialog(false);
-  };
+  }, [createConversation, sendMessage]);
 
-  const handleSendMessage = async (content: string, attachments?: File[]) => {
+  const handleSendMessage = useCallback(async (content: string, attachments?: File[]) => {
     await sendMessage(content, attachments);
     // Refresh conversations to update the last message and timestamp
     await fetchConversations();
-  };
+  }, [sendMessage, fetchConversations]);
 
   return (
     <div className="w-full max-w-7xl mx-auto py-4 px-4 sm:px-6">
@@ -114,6 +122,7 @@ const MessagingInterface = () => {
         open={showNewConversationDialog}
         onOpenChange={setShowNewConversationDialog}
         onCreateConversation={handleCreateConversation}
+        creating={creating}
       />
     </div>
   );
