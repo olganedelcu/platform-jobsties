@@ -59,41 +59,43 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   };
   
   return (
-    <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-      <DashboardHeader user={user} firstName={firstName} />
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="py-8">
+          <DashboardHeader user={user} firstName={firstName} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column */}
-        <div className="space-y-8">
-          <CareerProgressCard
-            courseProgress={courseProgress}
-            onCVOptimizedClick={handleCVOptimizedClick}
-            onInterviewPrepClick={handleInterviewPrepClick}
-            onSalaryNegotiationClick={handleSalaryNegotiationClick}
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Left Column */}
+            <div className="space-y-8">
+              <CareerProgressCard
+                courseProgress={courseProgress}
+                onCVOptimizedClick={handleCVOptimizedClick}
+                onInterviewPrepClick={handleInterviewPrepClick}
+                onSalaryNegotiationClick={handleSalaryNegotiationClick}
+              />
 
-          <RecentActivityCard
-            recentApplications={recentApplications}
-            onViewAll={() => navigate('/tracker')}
-            onAddApplication={() => navigate('/tracker')}
-          />
-        </div>
+              <RecentActivityCard
+                recentApplications={recentApplications}
+                onViewAll={() => navigate('/tracker')}
+                onAddApplication={() => navigate('/tracker')}
+              />
+            </div>
 
-        {/* Right Column */}
-        <div className="space-y-8">
-          <UpcomingSessionsCard />
+            {/* Right Column */}
+            <div className="space-y-8">
+              <UpcomingSessionsCard />
 
-          <ApplicationsStatsCard
-            applicationsThisMonth={applicationsThisMonth}
-            onClick={() => navigate('/tracker')}
-          />
+              <ApplicationsStatsCard
+                applicationsThisMonth={applicationsThisMonth}
+                onClick={() => navigate('/tracker')}
+              />
+            </div>
+          </div>
+          
+          <DashboardQuickLinks />
         </div>
       </div>
-      
-      <div className="mt-8">
-        <DashboardQuickLinks />
-      </div>
-    </main>
+    </div>
   );
 };
 

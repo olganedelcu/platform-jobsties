@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
-import { Loader2 } from 'lucide-react';
 import DashboardContent from '@/components/DashboardContent';
+import { Loader2 } from 'lucide-react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -63,10 +63,10 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex items-center space-x-3">
+          <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+          <div className="text-lg text-gray-700">Loading...</div>
         </div>
       </div>
     );
