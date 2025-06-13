@@ -45,7 +45,7 @@ export const useTimeBasedGreeting = (firstName: string): TimeBasedGreeting => {
   }, []);
 
   return {
-    greeting: `${greeting}, ${firstName}`,
+    greeting: `${greeting}, ${firstName}!`,
     timeZone,
     currentTime
   };
