@@ -33,6 +33,16 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
   console.log('User ID:', userId);
   console.log('Is Coach:', isCoach);
   
+  // Check authentication first
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  console.log('Current authenticated user:', user?.id);
+  console.log('Auth error:', authError);
+  
+  if (authError || !user) {
+    console.error('No authenticated user found');
+    throw new Error('Authentication required');
+  }
+  
   // First, let's check if there are any assignments at all
   const { data: allAssignments, error: allError } = await supabase
     .from('mentee_todo_assignments')
@@ -40,6 +50,11 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     
   console.log('All assignments in database:', allAssignments?.length || 0);
   console.log('Sample assignments:', allAssignments?.slice(0, 3));
+
+  // Let's also check what mentee_id values exist
+  const menteeIds = allAssignments?.map(a => a.mentee_id).filter((value, index, self) => self.indexOf(value) === index);
+  console.log('Unique mentee IDs in assignments:', menteeIds);
+  console.log('Does our user ID exist in mentee IDs?', menteeIds?.includes(userId));
 
   let query = supabase
     .from('mentee_todo_assignments')

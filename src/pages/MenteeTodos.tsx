@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +20,7 @@ const MenteeTodos = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'assignments' | 'personal'>('assignments');
 
-  // Hooks for todo management
+  // Hooks for todo management - only initialize when we have a user
   const { assignments, loading: assignmentsLoading, updateStatus } = useTodoAssignments(user?.id || '', false);
   const { todos, loading: todosLoading, addTodo, updateStatus: updateTodoStatus, deleteTodo } = useMenteeTodos(user?.id || '');
 
@@ -29,12 +30,22 @@ const MenteeTodos = () => {
 
   const checkAuth = async () => {
     try {
+      console.log('Checking authentication...');
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (userError || !user) {
+      if (userError) {
+        console.error('User error:', userError);
         navigate('/login');
         return;
       }
+
+      if (!user) {
+        console.log('No user found, redirecting to login');
+        navigate('/login');
+        return;
+      }
+
+      console.log('Authenticated user:', user.id, user.email);
 
       // Check if user is a mentee
       const { data: profile, error: profileError } = await supabase
@@ -43,7 +54,22 @@ const MenteeTodos = () => {
         .eq('id', user.id)
         .single();
 
-      if (profileError || profile?.role !== 'MENTEE') {
+      console.log('Profile data:', profile);
+      console.log('Profile error:', profileError);
+
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch user profile",
+          variant: "destructive"
+        });
+        navigate('/login');
+        return;
+      }
+
+      if (profile?.role !== 'MENTEE') {
+        console.log('User is not a mentee, role:', profile?.role);
         toast({
           title: "Access Denied",
           description: "You must be a mentee to access this page",
@@ -53,9 +79,15 @@ const MenteeTodos = () => {
         return;
       }
 
+      console.log('User authenticated as mentee successfully');
       setUser(user);
     } catch (error: any) {
       console.error('Auth check error:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Failed to verify authentication",
+        variant: "destructive"
+      });
       navigate('/login');
     } finally {
       setLoading(false);
@@ -90,7 +122,14 @@ const MenteeTodos = () => {
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg mb-4">Authentication required</div>
+          <Button onClick={() => navigate('/login')}>Go to Login</Button>
+        </div>
+      </div>
+    );
   }
 
   console.log('Rendering MenteeTodos with user:', user.id);

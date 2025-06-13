@@ -16,17 +16,29 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
 
   const loadAssignments = async () => {
     try {
+      console.log('Loading assignments for user:', userId);
+      
+      if (!userId) {
+        console.log('No userId provided, skipping load');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       const data = await fetchTodoAssignments(userId, isCoach);
       setAssignments(data);
       console.log('Assignments loaded:', data);
     } catch (error: any) {
       console.error('Error fetching todo assignments:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch todo assignments",
-        variant: "destructive"
-      });
+      
+      // Only show toast for non-auth errors to avoid spam
+      if (!error.message?.includes('Authentication')) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch todo assignments",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -60,7 +72,12 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
   };
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      console.log('No userId, skipping effect');
+      return;
+    }
+
+    console.log('Setting up todo assignments for user:', userId, 'isCoach:', isCoach);
 
     // Load initial data
     loadAssignments();
@@ -72,34 +89,46 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
       channelRef.current = null;
     }
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel(`todo_assignments_${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'mentee_todo_assignments',
-          filter: isCoach ? `coach_id=eq.${userId}` : `mentee_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Real-time update received:', payload);
-          // Reload assignments when changes occur
-          loadAssignments();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-      });
+    // Set up real-time subscription with error handling
+    try {
+      const channel = supabase
+        .channel(`todo_assignments_${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'mentee_todo_assignments',
+            filter: isCoach ? `coach_id=eq.${userId}` : `mentee_id=eq.${userId}`
+          },
+          (payload) => {
+            console.log('Real-time update received:', payload);
+            // Reload assignments when changes occur
+            loadAssignments();
+          }
+        )
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
+          if (status === 'CHANNEL_ERROR') {
+            console.error('Real-time subscription error');
+          }
+        });
 
-    channelRef.current = channel;
+      channelRef.current = channel;
+    } catch (error) {
+      console.error('Error setting up real-time subscription:', error);
+      // Continue without real-time updates if subscription fails
+    }
 
     // Cleanup function
     return () => {
       if (channelRef.current) {
         console.log('Cleaning up channel on unmount');
-        supabase.removeChannel(channelRef.current);
+        try {
+          supabase.removeChannel(channelRef.current);
+        } catch (error) {
+          console.error('Error cleaning up channel:', error);
+        }
         channelRef.current = null;
       }
     };
