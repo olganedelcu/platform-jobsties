@@ -38,11 +38,16 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
   console.log('Current authenticated user:', user?.id);
   
   if (authError || !user) {
-    console.error('No authenticated user found');
+    console.error('No authenticated user found:', authError);
     throw new Error('Authentication required');
   }
 
-  // Build the query based on user role
+  if (user.id !== userId) {
+    console.error('User ID mismatch - authenticated user:', user.id, 'requested user:', userId);
+    throw new Error('User ID mismatch');
+  }
+
+  // Build the query with proper JOIN for RLS
   let query = supabase
     .from('mentee_todo_assignments')
     .select(`
