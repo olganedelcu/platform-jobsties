@@ -6,38 +6,38 @@ interface Quote {
   author: string;
 }
 
-const motivationalQuotes: Quote[] = [
-  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
-  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-  { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
-  { text: "Your career is a marathon, not a sprint. Pace yourself and enjoy the journey.", author: "Anonymous" },
-  { text: "Every expert was once a beginner. Every pro was once an amateur.", author: "Robin Sharma" },
-  { text: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller" },
-  { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
-  { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-  { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
-  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
-  { text: "The only impossible journey is the one you never begin.", author: "Tony Robbins" },
-  { text: "Success is walking from failure to failure with no loss of enthusiasm.", author: "Winston Churchill" },
-  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
-  { text: "If you really look closely, most overnight successes took a long time.", author: "Steve Jobs" },
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-  { text: "I have not failed. I've just found 10,000 ways that won't work.", author: "Thomas Edison" },
-  { text: "Don't let yesterday take up too much of today.", author: "Will Rogers" },
-  { text: "You learn more from failure than from success. Don't let it stop you.", author: "Anonymous" },
-  { text: "It's fine to celebrate success but it is more important to heed the lessons of failure.", author: "Bill Gates" },
-  { text: "If you are not willing to risk the usual, you will have to settle for the ordinary.", author: "Jim Rohn" },
-  { text: "Take up one idea. Make that one idea your life - think of it, dream of it, live on that idea.", author: "Swami Vivekananda" },
-  { text: "All our dreams can come true if we have the courage to pursue them.", author: "Walt Disney" },
-  { text: "Good things happen to those who hustle.", author: "Anais Nin" },
-  { text: "Don't be distracted by criticism. Remember - the only taste of success some people get is to take a bite out of you.", author: "Zig Ziglar" },
+const inspirationalQuotes: Quote[] = [
+  { text: "Faith is taking the first step even when you don't see the whole staircase.", author: "Martin Luther King Jr." },
+  { text: "In the depths of winter, I finally learned that there was in me an invincible summer.", author: "Albert Camus" },
+  { text: "The cave you fear to enter holds the treasure you seek.", author: "Joseph Campbell" },
+  { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
+  { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne" },
+  { text: "The wound is the place where the Light enters you.", author: "Rumi" },
+  { text: "Everything you need is inside you – you just need to access it.", author: "Buddha" },
+  { text: "Trust in dreams, for in them is hidden the gate to eternity.", author: "Khalil Gibran" },
+  { text: "The quieter you become, the more able you are to hear.", author: "Rumi" },
+  { text: "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it.", author: "Rumi" },
+  { text: "The best way to find out if you can trust somebody is to trust them.", author: "Ernest Hemingway" },
+  { text: "Faith consists in believing when it is beyond the power of reason to believe.", author: "Voltaire" },
+  { text: "Keep your face always toward the sunshine—and shadows will fall behind you.", author: "Walt Whitman" },
+  { text: "The universe is not outside of you. Look inside yourself; everything that you want, you already are.", author: "Rumi" },
+  { text: "We are not human beings having a spiritual experience. We are spiritual beings having a human experience.", author: "Pierre Teilhard de Chardin" },
+  { text: "What we plant in the soil of contemplation, we shall reap in the harvest of action.", author: "Meister Eckhart" },
+  { text: "The privilege of a lifetime is being who you are.", author: "Joseph Campbell" },
+  { text: "Peace comes from within. Do not seek it without.", author: "Buddha" },
+  { text: "Yesterday is history, tomorrow is a mystery, today is a gift, which is why we call it the present.", author: "Bill Keane" },
   { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
-  { text: "I'm not a product of my circumstances. I am a product of my decisions.", author: "Stephen Covey" },
-  { text: "Every child is an artist. The problem is how to remain an artist once he grows up.", author: "Pablo Picasso" },
-  { text: "You can never cross the ocean until you have the courage to lose sight of the shore.", author: "Christopher Columbus" },
-  { text: "I've learned that people will forget what you said, people will forget what you did, but people will never forget how you made them feel.", author: "Maya Angelou" },
-  { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford" }
+  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+  { text: "The only way to make sense out of change is to plunge into it, move with it, and join the dance.", author: "Alan Watts" },
+  { text: "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.", author: "Christian D. Larson" },
+  { text: "Your purpose in life is to find your purpose and give your whole heart and soul to it.", author: "Buddha" },
+  { text: "The soul becomes dyed with the color of its thoughts.", author: "Marcus Aurelius" },
+  { text: "Hope is the thing with feathers that perches in the soul and sings the tune without the words and never stops at all.", author: "Emily Dickinson" },
+  { text: "Trust the process. Your time is coming. Just do the work and the results will handle themselves.", author: "Tony Gaskins" },
+  { text: "What you seek is seeking you.", author: "Rumi" },
+  { text: "The present moment is the only time over which we have dominion.", author: "Thich Nhat Hanh" },
+  { text: "Inner peace begins the moment you choose not to allow another person or event to control your emotions.", author: "Pema Chödrön" },
+  { text: "You have been assigned this mountain to show others it can be moved.", author: "Mel Robbins" }
 ];
 
 export const useQuoteOfTheDay = () => {
@@ -57,8 +57,8 @@ export const useQuoteOfTheDay = () => {
     }
     
     // Use absolute value and modulo to get a valid index
-    const quoteIndex = Math.abs(hash) % motivationalQuotes.length;
-    setTodaysQuote(motivationalQuotes[quoteIndex]);
+    const quoteIndex = Math.abs(hash) % inspirationalQuotes.length;
+    setTodaysQuote(inspirationalQuotes[quoteIndex]);
   }, []);
 
   return { todaysQuote };
