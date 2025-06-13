@@ -13,7 +13,7 @@ const QuoteOfTheDay = () => {
 
   return (
     <Card className="bg-gray-50/50 border-gray-200/50 shadow-none relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-100/20 to-transparent animate-[shimmer_3s_ease-in-out_infinite] transform -skew-x-12"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-200/40 via-blue-200/40 via-yellow-200/30 to-transparent animate-[shimmer_3s_ease-in-out_infinite] transform -skew-x-12"></div>
       <CardContent className="p-3 relative z-10">
         <div className="flex items-start space-x-2">
           <div className="flex-shrink-0 p-1.5 bg-indigo-50 rounded-full">
