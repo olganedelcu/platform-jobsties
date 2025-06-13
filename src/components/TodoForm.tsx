@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { createTodoAssignments } from '@/services/todoAssignmentService';
 import { useTodoFormState } from '@/hooks/useTodoFormState';
 import TodoFormFields from './forms/TodoFormFields';
 import TodoMenteeAssignment from './forms/TodoMenteeAssignment';
@@ -67,7 +68,12 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
     }
 
     try {
-      // First create the todo
+      console.log('=== CREATING TODO ===');
+      console.log('Form data:', formData);
+      console.log('Assign to mentees:', assignToMentees);
+      console.log('Selected mentees:', selectedMentees);
+
+      // First create the todo in coach_todos table
       const { data: todoData, error: todoError } = await supabase
         .from('coach_todos')
         .insert({
@@ -76,26 +82,22 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
           description: formData.description || null,
           mentee_id: assignToMentees ? selectedMentees[0] : mentees[0]?.id, // Required field, use first mentee
           priority: formData.priority,
-          due_date: formData.due_date || null
+          due_date: formData.due_date || null,
+          status: 'pending'
         })
         .select()
         .single();
 
+      console.log('Todo created:', todoData);
+      console.log('Todo error:', todoError);
+
       if (todoError) throw todoError;
 
-      // If assigning to mentees, create assignments
+      // If assigning to mentees, create assignments in mentee_todo_assignments table
       if (assignToMentees && selectedMentees.length > 0) {
-        const assignments = selectedMentees.map(menteeId => ({
-          coach_id: coachId,
-          mentee_id: menteeId,
-          todo_id: todoData.id
-        }));
-
-        const { error: assignmentError } = await supabase
-          .from('mentee_todo_assignments')
-          .insert(assignments);
-
-        if (assignmentError) throw assignmentError;
+        console.log('Creating assignments for mentees...');
+        await createTodoAssignments(coachId, todoData.id, selectedMentees);
+        console.log('Assignments created successfully');
       }
 
       // Type cast the returned data
@@ -116,6 +118,8 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
         title: "Success",
         description: successMessage
       });
+
+      console.log('=== TODO CREATION COMPLETE ===');
     } catch (error: any) {
       console.error('Error adding todo:', error);
       toast({

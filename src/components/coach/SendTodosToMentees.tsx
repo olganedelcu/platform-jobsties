@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -82,8 +81,15 @@ const SendTodosToMentees = ({ coachId }: SendTodosToMenteesProps) => {
     setIsSubmitting(true);
 
     try {
+      console.log('=== SENDING TODOS TO MENTEES ===');
+      console.log('Coach ID:', coachId);
+      console.log('Selected mentees:', selectedMentees);
+      console.log('Todos to send:', todos);
+
       // Create todos in coach_todos table and assignments for each mentee
       for (const todo of todos) {
+        console.log('Creating todo:', todo.title);
+        
         // Create the todo first
         const { data: todoData, error: todoError } = await supabase
           .from('coach_todos')
@@ -93,15 +99,19 @@ const SendTodosToMentees = ({ coachId }: SendTodosToMenteesProps) => {
             description: todo.description.trim() || null,
             priority: todo.priority,
             due_date: todo.due_date || null,
-            mentee_id: selectedMentees[0] // Required field, use first mentee
+            mentee_id: selectedMentees[0], // Required field, use first mentee
+            status: 'pending'
           })
           .select()
           .single();
 
+        console.log('Todo created:', todoData);
         if (todoError) throw todoError;
 
         // Create assignments for all selected mentees
+        console.log('Creating assignments for todo:', todoData.id);
         await createTodoAssignments(coachId, todoData.id, selectedMentees);
+        console.log('Assignments created for todo:', todoData.id);
       }
 
       toast({
@@ -112,6 +122,8 @@ const SendTodosToMentees = ({ coachId }: SendTodosToMenteesProps) => {
       // Reset form
       setTodos([{ title: '', description: '', priority: 'medium', due_date: '' }]);
       setSelectedMentees([]);
+      
+      console.log('=== TODOS SENT SUCCESSFULLY ===');
     } catch (error: any) {
       console.error('Error sending todos:', error);
       toast({

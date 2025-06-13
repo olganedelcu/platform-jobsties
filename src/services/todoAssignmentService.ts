@@ -42,12 +42,23 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     throw new Error('Authentication required');
   }
 
+  // Build the query based on user role
   let query = supabase
     .from('mentee_todo_assignments')
     .select(`
       *,
-      coach_todos!inner(title, description, priority, due_date),
-      profiles!mentee_id(first_name, last_name, email)
+      coach_todos!inner(
+        id,
+        title,
+        description,
+        priority,
+        due_date
+      ),
+      profiles!mentee_id(
+        first_name,
+        last_name,
+        email
+      )
     `)
     .order('created_at', { ascending: false });
 
@@ -105,9 +116,31 @@ export const updateAssignmentStatus = async (
   assignmentId: string, 
   status: 'pending' | 'in_progress' | 'completed'
 ): Promise<void> => {
+  const updateData: any = { status };
+  
+  // Set timestamps based on status
+  if (status === 'in_progress') {
+    updateData.started_at = new Date().toISOString();
+  } else if (status === 'completed') {
+    updateData.completed_at = new Date().toISOString();
+    // Ensure started_at is set if not already
+    const { data: current } = await supabase
+      .from('mentee_todo_assignments')
+      .select('started_at')
+      .eq('id', assignmentId)
+      .single();
+    
+    if (!current?.started_at) {
+      updateData.started_at = new Date().toISOString();
+    }
+  } else if (status === 'pending') {
+    updateData.started_at = null;
+    updateData.completed_at = null;
+  }
+
   const { error } = await supabase
     .from('mentee_todo_assignments')
-    .update({ status })
+    .update(updateData)
     .eq('id', assignmentId);
 
   if (error) {
@@ -128,7 +161,8 @@ export const createTodoAssignments = async (
   const assignments = menteeIds.map(menteeId => ({
     coach_id: coachId,
     mentee_id: menteeId,
-    todo_id: todoId
+    todo_id: todoId,
+    status: 'pending'
   }));
 
   console.log('Assignments to create:', assignments);
@@ -144,6 +178,7 @@ export const createTodoAssignments = async (
   console.log('=== END CREATE ===');
 
   if (error) {
+    console.error('Error creating assignments:', error);
     throw error;
   }
 };
