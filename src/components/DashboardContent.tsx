@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -11,6 +10,7 @@ import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
+import QuoteOfTheDay from '@/components/dashboard/QuoteOfTheDay';
 
 interface DashboardContentProps {
   user: any;
@@ -61,6 +61,11 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
       <DashboardHeader user={user} firstName={firstName} />
+
+      {/* Quote of the Day */}
+      <div className="mb-8">
+        <QuoteOfTheDay />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column */}
