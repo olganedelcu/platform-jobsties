@@ -11,6 +11,7 @@ import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
+import QuoteOfTheDay from '@/components/dashboard/QuoteOfTheDay';
 
 interface DashboardContentProps {
   user: any;
@@ -87,6 +88,9 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             applicationsThisMonth={applicationsThisMonth}
             onClick={() => navigate('/tracker')}
           />
+          
+          {/* Daily Quote positioned below Applications Stats */}
+          <QuoteOfTheDay />
         </div>
       </div>
       
