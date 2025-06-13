@@ -32,6 +32,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/messages', label: 'Communication', icon: MessageCircle },
     { path: '/course', label: 'Course', icon: BookOpen },
+    { path: '/todos', label: 'Tasks', icon: FileText },
     { path: '/tracker', label: 'Tracker', icon: FileText }
   ];
 

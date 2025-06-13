@@ -34,7 +34,7 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     .select(`
       *,
       coach_todos!inner(title, description, priority, due_date),
-      profiles!inner(first_name, last_name, email)
+      profiles!mentee_id(first_name, last_name, email)
     `)
     .order('created_at', { ascending: false });
 

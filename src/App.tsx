@@ -30,6 +30,7 @@ import JobRecommendations from "./pages/coach/JobRecommendations";
 import BackupManagementPage from "./pages/coach/BackupManagement";
 import CoachMessages from "./pages/coach/CoachMessages";
 import ChatPage from "./pages/ChatPage";
+import MenteeTodos from "./pages/MenteeTodos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/tracker" element={<Tracker />} />
               <Route path="/course" element={<Course />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/todos" element={<MenteeTodos />} />
               
               {/* Coach Routes */}
               <Route path="/coach/signup" element={<CoachSignUp />} />
