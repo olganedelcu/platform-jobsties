@@ -4,13 +4,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Plus, Send } from 'lucide-react';
-import { useMentees } from '@/hooks/useMentees';
 import JobRecommendationItem from './JobRecommendationItem';
+import MenteeMultiSelector from './MenteeMultiSelector';
 import { JobRecommendation } from '@/hooks/useJobRecommendationForm';
 
 interface JobRecommendationFormSectionProps {
-  selectedMentee: string;
-  onMenteeChange: (value: string) => void;
+  selectedMentees: string[];
+  onToggleMentee: (menteeId: string) => void;
   weekStartDate: string;
   onWeekChange: (value: string) => void;
   jobRecommendations: JobRecommendation[];
@@ -23,8 +23,8 @@ interface JobRecommendationFormSectionProps {
 }
 
 const JobRecommendationFormSection = ({
-  selectedMentee,
-  onMenteeChange,
+  selectedMentees,
+  onToggleMentee,
   weekStartDate,
   onWeekChange,
   jobRecommendations,
@@ -35,33 +35,18 @@ const JobRecommendationFormSection = ({
   getValidRecommendations,
   onCancel
 }: JobRecommendationFormSectionProps) => {
-  const { mentees } = useMentees();
+  const validRecommendations = getValidRecommendations();
+  const totalRecommendations = validRecommendations.length * selectedMentees.length;
 
   return (
     <div className="space-y-6">
       {/* Mentee and Week Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="menteeSelect">Select Mentee</Label>
-          <Select
-            value={selectedMentee}
-            onValueChange={onMenteeChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a mentee" />
-            </SelectTrigger>
-            <SelectContent>
-              {mentees.length === 0 ? (
-                <SelectItem value="no-mentees-placeholder" disabled>No mentees found</SelectItem>
-              ) : (
-                mentees.map((mentee) => (
-                  <SelectItem key={mentee.id} value={mentee.id}>
-                    {mentee.first_name} {mentee.last_name}
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
+          <MenteeMultiSelector
+            selectedMentees={selectedMentees}
+            onToggleMentee={onToggleMentee}
+          />
         </div>
 
         <div>
@@ -113,14 +98,15 @@ const JobRecommendationFormSection = ({
         </div>
       </div>
 
+      {/* Summary and Actions */}
       <div className="flex gap-2 pt-4 border-t">
         <Button 
           type="submit" 
           className="flex-1 bg-indigo-600 hover:bg-indigo-700"
-          disabled={!selectedMentee || selectedMentee === "no-mentees-placeholder"}
+          disabled={selectedMentees.length === 0 || validRecommendations.length === 0}
         >
           <Send className="h-4 w-4 mr-2" />
-          Send {getValidRecommendations().length} Recommendation(s)
+          Send {totalRecommendations} Recommendation(s) to {selectedMentees.length} Mentee(s)
         </Button>
         <Button
           type="button"

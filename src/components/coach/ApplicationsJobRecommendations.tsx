@@ -16,8 +16,8 @@ const ApplicationsJobRecommendations = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const {
-    selectedMentee,
-    setSelectedMentee,
+    selectedMentees,
+    toggleMenteeSelection,
     weekStartDate,
     setWeekStartDate,
     jobRecommendations,
@@ -37,10 +37,10 @@ const ApplicationsJobRecommendations = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedMentee) {
+    if (selectedMentees.length === 0) {
       toast({
         title: "Validation Error",
-        description: "Please select a mentee.",
+        description: "Please select at least one mentee.",
         variant: "destructive"
       });
       return;
@@ -58,22 +58,30 @@ const ApplicationsJobRecommendations = () => {
     }
 
     try {
-      const promises = validRecommendations.map(rec => 
-        addRecommendation({
-          menteeId: selectedMentee,
-          jobTitle: rec.jobTitle,
-          jobLink: rec.jobLink,
-          companyName: rec.companyName,
-          description: rec.description,
-          weekStartDate
-        })
-      );
+      // Create all combinations of mentees and recommendations
+      const promises = [];
+      for (const menteeId of selectedMentees) {
+        for (const rec of validRecommendations) {
+          promises.push(
+            addRecommendation({
+              menteeId,
+              jobTitle: rec.jobTitle,
+              jobLink: rec.jobLink,
+              companyName: rec.companyName,
+              description: rec.description,
+              weekStartDate
+            })
+          );
+        }
+      }
 
       await Promise.all(promises);
 
+      const totalRecommendations = validRecommendations.length * selectedMentees.length;
+      
       toast({
         title: "Success",
-        description: `${validRecommendations.length} job recommendation(s) sent successfully.`,
+        description: `${totalRecommendations} job recommendation(s) sent successfully to ${selectedMentees.length} mentee(s).`,
       });
 
       resetForm();
@@ -116,8 +124,8 @@ const ApplicationsJobRecommendations = () => {
       <CardContent>
         <form onSubmit={handleSubmit}>
           <JobRecommendationFormSection
-            selectedMentee={selectedMentee}
-            onMenteeChange={setSelectedMentee}
+            selectedMentees={selectedMentees}
+            onToggleMentee={toggleMenteeSelection}
             weekStartDate={weekStartDate}
             onWeekChange={setWeekStartDate}
             jobRecommendations={jobRecommendations}

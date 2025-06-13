@@ -11,7 +11,7 @@ export interface JobRecommendation {
 }
 
 export const useJobRecommendationForm = () => {
-  const [selectedMentee, setSelectedMentee] = useState<string>('');
+  const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [weekStartDate, setWeekStartDate] = useState(
     format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
   );
@@ -39,9 +39,17 @@ export const useJobRecommendationForm = () => {
     ));
   };
 
+  const toggleMenteeSelection = (menteeId: string) => {
+    setSelectedMentees(prev => 
+      prev.includes(menteeId)
+        ? prev.filter(id => id !== menteeId)
+        : [...prev, menteeId]
+    );
+  };
+
   const resetForm = () => {
     setJobRecommendations([{ id: '1', jobTitle: '', jobLink: '', companyName: '', description: '' }]);
-    setSelectedMentee('');
+    setSelectedMentees([]);
     setWeekStartDate(format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd'));
   };
 
@@ -67,8 +75,9 @@ export const useJobRecommendationForm = () => {
   };
 
   return {
-    selectedMentee,
-    setSelectedMentee,
+    selectedMentees,
+    setSelectedMentees,
+    toggleMenteeSelection,
     weekStartDate,
     setWeekStartDate,
     jobRecommendations,
