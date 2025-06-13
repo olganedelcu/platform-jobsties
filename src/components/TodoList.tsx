@@ -1,12 +1,12 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import TodoForm from './TodoForm';
 import TodoItem from './TodoItem';
+import SendTodosToMentees from './coach/SendTodosToMentees';
 
 interface Todo {
   id: string;
@@ -35,6 +35,7 @@ interface TodoListProps {
 const TodoList = ({ mentees, coachId }: TodoListProps) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showSendToMentees, setShowSendToMentees] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -94,16 +95,32 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Todo List</h2>
-        <Button
-          onClick={() => setShowAddForm(true)}
-          className="flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Todo</span>
-        </Button>
+        <h2 className="text-2xl font-bold text-gray-900">Todo Management</h2>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => setShowSendToMentees(!showSendToMentees)}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <Users className="h-4 w-4" />
+            <span>Send to Mentees</span>
+          </Button>
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Personal Todo</span>
+          </Button>
+        </div>
       </div>
 
+      {/* Send to Mentees Section */}
+      {showSendToMentees && (
+        <SendTodosToMentees coachId={coachId} />
+      )}
+
+      {/* Personal Todo Form */}
       {showAddForm && (
         <TodoForm
           mentees={mentees}
@@ -113,24 +130,28 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
         />
       )}
 
-      <div className="grid gap-4">
-        {todos.length === 0 ? (
-          <Card>
-            <CardContent className="text-center py-8">
-              <p className="text-gray-500">No todos yet. Add your first todo to get started!</p>
-            </CardContent>
-          </Card>
-        ) : (
-          todos.map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              mentees={mentees}
-              onTodoUpdated={handleTodoUpdated}
-              onTodoDeleted={handleTodoDeleted}
-            />
-          ))
-        )}
+      {/* Personal Todos List */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-gray-900">My Personal Todos</h3>
+        <div className="grid gap-4">
+          {todos.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-8">
+                <p className="text-gray-500">No personal todos yet. Add your first todo to get started!</p>
+              </CardContent>
+            </Card>
+          ) : (
+            todos.map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                mentees={mentees}
+                onTodoUpdated={handleTodoUpdated}
+                onTodoDeleted={handleTodoDeleted}
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
