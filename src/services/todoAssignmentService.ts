@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface TodoAssignment {
@@ -29,8 +28,6 @@ export interface TodoAssignmentWithDetails extends TodoAssignment {
 }
 
 export const fetchTodoAssignments = async (userId: string, isCoach: boolean = false): Promise<TodoAssignmentWithDetails[]> => {
-  console.log('Fetching todo assignments for user:', userId, 'isCoach:', isCoach);
-  
   let query = supabase
     .from('mentee_todo_assignments')
     .select(`
@@ -52,8 +49,6 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     console.error('Error fetching todo assignments:', error);
     throw error;
   }
-
-  console.log('Raw assignment data:', data);
 
   // Transform the data to match our interface
   const transformedData = (data || []).map(item => ({
@@ -80,7 +75,6 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     } : undefined
   }));
 
-  console.log('Transformed assignment data:', transformedData);
   return transformedData;
 };
 

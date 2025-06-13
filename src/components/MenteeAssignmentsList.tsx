@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,11 +10,7 @@ interface MenteeAssignmentsListProps {
 }
 
 const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
-  console.log('MenteeAssignmentsList rendered with userId:', userId);
   const { assignments, loading, updateStatus } = useTodoAssignments(userId, false);
-
-  console.log('MenteeAssignmentsList assignments:', assignments);
-  console.log('MenteeAssignmentsList loading:', loading);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

@@ -15,10 +15,8 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
 
   const loadAssignments = async () => {
     try {
-      console.log('Loading assignments for userId:', userId, 'isCoach:', isCoach);
       setLoading(true);
       const data = await fetchTodoAssignments(userId, isCoach);
-      console.log('Loaded assignments:', data);
       setAssignments(data);
     } catch (error: any) {
       console.error('Error fetching todo assignments:', error);
@@ -61,7 +59,6 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
 
   useEffect(() => {
     if (userId) {
-      console.log('useEffect triggered with userId:', userId, 'isCoach:', isCoach);
       loadAssignments();
     }
 

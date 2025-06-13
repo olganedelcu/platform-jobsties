@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,16 +29,12 @@ const MenteeTodos = () => {
 
   const checkAuth = async () => {
     try {
-      console.log('Checking auth in MenteeTodos...');
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
-        console.log('No user found, redirecting to login');
         navigate('/login');
         return;
       }
-
-      console.log('User found:', user.id, user.email);
 
       // Check if user is a mentee
       const { data: profile, error: profileError } = await supabase
@@ -48,10 +43,7 @@ const MenteeTodos = () => {
         .eq('id', user.id)
         .single();
 
-      console.log('Profile data:', profile);
-
       if (profileError || profile?.role !== 'MENTEE') {
-        console.log('User is not a mentee, profile:', profile);
         toast({
           title: "Access Denied",
           description: "You must be a mentee to access this page",
@@ -61,7 +53,6 @@ const MenteeTodos = () => {
         return;
       }
 
-      console.log('User authenticated as mentee:', user.id);
       setUser(user);
     } catch (error: any) {
       console.error('Auth check error:', error);
