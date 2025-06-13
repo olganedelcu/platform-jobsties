@@ -26,8 +26,8 @@ const DashboardHeader = ({ user, firstName }: DashboardHeaderProps) => {
       </div>
       
       {todaysQuote && (
-        <div className="max-w-md">
-          <div className="bg-gray-50/50 border border-gray-200/50 rounded-md p-2 shadow-none">
+        <div className="max-w-lg">
+          <div className="bg-gray-50/30 border border-gray-200/30 rounded-md p-2 shadow-none">
             <div className="flex items-center space-x-1.5">
               <div className="flex-shrink-0 p-1 bg-indigo-50 rounded-full">
                 <Sparkles className="h-2.5 w-2.5 text-indigo-500" />
