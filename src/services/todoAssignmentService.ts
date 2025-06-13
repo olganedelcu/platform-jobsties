@@ -34,7 +34,7 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     .select(`
       *,
       coach_todos!inner(title, description, priority, due_date),
-      profiles!mentee_id(first_name, last_name, email)
+      profiles!inner(first_name, last_name, email)
     `)
     .order('created_at', { ascending: false });
 
@@ -50,10 +50,21 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     throw error;
   }
 
+  // Type cast the data to ensure proper typing
   return (data || []).map(item => ({
     ...item,
-    todo: item.coach_todos,
-    mentee: item.profiles
+    status: item.status as 'pending' | 'in_progress' | 'completed',
+    todo: item.coach_todos ? {
+      title: item.coach_todos.title,
+      description: item.coach_todos.description,
+      priority: item.coach_todos.priority as 'low' | 'medium' | 'high',
+      due_date: item.coach_todos.due_date
+    } : undefined,
+    mentee: item.profiles ? {
+      first_name: item.profiles.first_name,
+      last_name: item.profiles.last_name,
+      email: item.profiles.email
+    } : undefined
   }));
 };
 

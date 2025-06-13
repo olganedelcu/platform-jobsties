@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,7 +58,14 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
         .eq('todo_id', todo.id);
 
       if (error) throw error;
-      setAssignments(data || []);
+      
+      // Type cast the data to ensure proper typing
+      const typedAssignments: Assignment[] = (data || []).map(item => ({
+        ...item,
+        status: item.status as 'pending' | 'in_progress' | 'completed'
+      }));
+      
+      setAssignments(typedAssignments);
     } catch (error) {
       console.error('Error fetching assignments:', error);
     }
