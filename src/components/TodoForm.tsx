@@ -1,10 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useTodoForm } from '@/hooks/useTodoForm';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useTodoFormState } from '@/hooks/useTodoFormState';
 import TodoFormFields from './forms/TodoFormFields';
 import TodoMenteeAssignment from './forms/TodoMenteeAssignment';
+import TodoFormActions from './forms/TodoFormActions';
 
 interface Mentee {
   id: string;
@@ -40,9 +42,94 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
     assignToMentees,
     setAssignToMentees,
     toggleMenteeSelection,
-    handleAddTodo,
-    onCancel: handleCancel
-  } = useTodoForm(mentees, coachId, onTodoAdded, onCancel);
+    resetForm
+  } = useTodoFormState();
+
+  const { toast } = useToast();
+
+  const handleAddTodo = async () => {
+    if (!formData.title) {
+      toast({
+        title: "Error",
+        description: "Please fill in the title",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (assignToMentees && selectedMentees.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one mentee to assign the todo to",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // First create the todo
+      const { data: todoData, error: todoError } = await supabase
+        .from('coach_todos')
+        .insert({
+          coach_id: coachId,
+          title: formData.title,
+          description: formData.description || null,
+          mentee_id: assignToMentees ? selectedMentees[0] : mentees[0]?.id, // Required field, use first mentee
+          priority: formData.priority,
+          due_date: formData.due_date || null
+        })
+        .select()
+        .single();
+
+      if (todoError) throw todoError;
+
+      // If assigning to mentees, create assignments
+      if (assignToMentees && selectedMentees.length > 0) {
+        const assignments = selectedMentees.map(menteeId => ({
+          coach_id: coachId,
+          mentee_id: menteeId,
+          todo_id: todoData.id
+        }));
+
+        const { error: assignmentError } = await supabase
+          .from('mentee_todo_assignments')
+          .insert(assignments);
+
+        if (assignmentError) throw assignmentError;
+      }
+
+      // Type cast the returned data
+      const typedTodo: Todo = {
+        ...todoData,
+        status: todoData.status as 'pending' | 'in_progress' | 'completed',
+        priority: todoData.priority as 'low' | 'medium' | 'high'
+      };
+
+      onTodoAdded(typedTodo);
+      resetForm();
+
+      const successMessage = assignToMentees 
+        ? `Todo created and assigned to ${selectedMentees.length} mentee(s)`
+        : "Todo added successfully";
+      
+      toast({
+        title: "Success",
+        description: successMessage
+      });
+    } catch (error: any) {
+      console.error('Error adding todo:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add todo",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    onCancel();
+  };
 
   return (
     <Card>
@@ -63,12 +150,10 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
           onMenteeSelectionToggle={toggleMenteeSelection}
         />
 
-        <div className="flex space-x-2">
-          <Button onClick={handleAddTodo}>Add Todo</Button>
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-        </div>
+        <TodoFormActions
+          onAddTodo={handleAddTodo}
+          onCancel={handleCancel}
+        />
       </CardContent>
     </Card>
   );
