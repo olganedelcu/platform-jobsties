@@ -26,14 +26,14 @@ const DashboardHeader = ({ user, firstName }: DashboardHeaderProps) => {
       </div>
       
       {todaysQuote && (
-        <div className="max-w-lg">
+        <div className="max-w-2xl">
           <div className="bg-gray-50/50 border border-gray-200/50 rounded-lg p-4 shadow-none">
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0 p-2 bg-gray-100 rounded-full">
-                <Sparkles className="h-4 w-4 text-gray-400" />
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 p-2 bg-indigo-50 rounded-full">
+                <Sparkles className="h-4 w-4 text-indigo-500" />
               </div>
-              <div className="flex-1 space-y-2">
-                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+              <div className="flex-1 space-y-1">
+                <h3 className="text-sm font-medium text-indigo-600 uppercase tracking-wide">
                   Daily Quote
                 </h3>
                 
