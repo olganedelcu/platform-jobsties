@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -30,9 +29,9 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+    { path: '/course', label: 'Course', icon: BookOpen },
     { path: '/tracker', label: 'Tracker', icon: FileText },
     { path: '/messages', label: 'Communication', icon: MessageCircle },
-    { path: '/course', label: 'Course', icon: BookOpen },
     { path: '/todos', label: 'Tasks', icon: FileText }
   ];
 
