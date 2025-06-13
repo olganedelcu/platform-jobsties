@@ -1,15 +1,13 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { createTodoAssignments } from '@/services/todoAssignmentService';
 import MenteeMultiSelector from './MenteeMultiSelector';
+import TodoListSection from './todo-bulk/TodoListSection';
+import SendTodosActions from './todo-bulk/SendTodosActions';
 
 interface TodoItem {
   title: string;
@@ -154,107 +152,20 @@ const SendTodosToMentees = ({ coachId }: SendTodosToMenteesProps) => {
         </div>
 
         {/* Todo Items */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Todo Items</h3>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addTodo}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Todo
-            </Button>
-          </div>
-
-          {todos.map((todo, index) => (
-            <Card key={index} className="border-l-4 border-l-blue-500">
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Badge variant="outline">Todo #{index + 1}</Badge>
-                  {todos.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTodo(index)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Title *
-                    </label>
-                    <Input
-                      placeholder="Enter todo title"
-                      value={todo.title}
-                      onChange={(e) => updateTodo(index, 'title', e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Priority
-                    </label>
-                    <select
-                      value={todo.priority}
-                      onChange={(e) => updateTodo(index, 'priority', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="low">Low Priority</option>
-                      <option value="medium">Medium Priority</option>
-                      <option value="high">High Priority</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Description
-                    </label>
-                    <Textarea
-                      placeholder="Enter todo description (optional)"
-                      value={todo.description}
-                      onChange={(e) => updateTodo(index, 'description', e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Due Date
-                    </label>
-                    <Input
-                      type="date"
-                      value={todo.due_date}
-                      onChange={(e) => updateTodo(index, 'due_date', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <TodoListSection
+          todos={todos}
+          onAddTodo={addTodo}
+          onUpdateTodo={updateTodo}
+          onRemoveTodo={removeTodo}
+        />
 
         {/* Send Button */}
-        <div className="flex justify-end">
-          <Button
-            onClick={handleSendTodos}
-            disabled={isSubmitting}
-            className="flex items-center gap-2"
-          >
-            <Send className="h-4 w-4" />
-            {isSubmitting ? 'Sending...' : `Send ${todos.length} Todo(s) to ${selectedMentees.length} Mentee(s)`}
-          </Button>
-        </div>
+        <SendTodosActions
+          isSubmitting={isSubmitting}
+          todoCount={todos.length}
+          selectedMenteeCount={selectedMentees.length}
+          onSend={handleSendTodos}
+        />
       </CardContent>
     </Card>
   );

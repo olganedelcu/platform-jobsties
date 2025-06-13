@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
-import MenteeAssignmentsList from '@/components/MenteeAssignmentsList';
-import MenteePersonalTodosList from '@/components/MenteePersonalTodosList';
-import MenteeTodoForm from '@/components/MenteeTodoForm';
+import MenteeTodosHeader from '@/components/mentee/MenteeTodosHeader';
+import MenteeTodosTabNavigation from '@/components/mentee/MenteeTodosTabNavigation';
+import AssignmentsTabContent from '@/components/mentee/AssignmentsTabContent';
+import PersonalTodosTabContent from '@/components/mentee/PersonalTodosTabContent';
 
 const MenteeTodos = () => {
   const navigate = useNavigate();
@@ -139,84 +139,32 @@ const MenteeTodos = () => {
       <Navigation user={user} onSignOut={handleSignOut} />
       
       <main className="max-w-7xl mx-auto py-8 px-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-          <p className="text-gray-600 mt-2">Manage your assigned tasks and personal todos</p>
-        </div>
+        <MenteeTodosHeader />
 
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-6">
-          <button
-            onClick={() => setActiveTab('assignments')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === 'assignments'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Coach Assignments ({assignments.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('personal')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === 'personal'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Personal Todos ({todos.length})
-          </button>
-        </div>
+        <MenteeTodosTabNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          assignmentsCount={assignments.length}
+          todosCount={todos.length}
+        />
 
         {/* Content based on active tab */}
         {activeTab === 'assignments' && (
-          <div>
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Tasks from Your Coach</h2>
-              <p className="text-gray-600">Complete tasks assigned by your coach</p>
-            </div>
-            <MenteeAssignmentsList userId={user.id} />
-          </div>
+          <AssignmentsTabContent userId={user.id} />
         )}
 
         {activeTab === 'personal' && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">Your Personal Todos</h2>
-                <p className="text-gray-600">Create and manage your own weekly todo list</p>
-              </div>
-              <Button
-                onClick={() => setShowAddForm(true)}
-                className="flex items-center space-x-2"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Todo</span>
-              </Button>
-            </div>
-
-            {showAddForm && (
-              <div className="mb-6">
-                <MenteeTodoForm
-                  onAddTodo={handleAddTodo}
-                  onCancel={() => setShowAddForm(false)}
-                  menteeId={user.id}
-                />
-              </div>
-            )}
-
-            {todosLoading ? (
-              <div className="text-center py-8">
-                <div className="text-lg">Loading your todos...</div>
-              </div>
-            ) : (
-              <MenteePersonalTodosList
-                todos={todos}
-                onUpdateStatus={updateTodoStatus}
-                onDeleteTodo={deleteTodo}
-              />
-            )}
-          </div>
+          <PersonalTodosTabContent
+            todos={todos}
+            showAddForm={showAddForm}
+            todosLoading={todosLoading}
+            userId={user.id}
+            onShowAddForm={() => setShowAddForm(true)}
+            onAddTodo={handleAddTodo}
+            onCancelAdd={() => setShowAddForm(false)}
+            onUpdateStatus={updateTodoStatus}
+            onDeleteTodo={deleteTodo}
+          />
         )}
       </main>
     </div>
