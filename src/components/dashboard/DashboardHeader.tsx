@@ -22,7 +22,6 @@ const DashboardHeader = ({ user, firstName }: DashboardHeaderProps) => {
             {greeting}
           </h1>
           <div className="space-y-2">
-            <p className="text-gray-500 text-lg">Ready to accelerate your career journey?</p>
             {todaysQuote && (
               <div className="text-gray-600">
                 <span className="italic">"{todaysQuote.text}"</span>
