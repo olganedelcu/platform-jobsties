@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Plus, Archive, Clock } from 'lucide-react';
 import { Conversation } from '@/hooks/useConversations';
@@ -84,11 +83,6 @@ const ConversationsList = ({
                         <h4 className="font-medium text-sm truncate">
                           {conversation.subject || 'No Subject'}
                         </h4>
-                        {conversation.unread_count! > 0 && (
-                          <Badge variant="destructive" className="text-xs px-1.5 py-0.5">
-                            {conversation.unread_count}
-                          </Badge>
-                        )}
                       </div>
                       <p className="text-xs text-gray-600 mb-1">
                         with {conversation.mentee_name || 'Coach Ana'}
