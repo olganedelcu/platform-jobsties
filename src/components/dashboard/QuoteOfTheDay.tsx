@@ -15,12 +15,13 @@ const QuoteOfTheDay = () => {
     <Card className="bg-gray-50/50 border-gray-200/50 shadow-none">
       <CardContent className="p-3">
         <div className="flex items-start space-x-2">
-          <div className="flex-shrink-0 p-1.5 bg-gray-100 rounded-full">
-            <Sparkles className="h-3 w-3 text-gray-400" />
+          <div className="flex-shrink-0 p-1.5 bg-indigo-50 rounded-full">
+            <Sparkles className="h-3 w-3 text-indigo-500 animate-pulse" />
           </div>
           <div className="flex-1 space-y-1">
-            <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Daily Quote
+            <h3 className="text-xs font-medium text-indigo-600 uppercase tracking-wide relative overflow-hidden">
+              <span className="relative z-10">Daily Quote</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-200/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite] transform -skew-x-12"></div>
             </h3>
             
             <blockquote className="text-gray-600 text-sm leading-relaxed italic">
