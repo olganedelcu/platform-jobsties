@@ -62,7 +62,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
       loadAssignments();
     }
 
-    // Cleanup subscription on unmount or dependency change
+    // Clean up any existing subscription first
     return () => {
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe();

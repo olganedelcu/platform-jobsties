@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface TodoAssignment {
@@ -28,6 +29,8 @@ export interface TodoAssignmentWithDetails extends TodoAssignment {
 }
 
 export const fetchTodoAssignments = async (userId: string, isCoach: boolean = false): Promise<TodoAssignmentWithDetails[]> => {
+  console.log('Fetching todo assignments for userId:', userId, 'isCoach:', isCoach);
+  
   let query = supabase
     .from('mentee_todo_assignments')
     .select(`
@@ -44,6 +47,8 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
   }
 
   const { data, error } = await query;
+
+  console.log('Query result - data:', data, 'error:', error);
 
   if (error) {
     console.error('Error fetching todo assignments:', error);
@@ -75,6 +80,7 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     } : undefined
   }));
 
+  console.log('Transformed assignments data:', transformedData);
   return transformedData;
 };
 
