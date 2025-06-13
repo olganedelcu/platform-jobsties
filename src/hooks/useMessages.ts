@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,8 +10,6 @@ export interface Message {
   sender_type: 'mentee' | 'coach';
   content: string;
   message_type: 'text' | 'system';
-  read_status: boolean;
-  read_at: string | null;
   created_at: string;
   sender_name?: string;
   attachments?: MessageAttachment[];
@@ -50,10 +49,10 @@ export const useMessages = (conversationId: string | null) => {
         return;
       }
 
-      // Fetch the messages with read_at field
+      // Fetch the messages without read status fields
       const { data: messagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('*')
+        .select('id, conversation_id, sender_id, sender_type, content, message_type, created_at')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
@@ -135,9 +134,6 @@ export const useMessages = (conversationId: string | null) => {
       });
 
       setMessages(formattedMessages);
-
-      // Mark messages as read and update read_at timestamp
-      await markMessagesAsRead();
     } catch (error) {
       console.error('Error in fetchMessages:', error);
       toast({
@@ -147,30 +143,6 @@ export const useMessages = (conversationId: string | null) => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const markMessagesAsRead = async () => {
-    if (!conversationId) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const now = new Date().toISOString();
-
-      // Update messages to mark as read and set read_at timestamp
-      await supabase
-        .from('messages')
-        .update({ 
-          read_status: true,
-          read_at: now
-        })
-        .eq('conversation_id', conversationId)
-        .neq('sender_id', user.id)
-        .eq('read_status', false);
-    } catch (error) {
-      console.error('Error marking messages as read:', error);
     }
   };
 
@@ -191,7 +163,7 @@ export const useMessages = (conversationId: string | null) => {
 
       const senderType = profile?.role === 'COACH' ? 'coach' : 'mentee';
 
-      // Insert message
+      // Insert message without read status fields
       const { data: message, error: messageError } = await supabase
         .from('messages')
         .insert({
@@ -319,27 +291,6 @@ export const useMessages = (conversationId: string | null) => {
   useEffect(() => {
     if (conversationId) {
       fetchMessages();
-
-      // Set up real-time subscription for messages
-      const messagesChannel = supabase
-        .channel(`messages-${conversationId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `conversation_id=eq.${conversationId}`
-          },
-          () => {
-            fetchMessages();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(messagesChannel);
-      };
     }
   }, [conversationId]);
 

@@ -15,7 +15,6 @@ import {
   MessageCircle
 } from 'lucide-react';
 import NotificationDropdown from './messaging/NotificationDropdown';
-import { useNotifications } from '@/hooks/useNotifications';
 
 interface CoachNavigationProps {
   user: any;
@@ -25,7 +24,6 @@ interface CoachNavigationProps {
 const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { unreadCount } = useNotifications();
 
   const navItems = [
     { 
@@ -91,12 +89,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
           <div className="hidden md:flex items-center space-x-4">
             {navItems.slice(0, 6).map((item) => {
               const Icon = item.icon;
-              const isMessages = item.path === '/coach/messages';
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors relative ${
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive(item.path)
                       ? 'bg-indigo-100 text-indigo-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -104,11 +101,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 >
                   <Icon className="h-4 w-4" />
                   <span>{item.label}</span>
-                  {isMessages && unreadCount > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
                 </Link>
               );
             })}
@@ -148,12 +140,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isMessages = item.path === '/coach/messages';
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium relative ${
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
                     isActive(item.path)
                       ? 'bg-indigo-100 text-indigo-700'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -162,11 +153,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 >
                   <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
-                  {isMessages && unreadCount > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
                 </Link>
               );
             })}

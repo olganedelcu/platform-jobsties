@@ -13,7 +13,6 @@ export interface Conversation {
   updated_at: string;
   mentee_name?: string;
   last_message?: string;
-  unread_count?: number;
 }
 
 export const useConversations = () => {
@@ -61,7 +60,7 @@ export const useConversations = () => {
         return;
       }
 
-      // Format conversations with mentee names and get unread counts
+      // Format conversations with mentee names and get last message
       const formattedConversations = await Promise.all(
         (data || []).map(async (conv: any) => {
           const mentee = conv.profiles;
@@ -76,19 +75,10 @@ export const useConversations = () => {
             .limit(1)
             .single();
 
-          // Get unread count
-          const { count: unreadCount } = await supabase
-            .from('messages')
-            .select('*', { count: 'exact' })
-            .eq('conversation_id', conv.id)
-            .eq('read_status', false)
-            .neq('sender_id', user.id);
-
           return {
             ...conv,
             mentee_name: menteeName,
-            last_message: lastMessage?.content || '',
-            unread_count: unreadCount || 0
+            last_message: lastMessage?.content || ''
           };
         })
       );
@@ -173,26 +163,6 @@ export const useConversations = () => {
 
   useEffect(() => {
     fetchConversations();
-
-    // Set up real-time subscription for conversations
-    const conversationsChannel = supabase
-      .channel('conversations-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'conversations'
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(conversationsChannel);
-    };
   }, []);
 
   return {
