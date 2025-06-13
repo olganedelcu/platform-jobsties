@@ -663,6 +663,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_mentee_todo_assignments_coach_id"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_mentee_todo_assignments_mentee_id"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "mentee_todo_assignments_todo_id_fkey"
             columns: ["todo_id"]
             isOneToOne: false

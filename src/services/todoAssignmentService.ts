@@ -50,10 +50,18 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     throw error;
   }
 
-  // Type cast the data to ensure proper typing
+  // Transform the data to match our interface
   return (data || []).map(item => ({
-    ...item,
+    id: item.id,
+    coach_id: item.coach_id,
+    mentee_id: item.mentee_id,
+    todo_id: item.todo_id,
     status: item.status as 'pending' | 'in_progress' | 'completed',
+    assigned_at: item.assigned_at,
+    started_at: item.started_at,
+    completed_at: item.completed_at,
+    created_at: item.created_at,
+    updated_at: item.updated_at,
     todo: item.coach_todos ? {
       title: item.coach_todos.title,
       description: item.coach_todos.description,
