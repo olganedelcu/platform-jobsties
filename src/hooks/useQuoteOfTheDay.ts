@@ -6,38 +6,38 @@ interface Quote {
   author: string;
 }
 
-const inspirationalQuotes: Quote[] = [
-  { text: "Faith is taking the first step even when you don't see the whole staircase.", author: "Martin Luther King Jr." },
-  { text: "In the depths of winter, I finally learned that there was in me an invincible summer.", author: "Albert Camus" },
-  { text: "The cave you fear to enter holds the treasure you seek.", author: "Joseph Campbell" },
-  { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
-  { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne" },
-  { text: "The wound is the place where the Light enters you.", author: "Rumi" },
-  { text: "Everything you need is inside you – you just need to access it.", author: "Buddha" },
-  { text: "Trust in dreams, for in them is hidden the gate to eternity.", author: "Khalil Gibran" },
-  { text: "The quieter you become, the more able you are to hear.", author: "Rumi" },
-  { text: "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it.", author: "Rumi" },
-  { text: "The best way to find out if you can trust somebody is to trust them.", author: "Ernest Hemingway" },
-  { text: "Faith consists in believing when it is beyond the power of reason to believe.", author: "Voltaire" },
-  { text: "Keep your face always toward the sunshine—and shadows will fall behind you.", author: "Walt Whitman" },
-  { text: "The universe is not outside of you. Look inside yourself; everything that you want, you already are.", author: "Rumi" },
-  { text: "We are not human beings having a spiritual experience. We are spiritual beings having a human experience.", author: "Pierre Teilhard de Chardin" },
-  { text: "What we plant in the soil of contemplation, we shall reap in the harvest of action.", author: "Meister Eckhart" },
-  { text: "The privilege of a lifetime is being who you are.", author: "Joseph Campbell" },
-  { text: "Peace comes from within. Do not seek it without.", author: "Buddha" },
-  { text: "Yesterday is history, tomorrow is a mystery, today is a gift, which is why we call it the present.", author: "Bill Keane" },
-  { text: "Be yourself; everyone else is already taken.", author: "Oscar Wilde" },
-  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
-  { text: "The only way to make sense out of change is to plunge into it, move with it, and join the dance.", author: "Alan Watts" },
-  { text: "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.", author: "Christian D. Larson" },
-  { text: "Your purpose in life is to find your purpose and give your whole heart and soul to it.", author: "Buddha" },
-  { text: "The soul becomes dyed with the color of its thoughts.", author: "Marcus Aurelius" },
-  { text: "Hope is the thing with feathers that perches in the soul and sings the tune without the words and never stops at all.", author: "Emily Dickinson" },
-  { text: "Trust the process. Your time is coming. Just do the work and the results will handle themselves.", author: "Tony Gaskins" },
-  { text: "What you seek is seeking you.", author: "Rumi" },
-  { text: "The present moment is the only time over which we have dominion.", author: "Thich Nhat Hanh" },
-  { text: "Inner peace begins the moment you choose not to allow another person or event to control your emotions.", author: "Pema Chödrön" },
-  { text: "You have been assigned this mountain to show others it can be moved.", author: "Mel Robbins" }
+const motivationalMessages: Quote[] = [
+  { text: "One day more, one day closer to that offer!", author: "Your JobsTies Team" },
+  { text: "Every application is a step forward. Keep going!", author: "Your JobsTies Team" },
+  { text: "Today's the perfect day to update your profile and stand out!", author: "Your JobsTies Team" },
+  { text: "Your dream job is out there waiting. Let's find it together!", author: "Your JobsTies Team" },
+  { text: "Small steps today, big opportunities tomorrow!", author: "Your JobsTies Team" },
+  { text: "Ready to make today count? Your next opportunity awaits!", author: "Your JobsTies Team" },
+  { text: "Every skill you build brings you closer to success!", author: "Your JobsTies Team" },
+  { text: "Don't just wait for opportunities – create them by staying active!", author: "Your JobsTies Team" },
+  { text: "Your consistency today becomes your success tomorrow!", author: "Your JobsTies Team" },
+  { text: "Time to turn those career goals into career wins!", author: "Your JobsTies Team" },
+  { text: "The best time to network was yesterday. The second best time is now!", author: "Your JobsTies Team" },
+  { text: "Your future self will thank you for the effort you put in today!", author: "Your JobsTies Team" },
+  { text: "Progress over perfection – every action counts!", author: "Your JobsTies Team" },
+  { text: "Today's preparation is tomorrow's advantage!", author: "Your JobsTies Team" },
+  { text: "Stay active, stay visible, stay unstoppable!", author: "Your JobsTies Team" },
+  { text: "Your next breakthrough could be just one application away!", author: "Your JobsTies Team" },
+  { text: "Invest in yourself today – complete a course module!", author: "Your JobsTies Team" },
+  { text: "Great careers are built one intentional action at a time!", author: "Your JobsTies Team" },
+  { text: "Your dedication today shapes your opportunities tomorrow!", author: "Your JobsTies Team" },
+  { text: "Ready to level up? Let's make today productive!", author: "Your JobsTies Team" },
+  { text: "Success loves consistency. What will you accomplish today?", author: "Your JobsTies Team" },
+  { text: "Every expert was once a beginner who refused to give up!", author: "Your JobsTies Team" },
+  { text: "Your career transformation starts with today's actions!", author: "Your JobsTies Team" },
+  { text: "Don't wait for the perfect moment – make this moment perfect!", author: "Your JobsTies Team" },
+  { text: "You're not just finding a job, you're building a career!", author: "Your JobsTies Team" },
+  { text: "Active job seekers get the best opportunities. Be active!", author: "Your JobsTies Team" },
+  { text: "Your persistence today creates your success story tomorrow!", author: "Your JobsTies Team" },
+  { text: "Ready to shine? Update that profile and show your best self!", author: "Your JobsTies Team" },
+  { text: "Every day is a chance to get closer to your ideal role!", author: "Your JobsTies Team" },
+  { text: "Your journey matters as much as your destination. Keep moving!", author: "Your JobsTies Team" },
+  { text: "Today's effort is tomorrow's advantage. Let's get started!", author: "Your JobsTies Team" }
 ];
 
 export const useQuoteOfTheDay = () => {
@@ -57,8 +57,8 @@ export const useQuoteOfTheDay = () => {
     }
     
     // Use absolute value and modulo to get a valid index
-    const quoteIndex = Math.abs(hash) % inspirationalQuotes.length;
-    setTodaysQuote(inspirationalQuotes[quoteIndex]);
+    const quoteIndex = Math.abs(hash) % motivationalMessages.length;
+    setTodaysQuote(motivationalMessages[quoteIndex]);
   }, []);
 
   return { todaysQuote };
