@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   fetchTodoAssignments, 
@@ -11,6 +11,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
   const [assignments, setAssignments] = useState<TodoAssignmentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const subscriptionRef = useRef<any>(null);
 
   const loadAssignments = async () => {
     try {
@@ -60,6 +61,14 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
     if (userId) {
       loadAssignments();
     }
+
+    // Cleanup subscription on unmount or dependency change
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+    };
   }, [userId, isCoach]);
 
   return {

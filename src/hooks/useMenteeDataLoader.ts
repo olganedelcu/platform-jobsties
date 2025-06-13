@@ -37,11 +37,14 @@ export const useMenteeDataLoader = () => {
 
     } catch (error) {
       console.error('Error fetching mentees:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch mentees.",
-        variant: "destructive"
-      });
+      // Only show error toast for unexpected errors
+      if (error && typeof error === 'object' && 'code' in error && error.code !== '23505') {
+        toast({
+          title: "Error",
+          description: "Failed to fetch mentees.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
