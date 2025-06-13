@@ -30,10 +30,10 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
+    { path: '/tracker', label: 'Tracker', icon: FileText },
     { path: '/messages', label: 'Communication', icon: MessageCircle },
     { path: '/course', label: 'Course', icon: BookOpen },
-    { path: '/todos', label: 'Tasks', icon: FileText },
-    { path: '/tracker', label: 'Tracker', icon: FileText }
+    { path: '/todos', label: 'Tasks', icon: FileText }
   ];
 
   useEffect(() => {
