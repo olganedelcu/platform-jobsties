@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Trash2, CheckCircle } from 'lucide-react';
+import { Trash2, Edit, CheckCircle, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -26,60 +26,56 @@ interface Mentee {
   email: string;
 }
 
+interface Assignment {
+  id: string;
+  mentee_id: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  assigned_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+}
+
 interface TodoItemProps {
   todo: Todo;
   mentees: Mentee[];
-  onTodoUpdated: (todoId: string, updates: Partial<Todo>) => void;
+  onTodoUpdated: (todoId: string, updatedTodo: Partial<Todo>) => void;
   onTodoDeleted: (todoId: string) => void;
 }
 
 const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps) => {
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleUpdateTodo = async (todoId: string, updates: Partial<Todo>) => {
+  useEffect(() => {
+    fetchAssignments();
+  }, [todo.id]);
+
+  const fetchAssignments = async () => {
     try {
       const { data, error } = await supabase
-        .from('coach_todos')
-        .update(updates)
-        .eq('id', todoId)
-        .select()
-        .single();
+        .from('mentee_todo_assignments')
+        .select('*')
+        .eq('todo_id', todo.id);
 
       if (error) throw error;
-
-      // Type cast the returned data
-      const typedUpdatedTodo: Todo = {
-        ...data,
-        status: data.status as 'pending' | 'in_progress' | 'completed',
-        priority: data.priority as 'low' | 'medium' | 'high'
-      };
-
-      onTodoUpdated(todoId, typedUpdatedTodo);
-
-      toast({
-        title: "Success",
-        description: "Todo updated successfully"
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to update todo",
-        variant: "destructive"
-      });
+      setAssignments(data || []);
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
     }
   };
 
-  const handleDeleteTodo = async (todoId: string) => {
+  const handleDelete = async () => {
     try {
+      setLoading(true);
       const { error } = await supabase
         .from('coach_todos')
         .delete()
-        .eq('id', todoId);
+        .eq('id', todo.id);
 
       if (error) throw error;
 
-      onTodoDeleted(todoId);
-
+      onTodoDeleted(todo.id);
       toast({
         title: "Success",
         description: "Todo deleted successfully"
@@ -90,11 +86,32 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
         description: "Failed to delete todo",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getMenteeById = (menteeId: string) => {
-    return mentees.find(m => m.id === menteeId);
+  const handleStatusUpdate = async (newStatus: 'pending' | 'in_progress' | 'completed') => {
+    try {
+      const { error } = await supabase
+        .from('coach_todos')
+        .update({ status: newStatus })
+        .eq('id', todo.id);
+
+      if (error) throw error;
+
+      onTodoUpdated(todo.id, { status: newStatus });
+      toast({
+        title: "Success",
+        description: "Todo status updated"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to update todo status",
+        variant: "destructive"
+      });
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -115,15 +132,30 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
     }
   };
 
-  const mentee = getMenteeById(todo.mentee_id);
+  const getAssignedMentees = () => {
+    return assignments.map(assignment => {
+      const mentee = mentees.find(m => m.id === assignment.mentee_id);
+      return mentee ? `${mentee.first_name} ${mentee.last_name}` : 'Unknown';
+    }).join(', ');
+  };
+
+  const getAssignmentStatusCounts = () => {
+    const counts = assignments.reduce((acc, assignment) => {
+      acc[assignment.status] = (acc[assignment.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    return counts;
+  };
+
+  const assignmentCounts = getAssignmentStatusCounts();
 
   return (
     <Card>
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-2">
-              <h3 className="font-semibold text-gray-900">{todo.title}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-semibold">{todo.title}</h3>
               <Badge className={getPriorityColor(todo.priority)}>
                 {todo.priority}
               </Badge>
@@ -133,49 +165,63 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
             </div>
             
             {todo.description && (
-              <p className="text-gray-600 mb-2">{todo.description}</p>
+              <p className="text-gray-600 text-sm mb-2">{todo.description}</p>
             )}
             
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span>
-                Mentee: {mentee ? `${mentee.first_name} ${mentee.last_name}` : 'Unknown'}
-              </span>
-              {todo.due_date && (
-                <div className="flex items-center space-x-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>Due: {new Date(todo.due_date).toLocaleDateString()}</span>
-                </div>
-              )}
-            </div>
-          </div>
+            {todo.due_date && (
+              <p className="text-sm text-gray-500 mb-2">
+                <Clock className="inline w-4 h-4 mr-1" />
+                Due: {new Date(todo.due_date).toLocaleDateString()}
+              </p>
+            )}
 
-          <div className="flex items-center space-x-2">
+            {assignments.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm font-medium">Assigned to:</span>
+                  <span className="text-sm text-gray-600">{getAssignedMentees()}</span>
+                </div>
+                
+                <div className="flex gap-2 text-xs">
+                  {assignmentCounts.pending && (
+                    <Badge variant="outline" className="text-gray-600">
+                      {assignmentCounts.pending} pending
+                    </Badge>
+                  )}
+                  {assignmentCounts.in_progress && (
+                    <Badge variant="outline" className="text-blue-600">
+                      {assignmentCounts.in_progress} in progress
+                    </Badge>
+                  )}
+                  {assignmentCounts.completed && (
+                    <Badge variant="outline" className="text-green-600">
+                      {assignmentCounts.completed} completed
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2 ml-4">
             {todo.status !== 'completed' && (
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleUpdateTodo(todo.id, { status: 'completed' })}
+                onClick={() => handleStatusUpdate('completed')}
               >
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className="w-4 h-4" />
               </Button>
             )}
             
-            <select
-              value={todo.status}
-              onChange={(e) => handleUpdateTodo(todo.id, { status: e.target.value as Todo['status'] })}
-              className="text-sm p-1 border border-gray-300 rounded"
-            >
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-
             <Button
               size="sm"
               variant="outline"
-              onClick={() => handleDeleteTodo(todo.id)}
+              onClick={handleDelete}
+              disabled={loading}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         </div>

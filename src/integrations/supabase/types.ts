@@ -624,6 +624,89 @@ export type Database = {
         }
         Relationships: []
       }
+      mentee_todo_assignments: {
+        Row: {
+          assigned_at: string
+          coach_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          mentee_id: string
+          started_at: string | null
+          status: string
+          todo_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          coach_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mentee_id: string
+          started_at?: string | null
+          status?: string
+          todo_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          coach_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mentee_id?: string
+          started_at?: string | null
+          status?: string
+          todo_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentee_todo_assignments_todo_id_fkey"
+            columns: ["todo_id"]
+            isOneToOne: false
+            referencedRelation: "coach_todos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentee_todos: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          mentee_id: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          mentee_id: string
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          mentee_id?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       message_attachments: {
         Row: {
           file_name: string
