@@ -6,18 +6,20 @@ import {
   updateAssignmentStatus, 
   TodoAssignmentWithDetails 
 } from '@/services/todoAssignmentService';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useTodoAssignments = (userId: string, isCoach: boolean = false) => {
   const [assignments, setAssignments] = useState<TodoAssignmentWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const subscriptionRef = useRef<any>(null);
+  const channelRef = useRef<any>(null);
 
   const loadAssignments = async () => {
     try {
       setLoading(true);
       const data = await fetchTodoAssignments(userId, isCoach);
       setAssignments(data);
+      console.log('Assignments loaded:', data);
     } catch (error: any) {
       console.error('Error fetching todo assignments:', error);
       toast({
@@ -58,15 +60,47 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
   };
 
   useEffect(() => {
-    if (userId) {
-      loadAssignments();
+    if (!userId) return;
+
+    // Load initial data
+    loadAssignments();
+
+    // Clean up any existing channel
+    if (channelRef.current) {
+      console.log('Cleaning up existing channel');
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
     }
 
-    // Clean up any existing subscription first
+    // Set up real-time subscription
+    const channel = supabase
+      .channel(`todo_assignments_${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'mentee_todo_assignments',
+          filter: isCoach ? `coach_id=eq.${userId}` : `mentee_id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          // Reload assignments when changes occur
+          loadAssignments();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
+
+    channelRef.current = channel;
+
+    // Cleanup function
     return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
+      if (channelRef.current) {
+        console.log('Cleaning up channel on unmount');
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
     };
   }, [userId, isCoach]);

@@ -29,8 +29,18 @@ export interface TodoAssignmentWithDetails extends TodoAssignment {
 }
 
 export const fetchTodoAssignments = async (userId: string, isCoach: boolean = false): Promise<TodoAssignmentWithDetails[]> => {
-  console.log('Fetching todo assignments for userId:', userId, 'isCoach:', isCoach);
+  console.log('=== FETCHING TODO ASSIGNMENTS ===');
+  console.log('User ID:', userId);
+  console.log('Is Coach:', isCoach);
   
+  // First, let's check if there are any assignments at all
+  const { data: allAssignments, error: allError } = await supabase
+    .from('mentee_todo_assignments')
+    .select('*');
+    
+  console.log('All assignments in database:', allAssignments?.length || 0);
+  console.log('Sample assignments:', allAssignments?.slice(0, 3));
+
   let query = supabase
     .from('mentee_todo_assignments')
     .select(`
@@ -42,13 +52,18 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
 
   if (isCoach) {
     query = query.eq('coach_id', userId);
+    console.log('Filtering by coach_id:', userId);
   } else {
     query = query.eq('mentee_id', userId);
+    console.log('Filtering by mentee_id:', userId);
   }
 
   const { data, error } = await query;
 
-  console.log('Query result - data:', data, 'error:', error);
+  console.log('Filtered query result:');
+  console.log('- Data:', data);
+  console.log('- Error:', error);
+  console.log('- Count:', data?.length || 0);
 
   if (error) {
     console.error('Error fetching todo assignments:', error);
@@ -81,6 +96,7 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
   }));
 
   console.log('Transformed assignments data:', transformedData);
+  console.log('=== END FETCH ===');
   return transformedData;
 };
 
@@ -103,15 +119,28 @@ export const createTodoAssignments = async (
   todoId: string,
   menteeIds: string[]
 ): Promise<void> => {
+  console.log('=== CREATING TODO ASSIGNMENTS ===');
+  console.log('Coach ID:', coachId);
+  console.log('Todo ID:', todoId);
+  console.log('Mentee IDs:', menteeIds);
+
   const assignments = menteeIds.map(menteeId => ({
     coach_id: coachId,
     mentee_id: menteeId,
     todo_id: todoId
   }));
 
-  const { error } = await supabase
+  console.log('Assignments to create:', assignments);
+
+  const { data, error } = await supabase
     .from('mentee_todo_assignments')
-    .insert(assignments);
+    .insert(assignments)
+    .select();
+
+  console.log('Create result:');
+  console.log('- Data:', data);
+  console.log('- Error:', error);
+  console.log('=== END CREATE ===');
 
   if (error) {
     throw error;
