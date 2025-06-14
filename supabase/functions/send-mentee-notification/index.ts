@@ -38,6 +38,30 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Email and action type are required");
     }
 
+    // For development/testing: Only send emails to ana@jobsties.com
+    // In production, you should verify your domain at resend.com/domains
+    const isTestMode = menteeEmail !== 'ana@jobsties.com';
+    
+    if (isTestMode) {
+      console.log(`Test mode: Would send ${actionType} notification to ${menteeEmail} (${menteeName})`);
+      console.log('Notification details:', actionDetails);
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: "Notification logged in test mode (recipient not ana@jobsties.com)",
+        testMode: true,
+        originalRecipient: menteeEmail,
+        actionType,
+        actionDetails
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    }
+
     // Generate email content based on action type
     let subject = "";
     let htmlContent = "";
@@ -116,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending ${actionType} notification to ${menteeEmail}`);
 
-    // Send notification email
+    // Send notification email (only to ana@jobsties.com in current setup)
     const emailResponse = await resend.emails.send({
       from: "Ana - JobsTies <onboarding@resend.dev>",
       to: [menteeEmail],
