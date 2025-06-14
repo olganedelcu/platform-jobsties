@@ -66,7 +66,7 @@ export const useModuleFileUpload = () => {
         throw uploadError;
       }
 
-      // Save file record to database
+      // Save file record to database - use file_url instead of file_path
       const { error: dbError } = await supabase
         .from('module_files')
         .insert({
@@ -74,7 +74,7 @@ export const useModuleFileUpload = () => {
           coach_id: user.id,
           module_type: moduleType,
           file_name: file.name,
-          file_path: filePath,
+          file_url: filePath, // Changed from file_path to file_url
           file_size: file.size
         });
 

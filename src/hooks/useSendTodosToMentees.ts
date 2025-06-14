@@ -9,7 +9,7 @@ interface Todo {
   id: string;
   title: string;
   description: string;
-  dueDate: string;
+  due_date: string; // Changed from dueDate to due_date to match database schema
   priority: 'low' | 'medium' | 'high';
 }
 
@@ -20,7 +20,7 @@ export const useSendTodosToMentees = (coachId: string) => {
     id: '1',
     title: '',
     description: '',
-    dueDate: '',
+    due_date: '', // Changed from dueDate to due_date
     priority: 'medium'
   }]);
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
@@ -31,7 +31,7 @@ export const useSendTodosToMentees = (coachId: string) => {
       id: Date.now().toString(),
       title: '',
       description: '',
-      dueDate: '',
+      due_date: '', // Changed from dueDate to due_date
       priority: 'medium'
     };
     setTodos([...todos, newTodo]);
@@ -86,25 +86,48 @@ export const useSendTodosToMentees = (coachId: string) => {
         throw new Error('User not authenticated');
       }
 
-      // Create todos for each selected mentee
+      // First, create todos in the coach_todos table
       const todoPromises = [];
       for (const menteeId of selectedMentees) {
         for (const todo of validTodos) {
           todoPromises.push(
-            supabase.from('mentee_todo_assignments').insert({
+            supabase.from('coach_todos').insert({
               coach_id: coachId,
               mentee_id: menteeId,
               title: todo.title,
               description: todo.description || null,
-              due_date: todo.dueDate || null,
+              due_date: todo.due_date || null,
               priority: todo.priority,
+              status: 'pending'
+            }).select().single()
+          );
+        }
+      }
+
+      const todoResults = await Promise.all(todoPromises);
+      
+      // Check for errors in todo creation
+      const todoErrors = todoResults.filter(result => result.error);
+      if (todoErrors.length > 0) {
+        throw new Error('Failed to create some todos');
+      }
+
+      // Now create assignments linking mentees to todos
+      const assignmentPromises = [];
+      for (const result of todoResults) {
+        if (result.data) {
+          assignmentPromises.push(
+            supabase.from('mentee_todo_assignments').insert({
+              coach_id: coachId,
+              mentee_id: result.data.mentee_id,
+              todo_id: result.data.id,
               status: 'pending'
             })
           );
         }
       }
 
-      await Promise.all(todoPromises);
+      await Promise.all(assignmentPromises);
 
       // Send notifications if Ana is the one sending todos
       if (user?.email) {
@@ -127,7 +150,7 @@ export const useSendTodosToMentees = (coachId: string) => {
         id: Date.now().toString(),
         title: '',
         description: '',
-        dueDate: '',
+        due_date: '', // Changed from dueDate to due_date
         priority: 'medium'
       }]);
       setSelectedMentees([]);
