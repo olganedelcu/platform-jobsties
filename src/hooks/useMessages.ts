@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
 export interface Message {
   id: string;
@@ -196,6 +197,24 @@ export const useMessages = (conversationId: string | null) => {
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId);
+
+      // Send notification if Ana sent the message
+      if (user?.email && senderType === 'coach') {
+        // Get the mentee ID from the conversation
+        const { data: conversation } = await supabase
+          .from('conversations')
+          .select('mentee_id')
+          .eq('id', conversationId)
+          .single();
+
+        if (conversation?.mentee_id) {
+          await NotificationHandlers.message(
+            user.email,
+            conversation.mentee_id,
+            content.trim()
+          );
+        }
+      }
 
       await fetchMessages();
     } catch (error) {

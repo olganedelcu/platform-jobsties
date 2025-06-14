@@ -1,67 +1,77 @@
 
 import { useState } from 'react';
+import { useMentees } from '@/hooks/useMentees';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { createTodoAssignments } from '@/services/todoAssignmentService';
+import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
-interface TodoItem {
+interface Todo {
+  id: string;
   title: string;
   description: string;
+  dueDate: string;
   priority: 'low' | 'medium' | 'high';
-  due_date: string;
 }
 
 export const useSendTodosToMentees = (coachId: string) => {
-  const [todos, setTodos] = useState<TodoItem[]>([
-    { title: '', description: '', priority: 'medium', due_date: '' }
-  ]);
+  const { mentees } = useMentees();
+  const { toast } = useToast();
+  const [todos, setTodos] = useState<Todo[]>([{
+    id: '1',
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'medium'
+  }]);
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
 
   const addTodo = () => {
-    setTodos([...todos, { title: '', description: '', priority: 'medium', due_date: '' }]);
+    const newTodo: Todo = {
+      id: Date.now().toString(),
+      title: '',
+      description: '',
+      dueDate: '',
+      priority: 'medium'
+    };
+    setTodos([...todos, newTodo]);
   };
 
-  const removeTodo = (index: number) => {
+  const removeTodo = (id: string) => {
     if (todos.length > 1) {
-      setTodos(todos.filter((_, i) => i !== index));
+      setTodos(todos.filter(todo => todo.id !== id));
     }
   };
 
-  const updateTodo = (index: number, field: keyof TodoItem, value: string) => {
-    const updatedTodos = todos.map((todo, i) => 
-      i === index ? { ...todo, [field]: value } : todo
-    );
-    setTodos(updatedTodos);
+  const updateTodo = (id: string, field: keyof Todo, value: string) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, [field]: value } : todo
+    ));
   };
 
   const toggleMenteeSelection = (menteeId: string) => {
-    setSelectedMentees(prev => 
+    setSelectedMentees(prev =>
       prev.includes(menteeId)
         ? prev.filter(id => id !== menteeId)
         : [...prev, menteeId]
     );
   };
 
-  const validateTodos = () => {
-    return todos.every(todo => todo.title.trim() !== '');
-  };
-
   const handleSendTodos = async () => {
-    if (!validateTodos()) {
+    if (selectedMentees.length === 0) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all todo titles",
+        title: "No mentees selected",
+        description: "Please select at least one mentee to send todos to.",
         variant: "destructive"
       });
       return;
     }
 
-    if (selectedMentees.length === 0) {
+    const validTodos = todos.filter(todo => todo.title.trim() !== '');
+    if (validTodos.length === 0) {
       toast({
-        title: "Selection Required",
-        description: "Please select at least one mentee",
+        title: "No valid todos",
+        description: "Please add at least one todo with a title.",
         variant: "destructive"
       });
       return;
@@ -70,54 +80,63 @@ export const useSendTodosToMentees = (coachId: string) => {
     setIsSubmitting(true);
 
     try {
-      console.log('=== SENDING TODOS TO MENTEES ===');
-      console.log('Coach ID:', coachId);
-      console.log('Selected mentees:', selectedMentees);
-      console.log('Todos to send:', todos);
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
-      // Create todos in coach_todos table and assignments for each mentee
-      for (const todo of todos) {
-        console.log('Creating todo:', todo.title);
-        
-        // Create the todo first
-        const { data: todoData, error: todoError } = await supabase
-          .from('coach_todos')
-          .insert({
-            coach_id: coachId,
-            title: todo.title.trim(),
-            description: todo.description.trim() || null,
-            priority: todo.priority,
-            due_date: todo.due_date || null,
-            mentee_id: selectedMentees[0], // Required field, use first mentee
-            status: 'pending'
-          })
-          .select()
-          .single();
+      // Create todos for each selected mentee
+      const todoPromises = [];
+      for (const menteeId of selectedMentees) {
+        for (const todo of validTodos) {
+          todoPromises.push(
+            supabase.from('mentee_todo_assignments').insert({
+              coach_id: coachId,
+              mentee_id: menteeId,
+              title: todo.title,
+              description: todo.description || null,
+              due_date: todo.dueDate || null,
+              priority: todo.priority,
+              status: 'pending'
+            })
+          );
+        }
+      }
 
-        console.log('Todo created:', todoData);
-        if (todoError) throw todoError;
+      await Promise.all(todoPromises);
 
-        // Create assignments for all selected mentees
-        console.log('Creating assignments for todo:', todoData.id);
-        await createTodoAssignments(coachId, todoData.id, selectedMentees);
-        console.log('Assignments created for todo:', todoData.id);
+      // Send notifications if Ana is the one sending todos
+      if (user?.email) {
+        const firstTodoTitle = validTodos[0]?.title;
+        await NotificationHandlers.todoAssignment(
+          user.email,
+          selectedMentees,
+          firstTodoTitle,
+          validTodos.length
+        );
       }
 
       toast({
-        title: "Success",
-        description: `${todos.length} todo(s) sent to ${selectedMentees.length} mentee(s)`,
+        title: "Todos sent successfully",
+        description: `${validTodos.length} todo(s) sent to ${selectedMentees.length} mentee(s).`,
       });
 
       // Reset form
-      setTodos([{ title: '', description: '', priority: 'medium', due_date: '' }]);
+      setTodos([{
+        id: Date.now().toString(),
+        title: '',
+        description: '',
+        dueDate: '',
+        priority: 'medium'
+      }]);
       setSelectedMentees([]);
-      
-      console.log('=== TODOS SENT SUCCESSFULLY ===');
+
     } catch (error: any) {
       console.error('Error sending todos:', error);
       toast({
         title: "Error",
-        description: "Failed to send todos to mentees",
+        description: "Failed to send todos. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -126,6 +145,7 @@ export const useSendTodosToMentees = (coachId: string) => {
   };
 
   return {
+    mentees,
     todos,
     selectedMentees,
     isSubmitting,

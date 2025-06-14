@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Mentee } from '@/hooks/useMentees';
+import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
 const ALLOWED_FILE_TYPES = [
   'application/pdf',
@@ -93,6 +94,15 @@ export const uploadCVFile = async (
       title: "Success",
       description: `Document uploaded successfully for ${mentee?.first_name} ${mentee?.last_name}`,
     });
+
+    // Send notification if Ana uploaded the file
+    if (user?.email) {
+      await NotificationHandlers.fileUpload(
+        user.email,
+        selectedMentee,
+        file.name
+      );
+    }
 
     // Call the success callback function
     onSuccess();
