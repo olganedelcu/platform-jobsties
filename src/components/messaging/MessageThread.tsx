@@ -36,7 +36,7 @@ const MessageThread = ({
   if (loading) {
     return (
       <Card className="h-full border-indigo-200">
-        <CardHeader className="bg-indigo-50 border-b border-indigo-100">
+        <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900">Loading messages...</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -55,13 +55,13 @@ const MessageThread = ({
   if (messages.length === 0) {
     return (
       <Card className="h-full border-indigo-200">
-        <CardHeader className="bg-indigo-50 border-b border-indigo-100">
+        <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900 flex items-center gap-2">
             <User className="h-5 w-5" />
             {conversationSubject || 'Conversation'}
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex items-center justify-center h-64">
+        <CardContent className="flex items-center justify-center flex-1">
           <div className="text-center text-indigo-600">
             <User className="h-12 w-12 mx-auto mb-3 text-indigo-400" />
             <p className="text-indigo-700 font-medium">No messages yet</p>
@@ -80,9 +80,9 @@ const MessageThread = ({
           {conversationSubject || 'Conversation'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 p-0">
-        <ScrollArea className="h-full px-6">
-          <div className="space-y-4 py-4">
+      <CardContent className="flex-1 p-0 min-h-0">
+        <ScrollArea className="h-full">
+          <div className="space-y-4 p-6">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
