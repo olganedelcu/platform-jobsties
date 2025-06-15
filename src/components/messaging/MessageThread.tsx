@@ -96,7 +96,7 @@ const MessageThread = ({
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-4 p-6">
+          <div className="flex flex-col space-y-4 p-4">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -107,7 +107,7 @@ const MessageThread = ({
                   className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    className={`max-w-[75%] sm:max-w-[85%] px-3 py-2 rounded-lg ${
                       isCurrentUser
                         ? 'bg-indigo-600 text-white'
                         : isCoach
@@ -131,7 +131,7 @@ const MessageThread = ({
                       )}
                     </div>
                     
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
@@ -142,14 +142,14 @@ const MessageThread = ({
                               isCurrentUser ? 'bg-indigo-700' : 'bg-gray-200'
                             }`}
                           >
-                            <Paperclip className="h-3 w-3" />
-                            <span className="text-xs truncate flex-1">
+                            <Paperclip className="h-3 w-3 flex-shrink-0" />
+                            <span className="text-xs truncate flex-1 min-w-0">
                               {attachment.file_name}
                             </span>
                             <Button
                               size="sm"
                               variant="ghost"
-                              className={`h-6 w-6 p-0 ${
+                              className={`h-6 w-6 p-0 flex-shrink-0 ${
                                 isCurrentUser 
                                   ? 'hover:bg-indigo-800 text-indigo-100' 
                                   : 'hover:bg-gray-300 text-gray-600'
