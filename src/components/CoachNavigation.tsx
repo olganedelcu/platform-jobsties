@@ -37,6 +37,11 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
       icon: BarChart3 
     },
     { 
+      path: '/coach/job-recommendations', 
+      label: 'Job Recommendations', 
+      icon: FileUp 
+    },
+    { 
       path: '/coach/messages', 
       label: 'Messages', 
       icon: MessageCircle 

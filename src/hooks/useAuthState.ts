@@ -101,7 +101,12 @@ export const useAuthState = () => {
             } catch (error) {
               // Cleanup error - silent
             }
-            navigate('/');
+            // Check if it's a coach based on current path and redirect appropriately
+            if (location.pathname.startsWith('/coach/')) {
+              navigate('/coach/login');
+            } else {
+              navigate('/');
+            }
           }
         }
       }
@@ -125,8 +130,16 @@ export const useAuthState = () => {
         // Cleanup error - silent
       }
       
+      // Check if it's a coach based on current path
+      const isCoach = location.pathname.startsWith('/coach/');
+      
       await supabase.auth.signOut();
-      navigate('/');
+      
+      if (isCoach) {
+        navigate('/coach/login');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       // Sign out error - silent
     }
