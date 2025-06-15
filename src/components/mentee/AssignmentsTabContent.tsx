@@ -30,6 +30,7 @@ const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
           </Button>
         </div>
 
+        {/* Pass userId as the mentee ID, not coach ID */}
         <CoachAssignmentsBoard coachId={userId} />
       </div>
     );

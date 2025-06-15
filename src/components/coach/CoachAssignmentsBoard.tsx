@@ -30,7 +30,7 @@ interface CoachAssignmentsBoardProps {
 
 const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   const { toast } = useToast();
-  const { assignments, updateStatus } = useTodoAssignments(coachId, true);
+  const { assignments, updateStatus } = useTodoAssignments(coachId, false); // false for mentee view
   const [columns, setColumns] = useState<TodoColumnType[]>([
     {
       id: '1',
@@ -52,6 +52,8 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   const [showAddColumn, setShowAddColumn] = useState(false);
 
   useEffect(() => {
+    console.log('Assignments in board:', assignments);
+    
     // Transform assignments to TodoItem format
     const transformedTodos: TodoItem[] = assignments.map(assignment => ({
       id: assignment.id,
@@ -63,12 +65,16 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
       assigned_date: assignment.assigned_at || undefined
     }));
 
+    console.log('Transformed todos:', transformedTodos);
+
     // Organize todos by status
     const todosByStatus = {
       pending: transformedTodos.filter(todo => todo.status === 'pending'),
       in_progress: transformedTodos.filter(todo => todo.status === 'in_progress'),
       completed: transformedTodos.filter(todo => todo.status === 'completed')
     };
+
+    console.log('Todos by status:', todosByStatus);
 
     setColumns([
       {
@@ -100,11 +106,10 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   };
 
   const addTodoToColumn = async (columnId: string, todo: Omit<TodoItem, 'id'>) => {
-    // This functionality would need to be implemented for creating new assignments
-    // For now, we'll just show a message that this is view-only
+    // Mentees cannot create new assignments
     toast({
       title: "Info",
-      description: "Assignment creation from board view is not yet implemented",
+      description: "You can only work on tasks assigned by your coach",
       variant: "default"
     });
   };
@@ -112,34 +117,43 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   const updateTodo = async (columnId: string, todoId: string, updates: Partial<TodoItem>) => {
     try {
       if (updates.status) {
+        console.log('Updating assignment status:', todoId, updates.status);
         await updateStatus(todoId, updates.status);
         
-        setColumns(columns.map(column =>
-          column.id === columnId
-            ? {
-                ...column,
-                todos: column.todos.map(todo =>
-                  todo.id === todoId ? { ...todo, ...updates } : todo
-                )
-              }
-            : column
-        ));
+        // Update local state to reflect the change immediately
+        setColumns(prevColumns => 
+          prevColumns.map(column =>
+            column.id === columnId
+              ? {
+                  ...column,
+                  todos: column.todos.map(todo =>
+                    todo.id === todoId ? { ...todo, ...updates } : todo
+                  )
+                }
+              : column
+          )
+        );
+
+        toast({
+          title: "Success",
+          description: "Task status updated successfully"
+        });
       }
     } catch (error: any) {
       console.error('Error updating assignment:', error);
       toast({
         title: "Error",
-        description: "Failed to update assignment",
+        description: "Failed to update task status",
         variant: "destructive"
       });
     }
   };
 
   const deleteTodo = async (columnId: string, todoId: string) => {
-    // Assignments typically shouldn't be deleted, just show info
+    // Mentees cannot delete assignments
     toast({
       title: "Info",
-      description: "Assignments cannot be deleted from this view",
+      description: "You cannot delete assignments from your coach",
       variant: "default"
     });
   };
@@ -160,11 +174,12 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
     }
 
     try {
+      console.log('Moving assignment:', todoId, 'from', fromColumnId, 'to', toColumnId, 'new status:', newStatus);
       await updateStatus(todoId, newStatus);
       
       const updatedTodo = { ...todo, status: newStatus };
 
-      setColumns(columns.map(column => {
+      setColumns(prevColumns => prevColumns.map(column => {
         if (column.id === fromColumnId) {
           return { ...column, todos: column.todos.filter(t => t.id !== todoId) };
         }
@@ -173,11 +188,16 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
         }
         return column;
       }));
+
+      toast({
+        title: "Success",
+        description: "Task moved successfully"
+      });
     } catch (error: any) {
       console.error('Error moving assignment:', error);
       toast({
         title: "Error",
-        description: "Failed to move assignment",
+        description: "Failed to move task",
         variant: "destructive"
       });
     }
