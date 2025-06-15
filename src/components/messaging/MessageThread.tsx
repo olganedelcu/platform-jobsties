@@ -24,14 +24,27 @@ const MessageThread = ({
   currentUserId
 }: MessageThreadProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 100); // Small delay to ensure DOM is updated
+
+    return () => clearTimeout(timeoutId);
+  }, [messages]);
+
+  // Scroll to bottom on initial load
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, []);
 
   if (loading) {
     return (
@@ -80,9 +93,9 @@ const MessageThread = ({
           {conversationSubject || 'Conversation'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 p-0 min-h-0">
-        <ScrollArea className="h-full">
-          <div className="space-y-4 p-6">
+      <CardContent className="flex-1 p-0 min-h-0 overflow-hidden">
+        <ScrollArea className="h-full" ref={scrollAreaRef}>
+          <div className="space-y-4 p-6 pb-2">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -162,7 +175,8 @@ const MessageThread = ({
                 </div>
               );
             })}
-            <div ref={messagesEndRef} />
+            {/* This invisible div acts as a scroll anchor for new messages */}
+            <div ref={messagesEndRef} className="h-1" />
           </div>
         </ScrollArea>
       </CardContent>
