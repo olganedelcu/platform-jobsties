@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
 import CoachNavigation from '@/components/CoachNavigation';
-import JobRecommendationForm from '@/components/coach/JobRecommendationForm';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { ExternalLink, Building2, Calendar, User, Trash2, UserPlus } from 'lucid
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import JobRecommendationAssignmentDialog from '@/components/coach/JobRecommendationAssignmentDialog';
+import ApplicationsJobRecommendations from '@/components/coach/ApplicationsJobRecommendations';
 
 const CoachJobRecommendations = () => {
   const { user, loading, handleSignOut } = useAuthState();
@@ -105,115 +105,109 @@ const CoachJobRecommendations = () => {
             <p className="text-gray-600 mt-2">Manage and assign job recommendations to your mentees</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Add New Recommendation Form */}
-            <div className="lg:col-span-1">
-              <JobRecommendationForm coachId={user.id} />
-            </div>
+          {/* Job Recommendations Form Section - Moved from Applications */}
+          <ApplicationsJobRecommendations />
 
-            {/* All Recommendations List */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Job Recommendations</CardTitle>
-                  <p className="text-sm text-gray-600">
-                    {uniqueRecommendations.length} unique job recommendations sent to mentees
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  {recommendationsLoading ? (
-                    <div className="text-center py-8">Loading recommendations...</div>
-                  ) : uniqueRecommendations.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500">
-                      <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                      <h3 className="text-lg font-medium mb-2">No Recommendations Yet</h3>
-                      <p>Start by adding job recommendations for your mentees.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {uniqueRecommendations.map((recommendation) => (
-                        <div key={`${recommendation.job_title}-${recommendation.company_name}`} className="border rounded-lg p-6 bg-white">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 mb-2 text-lg">
-                                {recommendation.job_title}
-                              </h4>
-                              <div className="flex items-center gap-2 text-gray-600 mb-3">
-                                <Building2 className="h-4 w-4" />
-                                <span className="font-medium">{recommendation.company_name}</span>
-                              </div>
-                              
-                              {recommendation.description && (
-                                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                                  {recommendation.description}
-                                </p>
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center gap-2 ml-4">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.open(recommendation.job_link, '_blank')}
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleAssignToMoreMentees(recommendation)}
-                                className="text-blue-600 hover:text-blue-700"
-                              >
-                                <UserPlus className="h-4 w-4" />
-                              </Button>
-                            </div>
+          {/* All Recommendations List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Job Recommendations</CardTitle>
+              <p className="text-sm text-gray-600">
+                {uniqueRecommendations.length} unique job recommendations sent to mentees
+              </p>
+            </CardHeader>
+            <CardContent>
+              {recommendationsLoading ? (
+                <div className="text-center py-8">Loading recommendations...</div>
+              ) : uniqueRecommendations.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-medium mb-2">No Recommendations Yet</h3>
+                  <p>Start by adding job recommendations for your mentees using the form above.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {uniqueRecommendations.map((recommendation) => (
+                    <div key={`${recommendation.job_title}-${recommendation.company_name}`} className="border rounded-lg p-6 bg-white">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 mb-2 text-lg">
+                            {recommendation.job_title}
+                          </h4>
+                          <div className="flex items-center gap-2 text-gray-600 mb-3">
+                            <Building2 className="h-4 w-4" />
+                            <span className="font-medium">{recommendation.company_name}</span>
                           </div>
-
-                          {/* Assignment Details */}
-                          <div className="border-t pt-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <User className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm font-medium text-gray-700">
-                                Assigned to {recommendation.assignments.length} mentee(s)
-                              </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {recommendation.assignments.map((assignment: any) => (
-                                <div key={assignment.id} className="bg-gray-50 rounded-lg p-3">
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <p className="text-sm font-medium text-gray-900">
-                                        Mentee ID: {assignment.mentee_id.slice(0, 8)}...
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        Week of {format(new Date(assignment.week_start_date), 'MMM dd, yyyy')}
-                                      </p>
-                                      <p className="text-xs text-gray-500">
-                                        Sent {format(new Date(assignment.created_at), 'MMM dd, yyyy')}
-                                      </p>
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => deleteRecommendation(assignment.id)}
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                          
+                          {recommendation.description && (
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                              {recommendation.description}
+                            </p>
+                          )}
                         </div>
-                      ))}
+                        
+                        <div className="flex items-center gap-2 ml-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(recommendation.job_link, '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAssignToMoreMentees(recommendation)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <UserPlus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Assignment Details */}
+                      <div className="border-t pt-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <User className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Assigned to {recommendation.assignments.length} mentee(s)
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {recommendation.assignments.map((assignment: any) => (
+                            <div key={assignment.id} className="bg-gray-50 rounded-lg p-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-gray-900">
+                                    Mentee ID: {assignment.mentee_id.slice(0, 8)}...
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Week of {format(new Date(assignment.week_start_date), 'MMM dd, yyyy')}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Sent {format(new Date(assignment.created_at), 'MMM dd, yyyy')}
+                                  </p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deleteRecommendation(assignment.id)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </main>
 
         <JobRecommendationAssignmentDialog

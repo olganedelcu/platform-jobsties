@@ -10,7 +10,6 @@ import MenteeApplicationsGrid from './MenteeApplicationsGrid';
 import MenteeApplicationsList from './MenteeApplicationsList';
 import MenteeApplicationsSearch from './MenteeApplicationsSearch';
 import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
-import ApplicationsJobRecommendations from './ApplicationsJobRecommendations';
 
 const ApplicationsContent = () => {
   const { applications, loading: applicationsLoading, refetchApplications } = useCoachApplications();
@@ -83,9 +82,6 @@ const ApplicationsContent = () => {
           Total applications: {applications.length} | Filtered: {filteredApplications.length}
         </div>
       </div>
-
-      {/* Job Recommendations Section */}
-      <ApplicationsJobRecommendations />
 
       <MenteeApplicationsSearch
         searchTerm={searchTerm}
