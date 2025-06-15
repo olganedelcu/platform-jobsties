@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useConversations } from '@/hooks/useConversations';
 import { useMessages } from '@/hooks/useMessages';
@@ -61,7 +60,7 @@ const MessagingInterface = () => {
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-indigo-900">Messages</h1>
-        <p className="text-indigo-600 mt-2">Communicate with your coach</p>
+        <p className="text-black mt-2">Communicate with your coach</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-250px)]">
