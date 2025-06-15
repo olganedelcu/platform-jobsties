@@ -148,9 +148,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Attempting to send ${actionType} notification to ${menteeEmail}`);
 
-    // Prepare email data
+    // Prepare email data using the default Resend domain
     const emailData = {
-      from: "Ana - JobsTies <ana@olga.jobsties.com>",
+      from: "Ana - JobsTies <onboarding@resend.dev>",
       to: [menteeEmail],
       subject: subject,
       html: htmlContent,
@@ -158,7 +158,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Email data prepared:", emailData);
 
-    // Send notification email using your verified domain
+    // Send notification email using the default verified domain
     const emailResponse = await resend.emails.send(emailData);
 
     console.log("Resend API response:", emailResponse);
