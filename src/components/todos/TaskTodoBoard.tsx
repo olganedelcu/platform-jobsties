@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,15 +22,15 @@ interface TodoColumnType {
   todos: TodoItem[];
 }
 
-interface TrelloTodoBoardProps {
+interface TaskTodoBoardProps {
   coachId: string;
 }
 
-const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
+const TaskTodoBoard = ({ coachId }: TaskTodoBoardProps) => {
   const [columns, setColumns] = useState<TodoColumnType[]>([
     {
       id: '1',
-      title: 'Marketing',
+      title: 'Pending',
       todos: [
         {
           id: '1',
@@ -42,60 +43,34 @@ const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
           title: 'Video Graph',
           status: 'pending',
           priority: 'medium'
-        },
+        }
+      ]
+    },
+    {
+      id: '2',
+      title: 'In Progress',
+      todos: [
         {
           id: '3',
           title: 'LinkedIn Posts',
           status: 'in_progress',
           priority: 'high',
           assigned_date: '2024-06-15'
-        }
-      ]
-    },
-    {
-      id: '2',
-      title: 'Customer Success',
-      todos: [
+        },
         {
           id: '4',
           title: 'Onboard 30 clients in June',
-          status: 'pending',
+          status: 'in_progress',
           priority: 'high'
-        },
-        {
-          id: '5',
-          title: 'Optimize and document the journey of each customer',
-          status: 'pending',
-          priority: 'medium'
         }
       ]
     },
     {
       id: '3',
-      title: 'Product / Tech: To Do',
-      todos: [
-        {
-          id: '6',
-          title: 'Improve Coach Dashboard',
-          status: 'in_progress',
-          priority: 'high',
-          due_date: '2024-06-15'
-        },
-        {
-          id: '7',
-          title: 'See if you qualify funnel development',
-          status: 'pending',
-          priority: 'medium',
-          due_date: '2024-06-11'
-        }
-      ]
-    },
-    {
-      id: '4',
       title: 'Done',
       todos: [
         {
-          id: '8',
+          id: '5',
           title: 'Improve Track for applications of user',
           status: 'completed',
           priority: 'medium',
@@ -157,12 +132,23 @@ const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
     
     if (!todo) return;
 
+    // Update todo status based on the destination column
+    let newStatus: 'pending' | 'in_progress' | 'completed' = todo.status;
+    const toColumn = columns.find(col => col.id === toColumnId);
+    if (toColumn) {
+      if (toColumn.title === 'Pending') newStatus = 'pending';
+      else if (toColumn.title === 'In Progress') newStatus = 'in_progress';  
+      else if (toColumn.title === 'Done') newStatus = 'completed';
+    }
+
+    const updatedTodo = { ...todo, status: newStatus };
+
     setColumns(columns.map(column => {
       if (column.id === fromColumnId) {
         return { ...column, todos: column.todos.filter(t => t.id !== todoId) };
       }
       if (column.id === toColumnId) {
-        return { ...column, todos: [...column.todos, todo] };
+        return { ...column, todos: [...column.todos, updatedTodo] };
       }
       return column;
     }));
@@ -206,4 +192,4 @@ const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
   );
 };
 
-export default TrelloTodoBoard;
+export default TaskTodoBoard;

@@ -70,9 +70,14 @@ const TodoCard = ({ todo, onUpdate, onDelete, onMove, allColumns }: TodoCardProp
     return new Date(dueDate) < new Date() && todo.status !== 'completed';
   };
 
+  // Handle double-click to edit
+  const handleDoubleClick = () => {
+    setShowEdit(true);
+  };
+
   return (
     <>
-      <Card className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+      <Card className="bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer group" onDoubleClick={handleDoubleClick}>
         <CardContent className="p-3">
           <div className="flex items-start gap-2 mb-2">
             <div className={`w-2 h-2 rounded-full mt-2 ${getStatusColor(todo.status)}`} />
@@ -140,6 +145,11 @@ const TodoCard = ({ todo, onUpdate, onDelete, onMove, allColumns }: TodoCardProp
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Hint for double-click editing */}
+          <div className="text-xs text-gray-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            Double-click to edit
           </div>
         </CardContent>
       </Card>

@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import TodoForm from './TodoForm';
 import TodoItem from './TodoItem';
 import SendTodosToMentees from './coach/SendTodosToMentees';
-import TrelloTodoBoard from './todos/TrelloTodoBoard';
+import TaskTodoBoard from './todos/TaskTodoBoard';
 
 interface Todo {
   id: string;
@@ -98,7 +98,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Todo Management</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Task Management</h2>
           <div className="flex gap-3">
             <Button
               onClick={() => setViewMode('list')}
@@ -124,7 +124,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
           <SendTodosToMentees coachId={coachId} />
         )}
 
-        <TrelloTodoBoard coachId={coachId} />
+        <TaskTodoBoard coachId={coachId} />
       </div>
     );
   }
@@ -132,7 +132,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Todo Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Task Management</h2>
         <div className="flex gap-3">
           <Button
             onClick={() => setViewMode('board')}
