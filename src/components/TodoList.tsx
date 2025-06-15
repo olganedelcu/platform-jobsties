@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, LayoutGrid, List } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import TodoForm from './TodoForm';
 import TodoItem from './TodoItem';
 import SendTodosToMentees from './coach/SendTodosToMentees';
+import TrelloTodoBoard from './todos/TrelloTodoBoard';
 
 interface Todo {
   id: string;
@@ -36,6 +37,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSendToMentees, setShowSendToMentees] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -88,8 +90,43 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
     setTodos(todos.filter(todo => todo.id !== todoId));
   };
 
-  if (loading) {
+  if (loading && viewMode === 'list') {
     return <div className="text-center py-8">Loading todos...</div>;
+  }
+
+  if (viewMode === 'board') {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Todo Management</h2>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setViewMode('list')}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <List className="h-4 w-4" />
+              <span>List View</span>
+            </Button>
+            <Button
+              onClick={() => setShowSendToMentees(!showSendToMentees)}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <Users className="h-4 w-4" />
+              <span>Send to Mentees</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Send to Mentees Section */}
+        {showSendToMentees && (
+          <SendTodosToMentees coachId={coachId} />
+        )}
+
+        <TrelloTodoBoard coachId={coachId} />
+      </div>
+    );
   }
 
   return (
@@ -97,6 +134,14 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Todo Management</h2>
         <div className="flex gap-3">
+          <Button
+            onClick={() => setViewMode('board')}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span>Board View</span>
+          </Button>
           <Button
             onClick={() => setShowSendToMentees(!showSendToMentees)}
             variant="outline"
