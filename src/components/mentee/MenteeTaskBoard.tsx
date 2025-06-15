@@ -100,7 +100,6 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
         }
       ]);
     } catch (error: any) {
-      console.error('Error fetching mentee todos:', error);
       toast({
         title: "Error",
         description: "Failed to fetch your tasks",
@@ -159,7 +158,6 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
         description: "Task added successfully"
       });
     } catch (error: any) {
-      console.error('Error adding todo:', error);
       toast({
         title: "Error",
         description: "Failed to add task",
@@ -193,7 +191,6 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
         description: "Task updated successfully"
       });
     } catch (error: any) {
-      console.error('Error updating todo:', error);
       toast({
         title: "Error",
         description: "Failed to update task",
@@ -222,7 +219,6 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
         description: "Task deleted successfully"
       });
     } catch (error: any) {
-      console.error('Error deleting todo:', error);
       toast({
         title: "Error",
         description: "Failed to delete task",
@@ -271,7 +267,6 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
         description: "Task moved successfully"
       });
     } catch (error: any) {
-      console.error('Error moving todo:', error);
       toast({
         title: "Error",
         description: "Failed to move task",

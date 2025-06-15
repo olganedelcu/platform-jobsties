@@ -26,8 +26,6 @@ export const useAssignmentBoard = (coachId: string) => {
   ]);
 
   useEffect(() => {
-    console.log('Assignments in board:', assignments);
-    
     // Transform assignments to TodoItem format
     const transformedTodos: TodoItem[] = assignments.map(assignment => ({
       id: assignment.id,
@@ -39,16 +37,12 @@ export const useAssignmentBoard = (coachId: string) => {
       assigned_date: assignment.assigned_at || undefined
     }));
 
-    console.log('Transformed todos:', transformedTodos);
-
     // Organize todos by status
     const todosByStatus = {
       pending: transformedTodos.filter(todo => todo.status === 'pending'),
       in_progress: transformedTodos.filter(todo => todo.status === 'in_progress'),
       completed: transformedTodos.filter(todo => todo.status === 'completed')
     };
-
-    console.log('Todos by status:', todosByStatus);
 
     setColumns([
       {
@@ -90,7 +84,6 @@ export const useAssignmentBoard = (coachId: string) => {
   const updateTodo = async (columnId: string, todoId: string, updates: Partial<TodoItem>) => {
     try {
       if (updates.status) {
-        console.log('Updating assignment status:', todoId, updates.status);
         await updateStatus(todoId, updates.status);
         
         // Update local state to reflect the change immediately
@@ -113,7 +106,6 @@ export const useAssignmentBoard = (coachId: string) => {
         });
       }
     } catch (error: any) {
-      console.error('Error updating assignment:', error);
       toast({
         title: "Error",
         description: "Failed to update task status",
@@ -147,7 +139,6 @@ export const useAssignmentBoard = (coachId: string) => {
     }
 
     try {
-      console.log('Moving assignment:', todoId, 'from', fromColumnId, 'to', toColumnId, 'new status:', newStatus);
       await updateStatus(todoId, newStatus);
       
       const updatedTodo = { ...todo, status: newStatus };
@@ -167,7 +158,6 @@ export const useAssignmentBoard = (coachId: string) => {
         description: "Task moved successfully"
       });
     } catch (error: any) {
-      console.error('Error moving assignment:', error);
       toast({
         title: "Error",
         description: "Failed to move task",

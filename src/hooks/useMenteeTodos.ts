@@ -20,7 +20,6 @@ export const useMenteeTodos = (menteeId: string) => {
       const data = await fetchMenteeTodos(menteeId);
       setTodos(data);
     } catch (error: any) {
-      console.error('Error fetching mentee todos:', error);
       toast({
         title: "Error",
         description: "Failed to fetch your todos",
@@ -40,7 +39,6 @@ export const useMenteeTodos = (menteeId: string) => {
         description: "Todo added successfully"
       });
     } catch (error: any) {
-      console.error('Error creating todo:', error);
       toast({
         title: "Error",
         description: "Failed to create todo",
@@ -64,7 +62,6 @@ export const useMenteeTodos = (menteeId: string) => {
         description: "Todo status updated successfully"
       });
     } catch (error: any) {
-      console.error('Error updating todo status:', error);
       toast({
         title: "Error",
         description: "Failed to update todo status",
@@ -82,7 +79,6 @@ export const useMenteeTodos = (menteeId: string) => {
         description: "Todo deleted successfully"
       });
     } catch (error: any) {
-      console.error('Error deleting todo:', error);
       toast({
         title: "Error",
         description: "Failed to delete todo",

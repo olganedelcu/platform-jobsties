@@ -25,8 +25,6 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
     setShowAddForm(false);
   };
 
-  console.log('Rendering MenteeTodosContainer with user:', userId);
-
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <MenteeTodosHeader />
