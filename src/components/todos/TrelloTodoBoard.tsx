@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,7 @@ interface TodoItem {
   assigned_date?: string;
 }
 
-interface TodoColumn {
+interface TodoColumnType {
   id: string;
   title: string;
   todos: TodoItem[];
@@ -27,7 +26,7 @@ interface TrelloTodoBoardProps {
 }
 
 const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
-  const [columns, setColumns] = useState<TodoColumn[]>([
+  const [columns, setColumns] = useState<TodoColumnType[]>([
     {
       id: '1',
       title: 'Marketing',
@@ -109,7 +108,7 @@ const TrelloTodoBoard = ({ coachId }: TrelloTodoBoardProps) => {
   const [showAddColumn, setShowAddColumn] = useState(false);
 
   const addColumn = (title: string) => {
-    const newColumn: TodoColumn = {
+    const newColumn: TodoColumnType = {
       id: Date.now().toString(),
       title,
       todos: []
