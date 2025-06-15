@@ -41,29 +41,19 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       
-      console.log('Attempting login with email:', formData.email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email.toLowerCase().trim(),
         password: formData.password
       });
 
-      console.log('Login response:', { data, error });
-
       if (error) {
-        console.error('Login error:', error);
         throw error;
       }
 
       // Check user role and redirect appropriately
       if (data.user) {
-        console.log('User logged in:', data.user);
-        console.log('User metadata:', data.user.user_metadata);
-        
         // Try to sync the user to profiles table if needed
-        console.log('Attempting to sync user to profiles...');
         const syncResult = await checkAndSyncCurrentUser();
-        console.log('Profile sync result:', syncResult);
         
         try {
           const { data: profile, error: profileError } = await supabase
@@ -72,13 +62,9 @@ const LoginForm = () => {
             .eq('id', data.user.id)
             .single();
 
-          console.log('Profile data:', profile);
-
           if (profileError) {
-            console.log('Profile error, checking metadata fallback:', profileError);
             // Fallback to metadata
             const userRole = data.user.user_metadata?.role;
-            console.log('User role from metadata:', userRole);
             
             if (userRole === 'COACH') {
               navigate('/coach/mentees');
@@ -86,7 +72,6 @@ const LoginForm = () => {
               navigate('/dashboard');
             }
           } else {
-            console.log('User role from profile:', profile.role);
             if (profile.role === 'COACH') {
               navigate('/coach/mentees');
             } else {
@@ -94,7 +79,6 @@ const LoginForm = () => {
             }
           }
         } catch (profileCheckError) {
-          console.error('Error checking profile:', profileCheckError);
           // Default to dashboard on profile check error
           navigate('/dashboard');
         }
@@ -106,8 +90,6 @@ const LoginForm = () => {
       }
       
     } catch (error: any) {
-      console.error('Login error details:', error);
-      
       let errorMessage = 'Failed to sign in';
       
       if (error.message?.includes('Invalid login credentials')) {

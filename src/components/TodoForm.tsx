@@ -68,11 +68,6 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
     }
 
     try {
-      console.log('=== CREATING TODO ===');
-      console.log('Form data:', formData);
-      console.log('Assign to mentees:', assignToMentees);
-      console.log('Selected mentees:', selectedMentees);
-
       // First create the todo in coach_todos table
       const { data: todoData, error: todoError } = await supabase
         .from('coach_todos')
@@ -88,16 +83,11 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
         .select()
         .single();
 
-      console.log('Todo created:', todoData);
-      console.log('Todo error:', todoError);
-
       if (todoError) throw todoError;
 
       // If assigning to mentees, create assignments in mentee_todo_assignments table
       if (assignToMentees && selectedMentees.length > 0) {
-        console.log('Creating assignments for mentees...');
         await createTodoAssignments(coachId, todoData.id, selectedMentees);
-        console.log('Assignments created successfully');
       }
 
       // Type cast the returned data
@@ -118,10 +108,7 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
         title: "Success",
         description: successMessage
       });
-
-      console.log('=== TODO CREATION COMPLETE ===');
     } catch (error: any) {
-      console.error('Error adding todo:', error);
       toast({
         title: "Error",
         description: "Failed to add todo",
