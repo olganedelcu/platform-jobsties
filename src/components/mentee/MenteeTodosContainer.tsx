@@ -14,6 +14,7 @@ interface MenteeTodosContainerProps {
 const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'assignments' | 'personal'>('assignments');
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Hooks for todo management
   const { assignments } = useTodoAssignments(userId, false);
@@ -48,6 +49,8 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
           showAddForm={showAddForm}
           todosLoading={todosLoading}
           userId={userId}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
           onShowAddForm={() => setShowAddForm(true)}
           onAddTodo={handleAddTodo}
           onCancelAdd={() => setShowAddForm(false)}
