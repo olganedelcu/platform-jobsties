@@ -96,7 +96,7 @@ const MessageThread = ({
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-2 p-2">
+          <div className="flex flex-col space-y-1 p-1">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -107,7 +107,7 @@ const MessageThread = ({
                   className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] px-2.5 py-1.5 rounded-lg break-words overflow-wrap-anywhere shadow-sm ${
+                    className={`max-w-[70%] px-1.5 py-1 rounded-md break-words overflow-wrap-anywhere shadow-sm ${
                       isCurrentUser
                         ? 'bg-indigo-600 text-white rounded-br-sm'
                         : isCoach
@@ -115,48 +115,48 @@ const MessageThread = ({
                         : 'bg-gray-100 text-gray-900 border border-gray-200 rounded-bl-sm'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-0.5">
+                    <div className="flex items-center gap-1 mb-0.5">
                       {isCoach ? (
-                        <Bot className="h-3 w-3 flex-shrink-0" />
+                        <Bot className="h-2.5 w-2.5 flex-shrink-0" />
                       ) : (
-                        <User className="h-3 w-3 flex-shrink-0" />
+                        <User className="h-2.5 w-2.5 flex-shrink-0" />
                       )}
-                      <span className="text-xs font-medium">
+                      <span className="text-[10px] font-medium">
                         {isCurrentUser ? 'You' : message.sender_name || 'Unknown'}
                       </span>
                       {isCoach && (
-                        <Badge variant="secondary" className="text-xs px-1 py-0 bg-purple-200 text-purple-800 h-4 text-[10px]">
+                        <Badge variant="secondary" className="text-[9px] px-0.5 py-0 bg-purple-200 text-purple-800 h-3 text-[8px]">
                           Coach
                         </Badge>
                       )}
                     </div>
                     
-                    <p className="text-sm leading-snug whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
+                    <p className="text-xs leading-tight whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
-                      <div className="mt-1.5 space-y-1">
+                      <div className="mt-1 space-y-0.5">
                         {message.attachments.map((attachment) => (
                           <div
                             key={attachment.id}
-                            className={`flex items-center gap-1.5 p-1.5 rounded text-xs ${
+                            className={`flex items-center gap-1 p-1 rounded text-[10px] ${
                               isCurrentUser ? 'bg-indigo-700' : 'bg-gray-200'
                             }`}
                           >
-                            <Paperclip className="h-3 w-3 flex-shrink-0" />
+                            <Paperclip className="h-2.5 w-2.5 flex-shrink-0" />
                             <span className="truncate flex-1 min-w-0">
                               {attachment.file_name}
                             </span>
                             <Button
                               size="sm"
                               variant="ghost"
-                              className={`h-5 w-5 p-0 flex-shrink-0 ${
+                              className={`h-4 w-4 p-0 flex-shrink-0 ${
                                 isCurrentUser 
                                   ? 'hover:bg-indigo-800 text-indigo-100' 
                                   : 'hover:bg-gray-300 text-gray-600'
                               }`}
                               onClick={() => onDownloadAttachment(attachment)}
                             >
-                              <Download className="h-2.5 w-2.5" />
+                              <Download className="h-2 w-2" />
                             </Button>
                           </div>
                         ))}
@@ -165,7 +165,7 @@ const MessageThread = ({
                     
                     <div className="mt-0.5 text-right">
                       <span
-                        className={`text-xs ${
+                        className={`text-[9px] ${
                           isCurrentUser ? 'text-indigo-200' : 'text-gray-500'
                         }`}
                       >
