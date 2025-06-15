@@ -44,8 +44,8 @@ const ConversationsList = ({
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
+    <Card className="h-full flex flex-col">
+      <CardHeader className="flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
@@ -57,8 +57,8 @@ const ConversationsList = ({
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="max-h-96 overflow-y-auto">
+      <CardContent className="p-0 flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
               <MessageCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
