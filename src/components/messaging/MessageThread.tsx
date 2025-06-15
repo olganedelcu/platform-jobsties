@@ -24,24 +24,22 @@ const MessageThread = ({
   currentUserId
 }: MessageThreadProps) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
-      }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   };
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      scrollToBottom();
-    }, 50);
-
-    return () => clearTimeout(timeoutId);
+    if (messages.length > 0) {
+      const timeoutId = setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
   }, [messages]);
 
   // Scroll to bottom on initial load
@@ -98,7 +96,7 @@ const MessageThread = ({
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-4 p-6" ref={messagesContainerRef}>
+          <div className="flex flex-col space-y-4 p-6">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -178,6 +176,8 @@ const MessageThread = ({
                 </div>
               );
             })}
+            {/* Scroll target element */}
+            <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
       </CardContent>
