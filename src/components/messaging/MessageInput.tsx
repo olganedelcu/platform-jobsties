@@ -54,14 +54,14 @@ const MessageInput = ({ onSendMessage, sending, disabled }: MessageInputProps) =
         <div className="mb-3 space-y-1">
           <p className="text-xs text-gray-600 font-medium">Attachments:</p>
           {attachments.map((file, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-              <Paperclip className="h-4 w-4 text-gray-500" />
-              <span className="text-sm flex-1 truncate">{file.name}</span>
-              <span className="text-xs text-gray-500">{formatFileSize(file.size)}</span>
+            <div key={index} className="flex items-center gap-2 p-2 bg-indigo-50 rounded-lg border border-indigo-100">
+              <Paperclip className="h-4 w-4 text-indigo-600" />
+              <span className="text-sm flex-1 truncate text-indigo-900">{file.name}</span>
+              <span className="text-xs text-indigo-600">{formatFileSize(file.size)}</span>
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700"
                 onClick={() => removeAttachment(index)}
               >
                 <X className="h-3 w-3" />
@@ -78,7 +78,7 @@ const MessageInput = ({ onSendMessage, sending, disabled }: MessageInputProps) =
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="min-h-[60px] resize-none"
+            className="min-h-[60px] resize-none border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"
             disabled={disabled || sending}
           />
         </div>
@@ -95,7 +95,7 @@ const MessageInput = ({ onSendMessage, sending, disabled }: MessageInputProps) =
             type="button"
             variant="outline"
             size="sm"
-            className="h-10 w-10 p-0"
+            className="h-10 w-10 p-0 border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300"
             onClick={() => document.getElementById('file-upload')?.click()}
             disabled={disabled || sending}
           >
@@ -104,7 +104,7 @@ const MessageInput = ({ onSendMessage, sending, disabled }: MessageInputProps) =
           <Button
             type="submit"
             size="sm"
-            className="h-10 w-10 p-0"
+            className="h-10 w-10 p-0 bg-indigo-600 hover:bg-indigo-700 text-white"
             disabled={disabled || sending || (!message.trim() && attachments.length === 0)}
           >
             <Send className="h-4 w-4" />

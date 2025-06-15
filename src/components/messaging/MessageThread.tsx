@@ -35,15 +35,15 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>Loading messages...</CardTitle>
+      <Card className="h-full border-indigo-200">
+        <CardHeader className="bg-indigo-50 border-b border-indigo-100">
+          <CardTitle className="text-indigo-900">Loading messages...</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-16 bg-gray-200 rounded-lg"></div>
+                <div className="h-16 bg-indigo-100 rounded-lg"></div>
               </div>
             ))}
           </div>
@@ -54,15 +54,18 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>{conversationSubject || 'Conversation'}</CardTitle>
+      <Card className="h-full border-indigo-200">
+        <CardHeader className="bg-indigo-50 border-b border-indigo-100">
+          <CardTitle className="text-indigo-900 flex items-center gap-2">
+            <User className="h-5 w-5" />
+            {conversationSubject || 'Conversation'}
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-64">
-          <div className="text-center text-gray-500">
-            <User className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>No messages yet</p>
-            <p className="text-sm text-gray-400 mt-1">Start the conversation below</p>
+          <div className="text-center text-indigo-600">
+            <User className="h-12 w-12 mx-auto mb-3 text-indigo-400" />
+            <p className="text-indigo-700 font-medium">No messages yet</p>
+            <p className="text-sm text-indigo-500 mt-1">Start the conversation below</p>
           </div>
         </CardContent>
       </Card>
@@ -70,9 +73,9 @@ const MessageThread = ({
   }
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="flex items-center gap-2">
+    <Card className="h-full flex flex-col border-indigo-200">
+      <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
+        <CardTitle className="flex items-center gap-2 text-indigo-900">
           <User className="h-5 w-5" />
           {conversationSubject || 'Conversation'}
         </CardTitle>
@@ -92,10 +95,10 @@ const MessageThread = ({
                   <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                       isCurrentUser
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-indigo-600 text-white'
                         : isCoach
-                        ? 'bg-purple-100 text-purple-900'
-                        : 'bg-gray-100 text-gray-900'
+                        ? 'bg-purple-100 text-purple-900 border border-purple-200'
+                        : 'bg-gray-100 text-gray-900 border border-gray-200'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -108,7 +111,7 @@ const MessageThread = ({
                         {isCurrentUser ? 'You' : message.sender_name || 'Unknown'}
                       </span>
                       {isCoach && (
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5 bg-purple-200 text-purple-800">
                           Coach
                         </Badge>
                       )}
@@ -122,7 +125,7 @@ const MessageThread = ({
                           <div
                             key={attachment.id}
                             className={`flex items-center gap-2 p-2 rounded ${
-                              isCurrentUser ? 'bg-blue-600' : 'bg-gray-200'
+                              isCurrentUser ? 'bg-indigo-700' : 'bg-gray-200'
                             }`}
                           >
                             <Paperclip className="h-3 w-3" />
@@ -133,7 +136,9 @@ const MessageThread = ({
                               size="sm"
                               variant="ghost"
                               className={`h-6 w-6 p-0 ${
-                                isCurrentUser ? 'hover:bg-blue-700' : 'hover:bg-gray-300'
+                                isCurrentUser 
+                                  ? 'hover:bg-indigo-800 text-indigo-100' 
+                                  : 'hover:bg-gray-300 text-gray-600'
                               }`}
                               onClick={() => onDownloadAttachment(attachment)}
                             >
@@ -147,7 +152,7 @@ const MessageThread = ({
                     <div className="mt-1">
                       <span
                         className={`text-xs ${
-                          isCurrentUser ? 'text-blue-100' : 'text-gray-500'
+                          isCurrentUser ? 'text-indigo-100' : 'text-gray-500'
                         }`}
                       >
                         {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}

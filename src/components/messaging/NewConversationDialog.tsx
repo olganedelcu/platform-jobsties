@@ -39,13 +39,13 @@ const NewConversationDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md border-indigo-200">
         <DialogHeader>
-          <DialogTitle>Start New Conversation</DialogTitle>
+          <DialogTitle className="text-indigo-900">Start New Conversation</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="subject">Subject *</Label>
+            <Label htmlFor="subject" className="text-indigo-700">Subject *</Label>
             <Input
               id="subject"
               value={subject}
@@ -53,10 +53,11 @@ const NewConversationDialog = ({
               placeholder="What would you like to discuss?"
               required
               disabled={creating}
+              className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <Label htmlFor="message">Initial Message (Optional)</Label>
+            <Label htmlFor="message" className="text-indigo-700">Initial Message (Optional)</Label>
             <Textarea
               id="message"
               value={initialMessage}
@@ -64,6 +65,7 @@ const NewConversationDialog = ({
               placeholder="Start your conversation..."
               rows={3}
               disabled={creating}
+              className="border-indigo-200 focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
           <DialogFooter>
@@ -72,10 +74,15 @@ const NewConversationDialog = ({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={creating}
+              className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={creating || !subject.trim()}>
+            <Button 
+              type="submit" 
+              disabled={creating || !subject.trim()}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
+            >
               {creating ? 'Creating...' : 'Create Conversation'}
             </Button>
           </DialogFooter>

@@ -60,8 +60,8 @@ const MessagingInterface = () => {
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-500 mt-2">Communicate with your coach</p>
+        <h1 className="text-3xl font-bold text-indigo-900">Messages</h1>
+        <p className="text-indigo-600 mt-2">Communicate with your coach</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
@@ -97,12 +97,12 @@ const MessagingInterface = () => {
               </div>
             </>
           ) : (
-            <Card className="h-full">
+            <Card className="h-full border-indigo-200">
               <CardContent className="flex items-center justify-center h-full">
-                <div className="text-center text-gray-500">
-                  <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-medium mb-2">Select a Conversation</h3>
-                  <p className="text-sm">Choose a conversation from the list to start messaging</p>
+                <div className="text-center text-indigo-600">
+                  <MessageCircle className="h-16 w-16 mx-auto mb-4 text-indigo-400" />
+                  <h3 className="text-lg font-medium mb-2 text-indigo-900">Select a Conversation</h3>
+                  <p className="text-sm text-indigo-600">Choose a conversation from the list to start messaging</p>
                 </div>
               </CardContent>
             </Card>
