@@ -58,7 +58,7 @@ const ConversationsList = ({
         </div>
       </CardHeader>
       <CardContent className="p-0 flex-1 overflow-hidden">
-        <div className="h-96 overflow-y-auto">
+        <div className="h-[28rem] overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
               <MessageCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
