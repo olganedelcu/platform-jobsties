@@ -49,11 +49,11 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <Card className="h-full border-indigo-200">
+      <Card className="w-full h-[600px] border-indigo-200 flex flex-col">
         <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900">Loading messages...</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-6 flex-1">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
@@ -68,7 +68,7 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <Card className="h-full border-indigo-200">
+      <Card className="w-full h-[600px] border-indigo-200 flex flex-col">
         <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900 flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -87,7 +87,7 @@ const MessageThread = ({
   }
 
   return (
-    <Card className="h-full flex flex-col border-indigo-200 overflow-hidden">
+    <Card className="w-full h-[600px] flex flex-col border-indigo-200 overflow-hidden">
       <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
         <CardTitle className="flex items-center gap-2 text-indigo-900">
           <User className="h-5 w-5" />
