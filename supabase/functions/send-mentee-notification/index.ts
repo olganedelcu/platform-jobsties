@@ -32,11 +32,40 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { menteeEmail, menteeName, actionType, actionDetails }: NotificationRequest = await req.json();
+    console.log("=== EMAIL NOTIFICATION DEBUG START ===");
+    console.log("Request method:", req.method);
+    console.log("Request headers:", Object.fromEntries(req.headers.entries()));
+    
+    const requestBody = await req.text();
+    console.log("Raw request body:", requestBody);
+    
+    let parsedBody: NotificationRequest;
+    try {
+      parsedBody = JSON.parse(requestBody);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      throw new Error("Invalid JSON in request body");
+    }
+    
+    const { menteeEmail, menteeName, actionType, actionDetails } = parsedBody;
+    
+    console.log("Parsed notification request:", {
+      menteeEmail,
+      menteeName,
+      actionType,
+      actionDetails
+    });
 
     if (!menteeEmail || !actionType) {
-      throw new Error("Email and action type are required");
+      const error = "Email and action type are required";
+      console.error("Validation error:", error);
+      throw new Error(error);
     }
+
+    // Check if RESEND_API_KEY is available
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    console.log("RESEND_API_KEY available:", !!resendKey);
+    console.log("RESEND_API_KEY length:", resendKey?.length || 0);
 
     // Generate email content based on action type
     let subject = "";
@@ -111,30 +140,51 @@ const handler = async (req: Request): Promise<Response> => {
         break;
 
       default:
+        console.error("Unknown action type:", actionType);
         throw new Error("Unknown action type");
     }
 
-    console.log(`Sending ${actionType} notification to ${menteeEmail}`);
+    console.log("Email content generated:", { subject, htmlContentLength: htmlContent.length });
 
-    // Send notification email using your verified domain
-    const emailResponse = await resend.emails.send({
+    console.log(`Attempting to send ${actionType} notification to ${menteeEmail}`);
+
+    // Prepare email data
+    const emailData = {
       from: "Ana - JobsTies <ana@olga.jobsties.com>",
       to: [menteeEmail],
       subject: subject,
       html: htmlContent,
-    });
+    };
+    
+    console.log("Email data prepared:", emailData);
+
+    // Send notification email using your verified domain
+    const emailResponse = await resend.emails.send(emailData);
+
+    console.log("Resend API response:", emailResponse);
 
     if (emailResponse.error) {
-      console.error("Error sending notification:", emailResponse.error);
+      console.error("Resend error details:", emailResponse.error);
       throw new Error(`Failed to send notification: ${emailResponse.error.message}`);
     }
 
-    console.log("Email sent successfully:", emailResponse.data?.id);
+    console.log("Email sent successfully:", {
+      id: emailResponse.data?.id,
+      actionType,
+      recipient: menteeEmail
+    });
+
+    console.log("=== EMAIL NOTIFICATION DEBUG END ===");
 
     return new Response(JSON.stringify({ 
       success: true,
       emailId: emailResponse.data?.id,
-      message: "Notification sent successfully."
+      message: "Notification sent successfully.",
+      debugInfo: {
+        actionType,
+        recipient: menteeEmail,
+        subject
+      }
     }), {
       status: 200,
       headers: {
@@ -144,9 +194,18 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error("Error in send-mentee-notification function:", error);
+    console.error("=== EMAIL NOTIFICATION ERROR ===");
+    console.error("Error details:", error);
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
+    console.error("=== END ERROR ===");
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack,
+        timestamp: new Date().toISOString()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

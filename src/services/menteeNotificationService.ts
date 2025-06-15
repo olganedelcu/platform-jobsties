@@ -22,25 +22,40 @@ export const MenteeNotificationService = {
     jobTitle: string, 
     companyName: string
   ): Promise<void> {
+    console.log("🚀 Calling job recommendation notification service:", {
+      menteeEmail,
+      menteeName,
+      jobTitle,
+      companyName
+    });
+
     try {
-      const { error } = await supabase.functions.invoke('send-mentee-notification', {
-        body: {
-          menteeEmail,
-          menteeName,
-          actionType: 'job_recommendation',
-          actionDetails: {
-            jobTitle,
-            companyName
-          }
+      const requestBody = {
+        menteeEmail,
+        menteeName,
+        actionType: 'job_recommendation' as const,
+        actionDetails: {
+          jobTitle,
+          companyName
         }
+      };
+
+      console.log("📤 Sending request to edge function:", requestBody);
+
+      const { data, error } = await supabase.functions.invoke('send-mentee-notification', {
+        body: requestBody
       });
 
+      console.log("📨 Edge function response:", { data, error });
+
       if (error) {
-        console.error('Error sending job recommendation notification:', error);
+        console.error('❌ Supabase function error:', error);
         throw error;
       }
+
+      console.log("✅ Job recommendation notification sent successfully");
     } catch (error) {
-      console.error('Failed to send job recommendation notification:', error);
+      console.error('❌ Failed to send job recommendation notification:', error);
       throw error;
     }
   },
@@ -50,24 +65,38 @@ export const MenteeNotificationService = {
     menteeName: string, 
     fileName: string
   ): Promise<void> {
+    console.log("📁 Calling file upload notification service:", {
+      menteeEmail,
+      menteeName,
+      fileName
+    });
+
     try {
-      const { error } = await supabase.functions.invoke('send-mentee-notification', {
-        body: {
-          menteeEmail,
-          menteeName,
-          actionType: 'file_upload',
-          actionDetails: {
-            fileName
-          }
+      const requestBody = {
+        menteeEmail,
+        menteeName,
+        actionType: 'file_upload' as const,
+        actionDetails: {
+          fileName
         }
+      };
+
+      console.log("📤 Sending request to edge function:", requestBody);
+
+      const { data, error } = await supabase.functions.invoke('send-mentee-notification', {
+        body: requestBody
       });
 
+      console.log("📨 Edge function response:", { data, error });
+
       if (error) {
-        console.error('Error sending file upload notification:', error);
+        console.error('❌ Supabase function error:', error);
         throw error;
       }
+
+      console.log("✅ File upload notification sent successfully");
     } catch (error) {
-      console.error('Failed to send file upload notification:', error);
+      console.error('❌ Failed to send file upload notification:', error);
       throw error;
     }
   },
@@ -77,26 +106,40 @@ export const MenteeNotificationService = {
     menteeName: string, 
     messagePreview: string
   ): Promise<void> {
+    console.log("💬 Calling message notification service:", {
+      menteeEmail,
+      menteeName,
+      messagePreview: messagePreview.substring(0, 50) + "..."
+    });
+
     try {
-      const { error } = await supabase.functions.invoke('send-mentee-notification', {
-        body: {
-          menteeEmail,
-          menteeName,
-          actionType: 'message',
-          actionDetails: {
-            messagePreview: messagePreview.length > 100 ? 
-              messagePreview.substring(0, 100) + '...' : 
-              messagePreview
-          }
+      const requestBody = {
+        menteeEmail,
+        menteeName,
+        actionType: 'message' as const,
+        actionDetails: {
+          messagePreview: messagePreview.length > 100 ? 
+            messagePreview.substring(0, 100) + '...' : 
+            messagePreview
         }
+      };
+
+      console.log("📤 Sending request to edge function:", requestBody);
+
+      const { data, error } = await supabase.functions.invoke('send-mentee-notification', {
+        body: requestBody
       });
 
+      console.log("📨 Edge function response:", { data, error });
+
       if (error) {
-        console.error('Error sending message notification:', error);
+        console.error('❌ Supabase function error:', error);
         throw error;
       }
+
+      console.log("✅ Message notification sent successfully");
     } catch (error) {
-      console.error('Failed to send message notification:', error);
+      console.error('❌ Failed to send message notification:', error);
       throw error;
     }
   },
@@ -107,25 +150,40 @@ export const MenteeNotificationService = {
     todoTitle?: string,
     count?: number
   ): Promise<void> {
+    console.log("✅ Calling todo assignment notification service:", {
+      menteeEmail,
+      menteeName,
+      todoTitle,
+      count
+    });
+
     try {
-      const { error } = await supabase.functions.invoke('send-mentee-notification', {
-        body: {
-          menteeEmail,
-          menteeName,
-          actionType: 'todo_assignment',
-          actionDetails: {
-            todoTitle,
-            count
-          }
+      const requestBody = {
+        menteeEmail,
+        menteeName,
+        actionType: 'todo_assignment' as const,
+        actionDetails: {
+          todoTitle,
+          count
         }
+      };
+
+      console.log("📤 Sending request to edge function:", requestBody);
+
+      const { data, error } = await supabase.functions.invoke('send-mentee-notification', {
+        body: requestBody
       });
 
+      console.log("📨 Edge function response:", { data, error });
+
       if (error) {
-        console.error('Error sending todo assignment notification:', error);
+        console.error('❌ Supabase function error:', error);
         throw error;
       }
+
+      console.log("✅ Todo assignment notification sent successfully");
     } catch (error) {
-      console.error('Failed to send todo assignment notification:', error);
+      console.error('❌ Failed to send todo assignment notification:', error);
       throw error;
     }
   }
