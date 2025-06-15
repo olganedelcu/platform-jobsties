@@ -67,6 +67,31 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("RESEND_API_KEY available:", !!resendKey);
     console.log("RESEND_API_KEY length:", resendKey?.length || 0);
 
+    // IMPORTANT: Due to Resend domain restrictions, we can only send to verified emails
+    // Currently, only ana@jobsties.com is verified with the default domain
+    const verifiedEmails = ['ana@jobsties.com'];
+    
+    if (!verifiedEmails.includes(menteeEmail)) {
+      console.log(`⚠️ Skipping email to ${menteeEmail} - not in verified emails list. To send to this email, please verify a custom domain at resend.com/domains`);
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        skipped: true,
+        message: `Notification skipped - ${menteeEmail} is not in verified emails list. Please verify a custom domain to send to all mentees.`,
+        debugInfo: {
+          actionType,
+          recipient: menteeEmail,
+          reason: "unverified_recipient"
+        }
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    }
+
     // Generate email content based on action type
     let subject = "";
     let htmlContent = "";
