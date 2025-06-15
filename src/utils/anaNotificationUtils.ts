@@ -1,5 +1,5 @@
 
-import { MenteeNotificationService } from '@/services/menteeNotificationService';
+import { InAppNotificationService } from '@/services/inAppNotificationService';
 
 // Helper function to check if the current user is Ana
 export const isAnaUser = (userEmail?: string): boolean => {
@@ -17,7 +17,7 @@ export const getMenteeNotificationData = async (menteeId: string) => {
   try {
     const { data: mentee, error } = await supabase
       .from('profiles')
-      .select('first_name, last_name, email')
+      .select('first_name, last_name, email, id')
       .eq('id', menteeId)
       .single();
 
@@ -27,6 +27,7 @@ export const getMenteeNotificationData = async (menteeId: string) => {
     }
 
     const menteeData = {
+      id: mentee.id,
       email: mentee.email,
       name: `${mentee.first_name} ${mentee.last_name}`.trim()
     };
@@ -67,9 +68,8 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending job recommendation notification...");
-      await MenteeNotificationService.sendJobRecommendationNotification(
-        menteeData.email,
-        menteeData.name,
+      await InAppNotificationService.sendJobRecommendationNotification(
+        menteeData.id,
         jobTitle,
         companyName
       );
@@ -104,9 +104,8 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending file upload notification...");
-      await MenteeNotificationService.sendFileUploadNotification(
-        menteeData.email,
-        menteeData.name,
+      await InAppNotificationService.sendFileUploadNotification(
+        menteeData.id,
         fileName
       );
       console.log("✅ File upload notification sent successfully");
@@ -140,9 +139,8 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending message notification...");
-      await MenteeNotificationService.sendMessageNotification(
-        menteeData.email,
-        menteeData.name,
+      await InAppNotificationService.sendMessageNotification(
+        menteeData.id,
         messageContent
       );
       console.log("✅ Message notification sent successfully");
@@ -177,9 +175,8 @@ export const NotificationHandlers = {
 
       try {
         console.log(`📤 Sending todo assignment notification to ${menteeData.name}...`);
-        await MenteeNotificationService.sendTodoAssignmentNotification(
-          menteeData.email,
-          menteeData.name,
+        await InAppNotificationService.sendTodoAssignmentNotification(
+          menteeData.id,
           todoTitle,
           count
         );

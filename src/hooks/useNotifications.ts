@@ -1,9 +1,8 @@
 
-import { useState } from 'react';
+import { useInAppNotifications } from './useInAppNotifications';
 
 export const useNotifications = () => {
-  // Return zero unread count since notifications are disabled
-  const unreadCount = 0;
+  const { unreadCount } = useInAppNotifications();
 
   return {
     unreadCount
