@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Paperclip, User, Bot } from 'lucide-react';
@@ -76,87 +77,89 @@ const MessageThread = ({
           {conversationSubject || 'Conversation'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto">
-        <div className="space-y-4">
-          {messages.map((message) => {
-            const isCurrentUser = message.sender_id === currentUserId;
-            const isCoach = message.sender_type === 'coach';
+      <CardContent className="flex-1 p-0">
+        <ScrollArea className="h-full px-6">
+          <div className="space-y-4 py-4">
+            {messages.map((message) => {
+              const isCurrentUser = message.sender_id === currentUserId;
+              const isCoach = message.sender_type === 'coach';
 
-            return (
-              <div
-                key={message.id}
-                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-              >
+              return (
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                    isCurrentUser
-                      ? 'bg-blue-500 text-white'
-                      : isCoach
-                      ? 'bg-purple-100 text-purple-900'
-                      : 'bg-gray-100 text-gray-900'
-                  }`}
+                  key={message.id}
+                  className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    {isCoach ? (
-                      <Bot className="h-4 w-4" />
-                    ) : (
-                      <User className="h-4 w-4" />
-                    )}
-                    <span className="text-xs font-medium">
-                      {isCurrentUser ? 'You' : message.sender_name || 'Unknown'}
-                    </span>
-                    {isCoach && (
-                      <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-                        Coach
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  
-                  {message.attachments && message.attachments.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {message.attachments.map((attachment) => (
-                        <div
-                          key={attachment.id}
-                          className={`flex items-center gap-2 p-2 rounded ${
-                            isCurrentUser ? 'bg-blue-600' : 'bg-gray-200'
-                          }`}
-                        >
-                          <Paperclip className="h-3 w-3" />
-                          <span className="text-xs truncate flex-1">
-                            {attachment.file_name}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className={`h-6 w-6 p-0 ${
-                              isCurrentUser ? 'hover:bg-blue-700' : 'hover:bg-gray-300'
-                            }`}
-                            onClick={() => onDownloadAttachment(attachment)}
-                          >
-                            <Download className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
+                  <div
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                      isCurrentUser
+                        ? 'bg-blue-500 text-white'
+                        : isCoach
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'bg-gray-100 text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      {isCoach ? (
+                        <Bot className="h-4 w-4" />
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
+                      <span className="text-xs font-medium">
+                        {isCurrentUser ? 'You' : message.sender_name || 'Unknown'}
+                      </span>
+                      {isCoach && (
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                          Coach
+                        </Badge>
+                      )}
                     </div>
-                  )}
-                  
-                  <div className="mt-1">
-                    <span
-                      className={`text-xs ${
-                        isCurrentUser ? 'text-blue-100' : 'text-gray-500'
-                      }`}
-                    >
-                      {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                    </span>
+                    
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    
+                    {message.attachments && message.attachments.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {message.attachments.map((attachment) => (
+                          <div
+                            key={attachment.id}
+                            className={`flex items-center gap-2 p-2 rounded ${
+                              isCurrentUser ? 'bg-blue-600' : 'bg-gray-200'
+                            }`}
+                          >
+                            <Paperclip className="h-3 w-3" />
+                            <span className="text-xs truncate flex-1">
+                              {attachment.file_name}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className={`h-6 w-6 p-0 ${
+                                isCurrentUser ? 'hover:bg-blue-700' : 'hover:bg-gray-300'
+                              }`}
+                              onClick={() => onDownloadAttachment(attachment)}
+                            >
+                              <Download className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="mt-1">
+                      <span
+                        className={`text-xs ${
+                          isCurrentUser ? 'text-blue-100' : 'text-gray-500'
+                        }`}
+                      >
+                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
-        </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
