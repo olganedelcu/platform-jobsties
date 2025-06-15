@@ -49,7 +49,7 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <Card className="w-full h-full border-indigo-200 flex flex-col">
+      <Card className="w-full h-[700px] border-indigo-200 flex flex-col">
         <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900">Loading messages...</CardTitle>
         </CardHeader>
@@ -68,7 +68,7 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <Card className="w-full h-full border-indigo-200 flex flex-col">
+      <Card className="w-full h-[700px] border-indigo-200 flex flex-col">
         <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
           <CardTitle className="text-indigo-900 flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -87,7 +87,7 @@ const MessageThread = ({
   }
 
   return (
-    <Card className="w-full h-full flex flex-col border-indigo-200 overflow-hidden">
+    <Card className="w-full h-[700px] flex flex-col border-indigo-200 overflow-hidden">
       <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
         <CardTitle className="flex items-center gap-2 text-indigo-900">
           <User className="h-5 w-5" />
