@@ -88,7 +88,7 @@ const MessageThread = ({
 
   return (
     <Card className="w-full h-full flex flex-col border-indigo-200 overflow-hidden">
-      <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
+      <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100 py-4">
         <CardTitle className="flex items-center gap-2 text-indigo-900">
           <User className="h-5 w-5" />
           {conversationSubject || 'Conversation'}
@@ -96,7 +96,7 @@ const MessageThread = ({
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-3 p-3">
+          <div className="flex flex-col space-y-4 p-4">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -107,15 +107,15 @@ const MessageThread = ({
                   className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[70%] sm:max-w-[80%] px-3 py-2 rounded-lg break-words overflow-wrap-anywhere ${
+                    className={`max-w-[75%] min-w-[200px] px-4 py-3 rounded-2xl break-words ${
                       isCurrentUser
-                        ? 'bg-indigo-600 text-white'
+                        ? 'bg-indigo-600 text-white rounded-br-md'
                         : isCoach
-                        ? 'bg-purple-100 text-purple-900 border border-purple-200'
-                        : 'bg-gray-100 text-gray-900 border border-gray-200'
+                        ? 'bg-purple-100 text-purple-900 border border-purple-200 rounded-bl-md'
+                        : 'bg-gray-100 text-gray-900 border border-gray-200 rounded-bl-md'
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-2">
                       {isCoach ? (
                         <Bot className="h-4 w-4" />
                       ) : (
@@ -131,14 +131,14 @@ const MessageThread = ({
                       )}
                     </div>
                     
-                    <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
-                      <div className="mt-2 space-y-1">
+                      <div className="mt-3 space-y-2">
                         {message.attachments.map((attachment) => (
                           <div
                             key={attachment.id}
-                            className={`flex items-center gap-2 p-2 rounded ${
+                            className={`flex items-center gap-2 p-2 rounded-lg ${
                               isCurrentUser ? 'bg-indigo-700' : 'bg-gray-200'
                             }`}
                           >
@@ -163,10 +163,10 @@ const MessageThread = ({
                       </div>
                     )}
                     
-                    <div className="mt-1">
+                    <div className="mt-2">
                       <span
                         className={`text-xs ${
-                          isCurrentUser ? 'text-indigo-100' : 'text-gray-500'
+                          isCurrentUser ? 'text-indigo-200' : 'text-gray-500'
                         }`}
                       >
                         {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
