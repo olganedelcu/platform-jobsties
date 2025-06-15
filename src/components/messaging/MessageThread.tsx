@@ -87,7 +87,7 @@ const MessageThread = ({
   }
 
   return (
-    <Card className="h-full flex flex-col border-indigo-200">
+    <Card className="h-full flex flex-col border-indigo-200 overflow-hidden">
       <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
         <CardTitle className="flex items-center gap-2 text-indigo-900">
           <User className="h-5 w-5" />
@@ -96,7 +96,7 @@ const MessageThread = ({
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-4 p-4">
+          <div className="flex flex-col space-y-3 p-3">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -107,7 +107,7 @@ const MessageThread = ({
                   className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] sm:max-w-[85%] px-3 py-2 rounded-lg ${
+                    className={`max-w-[70%] sm:max-w-[80%] px-3 py-2 rounded-lg break-words overflow-wrap-anywhere ${
                       isCurrentUser
                         ? 'bg-indigo-600 text-white'
                         : isCoach
@@ -131,7 +131,7 @@ const MessageThread = ({
                       )}
                     </div>
                     
-                    <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
