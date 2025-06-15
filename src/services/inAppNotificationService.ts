@@ -15,7 +15,7 @@ export const InAppNotificationService = {
     console.log("📱 Creating in-app notification:", data);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('in_app_notifications')
         .insert({
           user_id: data.userId,

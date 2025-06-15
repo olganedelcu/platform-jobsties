@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import DesktopNavigation from './DesktopNavigation';
 import MobileNavigation from './MobileNavigation';
 import UserProfileSection from './UserProfileSection';
 import MessageNotificationBadge from './messaging/MessageNotificationBadge';
-import NotificationDropdown from './NotificationDropdown';
+import NotificationDropdown from './notifications/NotificationDropdown';
 
 interface NavigationProps {
   user: any;

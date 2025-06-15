@@ -25,7 +25,8 @@ export const useInAppNotifications = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Use direct query without .from() type checking for now
+      const { data, error } = await (supabase as any)
         .from('in_app_notifications')
         .select('*')
         .eq('user_id', user.id)
@@ -34,7 +35,7 @@ export const useInAppNotifications = () => {
 
       if (error) throw error;
 
-      const formattedNotifications: InAppNotification[] = (data || []).map(notification => ({
+      const formattedNotifications: InAppNotification[] = (data || []).map((notification: any) => ({
         id: notification.id,
         title: notification.title,
         message: notification.message,
@@ -56,7 +57,7 @@ export const useInAppNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('in_app_notifications')
         .update({ is_read: true, updated_at: new Date().toISOString() })
         .eq('id', notificationId);
@@ -77,7 +78,7 @@ export const useInAppNotifications = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('in_app_notifications')
         .update({ is_read: true, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
@@ -94,7 +95,7 @@ export const useInAppNotifications = () => {
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('in_app_notifications')
         .delete()
         .eq('id', notificationId);
@@ -117,10 +118,10 @@ export const useInAppNotifications = () => {
 
   // Listen for real-time notifications
   useEffect(() => {
-    const { data: { user } } = supabase.auth.getUser();
-    
-    user.then(({ user: currentUser }) => {
-      if (!currentUser) return;
+    const setupRealtimeListener = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) return;
 
       const channel = supabase
         .channel('notifications')
@@ -130,7 +131,7 @@ export const useInAppNotifications = () => {
             event: 'INSERT',
             schema: 'public',
             table: 'in_app_notifications',
-            filter: `user_id=eq.${currentUser.id}`
+            filter: `user_id=eq.${user.id}`
           },
           (payload) => {
             const newNotification: InAppNotification = {
@@ -159,7 +160,9 @@ export const useInAppNotifications = () => {
       return () => {
         supabase.removeChannel(channel);
       };
-    });
+    };
+
+    setupRealtimeListener();
   }, [toast]);
 
   return {
