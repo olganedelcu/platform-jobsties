@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -96,7 +95,7 @@ export const useConversations = () => {
     }
   };
 
-  const createConversation = async (subject: string) => {
+  const createConversation = async (subject: string, initialMessage?: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
@@ -119,6 +118,23 @@ export const useConversations = () => {
           variant: "destructive"
         });
         return null;
+      }
+
+      // If there's an initial message, send it
+      if (initialMessage && data) {
+        const { error: messageError } = await supabase
+          .from('messages')
+          .insert({
+            conversation_id: data.id,
+            sender_id: user.id,
+            sender_type: 'mentee',
+            content: initialMessage,
+            message_type: 'text'
+          });
+
+        if (messageError) {
+          console.error('Error sending initial message:', messageError);
+        }
       }
 
       toast({

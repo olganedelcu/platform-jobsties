@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
@@ -6,6 +7,10 @@ import ModuleFiles from '@/components/ModuleFiles';
 import MenteeCVFiles from '@/components/MenteeCVFiles';
 import { courseModules } from '@/data/courseModules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
+import { useConversations } from '@/hooks/useConversations';
+import { Button } from '@/components/ui/button';
+import { MessageCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CourseContentProps {
   userId: string;
@@ -13,8 +18,10 @@ interface CourseContentProps {
 
 const CourseContent = ({ userId }: CourseContentProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [expandedModule, setExpandedModule] = useState<number | null>(0);
   const { progress, updateProgress } = useCourseProgress({ id: userId });
+  const { createConversation } = useConversations();
 
   const toggleModule = (index: number) => {
     setExpandedModule(expandedModule === index ? null : index);
@@ -32,7 +39,37 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     navigate('/sessions');
   };
 
-  // Calculate overall progress based on completed modules
+  const handleMessageCoach = async () => {
+    try {
+      const currentModule = expandedModule !== null ? courseModules[expandedModule] : null;
+      const subject = currentModule 
+        ? `Question about ${currentModule.title}` 
+        : 'Course Module Question';
+      
+      const initialMessage = currentModule 
+        ? `Hi! I have a question about the "${currentModule.title}" module. ${currentModule.description}`
+        : 'Hi! I have a question about the course modules.';
+
+      const conversation = await createConversation(subject, initialMessage);
+      
+      if (conversation) {
+        toast({
+          title: "Success",
+          description: "Conversation created! Redirecting to messages...",
+        });
+        navigate('/messages');
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create conversation. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Calculate overall progress based on completed modules  
   const calculateOverallProgress = () => {
     const completedModules = progress.filter(p => p.completed).length;
     return Math.min((completedModules / courseModules.length) * 100, 100);
@@ -72,6 +109,17 @@ const CourseContent = ({ userId }: CourseContentProps) => {
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
       <CourseHeader progress={calculateOverallProgress()} />
+
+      {/* Message Coach Button */}
+      <div className="mb-6 flex justify-center">
+        <Button 
+          onClick={handleMessageCoach}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 flex items-center gap-2"
+        >
+          <MessageCircle className="h-5 w-5" />
+          Message Coach About Module
+        </Button>
+      </div>
 
       <div className="space-y-6">
         {courseModules.map((module, index) => (
