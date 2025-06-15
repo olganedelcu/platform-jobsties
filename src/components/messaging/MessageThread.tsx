@@ -23,12 +23,15 @@ const MessageThread = ({
   onDownloadAttachment,
   currentUserId
 }: MessageThreadProps) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
     }
   };
 
@@ -36,7 +39,7 @@ const MessageThread = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       scrollToBottom();
-    }, 100); // Small delay to ensure DOM is updated
+    }, 50);
 
     return () => clearTimeout(timeoutId);
   }, [messages]);
@@ -93,9 +96,9 @@ const MessageThread = ({
           {conversationSubject || 'Conversation'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 p-0 min-h-0 overflow-hidden">
-        <ScrollArea className="h-full" ref={scrollAreaRef}>
-          <div className="space-y-4 p-6 pb-2">
+      <CardContent className="flex-1 p-0 overflow-hidden">
+        <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
+          <div className="flex flex-col space-y-4 p-6" ref={messagesContainerRef}>
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -103,7 +106,7 @@ const MessageThread = ({
               return (
                 <div
                   key={message.id}
-                  className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+                  className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
                     className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
@@ -175,8 +178,6 @@ const MessageThread = ({
                 </div>
               );
             })}
-            {/* This invisible div acts as a scroll anchor for new messages */}
-            <div ref={messagesEndRef} className="h-1" />
           </div>
         </ScrollArea>
       </CardContent>
