@@ -85,8 +85,8 @@ const PersonalTodosTabContent = ({
 
       {showAddForm && (
         <MenteeTodoForm
-          userId={userId}
-          onTodoAdded={onAddTodo}
+          menteeId={userId}
+          onAddTodo={onAddTodo}
           onCancel={onCancelAdd}
         />
       )}

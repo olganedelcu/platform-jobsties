@@ -64,11 +64,22 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
 
       if (error) throw error;
 
+      // Transform the data to match TodoItem interface with proper type casting
+      const transformedTodos: TodoItem[] = (data || []).map(todo => ({
+        id: todo.id,
+        title: todo.title,
+        description: todo.description || undefined,
+        status: todo.status as 'pending' | 'in_progress' | 'completed',
+        priority: todo.priority as 'low' | 'medium' | 'high',
+        due_date: todo.due_date || undefined,
+        assigned_date: todo.created_at || undefined
+      }));
+
       // Organize todos by status
       const todosByStatus = {
-        pending: data?.filter(todo => todo.status === 'pending') || [],
-        in_progress: data?.filter(todo => todo.status === 'in_progress') || [],
-        completed: data?.filter(todo => todo.status === 'completed') || []
+        pending: transformedTodos.filter(todo => todo.status === 'pending'),
+        in_progress: transformedTodos.filter(todo => todo.status === 'in_progress'),
+        completed: transformedTodos.filter(todo => todo.status === 'completed')
       };
 
       setColumns([
@@ -126,9 +137,20 @@ const MenteeTaskBoard = ({ userId }: MenteeTaskBoardProps) => {
 
       if (error) throw error;
 
+      // Transform the returned data to match TodoItem interface
+      const transformedTodo: TodoItem = {
+        id: data.id,
+        title: data.title,
+        description: data.description || undefined,
+        status: data.status as 'pending' | 'in_progress' | 'completed',
+        priority: data.priority as 'low' | 'medium' | 'high',
+        due_date: data.due_date || undefined,
+        assigned_date: data.created_at || undefined
+      };
+
       setColumns(columns.map(column =>
         column.id === columnId
-          ? { ...column, todos: [...column.todos, data] }
+          ? { ...column, todos: [...column.todos, transformedTodo] }
           : column
       ));
 
