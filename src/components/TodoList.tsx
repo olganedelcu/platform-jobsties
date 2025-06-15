@@ -1,13 +1,12 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus, Users, LayoutGrid, List } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import TodoForm from './TodoForm';
-import TodoItem from './TodoItem';
 import SendTodosToMentees from './coach/SendTodosToMentees';
-import TaskTodoBoard from './todos/TaskTodoBoard';
+import TodoListHeader from './todos/TodoListHeader';
+import TodoListBoardView from './todos/TodoListBoardView';
+import PersonalTodosSection from './todos/PersonalTodosSection';
 
 interface Todo {
   id: string;
@@ -90,75 +89,34 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
     setTodos(todos.filter(todo => todo.id !== todoId));
   };
 
+  const handleToggleSendToMentees = () => {
+    setShowSendToMentees(!showSendToMentees);
+  };
+
   if (loading && viewMode === 'list') {
     return <div className="text-center py-8">Loading todos...</div>;
   }
 
   if (viewMode === 'board') {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Task Management</h2>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setViewMode('list')}
-              variant="outline"
-              className="flex items-center space-x-2"
-            >
-              <List className="h-4 w-4" />
-              <span>List View</span>
-            </Button>
-            <Button
-              onClick={() => setShowSendToMentees(!showSendToMentees)}
-              variant="outline"
-              className="flex items-center space-x-2"
-            >
-              <Users className="h-4 w-4" />
-              <span>Send to Mentees</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Send to Mentees Section */}
-        {showSendToMentees && (
-          <SendTodosToMentees coachId={coachId} />
-        )}
-
-        <TaskTodoBoard coachId={coachId} />
-      </div>
+      <TodoListBoardView
+        coachId={coachId}
+        showSendToMentees={showSendToMentees}
+        onViewModeChange={setViewMode}
+        onToggleSendToMentees={handleToggleSendToMentees}
+      />
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Task Management</h2>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => setViewMode('board')}
-            variant="outline"
-            className="flex items-center space-x-2"
-          >
-            <LayoutGrid className="h-4 w-4" />
-            <span>Board View</span>
-          </Button>
-          <Button
-            onClick={() => setShowSendToMentees(!showSendToMentees)}
-            variant="outline"
-            className="flex items-center space-x-2"
-          >
-            <Users className="h-4 w-4" />
-            <span>Send to Mentees</span>
-          </Button>
-          <Button
-            onClick={() => setShowAddForm(true)}
-            className="flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Personal Todo</span>
-          </Button>
-        </div>
-      </div>
+      <TodoListHeader
+        viewMode={viewMode}
+        showSendToMentees={showSendToMentees}
+        onViewModeChange={setViewMode}
+        onToggleSendToMentees={handleToggleSendToMentees}
+        onShowAddForm={() => setShowAddForm(true)}
+      />
 
       {/* Send to Mentees Section */}
       {showSendToMentees && (
@@ -176,28 +134,12 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
       )}
 
       {/* Personal Todos List */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold text-gray-900">My Personal Todos</h3>
-        <div className="grid gap-4">
-          {todos.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-gray-500">No personal todos yet. Add your first todo to get started!</p>
-              </CardContent>
-            </Card>
-          ) : (
-            todos.map((todo) => (
-              <TodoItem
-                key={todo.id}
-                todo={todo}
-                mentees={mentees}
-                onTodoUpdated={handleTodoUpdated}
-                onTodoDeleted={handleTodoDeleted}
-              />
-            ))
-          )}
-        </div>
-      </div>
+      <PersonalTodosSection
+        todos={todos}
+        mentees={mentees}
+        onTodoUpdated={handleTodoUpdated}
+        onTodoDeleted={handleTodoDeleted}
+      />
     </div>
   );
 };
