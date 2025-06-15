@@ -14,7 +14,7 @@ import {
   Database,
   MessageCircle
 } from 'lucide-react';
-import NotificationDropdown from './messaging/NotificationDropdown';
+import NotificationDropdown from './notifications/NotificationDropdown';
 
 interface CoachNavigationProps {
   user: any;
