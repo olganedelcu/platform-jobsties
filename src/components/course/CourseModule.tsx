@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, ChevronUp, Lock, CheckCircle, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, Lock, CheckCircle, RotateCcw, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CourseModuleContent from './CourseModuleContent';
 
@@ -22,9 +22,20 @@ interface CourseModuleProps {
   onComplete: () => void;
   onUncomplete: () => void;
   onBookCall?: () => void;
+  onMessageCoach?: () => void;
 }
 
-const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, onUncomplete, onBookCall }: CourseModuleProps) => {
+const CourseModule = ({ 
+  module, 
+  index, 
+  expanded, 
+  userId, 
+  onToggle, 
+  onComplete, 
+  onUncomplete, 
+  onBookCall,
+  onMessageCoach 
+}: CourseModuleProps) => {
   const Icon = module.icon;
 
   const handleActionClick = (e: React.MouseEvent) => {
@@ -39,6 +50,13 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, o
   const handleUncompleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onUncomplete();
+  };
+
+  const handleMessageCoachClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onMessageCoach) {
+      onMessageCoach();
+    }
   };
 
   const getActionText = () => {
@@ -85,6 +103,14 @@ const CourseModule = ({ module, index, expanded, userId, onToggle, onComplete, o
           <div className="flex items-center space-x-3">
             {!module.locked && (
               <>
+                <Button
+                  onClick={handleMessageCoachClick}
+                  variant="outline"
+                  className="text-indigo-600 border-indigo-300 hover:bg-indigo-50 px-4 py-2 text-sm flex items-center space-x-1"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  <span>Message Coach</span>
+                </Button>
                 <Button
                   onClick={handleActionClick}
                   className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"

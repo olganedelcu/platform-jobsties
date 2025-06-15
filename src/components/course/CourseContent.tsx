@@ -8,8 +8,6 @@ import MenteeCVFiles from '@/components/MenteeCVFiles';
 import { courseModules } from '@/data/courseModules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 import { useConversations } from '@/hooks/useConversations';
-import { Button } from '@/components/ui/button';
-import { MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface CourseContentProps {
@@ -39,16 +37,10 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     navigate('/sessions');
   };
 
-  const handleMessageCoach = async () => {
+  const handleMessageCoach = async (moduleIndex: number, moduleTitle: string, moduleDescription: string) => {
     try {
-      const currentModule = expandedModule !== null ? courseModules[expandedModule] : null;
-      const subject = currentModule 
-        ? `Question about ${currentModule.title}` 
-        : 'Course Module Question';
-      
-      const initialMessage = currentModule 
-        ? `Hi! I have a question about the "${currentModule.title}" module. ${currentModule.description}`
-        : 'Hi! I have a question about the course modules.';
+      const subject = `Question about ${moduleTitle}`;
+      const initialMessage = `Hi! I have a question about the "${moduleTitle}" module. ${moduleDescription}`;
 
       const conversation = await createConversation(subject, initialMessage);
       
@@ -110,17 +102,6 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     <main className="max-w-7xl mx-auto py-8 px-6">
       <CourseHeader progress={calculateOverallProgress()} />
 
-      {/* Message Coach Button */}
-      <div className="mb-6 flex justify-center">
-        <Button 
-          onClick={handleMessageCoach}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 flex items-center gap-2"
-        >
-          <MessageCircle className="h-5 w-5" />
-          Message Coach About Module
-        </Button>
-      </div>
-
       <div className="space-y-6">
         {courseModules.map((module, index) => (
           <CourseModule
@@ -137,6 +118,7 @@ const CourseContent = ({ userId }: CourseContentProps) => {
             onComplete={() => handleCompleteModule(index, module.title)}
             onUncomplete={() => handleUncompleteModule(index, module.title)}
             onBookCall={handleBookCall}
+            onMessageCoach={() => handleMessageCoach(index, module.title, module.description)}
           />
         ))}
       </div>
