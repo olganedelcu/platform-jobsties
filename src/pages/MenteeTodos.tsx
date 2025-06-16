@@ -191,7 +191,6 @@ const MenteeTodos = () => {
 
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    Personal Tasks
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                       {personalTasks.length}
                     </Badge>
