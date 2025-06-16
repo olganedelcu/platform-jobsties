@@ -80,9 +80,15 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
             {assignments.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                    {assignments.length}
-                  </Badge>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      Coach Assignments
+                      <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                        {assignments.length}
+                      </Badge>
+                    </h2>
+                    <p className="text-gray-600">Tasks assigned by your coach</p>
+                  </div>
                   <Button
                     onClick={() => setAssignmentsViewMode(assignmentsViewMode === 'list' ? 'board' : 'list')}
                     variant="outline"
@@ -112,9 +118,15 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
             {/* Personal Tasks Section */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                  {todos.length}
-                </Badge>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                    Personal Tasks
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      {todos.length}
+                    </Badge>
+                  </h2>
+                  <p className="text-gray-600">Your personal tasks and goals</p>
+                </div>
                 <div className="flex gap-3">
                   <Button
                     onClick={() => setPersonalViewMode(personalViewMode === 'list' ? 'board' : 'list')}
@@ -173,6 +185,10 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
         <TabsContent value="personal" className="mt-6">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-1">Personal Tasks</h2>
+                <p className="text-gray-600">Your personal tasks and goals</p>
+              </div>
               <div className="flex gap-3">
                 <Button
                   onClick={() => setPersonalViewMode(personalViewMode === 'list' ? 'board' : 'list')}
