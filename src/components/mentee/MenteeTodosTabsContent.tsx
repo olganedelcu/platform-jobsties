@@ -2,22 +2,20 @@
 import React, { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Plus, LayoutGrid, List } from 'lucide-react';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
 import MenteeTodosStats from './MenteeTodosStats';
 import AssignmentsTabContent from './AssignmentsTabContent';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
+import MenteeTodosAllTabContent from './MenteeTodosAllTabContent';
 import MenteeTodoForm from '@/components/MenteeTodoForm';
-import MenteeAssignmentsList from '@/components/MenteeAssignmentsList';
-import CoachAssignmentsBoard from '@/components/coach/CoachAssignmentsBoard';
+import MenteeTodosSection from './MenteeTodosSection';
 
 interface MenteeTodosTabsContentProps {
   userId: string;
 }
 
-const MenteeTodosPage = ({ userId }: MenteeTodosTabsContentProps) => {
+const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
   const [assignmentsViewMode, setAssignmentsViewMode] = useState<'list' | 'board'>('list');
   const [personalViewMode, setPersonalViewMode] = useState<'list' | 'board'>('list');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -94,145 +92,27 @@ const MenteeTodosPage = ({ userId }: MenteeTodosTabsContentProps) => {
         </TabsList>
 
         <TabsContent value="all" className="mt-6">
-          <div className="space-y-8">
-            {/* Coach Assignments Section */}
-            {statistics.assignmentTasks > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                      Coach Assignments
-                      <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                        {statistics.assignmentTasks}
-                      </Badge>
-                    </h2>
-                  </div>
-                  <Button
-                    onClick={() => setAssignmentsViewMode(assignmentsViewMode === 'list' ? 'board' : 'list')}
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                  >
-                    {assignmentsViewMode === 'list' ? (
-                      <>
-                        <LayoutGrid className="h-4 w-4" />
-                        <span>Board View</span>
-                      </>
-                    ) : (
-                      <>
-                        <List className="h-4 w-4" />
-                        <span>List View</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                {assignmentsViewMode === 'list' ? (
-                  <MenteeAssignmentsList userId={userId} />
-                ) : (
-                  <CoachAssignmentsBoard coachId={userId} />
-                )}
-              </div>
-            )}
-
-            {/* Personal Tasks Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                    Personal Tasks
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      {statistics.personalTasks}
-                    </Badge>
-                  </h2>
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={() => setPersonalViewMode(personalViewMode === 'list' ? 'board' : 'list')}
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                  >
-                    {personalViewMode === 'list' ? (
-                      <>
-                        <LayoutGrid className="h-4 w-4" />
-                        <span>Board View</span>
-                      </>
-                    ) : (
-                      <>
-                        <List className="h-4 w-4" />
-                        <span>List View</span>
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => setShowAddForm(true)}
-                    className="flex items-center space-x-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Add Task</span>
-                  </Button>
-                </div>
-              </div>
-
-              {showAddForm && (
-                <div className="mb-6">
-                  <MenteeTodoForm
-                    menteeId={userId}
-                    onAddTodo={handleAddTodo}
-                    onCancel={() => setShowAddForm(false)}
-                  />
-                </div>
-              )}
-
-              <PersonalTodosTabContent
-                todos={todos}
-                showAddForm={false}
-                todosLoading={todosLoading}
-                userId={userId}
-                viewMode={personalViewMode}
-                onViewModeChange={setPersonalViewMode}
-                onShowAddForm={() => setShowAddForm(true)}
-                onAddTodo={handleAddTodo}
-                onCancelAdd={() => setShowAddForm(false)}
-                onUpdateStatus={updateTodoStatus}
-                onDeleteTodo={deleteTodo}
-              />
-            </div>
-          </div>
+          <MenteeTodosAllTabContent
+            userId={userId}
+            assignmentsViewMode={assignmentsViewMode}
+            personalViewMode={personalViewMode}
+            showAddForm={showAddForm}
+            assignmentTasks={statistics.assignmentTasks}
+            personalTasks={statistics.personalTasks}
+            todos={todos}
+            todosLoading={todosLoading}
+            onAssignmentsViewModeChange={setAssignmentsViewMode}
+            onPersonalViewModeChange={setPersonalViewMode}
+            onShowAddForm={() => setShowAddForm(true)}
+            onAddTodo={handleAddTodo}
+            onCancelAdd={() => setShowAddForm(false)}
+            onUpdateStatus={updateTodoStatus}
+            onDeleteTodo={deleteTodo}
+          />
         </TabsContent>
 
         <TabsContent value="personal" className="mt-6">
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-1">Personal Tasks</h2>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => setPersonalViewMode(personalViewMode === 'list' ? 'board' : 'list')}
-                  variant="outline"
-                  className="flex items-center space-x-2"
-                >
-                  {personalViewMode === 'list' ? (
-                    <>
-                      <LayoutGrid className="h-4 w-4" />
-                      <span>Board View</span>
-                    </>
-                  ) : (
-                    <>
-                      <List className="h-4 w-4" />
-                      <span>List View</span>
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => setShowAddForm(true)}
-                  className="flex items-center space-x-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Add Task</span>
-                </Button>
-              </div>
-            </div>
-
             {showAddForm && (
               <MenteeTodoForm
                 menteeId={userId}
@@ -241,16 +121,20 @@ const MenteeTodosPage = ({ userId }: MenteeTodosTabsContentProps) => {
               />
             )}
 
-            <PersonalTodosTabContent
-              todos={todos}
-              showAddForm={false}
-              todosLoading={todosLoading}
-              userId={userId}
+            <MenteeTodosSection
+              type="personal"
+              title="Personal Tasks"
+              count={statistics.personalTasks}
+              badgeColor="bg-blue-100 text-blue-800"
               viewMode={personalViewMode}
               onViewModeChange={setPersonalViewMode}
+              userId={userId}
+              showAddForm={showAddForm}
               onShowAddForm={() => setShowAddForm(true)}
               onAddTodo={handleAddTodo}
               onCancelAdd={() => setShowAddForm(false)}
+              todos={todos}
+              todosLoading={todosLoading}
               onUpdateStatus={updateTodoStatus}
               onDeleteTodo={deleteTodo}
             />
@@ -269,4 +153,4 @@ const MenteeTodosPage = ({ userId }: MenteeTodosTabsContentProps) => {
   );
 };
 
-export default MenteeTodosPage;
+export default MenteeTodosTabsContent;
