@@ -20,7 +20,7 @@ const MenteeTodos = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-purple-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       <MenteeTodosContainer userId={user.id} />
     </div>

@@ -29,7 +29,7 @@ const MenteeCard = ({ menteeInfo, applications, onViewDetails, onDeleteApplicati
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12">
-              <AvatarFallback className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+              <AvatarFallback className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
                 {menteeInfo.first_name[0]}{menteeInfo.last_name[0]}
               </AvatarFallback>
             </Avatar>
