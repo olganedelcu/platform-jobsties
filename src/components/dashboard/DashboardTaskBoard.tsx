@@ -22,7 +22,7 @@ const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
     .slice(0, 3); // Show only first 3 tasks
 
   const handleViewAllTasks = () => {
-    navigate('/mentee-todos');
+    navigate('/todos');
   };
 
   return (
