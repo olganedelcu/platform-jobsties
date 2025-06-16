@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +43,21 @@ const TodoCard = ({
     setShowEditDialog(false);
   };
 
+  const handleMoveToStatus = (targetStatus: 'pending' | 'in_progress' | 'completed') => {
+    // Find the column that represents this status
+    const targetColumn = allColumns.find(col => {
+      const columnTitle = col.title.toLowerCase();
+      if (targetStatus === 'pending') return columnTitle.includes('pending');
+      if (targetStatus === 'in_progress') return columnTitle.includes('progress');
+      if (targetStatus === 'completed') return columnTitle.includes('completed') || columnTitle.includes('done');
+      return false;
+    });
+
+    if (targetColumn && targetColumn.id !== currentColumnId) {
+      onMove(todo.id, currentColumnId, targetColumn.id);
+    }
+  };
+
   const otherColumns = allColumns.filter(col => col.id !== currentColumnId);
 
   return (
@@ -60,15 +76,28 @@ const TodoCard = ({
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              {otherColumns.map((column) => (
-                <DropdownMenuItem 
-                  key={column.id}
-                  onClick={() => onMove(todo.id, currentColumnId, column.id)}
-                >
+              
+              {todo.status !== 'pending' && (
+                <DropdownMenuItem onClick={() => handleMoveToStatus('pending')}>
                   <ArrowRight className="h-4 w-4 mr-2" />
-                  Move to {column.title}
+                  Move to Pending
                 </DropdownMenuItem>
-              ))}
+              )}
+              
+              {todo.status !== 'in_progress' && (
+                <DropdownMenuItem onClick={() => handleMoveToStatus('in_progress')}>
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  Move to In Progress
+                </DropdownMenuItem>
+              )}
+              
+              {todo.status !== 'completed' && (
+                <DropdownMenuItem onClick={() => handleMoveToStatus('completed')}>
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  Move to Completed
+                </DropdownMenuItem>
+              )}
+              
               <DropdownMenuItem onClick={onDelete} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete

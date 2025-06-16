@@ -134,20 +134,31 @@ export const useAssignmentBoard = (coachId: string) => {
     });
   };
 
-  const moveTodo = async (fromColumnId: string, toColumnId: string, todoId: string) => {
+  const moveTodo = async (todoId: string, fromColumnId: string, toColumnId: string) => {
+    console.log('Moving assignment:', { todoId, fromColumnId, toColumnId });
+    
     const fromColumn = columns.find(col => col.id === fromColumnId);
+    const toColumn = columns.find(col => col.id === toColumnId);
     const todo = fromColumn?.todos.find(t => t.id === todoId);
     
-    if (!todo) return;
-
-    // Update todo status based on the destination column
-    let newStatus: 'pending' | 'in_progress' | 'completed' = todo.status;
-    const toColumn = columns.find(col => col.id === toColumnId);
-    if (toColumn) {
-      if (toColumn.title === 'Pending') newStatus = 'pending';
-      else if (toColumn.title === 'In Progress') newStatus = 'in_progress';
-      else if (toColumn.title === 'Completed') newStatus = 'completed';
+    if (!todo || !toColumn) {
+      console.error('Assignment or target column not found');
+      return;
     }
+
+    // Determine new status based on the destination column title
+    let newStatus: 'pending' | 'in_progress' | 'completed' = todo.status;
+    const columnTitle = toColumn.title.toLowerCase();
+    
+    if (columnTitle.includes('pending')) {
+      newStatus = 'pending';
+    } else if (columnTitle.includes('progress')) {
+      newStatus = 'in_progress';
+    } else if (columnTitle.includes('completed') || columnTitle.includes('done')) {
+      newStatus = 'completed';
+    }
+
+    console.log('New assignment status:', newStatus);
 
     try {
       await updateStatus(todoId, newStatus);
@@ -169,6 +180,7 @@ export const useAssignmentBoard = (coachId: string) => {
         description: "Task moved successfully"
       });
     } catch (error: any) {
+      console.error('Error moving assignment:', error);
       toast({
         title: "Error",
         description: "Failed to move task",
