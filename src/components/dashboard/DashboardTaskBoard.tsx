@@ -3,9 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ListTodo, ArrowRight } from 'lucide-react';
+import { ListTodo, ArrowRight, UserCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMenteeTaskBoard } from '@/hooks/useMenteeTaskBoard';
+import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 
 interface DashboardTaskBoardProps {
   userId: string;
@@ -13,13 +14,32 @@ interface DashboardTaskBoardProps {
 
 const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
   const navigate = useNavigate();
-  const { columns } = useMenteeTaskBoard(userId);
+  const { columns: personalColumns } = useMenteeTaskBoard(userId);
+  const { assignments } = useTodoAssignments(userId, false);
 
-  // Get in-progress tasks from all columns
-  const inProgressTasks = columns
+  // Get in-progress personal tasks
+  const personalInProgressTasks = personalColumns
     .flatMap(column => column.todos)
     .filter(todo => todo.status === 'in_progress')
-    .slice(0, 3); // Show only first 3 tasks
+    .map(task => ({ ...task, source: 'personal' as const }));
+
+  // Get in-progress coach-assigned tasks
+  const coachInProgressTasks = assignments
+    .filter(assignment => assignment.status === 'in_progress')
+    .map(assignment => ({
+      id: assignment.id,
+      title: assignment.todo?.title || 'Untitled Task',
+      description: assignment.todo?.description,
+      status: assignment.status as 'in_progress',
+      priority: assignment.todo?.priority || 'medium' as const,
+      due_date: assignment.todo?.due_date,
+      assigned_date: assignment.assigned_at,
+      source: 'coach' as const
+    }));
+
+  // Combine and limit to first 3 tasks
+  const allInProgressTasks = [...personalInProgressTasks, ...coachInProgressTasks]
+    .slice(0, 3);
 
   const handleViewAllTasks = () => {
     navigate('/todos');
@@ -45,12 +65,16 @@ const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
       </CardHeader>
       
       <CardContent>
-        {inProgressTasks.length > 0 ? (
+        {allInProgressTasks.length > 0 ? (
           <div className="space-y-3">
-            {inProgressTasks.map((task) => (
+            {allInProgressTasks.map((task) => (
               <div key={task.id} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
                 <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <ListTodo className="h-5 w-5 text-green-600" />
+                  {task.source === 'coach' ? (
+                    <UserCheck className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <ListTodo className="h-5 w-5 text-green-600" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900">{task.title}</div>
@@ -64,6 +88,14 @@ const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
                     >
                       In Progress
                     </Badge>
+                    {task.source === 'coach' && (
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                      >
+                        From Coach
+                      </Badge>
+                    )}
                     {task.priority && (
                       <Badge 
                         variant="outline" 
@@ -97,7 +129,7 @@ const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
           </div>
         )}
         
-        {inProgressTasks.length > 0 && (
+        {allInProgressTasks.length > 0 && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <Button 
               onClick={handleViewAllTasks}
