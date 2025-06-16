@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -5,11 +6,12 @@ import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 import { courseModules } from '@/data/courseModules';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
+import MessageCoachCard from '@/components/dashboard/MessageCoachCard';
+import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
 
 interface DashboardContentProps {
   user: any;
@@ -76,6 +78,8 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             onViewAll={() => navigate('/tracker')}
             onAddApplication={() => navigate('/tracker')}
           />
+
+          <MessageCoachCard />
         </div>
 
         {/* Right Column */}
@@ -86,11 +90,9 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             applicationsThisMonth={applicationsThisMonth}
             onClick={() => navigate('/tracker')}
           />
+
+          <DashboardTaskBoard userId={user?.id} />
         </div>
-      </div>
-      
-      <div className="mt-8">
-        <DashboardQuickLinks />
       </div>
     </main>
   );
