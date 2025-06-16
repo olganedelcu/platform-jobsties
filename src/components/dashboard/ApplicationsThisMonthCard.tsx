@@ -76,13 +76,9 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
       <Card className="border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-12 bg-gray-200 rounded mb-4"></div>
-            <div className="flex justify-center gap-1">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-1.5 h-8 bg-gray-200 rounded-full"></div>
-              ))}
-            </div>
+            <div className="h-6 bg-gray-200 rounded w-24 mb-3"></div>
+            <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
+            <div className="h-2 bg-gray-200 rounded"></div>
           </div>
         </CardContent>
       </Card>
@@ -96,23 +92,17 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
     >
       <CardContent className="p-6">
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-600 mb-2">{applicationsThisWeek}</div>
-          <div className="text-sm text-gray-600 mb-2">Applications this week</div>
-          <div className="text-xs text-gray-500 mb-4">Target: {weeklyTarget} per week ({weekLabel})</div>
+          <div className="text-3xl font-bold text-blue-600 mb-2">
+            {applicationsThisWeek}/30
+          </div>
+          <div className="text-sm text-gray-600 mb-4">Applications this week</div>
           
           {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
               style={{ width: `${progressPercentage}%` }}
             ></div>
-          </div>
-          
-          {/* Visualization bars */}
-          <div className="flex justify-center gap-1">
-            {[...Array(Math.min(applicationsThisWeek, 12))].map((_, i) => (
-              <div key={i} className="w-1.5 h-8 bg-blue-500 rounded-full"></div>
-            ))}
           </div>
         </div>
       </CardContent>
