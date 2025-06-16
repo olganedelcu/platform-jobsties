@@ -79,7 +79,9 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navigation user={user} onSignOut={handleSignOut} />
-      <DashboardContent user={user} />
+      <div className="pt-20">
+        <DashboardContent user={user} />
+      </div>
     </div>
   );
 };
