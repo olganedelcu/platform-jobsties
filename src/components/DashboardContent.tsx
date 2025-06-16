@@ -6,8 +6,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
-import QuoteOfTheDay from '@/components/dashboard/QuoteOfTheDay';
-import CoachMessages from '@/components/dashboard/CoachMessages';
+import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 
 interface DashboardContentProps {
@@ -51,9 +50,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
       <DashboardHeader user={user} firstName={firstName} />
 
-      {/* Quote of the Day */}
-      <QuoteOfTheDay />
-
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Career Progress Card */}
         <CareerProgressCard
@@ -66,8 +62,11 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
         {/* Tasks In Progress */}
         <TasksInProgressCard userId={user?.id} />
 
-        {/* Coach Messages */}
-        <CoachMessages />
+        {/* Recent Activity */}
+        <MenteeRecentActivityCard
+          onViewAll={() => navigate('/tracker')}
+          onAddApplication={() => navigate('/tracker')}
+        />
 
         {/* Task Board */}
         <div className="xl:col-span-1">
