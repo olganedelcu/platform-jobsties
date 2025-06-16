@@ -1,3 +1,4 @@
+
 import React, { memo, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -24,21 +25,16 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
-  // Calculate applications for current week (for header - keeping for compatibility)
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  // Calculate applications for today (for header)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
+  const endOfToday = new Date(today);
+  endOfToday.setHours(23, 59, 59, 999);
   
-  const applicationsThisWeek = applications.filter(app => {
+  const applicationsToday = applications.filter(app => {
     const appDate = new Date(app.date_applied);
-    return appDate >= startOfWeek && appDate <= endOfWeek;
+    return appDate >= today && appDate <= endOfToday;
   }).length;
 
   const navigationHandlers = useMemo(() => ({
@@ -58,7 +54,7 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
       <DashboardHeader 
         user={user} 
         firstName={firstName} 
-        applicationsThisMonth={applicationsThisWeek}
+        applicationsThisMonth={applicationsToday}
         onTrackerClick={navigationHandlers.handleTrackerClick}
       />
 
@@ -71,7 +67,7 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
           onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
         />
 
-        {/* Applications This Week */}
+        {/* Applications Today */}
         <ApplicationsThisMonthCard
           applications={applications}
           loading={applicationsLoading}

@@ -10,25 +10,20 @@ interface ApplicationsThisMonthCardProps {
 }
 
 const ApplicationsThisMonthCard = ({ applications, loading, onClick }: ApplicationsThisMonthCardProps) => {
-  // Calculate applications for current week (Monday to Sunday)
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  // Calculate applications for today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
+  const endOfToday = new Date(today);
+  endOfToday.setHours(23, 59, 59, 999);
   
-  const applicationsThisWeek = applications.filter(app => {
+  const applicationsToday = applications.filter(app => {
     const appDate = new Date(app.date_applied);
-    return appDate >= startOfWeek && appDate <= endOfWeek;
+    return appDate >= today && appDate <= endOfToday;
   }).length;
 
-  const weeklyTarget = 30;
-  const progressPercentage = Math.min((applicationsThisWeek / weeklyTarget) * 100, 100);
+  const dailyTarget = 5; // Adjusted for daily target
+  const progressPercentage = Math.min((applicationsToday / dailyTarget) * 100, 100);
 
   if (loading) {
     return (
@@ -55,9 +50,9 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
     >
       <CardContent className="p-6">
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-600 mb-2">{applicationsThisWeek}</div>
-          <div className="text-sm text-gray-600 mb-2">Applications this week</div>
-          <div className="text-xs text-gray-500 mb-4">Target: {weeklyTarget} per week</div>
+          <div className="text-4xl font-bold text-blue-600 mb-2">{applicationsToday}</div>
+          <div className="text-sm text-gray-600 mb-2">Applications today</div>
+          <div className="text-xs text-gray-500 mb-4">Target: {dailyTarget} per day</div>
           
           {/* Progress bar */}
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
@@ -69,7 +64,7 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
           
           {/* Visualization bars */}
           <div className="flex justify-center gap-1">
-            {[...Array(Math.min(applicationsThisWeek, 12))].map((_, i) => (
+            {[...Array(Math.min(applicationsToday, 12))].map((_, i) => (
               <div key={i} className="w-1.5 h-8 bg-blue-500 rounded-full"></div>
             ))}
           </div>
