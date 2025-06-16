@@ -29,7 +29,7 @@ const CareerProgressCard = ({
           </Badge>
         </div>
         
-        <div className="text-4xl font-bold text-blue-600 mb-3">{courseProgress}%</div>
+        <div className="text-4xl font-bold text-purple-600 mb-3">{courseProgress}%</div>
         <Progress value={courseProgress} className="mb-4 h-3" />
         <div className="text-sm text-gray-500 mb-6">Course completion</div>
 
@@ -42,8 +42,8 @@ const CareerProgressCard = ({
             <div className="text-sm text-gray-700 font-medium">CV Optimized</div>
           </div>
           <div className="text-center cursor-pointer" onClick={onInterviewPrepClick}>
-            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-blue-200 transition-colors">
-              <Clock className="w-7 h-7 text-blue-600" />
+            <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-3 mx-auto hover:bg-purple-200 transition-colors">
+              <Clock className="w-7 h-7 text-purple-600" />
             </div>
             <div className="text-sm text-gray-700 font-medium">Interview Prep</div>
           </div>
