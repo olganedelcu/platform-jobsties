@@ -51,8 +51,8 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
+    <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ height: 'calc(100vh - 140px)' }}>
         <div className="lg:col-span-1 h-full">
           <ConversationsList
             conversations={conversations}
