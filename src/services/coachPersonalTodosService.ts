@@ -14,7 +14,7 @@ export interface CoachTodo {
 }
 
 export const coachPersonalTodosService = {
-  fetchPersonalTodos: async (coachId: string) => {
+  fetchPersonalTodos: async (coachId: string): Promise<CoachTodo[]> => {
     console.log('Fetching personal todos for coach:', coachId);
     
     const { data, error } = await supabase
@@ -27,7 +27,9 @@ export const coachPersonalTodosService = {
     if (error) throw error;
 
     console.log('Personal todos data:', data);
-    return data || [];
+    
+    // Type assert the data to match our CoachTodo interface
+    return (data || []) as CoachTodo[];
   },
 
   createTodo: async (coachId: string, todo: {
@@ -52,7 +54,7 @@ export const coachPersonalTodosService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as CoachTodo;
   },
 
   updateTodo: async (todoId: string, updates: {
