@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   fetchTodoAssignments, 
-  updateAssignmentStatus, 
+  updateAssignmentStatus,
+  updateAssignmentDetails,
   TodoAssignmentWithDetails 
 } from '@/services/todoAssignmentService';
 
@@ -69,6 +70,41 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
     }
   };
 
+  const updateDetails = async (
+    assignmentId: string, 
+    details: {
+      mentee_title?: string;
+      mentee_description?: string;
+      mentee_due_date?: string;
+      mentee_priority?: 'low' | 'medium' | 'high';
+    }
+  ) => {
+    try {
+      await updateAssignmentDetails(assignmentId, details);
+      
+      // Update local state
+      setAssignments(prev => 
+        prev.map(assignment => 
+          assignment.id === assignmentId 
+            ? { ...assignment, ...details }
+            : assignment
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Assignment details updated successfully"
+      });
+    } catch (error: any) {
+      console.error('Error updating assignment details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update assignment details",
+        variant: "destructive"
+      });
+    }
+  };
+
   useEffect(() => {
     if (!userId) {
       console.log('No userId, skipping effect');
@@ -83,6 +119,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
     assignments,
     loading,
     updateStatus,
+    updateDetails,
     refreshAssignments: loadAssignments
   };
 };

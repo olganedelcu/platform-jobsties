@@ -6,7 +6,7 @@ import { TodoItem, TodoColumnType } from '@/types/assignmentBoard';
 
 export const useAssignmentBoard = (coachId: string) => {
   const { toast } = useToast();
-  const { assignments, updateStatus } = useTodoAssignments(coachId, false);
+  const { assignments, updateStatus, updateDetails } = useTodoAssignments(coachId, false);
   const [columns, setColumns] = useState<TodoColumnType[]>([
     {
       id: '1',
@@ -26,14 +26,14 @@ export const useAssignmentBoard = (coachId: string) => {
   ]);
 
   useEffect(() => {
-    // Transform assignments to TodoItem format
+    // Transform assignments to TodoItem format, using mentee edits when available
     const transformedTodos: TodoItem[] = assignments.map(assignment => ({
       id: assignment.id,
-      title: assignment.todo?.title || 'Untitled Task',
-      description: assignment.todo?.description || undefined,
+      title: assignment.mentee_title || assignment.todo?.title || 'Untitled Task',
+      description: assignment.mentee_description || assignment.todo?.description || undefined,
       status: assignment.status,
-      priority: assignment.todo?.priority || 'medium',
-      due_date: assignment.todo?.due_date || undefined,
+      priority: assignment.mentee_priority || assignment.todo?.priority || 'medium',
+      due_date: assignment.mentee_due_date || assignment.todo?.due_date || undefined,
       assigned_date: assignment.assigned_at || undefined
     }));
 
@@ -85,30 +85,41 @@ export const useAssignmentBoard = (coachId: string) => {
     try {
       if (updates.status) {
         await updateStatus(todoId, updates.status);
+      } else {
+        // Handle other updates (title, description, priority, due_date)
+        const detailUpdates: any = {};
+        if (updates.title !== undefined) detailUpdates.mentee_title = updates.title;
+        if (updates.description !== undefined) detailUpdates.mentee_description = updates.description;
+        if (updates.priority !== undefined) detailUpdates.mentee_priority = updates.priority;
+        if (updates.due_date !== undefined) detailUpdates.mentee_due_date = updates.due_date;
         
-        // Update local state to reflect the change immediately
-        setColumns(prevColumns => 
-          prevColumns.map(column =>
-            column.id === columnId
-              ? {
-                  ...column,
-                  todos: column.todos.map(todo =>
-                    todo.id === todoId ? { ...todo, ...updates } : todo
-                  )
-                }
-              : column
-          )
-        );
-
-        toast({
-          title: "Success",
-          description: "Task status updated successfully"
-        });
+        if (Object.keys(detailUpdates).length > 0) {
+          await updateDetails(todoId, detailUpdates);
+        }
       }
+      
+      // Update local state to reflect the change immediately
+      setColumns(prevColumns => 
+        prevColumns.map(column =>
+          column.id === columnId
+            ? {
+                ...column,
+                todos: column.todos.map(todo =>
+                  todo.id === todoId ? { ...todo, ...updates } : todo
+                )
+              }
+            : column
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: "Task updated successfully"
+      });
     } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to update task status",
+        description: "Failed to update task",
         variant: "destructive"
       });
     }
@@ -134,7 +145,9 @@ export const useAssignmentBoard = (coachId: string) => {
     const toColumn = columns.find(col => col.id === toColumnId);
     if (toColumn) {
       if (toColumn.title === 'Pending') newStatus = 'pending';
-      else if (toColumn.title === 'In Progress') newStatus = 'in_progress';  
+      else if (toColumn.title === 'In Progress') newStatus = '
+
+in_progress';  
       else if (toColumn.title === 'Completed') newStatus = 'completed';
     }
 

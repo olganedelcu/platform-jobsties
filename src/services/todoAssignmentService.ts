@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface TodoAssignment {
@@ -12,6 +11,11 @@ export interface TodoAssignment {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  // New mentee edit fields
+  mentee_title: string | null;
+  mentee_description: string | null;
+  mentee_due_date: string | null;
+  mentee_priority: 'low' | 'medium' | 'high' | null;
 }
 
 export interface TodoAssignmentWithDetails extends TodoAssignment {
@@ -99,6 +103,10 @@ export const fetchTodoAssignments = async (userId: string, isCoach: boolean = fa
     completed_at: item.completed_at,
     created_at: item.created_at,
     updated_at: item.updated_at,
+    mentee_title: item.mentee_title,
+    mentee_description: item.mentee_description,
+    mentee_due_date: item.mentee_due_date,
+    mentee_priority: item.mentee_priority as 'low' | 'medium' | 'high' | null,
     todo: item.coach_todos ? {
       title: item.coach_todos.title,
       description: item.coach_todos.description,
@@ -146,6 +154,25 @@ export const updateAssignmentStatus = async (
   const { error } = await supabase
     .from('mentee_todo_assignments')
     .update(updateData)
+    .eq('id', assignmentId);
+
+  if (error) {
+    throw error;
+  }
+};
+
+export const updateAssignmentDetails = async (
+  assignmentId: string,
+  updates: {
+    mentee_title?: string;
+    mentee_description?: string;
+    mentee_due_date?: string;
+    mentee_priority?: 'low' | 'medium' | 'high';
+  }
+): Promise<void> => {
+  const { error } = await supabase
+    .from('mentee_todo_assignments')
+    .update(updates)
     .eq('id', assignmentId);
 
   if (error) {

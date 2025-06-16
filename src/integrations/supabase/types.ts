@@ -670,7 +670,11 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          mentee_description: string | null
+          mentee_due_date: string | null
           mentee_id: string
+          mentee_priority: string | null
+          mentee_title: string | null
           started_at: string | null
           status: string
           todo_id: string
@@ -682,7 +686,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          mentee_description?: string | null
+          mentee_due_date?: string | null
           mentee_id: string
+          mentee_priority?: string | null
+          mentee_title?: string | null
           started_at?: string | null
           status?: string
           todo_id: string
@@ -694,7 +702,11 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          mentee_description?: string | null
+          mentee_due_date?: string | null
           mentee_id?: string
+          mentee_priority?: string | null
+          mentee_title?: string | null
           started_at?: string | null
           status?: string
           todo_id?: string
