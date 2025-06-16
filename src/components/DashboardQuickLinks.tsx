@@ -3,18 +3,12 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, MessageSquare, FileText, User } from 'lucide-react';
+import { MessageSquare, FileText, User } from 'lucide-react';
 
 const DashboardQuickLinks = () => {
   const navigate = useNavigate();
 
   const quickLinks = [
-    {
-      title: 'Schedule Session',
-      icon: Calendar,
-      onClick: () => navigate('/sessions'),
-      color: 'bg-blue-100 text-blue-600'
-    },
     {
       title: 'Messages',
       icon: MessageSquare,
@@ -39,7 +33,7 @@ const DashboardQuickLinks = () => {
     <Card className="border border-gray-200 shadow-sm">
       <CardContent className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {quickLinks.map((link) => (
             <Button
               key={link.title}

@@ -25,6 +25,15 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
+  // Calculate applications for current month
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  
+  const applicationsThisMonth = applications.filter(app => {
+    const appDate = new Date(app.date_applied);
+    return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
+  }).length;
+
   const navigationHandlers = useMemo(() => ({
     handleCVOptimizedClick: () => navigate('/course?module=cv-optimization'),
     handleInterviewPrepClick: () => navigate('/course?module=interview-preparation'),
@@ -39,7 +48,12 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
 
   return (
     <main className="max-w-7xl mx-auto pt-8 py-8 px-4 sm:px-6 bg-white">
-      <DashboardHeader user={user} firstName={firstName} />
+      <DashboardHeader 
+        user={user} 
+        firstName={firstName} 
+        applicationsThisMonth={applicationsThisMonth}
+        onTrackerClick={navigationHandlers.handleTrackerClick}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Career Progress Card */}
