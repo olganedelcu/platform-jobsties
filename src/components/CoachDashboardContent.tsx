@@ -10,7 +10,6 @@ import MenteesCard from '@/components/dashboard/MenteesCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
 import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
-import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Bell } from 'lucide-react';
@@ -136,10 +135,6 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
           <p className="text-3xl font-bold text-blue-600">{messageNotifications.length}</p>
           <p className="text-sm text-gray-500 mt-1">New messages</p>
         </div>
-      </div>
-
-      <div className="mt-8">
-        <DashboardQuickLinks />
       </div>
     </main>
   );
