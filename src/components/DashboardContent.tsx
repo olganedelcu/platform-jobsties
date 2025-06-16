@@ -10,6 +10,7 @@ import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
 import MessageCoachCard from '@/components/dashboard/MessageCoachCard';
+import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 
 interface DashboardContentProps {
   user: any;
@@ -86,6 +87,8 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
             applicationsThisMonth={applicationsThisMonth}
             onClick={() => navigate('/tracker')}
           />
+
+          <TasksInProgressCard userId={user?.id || ''} />
         </div>
       </div>
     </main>
