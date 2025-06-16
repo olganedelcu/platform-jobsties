@@ -2,15 +2,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
-import { useCourseProgress } from '@/hooks/useCourseProgress';
-import { courseModules } from '@/data/courseModules';
+import { useQuoteOfTheDay } from '@/hooks/useQuoteOfTheDay';
+import { useDashboardTaskBoard } from '@/hooks/useDashboardTaskBoard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
-import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
-import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
-import MessageCoachCard from '@/components/dashboard/MessageCoachCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
+import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
+import DashboardQuickLinks from '@/components/DashboardQuickLinks';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface DashboardContentProps {
   user: any;
@@ -18,78 +17,83 @@ interface DashboardContentProps {
 
 const DashboardContent = ({ user }: DashboardContentProps) => {
   const navigate = useNavigate();
-  const firstName = user?.user_metadata?.first_name || 'User';
-  const { applications } = useJobApplicationsData(user);
-  const { progress } = useCourseProgress({ id: user?.id || '' });
+  const firstName = user?.user_metadata?.first_name || user?.first_name || 'there';
   
-  // Calculate course progress based on completed modules (same as course page)
-  const calculateCourseProgress = () => {
-    const completedModules = progress.filter(p => p.completed).length;
-    return Math.min((completedModules / courseModules.length) * 100, 100);
-  };
-
-  const courseProgress = calculateCourseProgress();
-  
-  // Calculate applications this month
-  const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const applicationsThisMonth = applications.filter(app => 
-    new Date(app.date_applied) >= firstDayOfMonth
-  ).length;
-
-  // Get recent activity (last 7 days)
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  
-  const recentApplications = applications
-    .filter(app => new Date(app.date_applied) >= oneWeekAgo)
-    .sort((a, b) => new Date(b.date_applied).getTime() - new Date(a.date_applied).getTime())
-    .slice(0, 3);
+  const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
+  const { todaysQuote } = useQuoteOfTheDay();
+  const { tasks, loading: tasksLoading, updateTaskStatus } = useDashboardTaskBoard(user?.id);
 
   const handleCVOptimizedClick = () => {
-    navigate('/course');
+    navigate('/course?module=cv-optimization');
   };
 
   const handleInterviewPrepClick = () => {
-    navigate('/course');
+    navigate('/course?module=interview-preparation');
   };
 
   const handleSalaryNegotiationClick = () => {
-    navigate('/course');
+    navigate('/course?module=salary-negotiation');
   };
-  
+
+  if (loading) {
+    return (
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
       <DashboardHeader user={user} firstName={firstName} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column */}
-        <div className="space-y-8">
-          <CareerProgressCard
-            courseProgress={courseProgress}
-            onCVOptimizedClick={handleCVOptimizedClick}
-            onInterviewPrepClick={handleInterviewPrepClick}
-            onSalaryNegotiationClick={handleSalaryNegotiationClick}
-          />
+      {/* Quote of the day */}
+      {todaysQuote && (
+        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="p-6 text-center">
+            <blockquote className="text-lg font-medium text-gray-900 italic mb-2">
+              "{todaysQuote.text}"
+            </blockquote>
+            <cite className="text-sm text-blue-600 font-semibold">— {todaysQuote.author}</cite>
+          </CardContent>
+        </Card>
+      )}
 
-          <RecentActivityCard
-            recentApplications={recentApplications}
-            onViewAll={() => navigate('/tracker')}
-            onAddApplication={() => navigate('/tracker')}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        {/* Career Progress Card */}
+        <CareerProgressCard
+          courseProgress={courseProgress}
+          onCVOptimizedClick={handleCVOptimizedClick}
+          onInterviewPrepClick={handleInterviewPrepClick}
+          onSalaryNegotiationClick={handleSalaryNegotiationClick}
+        />
 
-          <MessageCoachCard />
+        {/* Tasks In Progress */}
+        <TasksInProgressCard
+          tasksCount={tasks.filter(t => t.status === 'in_progress').length}
+          onViewTasks={() => navigate('/todos')}
+        />
+
+        {/* Task Board */}
+        <div className="xl:col-span-1">
+          <DashboardTaskBoard
+            tasks={tasks}
+            loading={tasksLoading}
+            onStatusChange={updateTaskStatus}
+            onViewAll={() => navigate('/todos')}
+          />
         </div>
+      </div>
 
-        {/* Right Column */}
-        <div className="space-y-8">
-          <ApplicationsStatsCard
-            applicationsThisMonth={applicationsThisMonth}
-            onClick={() => navigate('/tracker')}
-          />
-
-          <TasksInProgressCard userId={user?.id || ''} />
-        </div>
+      <div className="mt-8">
+        <DashboardQuickLinks />
       </div>
     </main>
   );
