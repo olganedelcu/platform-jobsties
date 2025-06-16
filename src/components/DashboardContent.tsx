@@ -5,7 +5,6 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
-import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
 import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
 import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMonthCard';
@@ -68,9 +67,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
           loading={applicationsLoading}
           onClick={() => navigate('/tracker')}
         />
-
-        {/* Tasks In Progress */}
-        <TasksInProgressCard userId={user?.id} />
 
         {/* Recent Activity */}
         <MenteeRecentActivityCard
