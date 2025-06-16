@@ -83,12 +83,24 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
 
   return (
     <main className="max-w-7xl mx-auto pt-8 py-8 px-4 sm:px-6 bg-white">
-      <DashboardHeader 
-        user={user} 
-        firstName={firstName} 
-        applicationsThisMonth={applicationsThisWeek}
-        onTrackerClick={navigationHandlers.handleTrackerClick}
-      />
+      {/* Header section with greeting and applications card */}
+      <div className="flex items-start justify-between mb-8">
+        <DashboardHeader 
+          user={user} 
+          firstName={firstName} 
+          applicationsThisMonth={applicationsThisWeek}
+          onTrackerClick={navigationHandlers.handleTrackerClick}
+        />
+        
+        {/* Applications This Week Card - positioned in header area */}
+        <div className="flex-shrink-0 ml-8">
+          <ApplicationsThisMonthCard
+            applications={applications}
+            loading={applicationsLoading}
+            onClick={navigationHandlers.handleTrackerClick}
+          />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Career Progress Card */}
@@ -110,15 +122,6 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
         <div className="xl:col-span-1">
           <DashboardTaskBoard userId={user?.id} />
         </div>
-      </div>
-
-      {/* Applications This Week - Moved to bottom and made smaller */}
-      <div className="mt-8 max-w-md mx-auto">
-        <ApplicationsThisMonthCard
-          applications={applications}
-          loading={applicationsLoading}
-          onClick={navigationHandlers.handleTrackerClick}
-        />
       </div>
     </main>
   );
