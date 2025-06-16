@@ -29,7 +29,9 @@ const Messages = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navigation user={user} onSignOut={handleSignOut} />
-      <MessagingInterface initialConversationId={conversationId} />
+      <div className="pt-20">
+        <MessagingInterface initialConversationId={conversationId} />
+      </div>
     </div>
   );
 };

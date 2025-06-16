@@ -97,7 +97,7 @@ const Tracker = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-8 px-6">
+      <main className="max-w-7xl mx-auto pt-28 py-8 px-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Job Application Tracker</h1>
           <p className="text-gray-600 mt-2">Track and manage your job applications</p>

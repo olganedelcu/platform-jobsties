@@ -22,7 +22,9 @@ const Course = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navigation user={user} onSignOut={handleSignOut} />
-      <CourseContent userId={user.id} />
+      <div className="pt-20">
+        <CourseContent userId={user.id} />
+      </div>
     </div>
   );
 };
