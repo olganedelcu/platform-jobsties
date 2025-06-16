@@ -25,12 +25,45 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
-  // Calculate applications for this specific week (16th to 22nd) for header
-  const weekStart = new Date(2025, 5, 16); // June 16th, 2025 (month is 0-indexed)
-  weekStart.setHours(0, 0, 0, 0);
-  
-  const weekEnd = new Date(2025, 5, 22); // June 22nd, 2025
-  weekEnd.setHours(23, 59, 59, 999);
+  // Calculate current week period dynamically for header
+  const getCurrentWeekPeriod = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    let weekStart: Date;
+    let weekEnd: Date;
+    
+    if (currentDay >= 16 && currentDay <= 22) {
+      weekStart = new Date(currentYear, currentMonth, 16);
+      weekEnd = new Date(currentYear, currentMonth, 22);
+    } else if (currentDay >= 23 && currentDay <= 29) {
+      weekStart = new Date(currentYear, currentMonth, 23);
+      weekEnd = new Date(currentYear, currentMonth, 29);
+    } else if (currentDay >= 30 || currentDay <= 6) {
+      if (currentDay >= 30) {
+        weekStart = new Date(currentYear, currentMonth, 30);
+        weekEnd = new Date(currentYear, currentMonth + 1, 6);
+      } else {
+        weekStart = new Date(currentYear, currentMonth - 1, 30);
+        weekEnd = new Date(currentYear, currentMonth, 6);
+      }
+    } else if (currentDay >= 7 && currentDay <= 13) {
+      weekStart = new Date(currentYear, currentMonth, 7);
+      weekEnd = new Date(currentYear, currentMonth, 13);
+    } else {
+      weekStart = new Date(currentYear, currentMonth, 14);
+      weekEnd = new Date(currentYear, currentMonth, 15);
+    }
+    
+    weekStart.setHours(0, 0, 0, 0);
+    weekEnd.setHours(23, 59, 59, 999);
+    
+    return { weekStart, weekEnd };
+  };
+
+  const { weekStart, weekEnd } = getCurrentWeekPeriod();
   
   const applicationsThisWeek = applications.filter(app => {
     const appDate = new Date(app.date_applied);

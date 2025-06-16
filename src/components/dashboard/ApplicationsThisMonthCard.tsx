@@ -10,19 +10,65 @@ interface ApplicationsThisMonthCardProps {
 }
 
 const ApplicationsThisMonthCard = ({ applications, loading, onClick }: ApplicationsThisMonthCardProps) => {
-  // Calculate applications for this specific week (16th to 22nd)
-  const weekStart = new Date(2025, 5, 16); // June 16th, 2025 (month is 0-indexed)
-  weekStart.setHours(0, 0, 0, 0);
-  
-  const weekEnd = new Date(2025, 5, 22); // June 22nd, 2025
-  weekEnd.setHours(23, 59, 59, 999);
+  // Calculate current week period dynamically
+  const getCurrentWeekPeriod = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    let weekStart: Date;
+    let weekEnd: Date;
+    let weekLabel: string;
+    
+    if (currentDay >= 16 && currentDay <= 22) {
+      // 16th to 22nd
+      weekStart = new Date(currentYear, currentMonth, 16);
+      weekEnd = new Date(currentYear, currentMonth, 22);
+      weekLabel = "16th-22nd";
+    } else if (currentDay >= 23 && currentDay <= 29) {
+      // 23rd to 29th
+      weekStart = new Date(currentYear, currentMonth, 23);
+      weekEnd = new Date(currentYear, currentMonth, 29);
+      weekLabel = "23rd-29th";
+    } else if (currentDay >= 30 || currentDay <= 6) {
+      // 30th to 6th (crosses month boundary)
+      if (currentDay >= 30) {
+        weekStart = new Date(currentYear, currentMonth, 30);
+        weekEnd = new Date(currentYear, currentMonth + 1, 6);
+        weekLabel = "30th-6th";
+      } else {
+        // We're in the first 6 days, so the week started last month
+        weekStart = new Date(currentYear, currentMonth - 1, 30);
+        weekEnd = new Date(currentYear, currentMonth, 6);
+        weekLabel = "30th-6th";
+      }
+    } else if (currentDay >= 7 && currentDay <= 13) {
+      // 7th to 13th
+      weekStart = new Date(currentYear, currentMonth, 7);
+      weekEnd = new Date(currentYear, currentMonth, 13);
+      weekLabel = "7th-13th";
+    } else {
+      // 14th to 15th (partial week)
+      weekStart = new Date(currentYear, currentMonth, 14);
+      weekEnd = new Date(currentYear, currentMonth, 15);
+      weekLabel = "14th-15th";
+    }
+    
+    weekStart.setHours(0, 0, 0, 0);
+    weekEnd.setHours(23, 59, 59, 999);
+    
+    return { weekStart, weekEnd, weekLabel };
+  };
+
+  const { weekStart, weekEnd, weekLabel } = getCurrentWeekPeriod();
   
   const applicationsThisWeek = applications.filter(app => {
     const appDate = new Date(app.date_applied);
     return appDate >= weekStart && appDate <= weekEnd;
   }).length;
 
-  const weeklyTarget = 20;
+  const weeklyTarget = 30;
   const progressPercentage = Math.min((applicationsThisWeek / weeklyTarget) * 100, 100);
 
   if (loading) {
@@ -52,7 +98,7 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
         <div className="text-center">
           <div className="text-4xl font-bold text-blue-600 mb-2">{applicationsThisWeek}</div>
           <div className="text-sm text-gray-600 mb-2">Applications this week</div>
-          <div className="text-xs text-gray-500 mb-4">Target: {weeklyTarget} per week (16th-22nd)</div>
+          <div className="text-xs text-gray-500 mb-4">Target: {weeklyTarget} per week ({weekLabel})</div>
           
           {/* Progress bar */}
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
