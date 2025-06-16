@@ -33,17 +33,8 @@ const AssignmentsTabContent = ({
             variant="outline"
             className="flex items-center space-x-2"
           >
-            {currentViewMode === 'list' ? (
-              <>
-                <LayoutGrid className="h-4 w-4" />
-                <span>Board View</span>
-              </>
-            ) : (
-              <>
-                <List className="h-4 w-4" />
-                <span>List View</span>
-              </>
-            )}
+            <LayoutGrid className="h-4 w-4" />
+            <span>Board View</span>
           </Button>
         )}
       </div>
