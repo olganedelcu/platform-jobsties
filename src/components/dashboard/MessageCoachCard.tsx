@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Mail, Plus, Clock } from 'lucide-react';
+import { MessageCircle, Mail, Clock } from 'lucide-react';
 import { useConversations } from '@/hooks/useConversations';
 import { format } from 'date-fns';
 
@@ -43,7 +43,7 @@ const MessageCoachCard = () => {
 
         {!loading && recentConversations.length > 0 ? (
           <>
-            <ScrollArea className="h-44">
+            <ScrollArea className="h-48">
               <div className="space-y-1.5 pr-2">
                 {recentConversations.map((conversation) => (
                   <div 
@@ -73,7 +73,7 @@ const MessageCoachCard = () => {
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-2 border-t border-gray-200 space-y-1.5">
+            <div className="mt-2 pt-2 border-t border-gray-200">
               <Button 
                 onClick={handleMessageCoach}
                 variant="ghost"
@@ -81,14 +81,6 @@ const MessageCoachCard = () => {
                 className="w-full text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 text-sm h-7"
               >
                 View All Messages
-              </Button>
-              <Button 
-                onClick={handleMessageCoach}
-                size="sm"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm h-7"
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                New Message
               </Button>
             </div>
           </>
@@ -104,7 +96,6 @@ const MessageCoachCard = () => {
               size="sm"
               className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm h-7"
             >
-              <Plus className="h-3 w-3 mr-1" />
               Send Message
             </Button>
           </div>
