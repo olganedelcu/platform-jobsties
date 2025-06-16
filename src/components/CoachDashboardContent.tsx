@@ -40,6 +40,15 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
     return new Date(app.date_applied) >= oneWeekAgo;
   });
 
+  // Calculate applications for current month (for coach dashboard header)
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  
+  const applicationsThisMonth = applications.filter(app => {
+    const appDate = new Date(app.date_applied);
+    return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
+  }).length;
+
   // Sort recent applications by date (most recent first) - show all of them
   const sortedRecentApplications = recentApplications.sort((a, b) => 
     new Date(b.date_applied).getTime() - new Date(a.date_applied).getTime()
@@ -47,7 +56,12 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
 
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
-      <DashboardHeader user={user} firstName={firstName} />
+      <DashboardHeader 
+        user={user} 
+        firstName={firstName} 
+        applicationsThisMonth={applicationsThisMonth}
+        onTrackerClick={() => navigate('/coach/applications')}
+      />
 
       {/* Quote of the Day */}
       <QuoteOfTheDay />
