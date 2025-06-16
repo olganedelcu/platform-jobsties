@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import TodoColumn from './TodoColumn';
 import AddColumnDialog from './AddColumnDialog';
 import AddColumnButton from './AddColumnButton';
-import { useTaskTodoBoard } from '@/hooks/useTaskTodoBoard';
+import { useCoachTodosBoard } from '@/hooks/useCoachTodosBoard';
 
 interface TaskTodoBoardProps {
   coachId: string;
@@ -19,7 +19,7 @@ const TaskTodoBoard = ({ coachId }: TaskTodoBoardProps) => {
     updateTodo,
     deleteTodo,
     moveTodo
-  } = useTaskTodoBoard(coachId);
+  } = useCoachTodosBoard(coachId);
 
   const handleAddColumn = (title: string) => {
     addColumn(title);
