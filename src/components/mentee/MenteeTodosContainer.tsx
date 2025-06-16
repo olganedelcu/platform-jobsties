@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
-import MenteeTodosHeader from './MenteeTodosHeader';
 import MenteeTodosTabNavigation from './MenteeTodosTabNavigation';
 import AssignmentsTabContent from './AssignmentsTabContent';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
@@ -27,8 +26,6 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
 
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
-      <MenteeTodosHeader />
-
       <MenteeTodosTabNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
