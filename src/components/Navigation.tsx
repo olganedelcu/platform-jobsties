@@ -66,22 +66,25 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="bg-white shadow-sm border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                alt="Logo" 
-                className="h-8 w-auto"
-              />
+            <Link to="/dashboard" className="flex items-center space-x-3">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-2 rounded-2xl">
+                <img 
+                  src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
+                  alt="Logo" 
+                  className="h-8 w-auto filter brightness-0 invert"
+                />
+              </div>
+              <span className="text-xl font-bold text-gray-900">JobSties</span>
             </Link>
           </div>
 
           <DesktopNavigation navigationItems={navigationItems} />
 
-          <div className="hidden md:flex md:items-center md:space-x-4">
+          <div className="hidden md:flex md:items-center md:space-x-6">
             <NotificationDropdown />
             <UserProfileSection
               user={user}
@@ -91,7 +94,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
             />
           </div>
 
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="md:hidden flex items-center space-x-3">
             <NotificationDropdown />
             <div className="relative">
               <Link
@@ -106,6 +109,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
               variant="ghost"
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2"
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />

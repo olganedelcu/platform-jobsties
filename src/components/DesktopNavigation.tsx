@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LucideIcon, MessageCircle } from 'lucide-react';
@@ -17,22 +18,24 @@ const DesktopNavigation = ({ navigationItems }: DesktopNavigationProps) => {
   const location = useLocation();
 
   return (
-    <div className="hidden md:flex md:items-center md:space-x-8">
+    <div className="hidden md:flex md:items-center md:space-x-2">
       {navigationItems.map((item) => {
         const IconComponent = item.icon;
+        const isActive = location.pathname === item.path;
         
         return (
           <Link
             key={item.path}
             to={item.path}
-            className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              location.pathname === item.path
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-gray-700 hover:text-indigo-600 hover:bg-gray-50'
+            className={`flex items-center px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 relative ${
+              isActive
+                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-sm'
+                : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
             }`}
           >
-            <IconComponent className="h-4 w-4 mr-2" />
-            {item.label}
+            <IconComponent className="h-5 w-5 mr-3" />
+            <span>{item.label}</span>
+            {item.path === '/messages' && <MessageNotificationBadge />}
           </Link>
         );
       })}
