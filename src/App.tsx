@@ -29,7 +29,7 @@ import CoachCalendar from "./pages/coach/CoachCalendar";
 import JobRecommendations from "./pages/coach/JobRecommendations";
 import BackupManagementPage from "./pages/coach/BackupManagement";
 import CoachMessages from "./pages/coach/CoachMessages";
-import MenteeTodos from "./pages/MenteeTodos";
+import MenteeTodosPage from "./pages/MenteeTodosPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -75,7 +75,7 @@ const App = () => (
               <Route path="/messages" element={<Messages />} />
               <Route path="/tracker" element={<Tracker />} />
               <Route path="/course" element={<Course />} />
-              <Route path="/todos" element={<MenteeTodos />} />
+              <Route path="/todos" element={<MenteeTodosPage />} />
               
               {/* Coach Routes */}
               <Route path="/coach/signup" element={<CoachSignUp />} />

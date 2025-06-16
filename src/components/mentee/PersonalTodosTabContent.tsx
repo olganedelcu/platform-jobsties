@@ -37,11 +37,7 @@ const PersonalTodosTabContent = ({
   if (viewMode === 'board') {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">My Personal Tasks</h2>
-            <p className="text-gray-600">Manage your personal tasks in board view</p>
-          </div>
+        <div className="flex items-center justify-end">
           <Button
             onClick={() => onViewModeChange('list')}
             variant="outline"
@@ -59,28 +55,22 @@ const PersonalTodosTabContent = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">My Personal Tasks</h2>
-          <p className="text-gray-600">Create and manage your personal tasks</p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => onViewModeChange('board')}
-            variant="outline"
-            className="flex items-center space-x-2"
-          >
-            <LayoutGrid className="h-4 w-4" />
-            <span>Board View</span>
-          </Button>
-          <Button
-            onClick={onShowAddForm}
-            className="flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Add Task</span>
-          </Button>
-        </div>
+      <div className="flex items-center justify-end gap-3">
+        <Button
+          onClick={() => onViewModeChange('board')}
+          variant="outline"
+          className="flex items-center space-x-2"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          <span>Board View</span>
+        </Button>
+        <Button
+          onClick={onShowAddForm}
+          className="flex items-center space-x-2"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add Task</span>
+        </Button>
       </div>
 
       {showAddForm && (

@@ -1,18 +1,19 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { User } from 'lucide-react';
 import TodoColumn from '@/components/todos/TodoColumn';
-import { TodoColumnType, TodoItem } from '@/types/assignmentBoard';
+import AddColumnButton from '@/components/todos/AddColumnButton';
+import { TodoColumnType } from '@/types/assignmentBoard';
 
 interface AssignmentColumnGridProps {
   columns: TodoColumnType[];
-  onAddTodo: (columnId: string, todo: Omit<TodoItem, 'id'>) => void;
-  onUpdateTodo: (columnId: string, todoId: string, updates: Partial<TodoItem>) => void;
+  onAddTodo: (columnId: string, todo: any) => void;
+  onUpdateTodo: (columnId: string, todoId: string, updates: any) => void;
   onDeleteTodo: (columnId: string, todoId: string) => void;
-  onMoveTodo: (fromColumnId: string, toColumnId: string, todoId: string) => void;
+  onMoveTodo: (todoId: string, fromColumnId: string, toColumnId: string) => void;
   onShowAddColumn: () => void;
+  showCoachAssignedLabel?: boolean;
 }
 
 const AssignmentColumnGrid = ({
@@ -21,11 +22,26 @@ const AssignmentColumnGrid = ({
   onUpdateTodo,
   onDeleteTodo,
   onMoveTodo,
-  onShowAddColumn
+  onShowAddColumn,
+  showCoachAssignedLabel = false
 }: AssignmentColumnGridProps) => {
+  const enhanceColumns = (columns: TodoColumnType[]) => {
+    if (!showCoachAssignedLabel) return columns;
+    
+    return columns.map(column => ({
+      ...column,
+      todos: column.todos.map(todo => ({
+        ...todo,
+        isCoachAssigned: true
+      }))
+    }));
+  };
+
+  const enhancedColumns = enhanceColumns(columns);
+
   return (
     <div className="flex gap-6 overflow-x-auto pb-4">
-      {columns.map((column) => (
+      {enhancedColumns.map((column) => (
         <TodoColumn
           key={column.id}
           column={column}
@@ -33,22 +49,12 @@ const AssignmentColumnGrid = ({
           onUpdateTodo={(todoId, updates) => onUpdateTodo(column.id, todoId, updates)}
           onDeleteTodo={(todoId) => onDeleteTodo(column.id, todoId)}
           onMoveTodo={onMoveTodo}
-          allColumns={columns}
+          allColumns={enhancedColumns}
+          showCoachAssignedLabel={showCoachAssignedLabel}
         />
       ))}
       
-      <Card className="min-w-80 bg-gray-50">
-        <CardContent className="p-4">
-          <Button
-            variant="ghost"
-            onClick={onShowAddColumn}
-            className="w-full justify-start text-gray-600 hover:bg-gray-100"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add another list
-          </Button>
-        </CardContent>
-      </Card>
+      <AddColumnButton onAddColumn={onShowAddColumn} />
     </div>
   );
 };

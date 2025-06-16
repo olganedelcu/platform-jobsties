@@ -26,8 +26,8 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   return (
     <div className="p-6">
       <AssignmentBoardHeader
-        title="Assignments to Mentees"
-        description="Track and manage tasks assigned to your mentees"
+        title="Coach Assigned Tasks"
+        description="Track and manage tasks assigned by your coach"
         onAddColumn={() => setShowAddColumn(true)}
       />
 
@@ -38,6 +38,7 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
         onDeleteTodo={deleteTodo}
         onMoveTodo={moveTodo}
         onShowAddColumn={() => setShowAddColumn(true)}
+        showCoachAssignedLabel={true}
       />
 
       <AddColumnDialog
