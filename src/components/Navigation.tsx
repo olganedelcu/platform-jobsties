@@ -72,7 +72,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
               <img 
-                src="/lovable-uploads/3b078c02-4587-47e6-91c9-51ddab04b13c.png" 
+                src="/lovable-uploads/187c9aad-b772-4ca0-99ab-6bd2978bb1c2.png" 
                 alt="Platform Logo" 
                 className="h-12 w-auto"
               />
