@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,6 +11,7 @@ import JobApplicationRow from '@/components/JobApplicationRow';
 import NewApplicationRow from '@/components/NewApplicationRow';
 import DraftRestorationBanner from '@/components/DraftRestorationBanner';
 import AutoSaveIndicator from '@/components/AutoSaveIndicator';
+import JobApplicationsSearch from '@/components/JobApplicationsSearch';
 import { useDraftManagement } from '@/hooks/useDraftManagement';
 
 interface ExcelLikeJobApplicationsTableProps {
@@ -29,6 +30,7 @@ const ExcelLikeJobApplicationsTable = ({
   isCoachView = false
 }: ExcelLikeJobApplicationsTableProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [newApplicationData, setNewApplicationData] = useState<NewJobApplicationData>({
     dateApplied: format(new Date(), 'yyyy-MM-dd'),
     companyName: '',
@@ -53,6 +55,17 @@ const ExcelLikeJobApplicationsTable = ({
     handleDiscardDraft,
     handleDismissBanner
   } = useDraftManagement();
+
+  // Filter applications based on search term
+  const filteredApplications = useMemo(() => {
+    if (!searchTerm) return applications;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return applications.filter(application => 
+      application.company_name.toLowerCase().includes(lowerSearchTerm) ||
+      application.job_title.toLowerCase().includes(lowerSearchTerm)
+    );
+  }, [applications, searchTerm]);
 
   const handleAddNew = () => {
     setIsAddingNew(true);
@@ -110,6 +123,18 @@ const ExcelLikeJobApplicationsTable = ({
         )}
       </div>
 
+      {/* Search Section - only show for mentees */}
+      {!isCoachView && (
+        <div className="px-4 pt-4">
+          <JobApplicationsSearch
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            totalApplications={applications.length}
+            filteredApplications={filteredApplications.length}
+          />
+        </div>
+      )}
+
       {showRestorationBanner && (
         <div className="p-4 pb-0">
           <DraftRestorationBanner
@@ -144,7 +169,7 @@ const ExcelLikeJobApplicationsTable = ({
                   />
                 )}
                 
-                {applications.map((application) => (
+                {filteredApplications.map((application) => (
                   <JobApplicationRow
                     key={application.id}
                     application={application}
@@ -160,10 +185,21 @@ const ExcelLikeJobApplicationsTable = ({
                   />
                 ))}
                 
-                {applications.length === 0 && !isAddingNew && (
+                {filteredApplications.length === 0 && !isAddingNew && (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                      {isCoachView 
+                      {searchTerm ? (
+                        <>
+                          No applications found matching "{searchTerm}".
+                          <br />
+                          <button 
+                            onClick={() => setSearchTerm('')}
+                            className="text-blue-600 hover:text-blue-800 underline mt-2"
+                          >
+                            Clear search
+                          </button>
+                        </>
+                      ) : isCoachView 
                         ? "No applications found for this mentee." 
                         : "No job applications found. Click \"Add Application\" to get started!"
                       }
