@@ -36,7 +36,7 @@ const InterviewPreparationModule = ({
         {moduleAction === 'Book Call' && onBookCall && (
           <Button 
             onClick={onBookCall}
-            className="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
           >
             <Calendar className="h-4 w-4" />
             <span>Book Interview Preparation Call</span>

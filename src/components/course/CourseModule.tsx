@@ -78,14 +78,14 @@ const CourseModule = ({
                 ? 'bg-gray-100' 
                 : module.completed 
                 ? 'bg-green-100' 
-                : 'bg-gradient-to-r from-indigo-100 to-purple-100'
+                : 'bg-gradient-to-r from-blue-100 to-blue-200'
             }`}>
               {module.locked ? (
                 <Lock className="h-6 w-6 text-gray-400" />
               ) : module.completed ? (
                 <CheckCircle className="h-6 w-6 text-green-600" />
               ) : (
-                <Icon className="h-6 w-6 text-indigo-600" />
+                <Icon className="h-6 w-6 text-blue-600" />
               )}
             </div>
             <div>
@@ -106,14 +106,14 @@ const CourseModule = ({
                 <Button
                   onClick={handleMessageCoachClick}
                   variant="outline"
-                  className="text-indigo-600 border-indigo-300 hover:bg-indigo-50 px-4 py-2 text-sm flex items-center space-x-1"
+                  className="text-blue-600 border-blue-300 hover:bg-blue-50 px-4 py-2 text-sm flex items-center space-x-1"
                 >
                   <MessageCircle className="h-3 w-3" />
                   <span>Message Coach</span>
                 </Button>
                 <Button
                   onClick={handleActionClick}
-                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white px-4 py-2 text-sm"
+                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 text-sm"
                 >
                   {getActionText()}
                 </Button>
