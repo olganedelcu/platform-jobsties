@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseModule from '@/components/course/CourseModule';
-import ModuleFiles from '@/components/ModuleFiles';
-import MenteeCVFiles from '@/components/MenteeCVFiles';
 import { courseModules } from '@/data/courseModules';
 import { useCourseProgress } from '@/hooks/useCourseProgress';
 import { useConversations } from '@/hooks/useConversations';
@@ -122,38 +120,6 @@ const CourseContent = ({ userId }: CourseContentProps) => {
           />
         ))}
       </div>
-
-      {/* Add the Module Materials section for all shared files */}
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold mb-4">Module Materials</h2>
-        <p className="text-gray-600 mb-6">
-          Access all files and materials that have been shared by your coach across different modules.
-        </p>
-        
-        <div className="space-y-6">
-          <MenteeCVFiles userId={userId} />
-          <ModuleFiles 
-            userId={userId} 
-            moduleType="linkedin" 
-            title="LinkedIn & Cover Letter" 
-          />
-          <ModuleFiles 
-            userId={userId} 
-            moduleType="job_search_strategy" 
-            title="Job Search Strategy" 
-          />
-          <ModuleFiles 
-            userId={userId} 
-            moduleType="interview_preparation" 
-            title="Interview Preparation" 
-          />
-          <ModuleFiles 
-            userId={userId} 
-            moduleType="feedback" 
-            title="Feedback & Next Steps" 
-          />
-        </div>
-      </section>
     </main>
   );
 };
