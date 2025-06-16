@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Plus, Archive, Clock } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MessageCircle, Plus, Archive, Clock, MoreVertical } from 'lucide-react';
 import { Conversation } from '@/hooks/useConversations';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -11,6 +12,7 @@ interface ConversationsListProps {
   selectedConversationId: string | null;
   onSelectConversation: (conversationId: string) => void;
   onNewConversation: () => void;
+  onArchiveConversation: (conversationId: string) => void;
   loading: boolean;
 }
 
@@ -19,6 +21,7 @@ const ConversationsList = ({
   selectedConversationId,
   onSelectConversation,
   onNewConversation,
+  onArchiveConversation,
   loading
 }: ConversationsListProps) => {
   if (loading) {
@@ -70,19 +73,24 @@ const ConversationsList = ({
               {conversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`group relative p-3 rounded-lg cursor-pointer transition-colors ${
                     selectedConversationId === conversation.id
                       ? 'bg-blue-50 border border-blue-200'
                       : 'hover:bg-gray-50 border border-transparent'
                   }`}
-                  onClick={() => onSelectConversation(conversation.id)}
                 >
-                  <div className="flex items-start justify-between">
+                  <div 
+                    className="flex items-start justify-between pr-8"
+                    onClick={() => onSelectConversation(conversation.id)}
+                  >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-medium text-sm truncate">
                           {conversation.subject || 'No Subject'}
                         </h4>
+                        {conversation.status === 'archived' && (
+                          <Archive className="h-3 w-3 text-gray-400" />
+                        )}
                       </div>
                       <p className="text-xs text-gray-600 mb-1">
                         with {conversation.mentee_name || 'Coach Ana'}
@@ -94,17 +102,40 @@ const ConversationsList = ({
                       )}
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-1">
-                        {conversation.status === 'archived' && (
-                          <Archive className="h-3 w-3 text-gray-400" />
-                        )}
-                        <Clock className="h-3 w-3 text-gray-400" />
-                      </div>
+                      <Clock className="h-3 w-3 text-gray-400" />
                       <span className="text-xs text-gray-400">
                         {formatDistanceToNow(new Date(conversation.updated_at), { addSuffix: true })}
                       </span>
                     </div>
                   </div>
+
+                  {conversation.status !== 'archived' && (
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-6 w-6 p-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-3 w-3" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onArchiveConversation(conversation.id);
+                            }}
+                          >
+                            <Archive className="h-4 w-4 mr-2" />
+                            Archive
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

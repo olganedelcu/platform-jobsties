@@ -15,7 +15,7 @@ interface MessagingInterfaceProps {
 const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [showNewConversation, setShowNewConversation] = useState(false);
-  const { conversations, loading, createConversation } = useConversations();
+  const { conversations, loading, createConversation, updateConversationStatus } = useConversations();
   const { sendMessage, sending } = useMessages(selectedConversationId);
 
   // Set initial conversation if provided
@@ -42,6 +42,14 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
     }
   };
 
+  const handleArchiveConversation = async (conversationId: string) => {
+    await updateConversationStatus(conversationId, 'archived');
+    // If the archived conversation was selected, clear the selection
+    if (selectedConversationId === conversationId) {
+      setSelectedConversationId(null);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
       <div className="mb-6">
@@ -57,6 +65,7 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
             selectedConversationId={selectedConversationId}
             onSelectConversation={setSelectedConversationId}
             onNewConversation={() => setShowNewConversation(true)}
+            onArchiveConversation={handleArchiveConversation}
           />
         </div>
 
