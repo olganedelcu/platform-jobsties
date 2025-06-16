@@ -10,7 +10,6 @@ const CourseHeader = ({ progress = 0 }: CourseHeaderProps) => {
   return (
     <div className="mb-8">
       <h1 className="text-3xl font-bold text-gray-900">Career Development Course</h1>
-      <p className="text-gray-600 mt-2">Your personalized journey to career success</p>
       
       <div className="mt-4">
         <div className="flex items-center space-x-2">
