@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import ConversationsList from './ConversationsList';
 import MessageThreadContainer from './MessageThreadContainer';
+import MessageInput from './MessageInput';
 import NewConversationDialog from './NewConversationDialog';
 import { useConversations } from '@/hooks/useConversations';
+import { useMessages } from '@/hooks/useMessages';
 
 interface MessagingInterfaceProps {
   initialConversationId?: string | null;
@@ -14,6 +16,7 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [showNewConversation, setShowNewConversation] = useState(false);
   const { conversations, loading, createConversation } = useConversations();
+  const { sendMessage, sending } = useMessages(selectedConversationId);
 
   // Set initial conversation if provided
   useEffect(() => {
@@ -30,6 +33,12 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
     if (newConversation) {
       setSelectedConversationId(newConversation.id);
       setShowNewConversation(false);
+    }
+  };
+
+  const handleSendMessage = async (content: string, attachments?: File[]) => {
+    if (selectedConversationId) {
+      await sendMessage(content, attachments);
     }
   };
 
@@ -52,11 +61,20 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
         </div>
 
         <div className="lg:col-span-2">
-          <Card className="h-[600px]">
-            <MessageThreadContainer 
-              conversationId={selectedConversationId}
-            />
-          </Card>
+          <div className="flex flex-col h-[600px]">
+            <div className="flex-1">
+              <MessageThreadContainer 
+                conversationId={selectedConversationId}
+              />
+            </div>
+            {selectedConversationId && (
+              <MessageInput
+                onSendMessage={handleSendMessage}
+                sending={sending}
+                disabled={!selectedConversationId}
+              />
+            )}
+          </div>
         </div>
       </div>
 
