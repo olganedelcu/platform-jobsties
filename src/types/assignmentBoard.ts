@@ -7,6 +7,7 @@ export interface TodoItem {
   priority: 'low' | 'medium' | 'high';
   due_date?: string;
   assigned_date?: string;
+  assignedTo?: string; // For assignments board to show who it's assigned to
 }
 
 export interface TodoColumnType {

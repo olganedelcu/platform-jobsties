@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Edit2, Trash2, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, Edit2, Trash2, ArrowRight, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -20,6 +20,7 @@ interface TodoItem {
   priority: 'low' | 'medium' | 'high';
   due_date?: string;
   assigned_date?: string;
+  assignedTo?: string;
 }
 
 interface TodoColumn {
@@ -146,6 +147,14 @@ const TodoCard = ({ todo, onUpdate, onDelete, onMove, allColumns }: TodoCardProp
               )}
             </div>
           </div>
+
+          {/* Show assigned to info for assignments */}
+          {todo.assignedTo && (
+            <div className="flex items-center gap-1 text-xs text-blue-600 mt-2">
+              <User className="h-3 w-3" />
+              <span>Assigned to: {todo.assignedTo}</span>
+            </div>
+          )}
 
           {/* Hint for double-click editing */}
           <div className="text-xs text-gray-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">

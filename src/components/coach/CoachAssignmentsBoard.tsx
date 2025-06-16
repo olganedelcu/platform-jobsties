@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAssignmentBoard } from '@/hooks/useAssignmentBoard';
+import { useCoachAssignmentsBoard } from '@/hooks/useCoachAssignmentsBoard';
 import AssignmentBoardHeader from './AssignmentBoardHeader';
 import AssignmentColumnGrid from './AssignmentColumnGrid';
 import AddColumnDialog from '@/components/todos/AddColumnDialog';
@@ -16,7 +16,7 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
     updateTodo,
     deleteTodo,
     moveTodo
-  } = useAssignmentBoard(coachId);
+  } = useCoachAssignmentsBoard(coachId);
 
   const handleAddColumn = (title: string) => {
     addColumn(title);
@@ -26,8 +26,8 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
   return (
     <div className="p-6">
       <AssignmentBoardHeader
-        title="Assignment Board"
-        description="Track and manage task assignments"
+        title="Assignments to Mentees"
+        description="Track and manage tasks assigned to your mentees"
         onAddColumn={() => setShowAddColumn(true)}
       />
 
