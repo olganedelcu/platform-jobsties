@@ -25,16 +25,16 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
-  // Calculate applications for today (for header)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Calculate applications for this specific week (16th to 22nd) for header
+  const weekStart = new Date(2025, 5, 16); // June 16th, 2025 (month is 0-indexed)
+  weekStart.setHours(0, 0, 0, 0);
   
-  const endOfToday = new Date(today);
-  endOfToday.setHours(23, 59, 59, 999);
+  const weekEnd = new Date(2025, 5, 22); // June 22nd, 2025
+  weekEnd.setHours(23, 59, 59, 999);
   
-  const applicationsToday = applications.filter(app => {
+  const applicationsThisWeek = applications.filter(app => {
     const appDate = new Date(app.date_applied);
-    return appDate >= today && appDate <= endOfToday;
+    return appDate >= weekStart && appDate <= weekEnd;
   }).length;
 
   const navigationHandlers = useMemo(() => ({
@@ -54,7 +54,7 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
       <DashboardHeader 
         user={user} 
         firstName={firstName} 
-        applicationsThisMonth={applicationsToday}
+        applicationsThisMonth={applicationsThisWeek}
         onTrackerClick={navigationHandlers.handleTrackerClick}
       />
 
@@ -67,7 +67,7 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
           onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
         />
 
-        {/* Applications Today */}
+        {/* Applications This Week */}
         <ApplicationsThisMonthCard
           applications={applications}
           loading={applicationsLoading}
