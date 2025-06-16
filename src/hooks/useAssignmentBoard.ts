@@ -145,9 +145,7 @@ export const useAssignmentBoard = (coachId: string) => {
     const toColumn = columns.find(col => col.id === toColumnId);
     if (toColumn) {
       if (toColumn.title === 'Pending') newStatus = 'pending';
-      else if (toColumn.title === 'In Progress') newStatus = '
-
-in_progress';  
+      else if (toColumn.title === 'In Progress') newStatus = 'in_progress';
       else if (toColumn.title === 'Completed') newStatus = 'completed';
     }
 
