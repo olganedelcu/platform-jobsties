@@ -49,54 +49,54 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <Card className="w-full h-full border-indigo-200 flex flex-col">
-        <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
-          <CardTitle className="text-indigo-900">Loading messages...</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 flex-1">
+      <div className="h-full flex flex-col">
+        <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
+          <div className="text-gray-900 font-medium">Loading messages...</div>
+        </div>
+        <div className="p-6 flex-1">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-16 bg-indigo-100 rounded-lg"></div>
+                <div className="h-16 bg-gray-200 rounded-lg"></div>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   if (messages.length === 0) {
     return (
-      <Card className="w-full h-full border-indigo-200 flex flex-col">
-        <CardHeader className="bg-indigo-50 border-b border-indigo-100 flex-shrink-0">
-          <CardTitle className="text-indigo-900 flex items-center gap-2">
+      <div className="h-full flex flex-col">
+        <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
+          <div className="text-gray-900 font-medium flex items-center gap-2">
             <User className="h-5 w-5" />
             {conversationSubject || 'Conversation'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center flex-1">
-          <div className="text-center text-indigo-600">
-            <User className="h-12 w-12 mx-auto mb-3 text-indigo-400" />
-            <p className="text-indigo-700 font-medium">No messages yet</p>
-            <p className="text-sm text-indigo-500 mt-1">Start the conversation below</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="flex items-center justify-center flex-1">
+          <div className="text-center text-gray-500">
+            <User className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+            <p className="text-gray-700 font-medium">No messages yet</p>
+            <p className="text-sm text-gray-500 mt-1">Start the conversation below</p>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full h-full flex flex-col border-indigo-200 overflow-hidden">
-      <CardHeader className="flex-shrink-0 bg-indigo-50 border-b border-indigo-100">
-        <CardTitle className="flex items-center gap-2 text-indigo-900">
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200 p-4">
+        <div className="flex items-center gap-2 text-gray-900 font-medium">
           <User className="h-5 w-5" />
           {conversationSubject || 'Conversation'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 p-0 overflow-hidden">
+        </div>
+      </div>
+      <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full w-full" ref={scrollAreaRef}>
-          <div className="flex flex-col space-y-2 p-3">
+          <div className="flex flex-col space-y-4 p-4">
             {messages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
@@ -107,51 +107,51 @@ const MessageThread = ({
                   className={`flex w-full ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[70%] px-3 py-2 rounded-lg break-words overflow-wrap-anywhere shadow-sm ${
+                    className={`max-w-[70%] px-4 py-3 rounded-lg break-words overflow-wrap-anywhere shadow-sm ${
                       isCurrentUser
-                        ? 'bg-indigo-600 text-white rounded-br-sm'
+                        ? 'bg-blue-600 text-white rounded-br-sm'
                         : isCoach
-                        ? 'bg-purple-100 text-purple-900 border border-purple-200 rounded-bl-sm'
+                        ? 'bg-purple-50 text-purple-900 border border-purple-200 rounded-bl-sm'
                         : 'bg-gray-100 text-gray-900 border border-gray-200 rounded-bl-sm'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center gap-2 mb-2">
                       {isCoach ? (
-                        <Bot className="h-3.5 w-3.5 flex-shrink-0" />
+                        <Bot className="h-4 w-4 flex-shrink-0" />
                       ) : (
-                        <User className="h-3.5 w-3.5 flex-shrink-0" />
+                        <User className="h-4 w-4 flex-shrink-0" />
                       )}
-                      <span className="text-xs font-medium">
+                      <span className="text-sm font-medium">
                         {isCurrentUser ? 'You' : message.sender_name || 'Unknown'}
                       </span>
                       {isCoach && (
-                        <Badge variant="secondary" className="text-xs px-1 py-0 bg-purple-200 text-purple-800">
+                        <Badge variant="secondary" className="text-xs px-2 py-0 bg-purple-100 text-purple-700">
                           Coach
                         </Badge>
                       )}
                     </div>
                     
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere mb-1">{message.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere mb-2">{message.content}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
-                      <div className="mt-1.5 space-y-1">
+                      <div className="mt-2 space-y-2">
                         {message.attachments.map((attachment) => (
                           <div
                             key={attachment.id}
-                            className={`flex items-center gap-1.5 p-1.5 rounded text-xs ${
-                              isCurrentUser ? 'bg-indigo-700' : 'bg-gray-200'
+                            className={`flex items-center gap-2 p-2 rounded text-sm ${
+                              isCurrentUser ? 'bg-blue-700' : 'bg-gray-200'
                             }`}
                           >
-                            <Paperclip className="h-3.5 w-3.5 flex-shrink-0" />
+                            <Paperclip className="h-4 w-4 flex-shrink-0" />
                             <span className="truncate flex-1 min-w-0">
                               {attachment.file_name}
                             </span>
                             <Button
                               size="sm"
                               variant="ghost"
-                              className={`h-5 w-5 p-0 flex-shrink-0 ${
+                              className={`h-6 w-6 p-0 flex-shrink-0 ${
                                 isCurrentUser 
-                                  ? 'hover:bg-indigo-800 text-indigo-100' 
+                                  ? 'hover:bg-blue-800 text-blue-100' 
                                   : 'hover:bg-gray-300 text-gray-600'
                               }`}
                               onClick={() => onDownloadAttachment(attachment)}
@@ -163,10 +163,10 @@ const MessageThread = ({
                       </div>
                     )}
                     
-                    <div className="mt-1 text-right">
+                    <div className="mt-2 text-right">
                       <span
                         className={`text-xs ${
-                          isCurrentUser ? 'text-indigo-200' : 'text-gray-500'
+                          isCurrentUser ? 'text-blue-100' : 'text-gray-500'
                         }`}
                       >
                         {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
@@ -180,8 +180,8 @@ const MessageThread = ({
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
