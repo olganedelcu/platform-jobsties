@@ -8,7 +8,6 @@ import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
 import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
 import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMonthCard';
-import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 
 interface DashboardContentProps {
@@ -100,13 +99,6 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
           onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
         />
 
-        {/* Applications This Week */}
-        <ApplicationsThisMonthCard
-          applications={applications}
-          loading={applicationsLoading}
-          onClick={navigationHandlers.handleTrackerClick}
-        />
-
         {/* Recent Activity */}
         <MenteeRecentActivityCard
           user={user}
@@ -120,9 +112,13 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
         </div>
       </div>
 
-      {/* Quick Links */}
-      <div className="mt-8">
-        <DashboardQuickLinks />
+      {/* Applications This Week - Moved to bottom and made smaller */}
+      <div className="mt-8 max-w-md mx-auto">
+        <ApplicationsThisMonthCard
+          applications={applications}
+          loading={applicationsLoading}
+          onClick={navigationHandlers.handleTrackerClick}
+        />
       </div>
     </main>
   );
