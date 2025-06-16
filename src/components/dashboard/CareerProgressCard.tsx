@@ -35,19 +35,19 @@ const CareerProgressCard = ({
         {/* Progress Icons */}
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center cursor-pointer" onClick={onCVOptimizedClick}>
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-2 mx-auto hover:bg-green-200 transition-colors">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2 mx-auto hover:bg-green-200 transition-colors">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <div className="text-xs text-gray-700 font-medium">CV Optimized</div>
           </div>
           <div className="text-center cursor-pointer" onClick={onInterviewPrepClick}>
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-2 mx-auto hover:bg-blue-200 transition-colors">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2 mx-auto hover:bg-blue-200 transition-colors">
               <Clock className="w-5 h-5 text-blue-600" />
             </div>
             <div className="text-xs text-gray-700 font-medium">Interview Prep</div>
           </div>
           <div className="text-center cursor-pointer" onClick={onSalaryNegotiationClick}>
-            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-2 mx-auto hover:bg-gray-200 transition-colors">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2 mx-auto hover:bg-gray-200 transition-colors">
               <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
             </div>
             <div className="text-xs text-gray-700 font-medium">Salary Negotiation</div>
