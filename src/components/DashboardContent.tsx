@@ -7,7 +7,6 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
-import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface DashboardContentProps {
@@ -80,10 +79,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
         <div className="xl:col-span-1">
           <DashboardTaskBoard userId={user?.id} />
         </div>
-      </div>
-
-      <div className="mt-8">
-        <DashboardQuickLinks />
       </div>
     </main>
   );
