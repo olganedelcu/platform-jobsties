@@ -1,87 +1,191 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { usePagePerformance } from '@/hooks/usePagePerformance';
+import React, { useState, useEffect, memo, useMemo } from 'react';
+import { useAuthState } from '@/hooks/useAuthState';
+import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import Navigation from '@/components/Navigation';
-import { ExcelLikeJobApplicationsTable } from '@/components/ExcelLikeJobApplicationsTable';
-import { Loader2 } from 'lucide-react';
+import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
+import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobRecommendations';
+import { Card, CardContent } from '@/components/ui/card';
+import { BarChart, TrendingUp, Target, Award, Loader2 } from 'lucide-react';
 
-const Tracker = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  
-  usePagePerformance('Tracker');
+const StatsCard = memo(({ title, value, icon: Icon, color }: {
+  title: string;
+  value: number;
+  icon: React.ComponentType<any>;
+  color: string;
+}) => (
+  <Card>
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
+          <p className={`text-2xl font-bold ${color}`}>{value}</p>
+        </div>
+        <Icon className={`h-8 w-8 ${color}`} />
+      </div>
+    </CardContent>
+  </Card>
+));
 
+StatsCard.displayName = 'StatsCard';
+
+const Tracker = memo(() => {
+  const { user, loading: authLoading, handleSignOut } = useAuthState();
+  const [isPageReady, setIsPageReady] = useState(false);
+
+  const {
+    applications,
+    loading: applicationsLoading,
+    handleAddApplication,
+    handleUpdateApplication,
+    handleDeleteApplication
+  } = useJobApplicationsData(user);
+
+  // Preserve scroll position
   useEffect(() => {
-    checkAuth();
+    const savedScrollPosition = localStorage.getItem('tracker-scroll-position');
+    if (savedScrollPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedScrollPosition, 10));
+      }, 100);
+    }
+    setIsPageReady(true);
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error || !user) {
-        navigate('/login');
-        return;
+  useEffect(() => {
+    const handleScroll = () => {
+      try {
+        localStorage.setItem('tracker-scroll-position', window.scrollY.toString());
+      } catch (error) {
+        console.error('Failed to save scroll position:', error);
       }
+    };
 
-      setUser(user);
-    } catch (error: any) {
-      console.error('Auth check error:', error);
-      toast({
-        title: "Error",
-        description: "Authentication failed",
-        variant: "destructive"
-      });
-      navigate('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate('/login');
-    } catch (error: any) {
-      console.error('Sign out error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive"
-      });
-    }
-  };
+  // Clean up scroll position on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        localStorage.removeItem('tracker-scroll-position');
+      } catch (error) {
+        console.error('Failed to clean up tracker localStorage:', error);
+      }
+    };
+  }, []);
 
-  if (loading) {
+  // Memoize statistics calculations
+  const statistics = useMemo(() => {
+    const totalApplications = applications.length;
+    const interviewingCount = applications.filter(app => app.application_status === 'interviewing').length;
+    const offersCount = applications.filter(app => app.application_status === 'offer').length;
+    
+    const applicationsThisMonth = applications.filter(app => {
+      const appDate = new Date(app.date_applied);
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
+    }).length;
+
+    return {
+      totalApplications,
+      interviewingCount,
+      offersCount,
+      applicationsThisMonth
+    };
+  }, [applications]);
+
+  if (authLoading || !isPageReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading tracker...</div>
+          <div className="text-lg">Loading...</div>
         </div>
       </div>
     );
   }
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <div className="text-lg">Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
-      <div className="pt-20">
-        <main className="max-w-7xl mx-auto py-8 px-6">
-          <ExcelLikeJobApplicationsTable />
-        </main>
-      </div>
+      
+      <main className="max-w-7xl mx-auto pt-28 py-8 px-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Job Application Tracker</h1>
+          <p className="text-gray-600 mt-2">Track and manage your job applications</p>
+        </div>
+
+        {/* Enhanced Job Recommendations Section with Archive System */}
+        <div className="mb-8">
+          <EnhancedWeeklyJobRecommendations userId={user.id} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatsCard 
+            title="Total Applications" 
+            value={statistics.totalApplications} 
+            icon={BarChart} 
+            color="text-indigo-600" 
+          />
+          <StatsCard 
+            title="Interviewing" 
+            value={statistics.interviewingCount} 
+            icon={TrendingUp} 
+            color="text-green-600" 
+          />
+          <StatsCard 
+            title="Offers Received" 
+            value={statistics.offersCount} 
+            icon={Target} 
+            color="text-purple-600" 
+          />
+          <StatsCard 
+            title="Applications this month" 
+            value={statistics.applicationsThisMonth} 
+            icon={Award} 
+            color="text-orange-600" 
+          />
+        </div>
+
+        <div className="space-y-8">
+          {applicationsLoading ? (
+            <div className="text-center py-8">
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                <div className="text-lg">Loading applications...</div>
+              </div>
+            </div>
+          ) : (
+            <ExcelLikeJobApplicationsTable
+              applications={applications}
+              onAddApplication={handleAddApplication}
+              onUpdateApplication={handleUpdateApplication}
+              onDeleteApplication={handleDeleteApplication}
+              isCoachView={false}
+            />
+          )}
+        </div>
+      </main>
     </div>
   );
-};
+});
+
+Tracker.displayName = 'Tracker';
 
 export default Tracker;

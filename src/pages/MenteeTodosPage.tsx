@@ -1,21 +1,19 @@
 
 import React from 'react';
 import { useMenteeTodosAuth } from '@/hooks/useMenteeTodosAuth';
-import { usePagePerformance } from '@/hooks/usePagePerformance';
 import Navigation from '@/components/Navigation';
 import { Loader2 } from 'lucide-react';
 import MenteeTodosTabsContent from '@/components/mentee/MenteeTodosTabsContent';
 
 const MenteeTodosPage = () => {
   const { user, loading, handleSignOut } = useMenteeTodosAuth();
-  usePagePerformance('Todos');
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading tasks...</div>
+          <div className="text-lg">Loading...</div>
         </div>
       </div>
     );
@@ -23,7 +21,7 @@ const MenteeTodosPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
           <div className="text-lg">Loading...</div>
