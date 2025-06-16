@@ -32,25 +32,25 @@ const RecommendationCard = ({
     : recommendation.description;
 
   return (
-    <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
+    <div className="border rounded-lg p-3 bg-white hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <h4 className="font-semibold text-gray-900 mb-2">{recommendation.job_title}</h4>
+          <h4 className="font-semibold text-gray-900 mb-1 text-sm">{recommendation.job_title}</h4>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <Building2 className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
+            <Building2 className="h-3 w-3" />
             <span>{recommendation.company_name}</span>
           </div>
           
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
             <Calendar className="h-3 w-3" />
             <span>For week of {format(new Date(recommendation.week_start_date), 'MMM dd, yyyy')}</span>
           </div>
 
           {/* Description Section */}
           {recommendation.description && (
-            <div className="mb-3">
-              <p className="text-sm text-gray-600 leading-relaxed">
+            <div className="mb-2">
+              <p className="text-xs text-gray-600 leading-relaxed">
                 {displayDescription}
               </p>
               {shouldTruncate && (
@@ -78,9 +78,9 @@ const RecommendationCard = ({
           variant="outline"
           size="sm"
           onClick={() => onViewJob(recommendation.job_link)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 text-xs px-2 py-1 h-7"
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-3 w-3" />
           View Job
         </Button>
 
@@ -90,16 +90,16 @@ const RecommendationCard = ({
             size="sm"
             onClick={() => onMarkAsApplied(recommendation)}
             disabled={isAddingToTracker}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]"
+            className="flex items-center gap-1 bg-green-600 hover:bg-green-700 min-w-[100px] text-xs px-2 py-1 h-7"
           >
             {isAddingToTracker ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3 w-3 animate-spin" />
                 Adding...
               </>
             ) : (
               <>
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className="h-3 w-3" />
                 Mark Applied
               </>
             )}

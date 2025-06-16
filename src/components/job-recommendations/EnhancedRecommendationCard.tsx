@@ -99,19 +99,19 @@ const EnhancedRecommendationCard = ({
   };
 
   return (
-    <div className="border rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
+    <div className="border rounded-lg p-3 bg-white hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h4 className="font-semibold text-gray-900">{recommendation.job_title}</h4>
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className="font-semibold text-gray-900 text-sm">{recommendation.job_title}</h4>
             <Badge className={`text-xs flex items-center gap-1 ${getStatusColor(recommendation.status)}`}>
               {getStatusIcon(recommendation.status)}
               {recommendation.status || 'active'}
             </Badge>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <Building2 className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
+            <Building2 className="h-3 w-3" />
             <span>{recommendation.company_name}</span>
           </div>
           
@@ -121,7 +121,7 @@ const EnhancedRecommendationCard = ({
           </div>
           
           {recommendation.applied_date && (
-            <div className="flex items-center gap-2 text-xs text-green-600 mb-3">
+            <div className="flex items-center gap-2 text-xs text-green-600 mb-2">
               <CheckCircle className="h-3 w-3" />
               <span>Applied on {format(new Date(recommendation.applied_date), 'MMM dd, yyyy')}</span>
             </div>
@@ -129,8 +129,8 @@ const EnhancedRecommendationCard = ({
 
           {/* Description Section */}
           {recommendation.description && (
-            <div className="mb-3">
-              <p className="text-sm text-gray-600 leading-relaxed">
+            <div className="mb-2">
+              <p className="text-xs text-gray-600 leading-relaxed">
                 {displayDescription}
               </p>
               {shouldTruncate && (
@@ -151,9 +151,9 @@ const EnhancedRecommendationCard = ({
           variant="outline"
           size="sm"
           onClick={() => onViewJob(recommendation.job_link)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 text-xs px-2 py-1 h-7"
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-3 w-3" />
           View Job
         </Button>
 
@@ -163,16 +163,16 @@ const EnhancedRecommendationCard = ({
             size="sm"
             onClick={handleMarkAsApplied}
             disabled={loading || isMarkingAsApplied}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]"
+            className="flex items-center gap-1 bg-green-600 hover:bg-green-700 min-w-[100px] text-xs px-2 py-1 h-7"
           >
             {isMarkingAsApplied ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-3 w-3 animate-spin" />
                 Adding...
               </>
             ) : (
               <>
-                <CheckCircle className="h-4 w-4" />
+                <CheckCircle className="h-3 w-3" />
                 Mark Applied
               </>
             )}
@@ -185,12 +185,12 @@ const EnhancedRecommendationCard = ({
             size="sm"
             onClick={handleArchive}
             disabled={loading || isArchiving}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 text-xs px-2 py-1 h-7"
           >
             {isArchiving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
-              <Archive className="h-4 w-4" />
+              <Archive className="h-3 w-3" />
             )}
             Archive
           </Button>
@@ -202,12 +202,12 @@ const EnhancedRecommendationCard = ({
             size="sm"
             onClick={handleReactivate}
             disabled={loading || isReactivating}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1 text-xs px-2 py-1 h-7"
           >
             {isReactivating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3 w-3 animate-spin" />
             ) : (
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-3 w-3" />
             )}
             Reactivate
           </Button>
