@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Clock } from 'lucide-react';
+import { MessageCircle, Mail, Clock } from 'lucide-react';
 import { useConversations } from '@/hooks/useConversations';
 import { format } from 'date-fns';
 
@@ -28,8 +28,8 @@ const MessageCoachCard = () => {
       <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            Coach Messages 
-            <span className="text-indigo-600">@</span>
+            <Mail className="h-4 w-4 text-indigo-600" />
+            Coach Messages
           </h3>
           <MessageCircle className="h-4 w-4 text-indigo-600" />
         </div>
