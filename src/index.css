@@ -33,7 +33,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 217.2 91.2% 59.8%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -108,12 +108,12 @@
 
   ::-webkit-scrollbar-track {
     @apply bg-muted;
-    border-radius: 4px;
+    border-radius: 1rem;
   }
 
   ::-webkit-scrollbar-thumb {
     @apply bg-border hover:bg-muted-foreground/50;
-    border-radius: 4px;
+    border-radius: 1rem;
   }
 
   ::-webkit-scrollbar-thumb:hover {
