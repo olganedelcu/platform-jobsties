@@ -24,8 +24,7 @@ const InterviewPreparationModule = ({
   return (
     <div className="space-y-6">
       <p className="text-gray-700">
-        Prepare for interviews with comprehensive guidance on common questions, body language, 
-        and how to showcase your skills effectively.
+        Prepare for interviews with Mock Interviews calls, scripts, and rehearsal. Learn about story telling with Ana.
       </p>
       <ModuleFiles 
         userId={userId} 
