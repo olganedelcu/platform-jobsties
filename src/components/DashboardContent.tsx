@@ -2,11 +2,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
 import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
+import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMonthCard';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
 
 interface DashboardContentProps {
@@ -18,6 +20,7 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   const firstName = user?.user_metadata?.first_name || user?.first_name || 'there';
   
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
+  const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
   const handleCVOptimizedClick = () => {
     navigate('/course?module=cv-optimization');
@@ -57,6 +60,13 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
           onCVOptimizedClick={handleCVOptimizedClick}
           onInterviewPrepClick={handleInterviewPrepClick}
           onSalaryNegotiationClick={handleSalaryNegotiationClick}
+        />
+
+        {/* Applications This Month */}
+        <ApplicationsThisMonthCard
+          applications={applications}
+          loading={applicationsLoading}
+          onClick={() => navigate('/tracker')}
         />
 
         {/* Tasks In Progress */}
