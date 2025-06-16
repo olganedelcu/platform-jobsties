@@ -1,4 +1,3 @@
-
 import { FormspreeNotificationService } from './formspreeNotificationService';
 
 interface PendingNotification {
@@ -15,7 +14,7 @@ interface PendingNotification {
 class BundledNotificationManager {
   private pendingNotifications: Map<string, PendingNotification[]> = new Map();
   private timers: Map<string, NodeJS.Timeout> = new Map();
-  private readonly BUNDLE_DELAY = 5 * 60 * 1000; // 5 minutes
+  private readonly BUNDLE_DELAY = 2 * 60 * 60 * 1000; // 2 hours
   private formspreeEndpoint: string = '';
 
   setFormspreeEndpoint(endpoint: string) {
