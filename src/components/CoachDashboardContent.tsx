@@ -45,7 +45,7 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
   );
 
   return (
-    <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+    <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
       <DashboardHeader user={user} firstName={firstName} />
 
       {/* Message Notifications Card - Show prominently if there are unread messages */}

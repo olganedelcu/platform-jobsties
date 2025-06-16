@@ -27,7 +27,7 @@ const Messages = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Navigation user={user} onSignOut={handleSignOut} />
       <MessagingInterface initialConversationId={conversationId} />
     </div>

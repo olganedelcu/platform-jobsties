@@ -60,7 +60,7 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   };
   
   return (
-    <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
+    <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
       <DashboardHeader user={user} firstName={firstName} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

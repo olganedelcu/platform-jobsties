@@ -22,7 +22,7 @@ const CoachDashboard = () => {
 
   return (
     <ProtectedCoachRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <CoachNavigation user={user} onSignOut={handleSignOut} />
         <CoachDashboardContent user={user} />
       </div>
