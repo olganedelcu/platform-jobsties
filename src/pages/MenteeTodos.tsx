@@ -10,14 +10,18 @@ import MenteeTodosContainer from '@/components/mentee/MenteeTodosContainer';
 import MenteeAssignmentsList from '@/components/MenteeAssignmentsList';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { LayoutGrid, List } from 'lucide-react';
 import { useDashboardTaskBoard } from '@/hooks/useDashboardTaskBoard';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
+import CoachAssignmentsBoard from '@/components/coach/CoachAssignmentsBoard';
 
 const MenteeTodos = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [assignmentsViewMode, setAssignmentsViewMode] = useState<'list' | 'board'>('list');
 
   // Get personal tasks and assignments
   const { tasks: personalTasks, loading: personalLoading } = useDashboardTaskBoard(user?.id || '');
@@ -104,11 +108,6 @@ const MenteeTodos = () => {
       <Navigation user={user} onSignOut={handleSignOut} />
       <div className="pt-20">
         <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tasks</h1>
-            <p className="text-gray-600">Manage your personal tasks and coach assignments</p>
-          </div>
-
           {/* Task Overview Stats */}
           <div className="grid grid-cols-3 gap-6 mb-8">
             <Card>
@@ -157,13 +156,36 @@ const MenteeTodos = () => {
               <div className="space-y-6">
                 {assignments.length > 0 && (
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      Coach Assignments
-                      <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                        {assignments.length}
-                      </Badge>
-                    </h2>
-                    <MenteeAssignmentsList userId={user.id} />
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                        Coach Assignments
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                          {assignments.length}
+                        </Badge>
+                      </h2>
+                      <Button
+                        onClick={() => setAssignmentsViewMode(assignmentsViewMode === 'list' ? 'board' : 'list')}
+                        variant="outline"
+                        className="flex items-center space-x-2"
+                      >
+                        {assignmentsViewMode === 'list' ? (
+                          <>
+                            <LayoutGrid className="h-4 w-4" />
+                            <span>Board View</span>
+                          </>
+                        ) : (
+                          <>
+                            <List className="h-4 w-4" />
+                            <span>List View</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {assignmentsViewMode === 'list' ? (
+                      <MenteeAssignmentsList userId={user.id} />
+                    ) : (
+                      <CoachAssignmentsBoard coachId={user.id} />
+                    )}
                   </div>
                 )}
 
@@ -184,7 +206,33 @@ const MenteeTodos = () => {
             </TabsContent>
 
             <TabsContent value="assignments" className="mt-6">
-              <MenteeAssignmentsList userId={user.id} />
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-900">Tasks from Your Coach</h2>
+                  <Button
+                    onClick={() => setAssignmentsViewMode(assignmentsViewMode === 'list' ? 'board' : 'list')}
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                  >
+                    {assignmentsViewMode === 'list' ? (
+                      <>
+                        <LayoutGrid className="h-4 w-4" />
+                        <span>Board View</span>
+                      </>
+                    ) : (
+                      <>
+                        <List className="h-4 w-4" />
+                        <span>List View</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {assignmentsViewMode === 'list' ? (
+                  <MenteeAssignmentsList userId={user.id} />
+                ) : (
+                  <CoachAssignmentsBoard coachId={user.id} />
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </main>
