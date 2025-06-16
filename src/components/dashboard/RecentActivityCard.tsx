@@ -61,7 +61,6 @@ const RecentActivityCard = ({ recentApplications, onViewAll, onAddApplication }:
                     <div className="flex flex-col items-end">
                       <Badge 
                         variant="outline" 
-                        size="sm"
                         className={`text-xs px-1 py-0 ${
                           application.application_status === 'applied' ? 'bg-blue-50 text-blue-700' :
                           application.application_status === 'interviewing' ? 'bg-purple-50 text-purple-700' :

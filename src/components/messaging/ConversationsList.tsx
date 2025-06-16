@@ -10,7 +10,7 @@ interface ConversationsListProps {
   conversations: Conversation[];
   selectedConversationId: string | null;
   onSelectConversation: (conversationId: string) => void;
-  onCreateConversation: () => void;
+  onNewConversation: () => void;
   loading: boolean;
 }
 
@@ -18,7 +18,7 @@ const ConversationsList = ({
   conversations,
   selectedConversationId,
   onSelectConversation,
-  onCreateConversation,
+  onNewConversation,
   loading
 }: ConversationsListProps) => {
   if (loading) {
@@ -51,7 +51,7 @@ const ConversationsList = ({
             <MessageCircle className="h-5 w-5" />
             Conversations
           </CardTitle>
-          <Button size="sm" onClick={onCreateConversation}>
+          <Button size="sm" onClick={onNewConversation}>
             <Plus className="h-4 w-4 mr-1" />
             New
           </Button>

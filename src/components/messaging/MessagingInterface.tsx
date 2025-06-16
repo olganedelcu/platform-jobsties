@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import ConversationsList from './ConversationsList';
-import MessageThread from './MessageThread';
+import MessageThreadContainer from './MessageThreadContainer';
 import NewConversationDialog from './NewConversationDialog';
 import { useConversations } from '@/hooks/useConversations';
 
@@ -53,7 +53,7 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
 
         <div className="lg:col-span-2">
           <Card className="h-[600px]">
-            <MessageThread 
+            <MessageThreadContainer 
               conversationId={selectedConversationId}
             />
           </Card>
@@ -62,7 +62,7 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
 
       <NewConversationDialog
         open={showNewConversation}
-        onClose={() => setShowNewConversation(false)}
+        onOpenChange={setShowNewConversation}
         onCreateConversation={handleNewConversation}
       />
     </div>
