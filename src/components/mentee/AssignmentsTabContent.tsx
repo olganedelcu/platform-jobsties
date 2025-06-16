@@ -7,24 +7,35 @@ import CoachAssignmentsBoard from '@/components/coach/CoachAssignmentsBoard';
 
 interface AssignmentsTabContentProps {
   userId: string;
+  viewMode?: 'list' | 'board';
+  onViewModeChange?: (mode: 'list' | 'board') => void;
 }
 
-const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
+const AssignmentsTabContent = ({ 
+  userId, 
+  viewMode: externalViewMode, 
+  onViewModeChange 
+}: AssignmentsTabContentProps) => {
+  const [internalViewMode, setInternalViewMode] = useState<'list' | 'board'>('list');
+  
+  const currentViewMode = externalViewMode || internalViewMode;
+  const handleViewModeChange = onViewModeChange || setInternalViewMode;
 
-  if (viewMode === 'board') {
+  if (currentViewMode === 'board') {
     return (
       <div className="space-y-6">
-        <div className="flex justify-end">
-          <Button
-            onClick={() => setViewMode('list')}
-            variant="outline"
-            className="flex items-center space-x-2"
-          >
-            <List className="h-4 w-4" />
-            <span>List View</span>
-          </Button>
-        </div>
+        {!onViewModeChange && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => handleViewModeChange('list')}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <List className="h-4 w-4" />
+              <span>List View</span>
+            </Button>
+          </div>
+        )}
 
         <CoachAssignmentsBoard coachId={userId} />
       </div>
@@ -33,16 +44,18 @@ const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => setViewMode('board')}
-          variant="outline"
-          className="flex items-center space-x-2"
-        >
-          <LayoutGrid className="h-4 w-4" />
-          <span>Board View</span>
-        </Button>
-      </div>
+      {!onViewModeChange && (
+        <div className="flex justify-end">
+          <Button
+            onClick={() => handleViewModeChange('board')}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span>Board View</span>
+          </Button>
+        </div>
+      )}
       
       <MenteeAssignmentsList userId={userId} />
     </div>

@@ -1,8 +1,6 @@
 
 import React, { useState } from 'react';
-import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
-import AssignmentsTabContent from './AssignmentsTabContent';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
 
 interface MenteeTodosContainerProps {
@@ -14,7 +12,6 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Hooks for todo management
-  const { assignments } = useTodoAssignments(userId, false);
   const { todos, loading: todosLoading, addTodo, updateStatus: updateTodoStatus, deleteTodo } = useMenteeTodos(userId);
 
   const handleAddTodo = async (todoData: any) => {
@@ -23,27 +20,19 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   };
 
   return (
-    <main className="max-w-7xl mx-auto py-8 px-6">
-      {/* Coach Assignments Section */}
-      <AssignmentsTabContent userId={userId} />
-
-      {/* Personal Todos Section */}
-      <div className="mt-12">
-        <PersonalTodosTabContent
-          todos={todos}
-          showAddForm={showAddForm}
-          todosLoading={todosLoading}
-          userId={userId}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          onShowAddForm={() => setShowAddForm(true)}
-          onAddTodo={handleAddTodo}
-          onCancelAdd={() => setShowAddForm(false)}
-          onUpdateStatus={updateTodoStatus}
-          onDeleteTodo={deleteTodo}
-        />
-      </div>
-    </main>
+    <PersonalTodosTabContent
+      todos={todos}
+      showAddForm={showAddForm}
+      todosLoading={todosLoading}
+      userId={userId}
+      viewMode={viewMode}
+      onViewModeChange={setViewMode}
+      onShowAddForm={() => setShowAddForm(true)}
+      onAddTodo={handleAddTodo}
+      onCancelAdd={() => setShowAddForm(false)}
+      onUpdateStatus={updateTodoStatus}
+      onDeleteTodo={deleteTodo}
+    />
   );
 };
 
