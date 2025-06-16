@@ -64,6 +64,7 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
 
         {/* Recent Activity */}
         <MenteeRecentActivityCard
+          user={user}
           onViewAll={() => navigate('/tracker')}
           onAddApplication={() => navigate('/tracker')}
         />
