@@ -1,5 +1,6 @@
 
 import { InAppNotificationService } from '@/services/inAppNotificationService';
+import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
 
 // Helper function to check if the current user is Ana
 export const isAnaUser = (userEmail?: string): boolean => {
@@ -68,11 +69,21 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending job recommendation notification...");
+      
+      // Send in-app notification
       await InAppNotificationService.sendJobRecommendationNotification(
         menteeData.id,
         jobTitle,
         companyName
       );
+      
+      // Send Formspree bundled notification
+      await FormspreeNotificationHandlers.jobRecommendation(
+        menteeData.id,
+        jobTitle,
+        companyName
+      );
+      
       console.log("✅ Job recommendation notification sent successfully");
     } catch (error) {
       // Silently handle errors to not disrupt the main flow
@@ -104,10 +115,19 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending file upload notification...");
+      
+      // Send in-app notification  
       await InAppNotificationService.sendFileUploadNotification(
         menteeData.id,
         fileName
       );
+      
+      // Send Formspree bundled notification
+      await FormspreeNotificationHandlers.fileUpload(
+        menteeData.id,
+        fileName
+      );
+      
       console.log("✅ File upload notification sent successfully");
     } catch (error) {
       // Silently handle errors to not disrupt the main flow
@@ -139,10 +159,19 @@ export const NotificationHandlers = {
 
     try {
       console.log("📤 Sending message notification...");
+      
+      // Send in-app notification
       await InAppNotificationService.sendMessageNotification(
         menteeData.id,
         messageContent
       );
+      
+      // Send Formspree bundled notification
+      await FormspreeNotificationHandlers.message(
+        menteeData.id,
+        messageContent
+      );
+      
       console.log("✅ Message notification sent successfully");
     } catch (error) {
       // Silently handle errors to not disrupt the main flow
@@ -168,8 +197,8 @@ export const NotificationHandlers = {
       return;
     }
 
-    // Send notifications to all mentees
-    const notificationPromises = menteeIds.map(async (menteeId) => {
+    // Send in-app notifications to all mentees
+    const inAppNotificationPromises = menteeIds.map(async (menteeId) => {
       const menteeData = await getMenteeNotificationData(menteeId);
       if (!menteeData) return;
 
@@ -187,6 +216,17 @@ export const NotificationHandlers = {
       }
     });
 
-    await Promise.all(notificationPromises);
+    // Send Formspree bundled notifications
+    try {
+      await FormspreeNotificationHandlers.todoAssignment(
+        menteeIds,
+        todoTitle,
+        count
+      );
+    } catch (error) {
+      console.error('❌ Formspree todo assignment notification error:', error);
+    }
+
+    await Promise.all(inAppNotificationPromises);
   }
 };
