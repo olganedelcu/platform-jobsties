@@ -179,10 +179,6 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
         <TabsContent value="personal" className="mt-6">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">My Personal Tasks</h2>
-                <p className="text-gray-600">Create and manage your personal tasks</p>
-              </div>
               <div className="flex gap-3">
                 <Button
                   onClick={() => setPersonalViewMode(personalViewMode === 'list' ? 'board' : 'list')}
