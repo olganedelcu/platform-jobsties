@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
@@ -37,7 +38,8 @@ const Tracker = memo(() => {
     loading: applicationsLoading,
     handleAddApplication,
     handleUpdateApplication,
-    handleDeleteApplication
+    handleDeleteApplication,
+    refetchApplications
   } = useJobApplicationsData(user);
 
   // Preserve scroll position
@@ -132,7 +134,10 @@ const Tracker = memo(() => {
 
         {/* Enhanced Job Recommendations Section with Archive System */}
         <div className="mb-8">
-          <EnhancedWeeklyJobRecommendations userId={user.id} />
+          <EnhancedWeeklyJobRecommendations 
+            userId={user.id} 
+            onApplicationAdded={refetchApplications}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

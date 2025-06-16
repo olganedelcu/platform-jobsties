@@ -6,9 +6,10 @@ import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions
 
 interface UseEnhancedJobRecommendationsParams {
   userId: string;
+  onApplicationAdded?: () => void;
 }
 
-export const useEnhancedJobRecommendations = ({ userId }: UseEnhancedJobRecommendationsParams) => {
+export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: UseEnhancedJobRecommendationsParams) => {
   const [recommendations, setRecommendations] = useState<{
     active: JobRecommendation[];
     applied: JobRecommendation[];
@@ -38,6 +39,10 @@ export const useEnhancedJobRecommendations = ({ userId }: UseEnhancedJobRecommen
     user: { id: userId },
     onApplicationAdded: () => {
       fetchAllRecommendations();
+      // Call the callback to refresh job applications data
+      if (onApplicationAdded) {
+        onApplicationAdded();
+      }
     }
   });
 

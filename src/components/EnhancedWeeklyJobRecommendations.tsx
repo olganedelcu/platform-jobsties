@@ -8,9 +8,10 @@ import EnhancedRecommendationsTabs from './job-recommendations/EnhancedRecommend
 
 interface EnhancedWeeklyJobRecommendationsProps {
   userId: string;
+  onApplicationAdded?: () => void;
 }
 
-const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommendationsProps) => {
+const EnhancedWeeklyJobRecommendations = ({ userId, onApplicationAdded }: EnhancedWeeklyJobRecommendationsProps) => {
   const [activeTab, setActiveTab] = useState('active');
   
   const {
@@ -20,7 +21,7 @@ const EnhancedWeeklyJobRecommendations = ({ userId }: EnhancedWeeklyJobRecommend
     handleMarkAsAppliedWithJobTracker,
     handleArchiveWithValidation,
     handleReactivateWithValidation
-  } = useEnhancedJobRecommendations({ userId });
+  } = useEnhancedJobRecommendations({ userId, onApplicationAdded });
 
   const { handleViewJob } = useJobViewHandler();
 
