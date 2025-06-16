@@ -65,6 +65,9 @@ const CourseModule = ({
     return 'Complete';
   };
 
+  // Don't show the action button for Interview Preparation module (index 3)
+  const shouldShowActionButton = index !== 3;
+
   return (
     <div className={`bg-white rounded-lg shadow overflow-hidden ${module.locked ? 'opacity-60' : ''}`}>
       <div 
@@ -111,12 +114,14 @@ const CourseModule = ({
                   <MessageCircle className="h-3 w-3" />
                   <span>Message Coach</span>
                 </Button>
-                <Button
-                  onClick={handleActionClick}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 text-sm"
-                >
-                  {getActionText()}
-                </Button>
+                {shouldShowActionButton && (
+                  <Button
+                    onClick={handleActionClick}
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 text-sm"
+                  >
+                    {getActionText()}
+                  </Button>
+                )}
                 {module.completed && (
                   <Button
                     onClick={handleUncompleteClick}
