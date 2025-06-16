@@ -87,7 +87,6 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
                         {assignments.length}
                       </Badge>
                     </h2>
-                    <p className="text-gray-600">Tasks assigned by your coach</p>
                   </div>
                   <Button
                     onClick={() => setAssignmentsViewMode(assignmentsViewMode === 'list' ? 'board' : 'list')}
@@ -125,7 +124,6 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
                       {todos.length}
                     </Badge>
                   </h2>
-                  <p className="text-gray-600">Your personal tasks and goals</p>
                 </div>
                 <div className="flex gap-3">
                   <Button
@@ -187,7 +185,6 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">Personal Tasks</h2>
-                <p className="text-gray-600">Your personal tasks and goals</p>
               </div>
               <div className="flex gap-3">
                 <Button

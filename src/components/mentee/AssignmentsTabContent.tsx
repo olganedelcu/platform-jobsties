@@ -26,7 +26,6 @@ const AssignmentsTabContent = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Coach Assignments</h2>
-          <p className="text-gray-600">Complete tasks assigned by your coach</p>
         </div>
         {!onViewModeChange && (
           <Button
