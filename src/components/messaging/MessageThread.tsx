@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -144,7 +145,7 @@ const MessageThread = ({
           </div>
         )}
         
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-full [&>div>div[style]]:!block">
           <div 
             ref={scrollContainerRef}
             className="p-2 min-h-full flex flex-col"
