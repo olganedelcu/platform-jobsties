@@ -15,14 +15,14 @@ interface MenteeAssignmentsListProps {
 }
 
 const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
-  const { assignments, loading, refetch } = useTodoAssignments(userId, false);
+  const { assignments, loading, refreshAssignments } = useTodoAssignments(userId, false);
   const { toast } = useToast();
   const [editingAssignment, setEditingAssignment] = useState<any>(null);
 
   const handleStatusUpdate = async (assignmentId: string, status: 'pending' | 'in_progress' | 'completed') => {
     try {
       await updateAssignmentStatus(assignmentId, status);
-      await refetch();
+      await refreshAssignments();
       toast({
         title: "Success",
         description: "Task status updated successfully"
@@ -212,7 +212,7 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
           assignment={editingAssignment}
           open={!!editingAssignment}
           onClose={() => setEditingAssignment(null)}
-          onUpdate={refetch}
+          onUpdate={refreshAssignments}
         />
       )}
     </div>

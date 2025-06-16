@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -109,7 +108,7 @@ const TodoCard = ({
           todo={todo}
           open={showEditDialog}
           onClose={() => setShowEditDialog(false)}
-          onSave={handleEdit}
+          onUpdate={handleEdit}
         />
       </CardContent>
     </Card>
