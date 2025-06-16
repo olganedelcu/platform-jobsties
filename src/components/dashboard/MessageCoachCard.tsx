@@ -35,7 +35,7 @@ const MessageCoachCard = () => {
 
         {!loading && recentConversations.length > 0 ? (
           <>
-            <ScrollArea className="h-52">
+            <ScrollArea className="h-56">
               <div className="space-y-1.5 pr-2">
                 {recentConversations.map((conversation) => (
                   <div 
@@ -65,7 +65,7 @@ const MessageCoachCard = () => {
               </div>
             </ScrollArea>
             
-            <div className="mt-1 pt-1 border-t border-gray-200">
+            <div className="border-t border-gray-200">
               <Button 
                 onClick={handleMessageCoach}
                 variant="ghost"
