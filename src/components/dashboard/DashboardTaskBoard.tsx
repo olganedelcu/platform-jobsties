@@ -3,11 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ListTodo, ArrowRight, UserCheck } from 'lucide-react';
+import { CheckCircle, Clock, Play, Plus, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useMenteeTaskBoard } from '@/hooks/useMenteeTaskBoard';
-import { useTodoAssignments } from '@/hooks/useTodoAssignments';
+import { useDashboardTaskBoard } from '@/hooks/useDashboardTaskBoard';
 
 interface DashboardTaskBoardProps {
   userId: string;
@@ -15,136 +13,143 @@ interface DashboardTaskBoardProps {
 
 const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
   const navigate = useNavigate();
-  const { columns: personalColumns } = useMenteeTaskBoard(userId);
-  const { assignments } = useTodoAssignments(userId, false);
+  const { tasks, loading, updateTaskStatus } = useDashboardTaskBoard(userId);
 
-  // Get in-progress personal tasks
-  const personalInProgressTasks = personalColumns
-    .flatMap(column => column.todos)
-    .filter(todo => todo.status === 'in_progress')
-    .map(task => ({ ...task, source: 'personal' as const }));
+  const pendingTasks = tasks.filter(task => task.status === 'pending');
+  const inProgressTasks = tasks.filter(task => task.status === 'in_progress');
+  const completedTasks = tasks.filter(task => task.status === 'completed');
 
-  // Get in-progress coach-assigned tasks
-  const coachInProgressTasks = assignments
-    .filter(assignment => assignment.status === 'in_progress')
-    .map(assignment => ({
-      id: assignment.id,
-      title: assignment.todo?.title || 'Untitled Task',
-      description: assignment.todo?.description,
-      status: assignment.status as 'in_progress',
-      priority: assignment.todo?.priority || 'medium' as const,
-      due_date: assignment.todo?.due_date,
-      assigned_date: assignment.assigned_at,
-      source: 'coach' as const
-    }));
-
-  // Combine and limit to first 5 tasks
-  const allInProgressTasks = [...personalInProgressTasks, ...coachInProgressTasks]
-    .slice(0, 5);
-
-  const handleViewAllTasks = () => {
-    navigate('/todos');
+  const getPriorityColor = (priority: 'low' | 'medium' | 'high') => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <Card className="border border-gray-200 shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-gray-900">My Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4">
+            <div className="text-sm text-gray-500">Loading tasks...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="border border-gray-200 shadow-sm h-80">
-      <CardHeader className="pb-2">
+    <Card className="border border-gray-200 shadow-sm">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
-            <ListTodo className="h-4 w-4 mr-2 text-green-600" />
-            Tasks in Progress
-          </CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleViewAllTasks}
-            className="text-green-600 hover:text-green-700 text-xs h-6 px-2"
+          <CardTitle className="text-lg font-semibold text-gray-900">My Tasks</CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/todos')}
+            className="text-blue-600 hover:text-blue-700"
           >
-            View All
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </CardHeader>
-      
-      <CardContent className="p-3 pt-0">
-        {allInProgressTasks.length > 0 ? (
+      <CardContent className="space-y-4">
+        {tasks.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="text-sm text-gray-500 mb-3">No tasks yet</div>
+            <Button
+              size="sm"
+              onClick={() => navigate('/todos')}
+              className="flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Task</span>
+            </Button>
+          </div>
+        ) : (
           <>
-            <ScrollArea className="h-52">
-              <div className="space-y-1.5 pr-2">
-                {allInProgressTasks.map((task) => (
-                  <div key={task.id} className="flex items-start gap-2 p-2 bg-green-50 rounded-md border border-green-100">
-                    <div className="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center flex-shrink-0">
-                      {task.source === 'coach' ? (
-                        <UserCheck className="h-3 w-3 text-green-600" />
-                      ) : (
-                        <ListTodo className="h-3 w-3 text-green-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-gray-900 truncate">{task.title}</div>
-                      {task.description && (
-                        <div className="text-xs text-gray-600 mt-0.5 line-clamp-2">{task.description}</div>
-                      )}
-                      <div className="flex items-center gap-1 mt-1 flex-wrap">
-                        <Badge 
-                          variant="outline" 
-                          className="text-xs bg-orange-50 text-orange-700 border-orange-200 px-1 py-0 h-4"
-                        >
-                          In Progress
-                        </Badge>
-                        {task.source === 'coach' && (
-                          <Badge 
-                            variant="outline" 
-                            className="text-xs bg-blue-50 text-blue-700 border-blue-200 px-1 py-0 h-4"
-                          >
-                            From Coach
-                          </Badge>
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="text-center p-2 bg-gray-50 rounded-lg">
+                <div className="text-lg font-semibold text-gray-900">{pendingTasks.length}</div>
+                <div className="text-xs text-gray-500">Pending</div>
+              </div>
+              <div className="text-center p-2 bg-blue-50 rounded-lg">
+                <div className="text-lg font-semibold text-blue-600">{inProgressTasks.length}</div>
+                <div className="text-xs text-gray-500">In Progress</div>
+              </div>
+              <div className="text-center p-2 bg-green-50 rounded-lg">
+                <div className="text-lg font-semibold text-green-600">{completedTasks.length}</div>
+                <div className="text-xs text-gray-500">Done</div>
+              </div>
+            </div>
+
+            {/* Recent Tasks */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Recent Tasks</h4>
+              {tasks.slice(0, 4).map(task => (
+                <div key={task.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => {
+                          const nextStatus = task.status === 'pending' 
+                            ? 'in_progress' 
+                            : task.status === 'in_progress' 
+                            ? 'completed' 
+                            : 'pending';
+                          updateTaskStatus(task.id, nextStatus);
+                        }}
+                        className="flex-shrink-0"
+                      >
+                        {task.status === 'completed' ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : task.status === 'in_progress' ? (
+                          <Clock className="h-4 w-4 text-blue-600" />
+                        ) : (
+                          <div className="h-4 w-4 border-2 border-gray-300 rounded-full" />
                         )}
-                        {task.priority && (
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs px-1 py-0 h-4 ${
-                              task.priority === 'high' ? 'bg-red-50 text-red-700 border-red-200' :
-                              task.priority === 'medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                              'bg-gray-50 text-gray-700 border-gray-200'
-                            }`}
-                          >
-                            {task.priority}
-                          </Badge>
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                          {task.title}
+                        </div>
+                        {task.due_date && (
+                          <div className="text-xs text-gray-500">
+                            Due: {formatDate(task.due_date)}
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
-            
-            <div className="pt-2 border-t border-gray-200">
-              <Button 
-                onClick={handleViewAllTasks}
-                variant="ghost"
+                  <Badge variant="secondary" className={`text-xs ${getPriorityColor(task.priority)}`}>
+                    {task.priority}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+
+            {tasks.length > 4 && (
+              <Button
+                variant="outline"
                 size="sm"
-                className="w-full text-green-600 hover:text-green-700 hover:bg-green-50 text-sm h-7"
+                onClick={() => navigate('/todos')}
+                className="w-full"
               >
-                Task Board
-                <ArrowRight className="h-3 w-3 ml-2" />
+                View All Tasks
               </Button>
-            </div>
+            )}
           </>
-        ) : (
-          <div className="text-center py-4">
-            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-2 mx-auto">
-              <ListTodo className="w-5 h-5 text-gray-400" />
-            </div>
-            <div className="text-gray-600 mb-1 text-sm">No tasks in progress</div>
-            <div className="text-xs text-gray-500 mb-2">Start working on your tasks to see them here</div>
-            <Button 
-              onClick={handleViewAllTasks} 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white text-sm h-7"
-            >
-              View All Tasks
-            </Button>
-          </div>
         )}
       </CardContent>
     </Card>

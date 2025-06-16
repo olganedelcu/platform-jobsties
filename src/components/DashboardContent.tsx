@@ -8,7 +8,6 @@ import { courseModules } from '@/data/courseModules';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import RecentActivityCard from '@/components/dashboard/RecentActivityCard';
-import UpcomingSessionsCard from '@/components/dashboard/UpcomingSessionsCard';
 import ApplicationsStatsCard from '@/components/dashboard/ApplicationsStatsCard';
 import MessageCoachCard from '@/components/dashboard/MessageCoachCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
@@ -84,8 +83,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
 
         {/* Right Column */}
         <div className="space-y-8">
-          <UpcomingSessionsCard />
-
           <ApplicationsStatsCard
             applicationsThisMonth={applicationsThisMonth}
             onClick={() => navigate('/tracker')}
