@@ -10,22 +10,26 @@ import { BundledNotificationService } from '@/services/bundledNotificationServic
 import { useToast } from '@/hooks/use-toast';
 
 const FormspreeConfiguration = () => {
-  const [endpoint, setEndpoint] = useState('');
-  const [isConfigured, setIsConfigured] = useState(false);
+  const [endpoint, setEndpoint] = useState('https://formspree.io/f/myzjjlvn');
+  const [isConfigured, setIsConfigured] = useState(true);
   const [isTesting, setIsTesting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load saved endpoint
-    const savedEndpoint = localStorage.getItem('formspree_endpoint');
-    if (savedEndpoint) {
-      setEndpoint(savedEndpoint);
-      setIsConfigured(true);
-      BundledNotificationService.configure(savedEndpoint);
-    }
-  }, []);
+    // Save the provided endpoint immediately
+    const formspreeEndpoint = 'https://formspree.io/f/myzjjlvn';
+    localStorage.setItem('formspree_endpoint', formspreeEndpoint);
+    BundledNotificationService.configure(formspreeEndpoint);
+    console.log('✅ Formspree endpoint configured automatically:', formspreeEndpoint);
+    
+    // Show success message
+    toast({
+      title: "Formspree Configured",
+      description: "Your Formspree endpoint has been automatically configured and is ready to send notifications!"
+    });
+  }, [toast]);
 
-  const handleSave = () => {
+  const handleUpdate = () => {
     if (!endpoint.trim()) {
       toast({
         title: "Error",
@@ -50,20 +54,11 @@ const FormspreeConfiguration = () => {
 
     toast({
       title: "Success",
-      description: "Formspree configuration saved successfully"
+      description: "Formspree configuration updated successfully"
     });
   };
 
   const handleTest = async () => {
-    if (!endpoint.trim()) {
-      toast({
-        title: "Error",
-        description: "Please save the configuration first",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsTesting(true);
     
     try {
@@ -72,22 +67,22 @@ const FormspreeConfiguration = () => {
         'test-mentee-id',
         'test@example.com',
         'Test Mentee',
-        'Software Developer',
-        'Test Company'
+        'Software Developer - Test Position',
+        'Test Company Inc.'
       );
 
       // Force flush to send immediately for testing
       await BundledNotificationService.flushAllNotifications();
 
       toast({
-        title: "Test Sent",
-        description: "Test notification has been sent via Formspree"
+        title: "Test Notification Sent!",
+        description: "A test email should arrive at test@example.com shortly via your Formspree form."
       });
     } catch (error) {
       console.error('Test failed:', error);
       toast({
         title: "Test Failed",
-        description: "Failed to send test notification. Please check your endpoint.",
+        description: "Failed to send test notification. Please check your endpoint and try again.",
         variant: "destructive"
       });
     } finally {
@@ -116,9 +111,8 @@ const FormspreeConfiguration = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
-          <AlertDescription>
-            Configure Formspree.io to send bundled email notifications to mentees. 
-            Notifications will be automatically grouped and sent every 5 minutes when there are pending items.
+          <AlertDescription className="text-green-700">
+            ✅ <strong>Configuration Complete!</strong> Your Formspree endpoint has been automatically configured and is ready to send bundled email notifications to mentees.
           </AlertDescription>
         </Alert>
 
@@ -134,63 +128,50 @@ const FormspreeConfiguration = () => {
               className="mt-1"
             />
             <p className="text-sm text-gray-500 mt-1">
-              Get your endpoint from your Formspree dashboard after creating a form
+              Your endpoint is configured and active
             </p>
           </div>
 
           <div className="flex gap-3">
-            <Button onClick={handleSave} className="flex items-center gap-2">
+            <Button onClick={handleUpdate} className="flex items-center gap-2">
               <Save className="h-4 w-4" />
-              Save Configuration
+              Update Configuration
             </Button>
             
-            {isConfigured && (
-              <Button 
-                onClick={handleTest} 
-                variant="outline"
-                disabled={isTesting}
-                className="flex items-center gap-2"
-              >
-                <TestTube className="h-4 w-4" />
-                {isTesting ? 'Testing...' : 'Send Test'}
-              </Button>
-            )}
+            <Button 
+              onClick={handleTest} 
+              variant="outline"
+              disabled={isTesting}
+              className="flex items-center gap-2"
+            >
+              <TestTube className="h-4 w-4" />
+              {isTesting ? 'Sending Test...' : 'Send Test Email'}
+            </Button>
 
-            {isConfigured && (
-              <Button onClick={handleReset} variant="destructive">
-                Reset
-              </Button>
-            )}
+            <Button onClick={handleReset} variant="destructive">
+              Reset
+            </Button>
           </div>
+        </div>
 
-          {isConfigured && (
-            <Alert>
-              <AlertDescription className="text-green-700">
-                ✅ Formspree is configured and ready to send bundled notifications!
-              </AlertDescription>
-            </Alert>
-          )}
+        <div className="border-t pt-4">
+          <h3 className="font-medium mb-2">✅ System Status:</h3>
+          <ul className="text-sm text-green-700 space-y-1">
+            <li>• Formspree endpoint configured: https://formspree.io/f/myzjjlvn</li>
+            <li>• Notification bundling active (sends every 2 hours)</li>
+            <li>• Ready to send job recommendations, file uploads, messages, and task assignments</li>
+            <li>• Test function available to verify email delivery</li>
+          </ul>
         </div>
 
         <div className="border-t pt-4">
           <h3 className="font-medium mb-2">How it works:</h3>
           <ul className="text-sm text-gray-600 space-y-1">
             <li>• Notifications are collected and bundled together for each mentee</li>
-            <li>• Emails are automatically sent every 5 minutes if there are pending notifications</li>
+            <li>• Emails are automatically sent every 2 hours if there are pending notifications</li>
             <li>• Multiple notification types are grouped together in a single email</li>
             <li>• Includes job recommendations, file uploads, messages, and task assignments</li>
           </ul>
-        </div>
-
-        <div className="border-t pt-4">
-          <h3 className="font-medium mb-2">Setup Instructions:</h3>
-          <ol className="text-sm text-gray-600 space-y-1">
-            <li>1. Go to <a href="https://formspree.io" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">formspree.io</a> and create an account</li>
-            <li>2. Create a new form in your Formspree dashboard</li>
-            <li>3. Copy the form endpoint (looks like: https://formspree.io/f/YOUR_FORM_ID)</li>
-            <li>4. Paste it above and click "Save Configuration"</li>
-            <li>5. Use "Send Test" to verify everything works</li>
-          </ol>
         </div>
       </CardContent>
     </Card>
