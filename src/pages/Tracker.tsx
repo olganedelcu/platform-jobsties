@@ -6,7 +6,7 @@ import Navigation from '@/components/Navigation';
 import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
 import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobRecommendations';
 import { Card, CardContent } from '@/components/ui/card';
-import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
+import { BarChart, TrendingUp, Target, Award, Loader2 } from 'lucide-react';
 
 const StatsCard = memo(({ title, value, icon: Icon, color }: {
   title: string;
@@ -102,7 +102,10 @@ const Tracker = memo(() => {
   if (authLoading || !isPageReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="flex items-center">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <div className="text-lg">Loading...</div>
+        </div>
       </div>
     );
   }
@@ -110,7 +113,10 @@ const Tracker = memo(() => {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Please log in to access the tracker.</div>
+        <div className="flex items-center">
+          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+          <div className="text-lg">Please log in to access the tracker.</div>
+        </div>
       </div>
     );
   }
@@ -160,7 +166,10 @@ const Tracker = memo(() => {
         <div className="space-y-8">
           {applicationsLoading ? (
             <div className="text-center py-8">
-              <div className="text-lg">Loading applications...</div>
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                <div className="text-lg">Loading applications...</div>
+              </div>
             </div>
           ) : (
             <ExcelLikeJobApplicationsTable
