@@ -30,8 +30,7 @@ const CareerProgressCard = ({
         </div>
         
         <div className="text-3xl font-bold text-blue-600 mb-2">{courseProgress}%</div>
-        <Progress value={courseProgress} className="mb-3 h-2" />
-        <div className="text-sm text-gray-500 mb-4">Course completion</div>
+        <Progress value={courseProgress} className="mb-4 h-2" />
 
         {/* Progress Icons */}
         <div className="grid grid-cols-3 gap-3">
