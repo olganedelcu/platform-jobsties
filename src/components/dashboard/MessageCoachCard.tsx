@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Mail, Clock } from 'lucide-react';
+import { MessageCircle, Clock } from 'lucide-react';
 import { useConversations } from '@/hooks/useConversations';
 import { format } from 'date-fns';
 
@@ -27,23 +27,16 @@ const MessageCoachCard = () => {
     <Card className="border border-gray-200 shadow-sm h-80">
       <CardContent className="p-3">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900">Coach Messages</h3>
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            Coach Messages 
+            <span className="text-indigo-600">@</span>
+          </h3>
           <MessageCircle className="h-4 w-4 text-indigo-600" />
-        </div>
-        
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-7 h-7 bg-indigo-100 rounded-md flex items-center justify-center">
-            <Mail className="h-3 w-3 text-indigo-600" />
-          </div>
-          <div>
-            <p className="font-medium text-sm text-gray-900">Ana Nedelcu</p>
-            <p className="text-xs text-gray-600">Your Career Coach</p>
-          </div>
         </div>
 
         {!loading && recentConversations.length > 0 ? (
           <>
-            <ScrollArea className="h-48">
+            <ScrollArea className="h-52">
               <div className="space-y-1.5 pr-2">
                 {recentConversations.map((conversation) => (
                   <div 
