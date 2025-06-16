@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 
@@ -7,7 +6,7 @@ export const fetchJobApplications = async (userId: string): Promise<JobApplicati
     .from('job_applications')
     .select('*')
     .eq('mentee_id', userId)
-    .order('date_applied', { ascending: false });
+    .order('created_at', { ascending: false }); // Sort by creation time, most recent first
 
   if (error) {
     throw error;

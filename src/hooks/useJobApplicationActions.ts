@@ -19,6 +19,7 @@ export const useJobApplicationActions = (
 
     try {
       const newApplication = await addJobApplication(user.id, applicationData);
+      // Add new application at the top of the list
       setApplications(prev => [newApplication, ...prev]);
       
       toast({
