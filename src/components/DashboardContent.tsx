@@ -9,6 +9,7 @@ import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
 import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
 import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMonthCard';
 import DashboardQuickLinks from '@/components/DashboardQuickLinks';
+import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 
 interface DashboardContentProps {
   user: any;
@@ -33,19 +34,8 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
     navigate('/course?module=salary-negotiation');
   };
 
-  if (loading) {
-    return (
-      <main className="max-w-7xl mx-auto pt-8 py-8 px-4 sm:px-6 bg-white">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-            <div className="h-64 bg-gray-200 rounded"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </main>
-    );
+  if (loading || applicationsLoading) {
+    return <DashboardSkeleton />;
   }
 
   return (

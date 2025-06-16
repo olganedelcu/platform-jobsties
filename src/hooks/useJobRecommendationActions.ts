@@ -107,7 +107,7 @@ export const useJobRecommendationActions = ({
     setSelectedRecommendation(null);
   };
 
-  // Mentee functionality: Mark recommendation as applied and add to job tracker
+  // Mentee functionality: Mark recommendation as applied and add to job tracker with description in notes
   const markAsApplied = async (recommendation: JobRecommendation) => {
     if (!user) {
       toast({
@@ -119,12 +119,18 @@ export const useJobRecommendationActions = ({
     }
 
     try {
-      // Add to job applications tracker
+      // Prepare mentee notes with job description
+      const menteeNotes = recommendation.description 
+        ? `Job Description: ${recommendation.description}`
+        : undefined;
+
+      // Add to job applications tracker with description in notes
       await addJobApplication(user.id, {
         jobTitle: recommendation.job_title,
         companyName: recommendation.company_name,
         dateApplied: new Date().toISOString().split('T')[0],
-        applicationStatus: 'applied'
+        applicationStatus: 'applied',
+        menteeNotes
       });
 
       // Update recommendation status
@@ -136,7 +142,7 @@ export const useJobRecommendationActions = ({
 
       toast({
         title: "Success",
-        description: `Application for ${recommendation.job_title} at ${recommendation.company_name} has been added to your tracker and marked as applied.`,
+        description: `Application for ${recommendation.job_title} at ${recommendation.company_name} has been added to your tracker${recommendation.description ? ' with job description in your notes' : ''}.`,
       });
 
       // Call the callback if provided
