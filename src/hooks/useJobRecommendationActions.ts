@@ -1,87 +1,115 @@
 
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
-import { JobRecommendation } from '@/types/jobRecommendations';
-import { format, startOfWeek } from 'date-fns';
+import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 
 interface UseJobRecommendationActionsProps {
-  user: any;
-  onApplicationAdded?: () => void;
+  userId: string;
+  addRecommendation: (data: any) => Promise<any>;
+  deleteRecommendation: (id: string) => Promise<void>;
 }
 
-export const useJobRecommendationActions = ({ user, onApplicationAdded }: UseJobRecommendationActionsProps) => {
-  const { toast, dismiss } = useToast();
-  const { handleAddApplication } = useJobApplicationsData(user);
+export const useJobRecommendationActions = ({ 
+  userId, 
+  addRecommendation, 
+  deleteRecommendation 
+}: UseJobRecommendationActionsProps) => {
+  const { toast } = useToast();
+  const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
 
-  const markAsApplied = async (recommendation: JobRecommendation) => {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to add applications.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleAssignToMoreMentees = (recommendation: any) => {
+    setSelectedRecommendation(recommendation);
+    setAssignmentDialogOpen(true);
+  };
 
-    // Show loading toast that persists
-    const loadingToastId = toast({
-      title: "Adding to tracker...",
-      description: `Adding ${recommendation.job_title} at ${recommendation.company_name} to your applications.`,
-      className: "fixed top-4 right-4 w-80 max-w-sm",
-      duration: Infinity // Make it persist until we dismiss it
-    });
+  const handleAssignmentSubmit = async (menteeIds: string[], weekStartDate: string) => {
+    if (!selectedRecommendation) return;
 
     try {
-      // Get the current week start date
-      const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Monday as start of week
-      
-      const applicationData = {
-        dateApplied: format(new Date(), 'yyyy-MM-dd'),
-        companyName: recommendation.company_name,
-        jobTitle: recommendation.job_title,
-        applicationStatus: 'applied',
-        menteeNotes: `Applied via Coach Recommendation from week of ${format(currentWeekStart, 'MMM dd, yyyy')}`
-      };
+      const promises = menteeIds.map(menteeId =>
+        addRecommendation({
+          menteeId,
+          jobTitle: selectedRecommendation.job_title,
+          jobLink: selectedRecommendation.job_link,
+          companyName: selectedRecommendation.company_name,
+          description: selectedRecommendation.description,
+          weekStartDate
+        })
+      );
 
-      await handleAddApplication(applicationData);
-      
-      // Dismiss the loading toast
-      if (loadingToastId) {
-        dismiss(loadingToastId.id);
-      }
-      
-      // Show success toast
+      await Promise.all(promises);
+
       toast({
-        title: "Added to tracker",
-        description: `${recommendation.job_title} at ${recommendation.company_name}`,
-        className: "fixed top-4 right-4 w-80 max-w-sm",
-        duration: 4000 // Show success for 4 seconds
+        title: "Success",
+        description: `Job recommendation assigned to ${menteeIds.length} additional mentee(s).`,
       });
 
-      // Only call the callback if it exists and after successful addition
-      if (onApplicationAdded) {
-        // Use setTimeout to prevent immediate re-render issues
-        setTimeout(() => {
-          onApplicationAdded();
-        }, 100);
-      }
+      setAssignmentDialogOpen(false);
+      setSelectedRecommendation(null);
     } catch (error) {
-      // Dismiss the loading toast
-      if (loadingToastId) {
-        dismiss(loadingToastId.id);
-      }
-      
       toast({
         title: "Error",
-        description: "Failed to add job to tracker. Please try again.",
-        variant: "destructive",
-        className: "fixed top-4 right-4 w-80 max-w-sm"
+        description: "Failed to assign job recommendations. Please try again.",
+        variant: "destructive"
       });
-      throw error; // Re-throw to let the component handle the error state
     }
   };
 
+  const handleSelectAssignment = (assignmentId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedAssignments(prev => [...prev, assignmentId]);
+    } else {
+      setSelectedAssignments(prev => prev.filter(id => id !== assignmentId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean, recommendations: any[]) => {
+    if (checked) {
+      const allAssignmentIds = recommendations.map(rec => rec.id);
+      setSelectedAssignments(allAssignmentIds);
+    } else {
+      setSelectedAssignments([]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedAssignments.length === 0) return;
+
+    try {
+      const promises = selectedAssignments.map(id => deleteRecommendation(id));
+      await Promise.all(promises);
+
+      toast({
+        title: "Success",
+        description: `${selectedAssignments.length} recommendation(s) deleted successfully.`,
+      });
+
+      setSelectedAssignments([]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete some recommendations. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const closeAssignmentDialog = () => {
+    setAssignmentDialogOpen(false);
+    setSelectedRecommendation(null);
+  };
+
   return {
-    markAsApplied
+    selectedRecommendation,
+    assignmentDialogOpen,
+    selectedAssignments,
+    handleAssignToMoreMentees,
+    handleAssignmentSubmit,
+    handleSelectAssignment,
+    handleSelectAll,
+    handleDeleteSelected,
+    closeAssignmentDialog
   };
 };
