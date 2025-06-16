@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,13 +37,19 @@ export const useCoachTodosBoard = (coachId: string) => {
 
   const fetchTodos = async () => {
     try {
+      console.log('Fetching personal todos for coach:', coachId);
+      
+      // Fetch only personal todos where mentee_id equals coach_id
       const { data, error } = await supabase
         .from('coach_todos')
         .select('*')
         .eq('coach_id', coachId)
+        .eq('mentee_id', coachId) // Only personal todos, not assignments to mentees
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      console.log('Personal todos data:', data);
 
       // Transform coach todos to TodoItem format
       const transformedTodos: TodoItem[] = (data || []).map(todo => ({
@@ -82,10 +87,10 @@ export const useCoachTodosBoard = (coachId: string) => {
         }
       ]);
     } catch (error: any) {
-      console.error('Error fetching coach todos:', error);
+      console.error('Error fetching personal todos:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch todos",
+        description: "Failed to fetch personal todos",
         variant: "destructive"
       });
     }
