@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -79,11 +78,11 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col max-h-full">
+      <div className="h-full flex flex-col">
         <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
           <div className="text-gray-900 font-medium">Loading messages...</div>
         </div>
-        <div className="p-6 flex-1 min-h-0">
+        <div className="flex-1 p-6 min-h-0">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
@@ -98,7 +97,7 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <div className="h-full flex flex-col max-h-full">
+      <div className="h-full flex flex-col">
         <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
           <div className="text-gray-900 font-medium flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -117,7 +116,7 @@ const MessageThread = ({
   }
 
   return (
-    <div className="h-full flex flex-col max-h-full">
+    <div className="h-full flex flex-col">
       <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200 p-4">
         <div className="flex items-center gap-2 text-gray-900 font-medium">
           <User className="h-5 w-5" />
@@ -130,7 +129,7 @@ const MessageThread = ({
         </div>
       </div>
       
-      <div className="flex-1 min-h-0 overflow-hidden relative">
+      <div className="flex-1 min-h-0 relative">
         {showLoadMore && hasMoreMessages && (
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
             <Button
@@ -148,9 +147,10 @@ const MessageThread = ({
         <ScrollArea className="h-full">
           <div 
             ref={scrollContainerRef}
-            className="p-2"
+            className="p-2 min-h-full flex flex-col"
             onScroll={handleScroll}
           >
+            <div className="flex-1"></div>
             <div className="space-y-1">
               {hasMoreMessages && (
                 <div className="text-center py-2">

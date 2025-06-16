@@ -57,8 +57,8 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
         <p className="text-gray-600 mt-2">Communicate with your coach and manage conversations</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
+        <div className="lg:col-span-1 h-full">
           <ConversationsList
             conversations={conversations}
             loading={loading}
@@ -69,19 +69,21 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 h-full">
           <Card className="h-full flex flex-col border-gray-200 shadow-sm">
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 min-h-0">
               <MessageThreadContainer 
                 conversationId={selectedConversationId}
               />
             </div>
             {selectedConversationId && (
-              <MessageInput
-                onSendMessage={handleSendMessage}
-                sending={sending}
-                disabled={!selectedConversationId}
-              />
+              <div className="flex-shrink-0 border-t border-gray-200">
+                <MessageInput
+                  onSendMessage={handleSendMessage}
+                  sending={sending}
+                  disabled={!selectedConversationId}
+                />
+              </div>
             )}
           </Card>
         </div>
