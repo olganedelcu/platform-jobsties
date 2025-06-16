@@ -73,12 +73,12 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   if (loading) {
     return (
-      <Card className="border border-gray-200 shadow-sm w-56 h-16">
-        <CardContent className="p-2">
+      <Card className="border border-gray-200 shadow-sm w-72 h-16">
+        <CardContent className="p-2 h-full flex items-center justify-center">
           <div className="animate-pulse flex items-center gap-4">
-            <div className="h-4 bg-gray-200 rounded w-10"></div>
+            <div className="h-4 bg-gray-200 rounded w-12"></div>
             <div className="flex-1">
-              <div className="h-2 bg-gray-200 rounded w-24 mb-1"></div>
+              <div className="h-2 bg-gray-200 rounded w-28 mb-1"></div>
               <div className="h-1 bg-gray-200 rounded"></div>
             </div>
           </div>
@@ -89,16 +89,16 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   return (
     <Card 
-      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-56 h-16" 
+      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-72 h-16" 
       onClick={onClick}
     >
-      <CardContent className="p-2">
+      <CardContent className="p-2 h-full flex items-center justify-center">
         <div className="flex items-center gap-4">
           <div className="text-lg font-bold text-blue-600">
             {applicationsThisWeek}/30
           </div>
           <div className="flex-1">
-            <div className="text-xs text-gray-600 mb-1">Applications this week</div>
+            <div className="text-xs text-gray-600 mb-1 text-center">Applications this week</div>
             {/* Progress bar */}
             <div className="w-full bg-gray-200 rounded-full h-1">
               <div 
