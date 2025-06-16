@@ -118,7 +118,7 @@ const DashboardTaskBoard = ({ userId }: DashboardTaskBoardProps) => {
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-1 border-t border-gray-200">
+            <div className="pt-2 border-t border-gray-200">
               <Button 
                 onClick={handleViewAllTasks}
                 variant="ghost"

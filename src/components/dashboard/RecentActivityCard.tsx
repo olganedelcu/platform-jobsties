@@ -76,7 +76,7 @@ const RecentActivityCard = ({ recentApplications, onViewAll, onAddApplication }:
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-1 border-t border-gray-200">
+            <div className="pt-2 border-t border-gray-200">
               <Button 
                 onClick={onViewAll}
                 variant="ghost"
