@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation';
 import { Loader2 } from 'lucide-react';
 import DashboardContent from '@/components/DashboardContent';
 
-const Dashboard = () => {
+const Dashboard = memo(() => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
@@ -84,6 +84,8 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
+});
+
+Dashboard.displayName = 'Dashboard';
 
 export default Dashboard;

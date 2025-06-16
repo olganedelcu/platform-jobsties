@@ -1,5 +1,5 @@
 
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,43 +7,44 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import SignUp from "./pages/SignUp";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import Sessions from "./pages/Sessions";
-import Messages from "./pages/Messages";
-import Tracker from "./pages/Tracker";
-import Course from "./pages/Course";
-import CoachSignUp from "./pages/CoachSignUp";
-import CoachLogin from "./pages/CoachLogin";
-import CoachDashboard from "./pages/CoachDashboard";
-import CVUpload from "./pages/coach/CVUpload";
-import CoachSessions from "./pages/coach/CoachSessions";
-import Mentees from "./pages/coach/Mentees";
-import CoachSettings from "./pages/coach/CoachSettings";
-import CoachProfile from "./pages/coach/CoachProfile";
-import CoachTodos from "./pages/coach/CoachTodos";
-import Applications from "./pages/coach/Applications";
-import CoachCalendar from "./pages/coach/CoachCalendar";
-import JobRecommendations from "./pages/coach/JobRecommendations";
-import BackupManagementPage from "./pages/coach/BackupManagement";
-import CoachMessages from "./pages/coach/CoachMessages";
-import MenteeTodosPage from "./pages/MenteeTodosPage";
-import NotFound from "./pages/NotFound";
+
+// Lazy load components for better performance
+const SignUp = lazy(() => import("./pages/SignUp"));
+const Login = lazy(() => import("./pages/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Sessions = lazy(() => import("./pages/Sessions"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Tracker = lazy(() => import("./pages/Tracker"));
+const Course = lazy(() => import("./pages/Course"));
+const CoachSignUp = lazy(() => import("./pages/CoachSignUp"));
+const CoachLogin = lazy(() => import("./pages/CoachLogin"));
+const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
+const CVUpload = lazy(() => import("./pages/coach/CVUpload"));
+const CoachSessions = lazy(() => import("./pages/coach/CoachSessions"));
+const Mentees = lazy(() => import("./pages/coach/Mentees"));
+const CoachSettings = lazy(() => import("./pages/coach/CoachSettings"));
+const CoachProfile = lazy(() => import("./pages/coach/CoachProfile"));
+const CoachTodos = lazy(() => import("./pages/coach/CoachTodos"));
+const Applications = lazy(() => import("./pages/coach/Applications"));
+const CoachCalendar = lazy(() => import("./pages/coach/CoachCalendar"));
+const JobRecommendations = lazy(() => import("./pages/coach/JobRecommendations"));
+const BackupManagementPage = lazy(() => import("./pages/coach/BackupManagement"));
+const CoachMessages = lazy(() => import("./pages/coach/CoachMessages"));
+const MenteeTodosPage = lazy(() => import("./pages/MenteeTodosPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        // Don't retry on authentication errors
         if (error?.status === 401 || error?.status === 403) {
           return false;
         }
-        // Retry up to 3 times for other errors
         return failureCount < 3;
       },
       staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes (replaces cacheTime)
     },
   },
 });

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import Navigation from '@/components/Navigation';
@@ -8,11 +8,31 @@ import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobReco
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
 
-const Tracker = () => {
+const StatsCard = memo(({ title, value, icon: Icon, color }: {
+  title: string;
+  value: number;
+  icon: React.ComponentType<any>;
+  color: string;
+}) => (
+  <Card>
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-600">{title}</p>
+          <p className={`text-2xl font-bold ${color}`}>{value}</p>
+        </div>
+        <Icon className={`h-8 w-8 ${color}`} />
+      </div>
+    </CardContent>
+  </Card>
+));
+
+StatsCard.displayName = 'StatsCard';
+
+const Tracker = memo(() => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
   const [isPageReady, setIsPageReady] = useState(false);
 
-  // Use job applications data hook only when user is available
   const {
     applications,
     loading: applicationsLoading,
@@ -58,6 +78,27 @@ const Tracker = () => {
     };
   }, []);
 
+  // Memoize statistics calculations
+  const statistics = useMemo(() => {
+    const totalApplications = applications.length;
+    const interviewingCount = applications.filter(app => app.application_status === 'interviewing').length;
+    const offersCount = applications.filter(app => app.application_status === 'offer').length;
+    
+    const applicationsThisMonth = applications.filter(app => {
+      const appDate = new Date(app.date_applied);
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
+    }).length;
+
+    return {
+      totalApplications,
+      interviewingCount,
+      offersCount,
+      applicationsThisMonth
+    };
+  }, [applications]);
+
   if (authLoading || !isPageReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -73,25 +114,6 @@ const Tracker = () => {
       </div>
     );
   }
-
-  // Calculate statistics
-  const totalApplications = applications.length;
-  const interviewingCount = applications.filter(app => app.application_status === 'interviewing').length;
-  const offersCount = applications.filter(app => app.application_status === 'offer').length;
-  const recentApplications = applications.filter(app => {
-    const appDate = new Date(app.date_applied);
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    return appDate >= oneWeekAgo;
-  }).length;
-
-  // Calculate applications this month instead of coach feedback
-  const applicationsThisMonth = applications.filter(app => {
-    const appDate = new Date(app.date_applied);
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
-  }).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -109,53 +131,30 @@ const Tracker = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Applications</p>
-                  <p className="text-2xl font-bold text-indigo-600">{totalApplications}</p>
-                </div>
-                <BarChart className="h-8 w-8 text-indigo-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Interviewing</p>
-                  <p className="text-2xl font-bold text-green-600">{interviewingCount}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Offers Received</p>
-                  <p className="text-2xl font-bold text-purple-600">{offersCount}</p>
-                </div>
-                <Target className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Applications this month</p>
-                  <p className="text-2xl font-bold text-orange-600">{applicationsThisMonth}</p>
-                </div>
-                <Award className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
+          <StatsCard 
+            title="Total Applications" 
+            value={statistics.totalApplications} 
+            icon={BarChart} 
+            color="text-indigo-600" 
+          />
+          <StatsCard 
+            title="Interviewing" 
+            value={statistics.interviewingCount} 
+            icon={TrendingUp} 
+            color="text-green-600" 
+          />
+          <StatsCard 
+            title="Offers Received" 
+            value={statistics.offersCount} 
+            icon={Target} 
+            color="text-purple-600" 
+          />
+          <StatsCard 
+            title="Applications this month" 
+            value={statistics.applicationsThisMonth} 
+            icon={Award} 
+            color="text-orange-600" 
+          />
         </div>
 
         <div className="space-y-8">
@@ -176,6 +175,8 @@ const Tracker = () => {
       </main>
     </div>
   );
-};
+});
+
+Tracker.displayName = 'Tracker';
 
 export default Tracker;

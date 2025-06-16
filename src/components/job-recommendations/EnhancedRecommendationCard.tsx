@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { JobRecommendation } from '@/types/jobRecommendations';
 import RecommendationCardHeader from './RecommendationCardHeader';
 import RecommendationCardDescription from './RecommendationCardDescription';
@@ -14,7 +14,7 @@ interface EnhancedRecommendationCardProps {
   loading: boolean;
 }
 
-const EnhancedRecommendationCard = ({
+const EnhancedRecommendationCard = memo(({
   recommendation,
   onViewJob,
   onMarkAsApplied,
@@ -40,6 +40,8 @@ const EnhancedRecommendationCard = ({
       />
     </div>
   );
-};
+});
+
+EnhancedRecommendationCard.displayName = 'EnhancedRecommendationCard';
 
 export default EnhancedRecommendationCard;

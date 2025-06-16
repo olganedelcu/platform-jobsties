@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
@@ -15,24 +15,23 @@ interface DashboardContentProps {
   user: any;
 }
 
-const DashboardContent = ({ user }: DashboardContentProps) => {
+const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const navigate = useNavigate();
-  const firstName = user?.user_metadata?.first_name || user?.first_name || 'there';
+  const firstName = useMemo(() => 
+    user?.user_metadata?.first_name || user?.first_name || 'there',
+    [user]
+  );
   
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { applications, loading: applicationsLoading } = useJobApplicationsData(user);
 
-  const handleCVOptimizedClick = () => {
-    navigate('/course?module=cv-optimization');
-  };
-
-  const handleInterviewPrepClick = () => {
-    navigate('/course?module=interview-preparation');
-  };
-
-  const handleSalaryNegotiationClick = () => {
-    navigate('/course?module=salary-negotiation');
-  };
+  const navigationHandlers = useMemo(() => ({
+    handleCVOptimizedClick: () => navigate('/course?module=cv-optimization'),
+    handleInterviewPrepClick: () => navigate('/course?module=interview-preparation'),
+    handleSalaryNegotiationClick: () => navigate('/course?module=salary-negotiation'),
+    handleTrackerClick: () => navigate('/tracker'),
+    handleAddApplicationClick: () => navigate('/tracker')
+  }), [navigate]);
 
   if (loading || applicationsLoading) {
     return <DashboardSkeleton />;
@@ -46,23 +45,23 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
         {/* Career Progress Card */}
         <CareerProgressCard
           courseProgress={courseProgress}
-          onCVOptimizedClick={handleCVOptimizedClick}
-          onInterviewPrepClick={handleInterviewPrepClick}
-          onSalaryNegotiationClick={handleSalaryNegotiationClick}
+          onCVOptimizedClick={navigationHandlers.handleCVOptimizedClick}
+          onInterviewPrepClick={navigationHandlers.handleInterviewPrepClick}
+          onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
         />
 
         {/* Applications This Month */}
         <ApplicationsThisMonthCard
           applications={applications}
           loading={applicationsLoading}
-          onClick={() => navigate('/tracker')}
+          onClick={navigationHandlers.handleTrackerClick}
         />
 
         {/* Recent Activity */}
         <MenteeRecentActivityCard
           user={user}
-          onViewAll={() => navigate('/tracker')}
-          onAddApplication={() => navigate('/tracker')}
+          onViewAll={navigationHandlers.handleTrackerClick}
+          onAddApplication={navigationHandlers.handleAddApplicationClick}
         />
 
         {/* Task Board */}
@@ -77,6 +76,8 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
       </div>
     </main>
   );
-};
+});
+
+DashboardContent.displayName = 'DashboardContent';
 
 export default DashboardContent;

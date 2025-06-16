@@ -1,9 +1,27 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
-const DashboardSkeleton = () => {
+const SkeletonCard = memo(() => (
+  <Card className="border border-gray-200 shadow-sm">
+    <CardContent className="p-6">
+      <div className="animate-pulse space-y-4">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-12 w-full" />
+        <div className="flex justify-center gap-1">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="w-1.5 h-8 rounded-full" />
+          ))}
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+));
+
+SkeletonCard.displayName = 'SkeletonCard';
+
+const DashboardSkeleton = memo(() => {
   return (
     <main className="max-w-7xl mx-auto pt-8 py-8 px-4 sm:px-6 bg-white">
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
@@ -22,19 +40,7 @@ const DashboardSkeleton = () => {
         <div className="w-full max-w-4xl mt-8">
           <Skeleton className="h-8 w-1/3 mb-6" />
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            <Card className="border border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="animate-pulse space-y-4">
-                  <Skeleton className="h-4 w-2/3" />
-                  <Skeleton className="h-12 w-full" />
-                  <div className="flex justify-center gap-1">
-                    {[...Array(4)].map((_, i) => (
-                      <Skeleton key={i} className="w-1.5 h-8 rounded-full" />
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <SkeletonCard />
             
             <Card className="border border-gray-200 shadow-sm">
               <CardContent className="p-6">
@@ -62,6 +68,8 @@ const DashboardSkeleton = () => {
       </div>
     </main>
   );
-};
+});
+
+DashboardSkeleton.displayName = 'DashboardSkeleton';
 
 export default DashboardSkeleton;
