@@ -25,6 +25,7 @@ const WeeklyJobRecommendations = ({ userId }: WeeklyJobRecommendationsProps) => 
   const [addingToTracker, setAddingToTracker] = useState<string | null>(null);
 
   const { markAsApplied } = useJobRecommendationActions({ 
+    userId: userId,
     user: { id: userId }
   });
 

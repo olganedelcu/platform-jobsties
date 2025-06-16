@@ -34,6 +34,7 @@ export const useEnhancedJobRecommendations = ({ userId }: UseEnhancedJobRecommen
 
   // Use the job recommendation actions hook for adding to job applications
   const { markAsApplied: addToJobTracker } = useJobRecommendationActions({ 
+    userId: userId,
     user: { id: userId },
     onApplicationAdded: () => {
       fetchAllRecommendations();
