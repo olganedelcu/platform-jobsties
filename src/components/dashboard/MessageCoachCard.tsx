@@ -13,15 +13,15 @@ const MessageCoachCard = () => {
   };
 
   return (
-    <Card className="border border-gray-200 shadow-sm">
+    <Card className="border border-indigo-200 shadow-sm">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold text-gray-900">Get in Touch with Ana</h3>
+          <h3 className="text-xl font-semibold text-indigo-900">Get in Touch with Ana</h3>
           <MessageCircle className="h-6 w-6 text-indigo-600" />
         </div>
         
         <div className="space-y-4">
-          <p className="text-gray-600 text-sm">
+          <p className="text-indigo-700 text-sm">
             Need guidance or have questions about your career journey? Ana is here to help you succeed.
           </p>
           
@@ -30,8 +30,8 @@ const MessageCoachCard = () => {
               <Mail className="h-5 w-5 text-indigo-600" />
             </div>
             <div>
-              <p className="font-medium text-gray-900">Ana Nedelcu</p>
-              <p className="text-sm text-gray-600">Your Career Coach</p>
+              <p className="font-medium text-indigo-900">Ana Nedelcu</p>
+              <p className="text-sm text-indigo-600">Your Career Coach</p>
             </div>
           </div>
           
