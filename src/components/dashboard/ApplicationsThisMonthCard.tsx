@@ -72,12 +72,12 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   if (loading) {
     return (
-      <Card className="border border-gray-200 shadow-sm w-48">
-        <CardContent className="p-4">
+      <Card className="border border-gray-200 shadow-sm w-36">
+        <CardContent className="p-3">
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-16 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-20 mb-3"></div>
-            <div className="h-1.5 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-12 mb-1"></div>
+            <div className="h-2 bg-gray-200 rounded w-16 mb-2"></div>
+            <div className="h-1 bg-gray-200 rounded"></div>
           </div>
         </CardContent>
       </Card>
@@ -86,20 +86,20 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   return (
     <Card 
-      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-48" 
+      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-36" 
       onClick={onClick}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600 mb-1">
+          <div className="text-lg font-bold text-blue-600 mb-0.5">
             {applicationsThisWeek}/30
           </div>
-          <div className="text-xs text-gray-600 mb-3">Applications this week</div>
+          <div className="text-xs text-gray-600 mb-2">Applications this week</div>
           
           {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div className="w-full bg-gray-200 rounded-full h-1">
             <div 
-              className="bg-blue-500 h-1.5 rounded-full transition-all duration-300" 
+              className="bg-blue-500 h-1 rounded-full transition-all duration-300" 
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
