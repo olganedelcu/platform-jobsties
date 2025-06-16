@@ -46,11 +46,11 @@ const MessageThread = ({
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col max-h-full">
         <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
           <div className="text-gray-900 font-medium">Loading messages...</div>
         </div>
-        <div className="p-6 flex-1">
+        <div className="p-6 flex-1 min-h-0">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse">
@@ -65,14 +65,14 @@ const MessageThread = ({
 
   if (messages.length === 0) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full flex flex-col max-h-full">
         <div className="bg-gray-50 border-b border-gray-200 p-4 flex-shrink-0">
           <div className="text-gray-900 font-medium flex items-center gap-2">
             <User className="h-5 w-5" />
             {conversationSubject || 'Conversation'}
           </div>
         </div>
-        <div className="flex items-center justify-center flex-1">
+        <div className="flex items-center justify-center flex-1 min-h-0">
           <div className="text-center text-gray-500">
             <User className="h-12 w-12 mx-auto mb-3 text-gray-400" />
             <p className="text-gray-700 font-medium">No messages yet</p>
@@ -84,7 +84,7 @@ const MessageThread = ({
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col max-h-full">
       <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200 p-4">
         <div className="flex items-center gap-2 text-gray-900 font-medium">
           <User className="h-5 w-5" />
@@ -92,7 +92,7 @@ const MessageThread = ({
         </div>
       </div>
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <div 
           ref={scrollContainerRef}
           className="h-full overflow-y-auto p-2"
