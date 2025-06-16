@@ -15,11 +15,7 @@ const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
   if (viewMode === 'board') {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Tasks from Your Coach</h2>
-            <p className="text-gray-600">Complete tasks assigned by your coach in board view</p>
-          </div>
+        <div className="flex justify-end">
           <Button
             onClick={() => setViewMode('list')}
             variant="outline"
@@ -30,7 +26,6 @@ const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
           </Button>
         </div>
 
-        {/* Pass userId as the mentee ID, not coach ID */}
         <CoachAssignmentsBoard coachId={userId} />
       </div>
     );
@@ -38,11 +33,7 @@ const AssignmentsTabContent = ({ userId }: AssignmentsTabContentProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Tasks from Your Coach</h2>
-          <p className="text-gray-600">Complete tasks assigned by your coach</p>
-        </div>
+      <div className="flex justify-end">
         <Button
           onClick={() => setViewMode('board')}
           variant="outline"
