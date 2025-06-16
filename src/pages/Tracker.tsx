@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
