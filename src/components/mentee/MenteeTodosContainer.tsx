@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
-import MenteeTodosTabNavigation from './MenteeTodosTabNavigation';
 import AssignmentsTabContent from './AssignmentsTabContent';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
 
@@ -12,7 +11,6 @@ interface MenteeTodosContainerProps {
 
 const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState<'assignments' | 'personal'>('assignments');
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Hooks for todo management
@@ -26,19 +24,11 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
 
   return (
     <main className="max-w-7xl mx-auto py-8 px-6">
-      <MenteeTodosTabNavigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        assignmentsCount={assignments.length}
-        todosCount={todos.length}
-      />
+      {/* Coach Assignments Section */}
+      <AssignmentsTabContent userId={userId} />
 
-      {/* Content based on active tab */}
-      {activeTab === 'assignments' && (
-        <AssignmentsTabContent userId={userId} />
-      )}
-
-      {activeTab === 'personal' && (
+      {/* Personal Todos Section */}
+      <div className="mt-12">
         <PersonalTodosTabContent
           todos={todos}
           showAddForm={showAddForm}
@@ -52,7 +42,7 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
           onUpdateStatus={updateTodoStatus}
           onDeleteTodo={deleteTodo}
         />
-      )}
+      </div>
     </main>
   );
 };
