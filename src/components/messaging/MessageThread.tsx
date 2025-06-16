@@ -1,9 +1,9 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, Paperclip, User, Bot } from 'lucide-react';
+import { Download, Paperclip, User, Bot, ChevronUp } from 'lucide-react';
 import { Message, MessageAttachment } from '@/hooks/useMessages';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -15,6 +15,8 @@ interface MessageThreadProps {
   currentUserId: string | null;
 }
 
+const MESSAGES_PER_PAGE = 5;
+
 const MessageThread = ({
   messages,
   loading,
@@ -24,20 +26,50 @@ const MessageThread = ({
 }: MessageThreadProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [visibleMessagesCount, setVisibleMessagesCount] = useState(MESSAGES_PER_PAGE);
+  const [showLoadMore, setShowLoadMore] = useState(false);
+
+  // Get the messages to display (most recent ones)
+  const visibleMessages = messages.slice(-visibleMessagesCount);
+  const hasMoreMessages = messages.length > visibleMessagesCount;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Scroll to bottom when messages change
+  const loadMoreMessages = () => {
+    const newCount = Math.min(visibleMessagesCount + MESSAGES_PER_PAGE, messages.length);
+    setVisibleMessagesCount(newCount);
+  };
+
+  const handleScroll = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+    
+    const { scrollTop } = scrollContainerRef.current;
+    
+    // Show load more button when scrolled near the top
+    if (scrollTop < 100 && hasMoreMessages) {
+      setShowLoadMore(true);
+    } else {
+      setShowLoadMore(false);
+    }
+  }, [hasMoreMessages]);
+
+  // Reset visible messages count when conversation changes
   useEffect(() => {
-    if (messages.length > 0) {
+    setVisibleMessagesCount(MESSAGES_PER_PAGE);
+    setShowLoadMore(false);
+  }, [messages.length === 0]);
+
+  // Scroll to bottom when new messages arrive (but only if we're showing recent messages)
+  useEffect(() => {
+    if (messages.length > 0 && visibleMessagesCount >= messages.length - MESSAGES_PER_PAGE) {
       const timeoutId = setTimeout(() => {
         scrollToBottom();
       }, 100);
       return () => clearTimeout(timeoutId);
     }
-  }, [messages]);
+  }, [messages, visibleMessagesCount]);
 
   // Scroll to bottom on initial load
   useEffect(() => {
@@ -89,17 +121,48 @@ const MessageThread = ({
         <div className="flex items-center gap-2 text-gray-900 font-medium">
           <User className="h-5 w-5" />
           {conversationSubject || 'Conversation'}
+          {hasMoreMessages && (
+            <span className="text-xs text-gray-500">
+              ({visibleMessagesCount} of {messages.length})
+            </span>
+          )}
         </div>
       </div>
       
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden relative">
+        {showLoadMore && hasMoreMessages && (
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+            <Button
+              size="sm"
+              variant="outline"
+              className="bg-white shadow-md hover:bg-gray-50 text-xs"
+              onClick={loadMoreMessages}
+            >
+              <ChevronUp className="h-3 w-3 mr-1" />
+              Load more messages
+            </Button>
+          </div>
+        )}
+        
         <div 
           ref={scrollContainerRef}
           className="h-full overflow-y-auto p-2"
           style={{ scrollBehavior: 'smooth' }}
+          onScroll={handleScroll}
         >
           <div className="space-y-1">
-            {messages.map((message) => {
+            {hasMoreMessages && (
+              <div className="text-center py-2">
+                <button
+                  onClick={loadMoreMessages}
+                  className="text-xs text-gray-500 hover:text-gray-700 underline"
+                >
+                  {messages.length - visibleMessagesCount} older messages
+                </button>
+              </div>
+            )}
+            
+            {visibleMessages.map((message) => {
               const isCurrentUser = message.sender_id === currentUserId;
               const isCoach = message.sender_type === 'coach';
 
