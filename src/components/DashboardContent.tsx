@@ -3,7 +3,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useQuoteOfTheDay } from '@/hooks/useQuoteOfTheDay';
-import { useDashboardTaskBoard } from '@/hooks/useDashboardTaskBoard';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
@@ -21,7 +20,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
   const { todaysQuote } = useQuoteOfTheDay();
-  const { tasks, loading: tasksLoading, updateTaskStatus } = useDashboardTaskBoard(user?.id);
 
   const handleCVOptimizedClick = () => {
     navigate('/course?module=cv-optimization');
@@ -76,19 +74,11 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
         />
 
         {/* Tasks In Progress */}
-        <TasksInProgressCard
-          tasksCount={tasks.filter(t => t.status === 'in_progress').length}
-          onViewTasks={() => navigate('/todos')}
-        />
+        <TasksInProgressCard userId={user?.id} />
 
         {/* Task Board */}
         <div className="xl:col-span-1">
-          <DashboardTaskBoard
-            tasks={tasks}
-            loading={tasksLoading}
-            onStatusChange={updateTaskStatus}
-            onViewAll={() => navigate('/todos')}
-          />
+          <DashboardTaskBoard userId={user?.id} />
         </div>
       </div>
 
