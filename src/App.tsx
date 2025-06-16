@@ -32,6 +32,7 @@ const JobRecommendations = lazy(() => import("./pages/coach/JobRecommendations")
 const BackupManagementPage = lazy(() => import("./pages/coach/BackupManagement"));
 const CoachMessages = lazy(() => import("./pages/coach/CoachMessages"));
 const MenteeTodosPage = lazy(() => import("./pages/MenteeTodosPage"));
+const ApplicationDetail = lazy(() => import("./pages/ApplicationDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -75,6 +76,7 @@ const App = () => (
               <Route path="/sessions" element={<Sessions />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/tracker" element={<Tracker />} />
+              <Route path="/application/:id" element={<ApplicationDetail />} />
               <Route path="/course" element={<Course />} />
               <Route path="/todos" element={<MenteeTodosPage />} />
               

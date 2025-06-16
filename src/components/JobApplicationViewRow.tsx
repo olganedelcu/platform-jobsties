@@ -1,10 +1,14 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
+import { Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import JobApplicationStatusBadge from '@/components/JobApplicationStatusBadge';
 import JobApplicationRowActions from '@/components/JobApplicationRowActions';
+import TruncatedNotes from '@/components/TruncatedNotes';
 
 interface JobApplicationViewRowProps {
   application: JobApplication;
@@ -37,13 +41,7 @@ const JobApplicationViewRow = ({
       </TableCell>
       <TableCell className="w-64">
         <div className="break-words">
-          {application.mentee_notes ? (
-            <div className="text-sm text-gray-700 bg-green-50 p-2 rounded border-l-2 border-green-400">
-              {application.mentee_notes}
-            </div>
-          ) : (
-            <span className="text-gray-400 text-sm">-</span>
-          )}
+          <TruncatedNotes notes={application.mentee_notes} maxLength={100} />
         </div>
       </TableCell>
       <TableCell className="w-64">
@@ -57,17 +55,26 @@ const JobApplicationViewRow = ({
           )}
         </div>
       </TableCell>
-      <TableCell className="w-24">
-        <JobApplicationRowActions
-          application={application}
-          isEditing={false}
-          isAddingNew={isAddingNew}
-          isCoachView={isCoachView}
-          onEdit={onEdit}
-          onSave={() => Promise.resolve()}
-          onCancel={() => {}}
-          onDelete={onDelete}
-        />
+      <TableCell className="w-32">
+        <div className="flex items-center space-x-2">
+          {!isCoachView && (
+            <Link to={`/application/${application.id}`}>
+              <Button variant="outline" size="sm" title="View Full Application">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
+          <JobApplicationRowActions
+            application={application}
+            isEditing={false}
+            isAddingNew={isAddingNew}
+            isCoachView={isCoachView}
+            onEdit={onEdit}
+            onSave={() => Promise.resolve()}
+            onCancel={() => {}}
+            onDelete={onDelete}
+          />
+        </div>
       </TableCell>
     </TableRow>
   );
