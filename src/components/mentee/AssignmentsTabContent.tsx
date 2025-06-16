@@ -21,43 +21,39 @@ const AssignmentsTabContent = ({
   const currentViewMode = externalViewMode || internalViewMode;
   const handleViewModeChange = onViewModeChange || setInternalViewMode;
 
-  if (currentViewMode === 'board') {
-    return (
-      <div className="space-y-6">
-        {!onViewModeChange && (
-          <div className="flex justify-end">
-            <Button
-              onClick={() => handleViewModeChange('list')}
-              variant="outline"
-              className="flex items-center space-x-2"
-            >
-              <List className="h-4 w-4" />
-              <span>List View</span>
-            </Button>
-          </div>
-        )}
-
-        <CoachAssignmentsBoard coachId={userId} />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {!onViewModeChange && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Tasks from Your Coach</h2>
+          <p className="text-gray-600">Complete tasks assigned by your coach</p>
+        </div>
+        {!onViewModeChange && (
           <Button
-            onClick={() => handleViewModeChange('board')}
+            onClick={() => handleViewModeChange(currentViewMode === 'list' ? 'board' : 'list')}
             variant="outline"
             className="flex items-center space-x-2"
           >
-            <LayoutGrid className="h-4 w-4" />
-            <span>Board View</span>
+            {currentViewMode === 'list' ? (
+              <>
+                <LayoutGrid className="h-4 w-4" />
+                <span>Board View</span>
+              </>
+            ) : (
+              <>
+                <List className="h-4 w-4" />
+                <span>List View</span>
+              </>
+            )}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
       
-      <MenteeAssignmentsList userId={userId} />
+      {currentViewMode === 'list' ? (
+        <MenteeAssignmentsList userId={userId} />
+      ) : (
+        <CoachAssignmentsBoard coachId={userId} />
+      )}
     </div>
   );
 };
