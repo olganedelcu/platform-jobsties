@@ -52,11 +52,6 @@ const MessagingInterface = ({ initialConversationId }: MessagingInterfaceProps) 
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
-        <p className="text-gray-600 mt-2">Communicate with your coach and manage conversations</p>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{ height: 'calc(100vh - 200px)' }}>
         <div className="lg:col-span-1 h-full">
           <ConversationsList
