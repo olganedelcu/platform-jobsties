@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -66,7 +65,7 @@ const MessageCoachCard = () => {
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-1 border-t border-gray-200 pb-0">
+            <div className="mt-1 pt-1 border-t border-gray-200">
               <Button 
                 onClick={handleMessageCoach}
                 variant="ghost"
