@@ -72,12 +72,14 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   if (loading) {
     return (
-      <Card className="border border-gray-200 shadow-sm w-36">
-        <CardContent className="p-3">
-          <div className="animate-pulse">
-            <div className="h-3 bg-gray-200 rounded w-12 mb-1"></div>
-            <div className="h-2 bg-gray-200 rounded w-16 mb-2"></div>
-            <div className="h-1 bg-gray-200 rounded"></div>
+      <Card className="border border-gray-200 shadow-sm w-44 h-16">
+        <CardContent className="p-2">
+          <div className="animate-pulse flex items-center gap-3">
+            <div className="h-4 bg-gray-200 rounded w-8"></div>
+            <div className="flex-1">
+              <div className="h-2 bg-gray-200 rounded w-20 mb-1"></div>
+              <div className="h-1 bg-gray-200 rounded"></div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -86,22 +88,23 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   return (
     <Card 
-      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-36" 
+      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-44 h-16" 
       onClick={onClick}
     >
-      <CardContent className="p-3">
-        <div className="text-center">
-          <div className="text-lg font-bold text-blue-600 mb-0.5">
+      <CardContent className="p-2">
+        <div className="flex items-center gap-3">
+          <div className="text-lg font-bold text-blue-600">
             {applicationsThisWeek}/30
           </div>
-          <div className="text-xs text-gray-600 mb-2">Applications this week</div>
-          
-          {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-1">
-            <div 
-              className="bg-blue-500 h-1 rounded-full transition-all duration-300" 
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
+          <div className="flex-1">
+            <div className="text-xs text-gray-600 mb-1">Applications this week</div>
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-1">
+              <div 
+                className="bg-blue-500 h-1 rounded-full transition-all duration-300" 
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
           </div>
         </div>
       </CardContent>
