@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,12 @@ interface MenteeTodosTabsContentProps {
   userId: string;
 }
 
-const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
+const MenteeTodosPage = ({ userId }: MenteeTodosTabsContentProps) => {
   const [assignmentsViewMode, setAssignmentsViewMode] = useState<'list' | 'board'>('list');
   const [personalViewMode, setPersonalViewMode] = useState<'list' | 'board'>('list');
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // Get personal tasks and assignments
+  // Get personal tasks and assignments with error handling
   const { assignments, loading: assignmentsLoading } = useTodoAssignments(userId, false);
   const { todos, loading: todosLoading, addTodo, updateStatus: updateTodoStatus, deleteTodo } = useMenteeTodos(userId);
 
@@ -31,25 +31,44 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
     setShowAddForm(false);
   };
 
-  // Calculate task statistics
-  const personalPending = todos.filter(task => task.status === 'pending').length;
-  const personalInProgress = todos.filter(task => task.status === 'in_progress').length;
-  const personalCompleted = todos.filter(task => task.status === 'completed').length;
+  // Memoize statistics calculations to prevent unnecessary re-renders
+  const statistics = useMemo(() => {
+    const personalPending = todos.filter(task => task.status === 'pending').length;
+    const personalInProgress = todos.filter(task => task.status === 'in_progress').length; 
+    const personalCompleted = todos.filter(task => task.status === 'completed').length;
 
-  const assignmentsPending = assignments.filter(assignment => assignment.status === 'pending').length;
-  const assignmentsInProgress = assignments.filter(assignment => assignment.status === 'in_progress').length;
-  const assignmentsCompleted = assignments.filter(assignment => assignment.status === 'completed').length;
+    const assignmentsPending = assignments.filter(assignment => assignment.status === 'pending').length;
+    const assignmentsInProgress = assignments.filter(assignment => assignment.status === 'in_progress').length;
+    const assignmentsCompleted = assignments.filter(assignment => assignment.status === 'completed').length;
 
-  const totalPending = personalPending + assignmentsPending;
-  const totalInProgress = personalInProgress + assignmentsInProgress;
-  const totalCompleted = personalCompleted + assignmentsCompleted;
+    return {
+      totalPending: personalPending + assignmentsPending,
+      totalInProgress: personalInProgress + assignmentsInProgress,
+      totalCompleted: personalCompleted + assignmentsCompleted,
+      totalTasks: todos.length + assignments.length,
+      personalTasks: todos.length,
+      assignmentTasks: assignments.length
+    };
+  }, [todos, assignments]);
+
+  // Show loading state while data is being fetched
+  if (assignmentsLoading && todosLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your tasks...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <MenteeTodosStats 
-        totalPending={totalPending}
-        totalInProgress={totalInProgress}
-        totalCompleted={totalCompleted}
+        totalPending={statistics.totalPending}
+        totalInProgress={statistics.totalInProgress}
+        totalCompleted={statistics.totalCompleted}
       />
 
       <Tabs defaultValue="all" className="w-full">
@@ -57,19 +76,19 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
           <TabsTrigger value="all" className="flex items-center gap-2">
             All Tasks
             <Badge variant="secondary" className="bg-gray-100">
-              {todos.length + assignments.length}
+              {statistics.totalTasks}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="personal" className="flex items-center gap-2">
             Personal Tasks
             <Badge variant="secondary" className="bg-blue-100">
-              {todos.length}
+              {statistics.personalTasks}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="assignments" className="flex items-center gap-2">
             Coach Assignments
             <Badge variant="secondary" className="bg-purple-100">
-              {assignments.length}
+              {statistics.assignmentTasks}
             </Badge>
           </TabsTrigger>
         </TabsList>
@@ -77,14 +96,14 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
         <TabsContent value="all" className="mt-6">
           <div className="space-y-8">
             {/* Coach Assignments Section */}
-            {assignments.length > 0 && (
+            {statistics.assignmentTasks > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
                       Coach Assignments
                       <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                        {assignments.length}
+                        {statistics.assignmentTasks}
                       </Badge>
                     </h2>
                   </div>
@@ -121,7 +140,7 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
                   <h2 className="text-xl font-semibold text-gray-900 mb-1 flex items-center gap-2">
                     Personal Tasks
                     <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                      {todos.length}
+                      {statistics.personalTasks}
                     </Badge>
                   </h2>
                 </div>
@@ -250,4 +269,4 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
   );
 };
 
-export default MenteeTodosTabsContent;
+export default MenteeTodosPage;
