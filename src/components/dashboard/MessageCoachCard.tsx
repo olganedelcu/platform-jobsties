@@ -73,14 +73,14 @@ const MessageCoachCard = () => {
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-2 border-t border-gray-200">
+            <div className="mt-2 pt-1 border-t border-gray-200">
               <Button 
                 onClick={handleMessageCoach}
                 variant="ghost"
                 size="sm"
                 className="w-full text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 text-sm h-7"
               >
-                View All Messages
+                All Messages
               </Button>
             </div>
           </>

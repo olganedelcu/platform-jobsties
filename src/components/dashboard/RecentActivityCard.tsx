@@ -76,14 +76,14 @@ const RecentActivityCard = ({ recentApplications, onViewAll, onAddApplication }:
               </div>
             </ScrollArea>
             
-            <div className="mt-2 pt-2 border-t border-gray-200">
+            <div className="mt-2 pt-1 border-t border-gray-200">
               <Button 
                 onClick={onViewAll}
                 variant="ghost"
                 size="sm"
                 className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-sm h-7"
               >
-                View All Applications
+                All Applications
               </Button>
             </div>
           </>
