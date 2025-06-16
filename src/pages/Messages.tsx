@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
+import { useSearchParams } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import MessagingInterface from '@/components/messaging/MessagingInterface';
 import { Loader2 } from 'lucide-react';
 
 const Messages = () => {
   const { user, loading, handleSignOut } = useAuthState();
+  const [searchParams] = useSearchParams();
+  const conversationId = searchParams.get('conversation');
 
   if (loading) {
     return (
@@ -26,7 +29,7 @@ const Messages = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
-      <MessagingInterface />
+      <MessagingInterface initialConversationId={conversationId} />
     </div>
   );
 };
