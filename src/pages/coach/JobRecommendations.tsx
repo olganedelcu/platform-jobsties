@@ -4,14 +4,17 @@ import { useAuthState } from '@/hooks/useAuthState';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
 import CoachNavigation from '@/components/CoachNavigation';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
+import { useMenteeNames } from '@/hooks/useMenteeNames';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ExternalLink, Building2, Calendar, User, Trash2, UserPlus } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import JobRecommendationAssignmentDialog from '@/components/coach/JobRecommendationAssignmentDialog';
 import ApplicationsJobRecommendations from '@/components/coach/ApplicationsJobRecommendations';
+import MenteeNameCell from '@/components/coach/MenteeNameCell';
 
 const CoachJobRecommendations = () => {
   const { user, loading, handleSignOut } = useAuthState();
@@ -23,6 +26,11 @@ const CoachJobRecommendations = () => {
   
   const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
+
+  // Get unique mentee IDs for fetching names
+  const uniqueMenteeIds = [...new Set(recommendations.map(rec => rec.mentee_id))];
+  const { menteeNames, loading: menteeNamesLoading } = useMenteeNames(uniqueMenteeIds);
 
   if (loading) {
     return (
@@ -74,6 +82,45 @@ const CoachJobRecommendations = () => {
     }
   };
 
+  const handleSelectAssignment = (assignmentId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedAssignments(prev => [...prev, assignmentId]);
+    } else {
+      setSelectedAssignments(prev => prev.filter(id => id !== assignmentId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allAssignmentIds = recommendations.map(rec => rec.id);
+      setSelectedAssignments(allAssignmentIds);
+    } else {
+      setSelectedAssignments([]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedAssignments.length === 0) return;
+
+    try {
+      const promises = selectedAssignments.map(id => deleteRecommendation(id));
+      await Promise.all(promises);
+
+      toast({
+        title: "Success",
+        description: `${selectedAssignments.length} recommendation(s) deleted successfully.`,
+      });
+
+      setSelectedAssignments([]);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete some recommendations. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   // Group recommendations by job details to show unique jobs
   const groupedRecommendations = recommendations.reduce((acc, rec) => {
     const key = `${rec.job_title}-${rec.company_name}-${rec.job_link}`;
@@ -105,19 +152,39 @@ const CoachJobRecommendations = () => {
             <p className="text-gray-600 mt-2">Manage and assign job recommendations to your mentees</p>
           </div>
 
-          {/* Job Recommendations Form Section - Moved from Applications */}
+          {/* Job Recommendations Form Section */}
           <ApplicationsJobRecommendations />
 
           {/* All Recommendations List */}
           <Card>
             <CardHeader>
-              <CardTitle>Your Job Recommendations</CardTitle>
-              <p className="text-sm text-gray-600">
-                {uniqueRecommendations.length} unique job recommendations sent to mentees
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Your Job Recommendations</CardTitle>
+                  <p className="text-sm text-gray-600">
+                    {uniqueRecommendations.length} unique job recommendations sent to mentees
+                  </p>
+                </div>
+                {selectedAssignments.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">
+                      {selectedAssignments.length} selected
+                    </Badge>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleDeleteSelected}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete Selected
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              {recommendationsLoading ? (
+              {recommendationsLoading || menteeNamesLoading ? (
                 <div className="text-center py-8">Loading recommendations...</div>
               ) : uniqueRecommendations.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
@@ -127,6 +194,17 @@ const CoachJobRecommendations = () => {
                 </div>
               ) : (
                 <div className="space-y-6">
+                  {/* Select All Checkbox */}
+                  <div className="flex items-center gap-2 border-b pb-4">
+                    <Checkbox
+                      checked={selectedAssignments.length === recommendations.length && recommendations.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                    <label className="text-sm font-medium">
+                      Select All ({recommendations.length} assignments)
+                    </label>
+                  </div>
+
                   {uniqueRecommendations.map((recommendation) => (
                     <div key={`${recommendation.job_title}-${recommendation.company_name}`} className="border rounded-lg p-6 bg-white">
                       <div className="flex items-start justify-between mb-4">
@@ -178,16 +256,23 @@ const CoachJobRecommendations = () => {
                           {recommendation.assignments.map((assignment: any) => (
                             <div key={assignment.id} className="bg-gray-50 rounded-lg p-3">
                               <div className="flex items-center justify-between">
-                                <div>
-                                  <p className="text-sm font-medium text-gray-900">
-                                    Mentee ID: {assignment.mentee_id.slice(0, 8)}...
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    Week of {format(new Date(assignment.week_start_date), 'MMM dd, yyyy')}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    Sent {format(new Date(assignment.created_at), 'MMM dd, yyyy')}
-                                  </p>
+                                <div className="flex items-center gap-3 flex-1">
+                                  <Checkbox
+                                    checked={selectedAssignments.includes(assignment.id)}
+                                    onCheckedChange={(checked) => handleSelectAssignment(assignment.id, checked as boolean)}
+                                  />
+                                  <div className="flex-1">
+                                    <MenteeNameCell
+                                      menteeId={assignment.mentee_id}
+                                      menteeName={menteeNames[assignment.mentee_id]}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      Week of {format(new Date(assignment.week_start_date), 'MMM dd, yyyy')}
+                                    </p>
+                                    <p className="text-xs text-gray-500">
+                                      Sent {format(new Date(assignment.created_at), 'MMM dd, yyyy')}
+                                    </p>
+                                  </div>
                                 </div>
                                 <Button
                                   variant="ghost"
