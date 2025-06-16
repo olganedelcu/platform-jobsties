@@ -17,7 +17,6 @@ import { supabase } from '@/integrations/supabase/client';
 import DesktopNavigation from './DesktopNavigation';
 import MobileNavigation from './MobileNavigation';
 import UserProfileSection from './UserProfileSection';
-import MessageNotificationBadge from './messaging/MessageNotificationBadge';
 import NotificationDropdown from './notifications/NotificationDropdown';
 
 interface NavigationProps {
@@ -93,15 +92,6 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
 
           <div className="md:hidden flex items-center space-x-3">
             <NotificationDropdown />
-            <div className="relative">
-              <Link
-                to="/messages"
-                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <MessageCircle className="h-5 w-5 text-gray-600" />
-                <MessageNotificationBadge />
-              </Link>
-            </div>
             <Button
               variant="ghost"
               size="sm"

@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LucideIcon, MessageCircle } from 'lucide-react';
-import MessageNotificationBadge from './messaging/MessageNotificationBadge';
+import { LucideIcon } from 'lucide-react';
 
 interface NavigationItem {
   path: string;
@@ -35,7 +34,6 @@ const DesktopNavigation = ({ navigationItems }: DesktopNavigationProps) => {
           >
             <IconComponent className="h-5 w-5 mr-2 flex-shrink-0" />
             <span className="whitespace-nowrap">{item.label}</span>
-            {item.path === '/messages' && <MessageNotificationBadge />}
           </Link>
         );
       })}
