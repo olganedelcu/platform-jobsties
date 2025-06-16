@@ -70,15 +70,12 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-2 rounded-2xl">
-                <img 
-                  src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-                  alt="Logo" 
-                  className="h-8 w-auto filter brightness-0 invert"
-                />
-              </div>
-              <span className="text-xl font-bold text-gray-900">JobSties</span>
+            <Link to="/dashboard" className="flex items-center">
+              <img 
+                src="/lovable-uploads/3b078c02-4587-47e6-91c9-51ddab04b13c.png" 
+                alt="Platform Logo" 
+                className="h-12 w-auto"
+              />
             </Link>
           </div>
 
