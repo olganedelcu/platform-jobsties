@@ -106,7 +106,7 @@ const CoachTodos = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <CoachNavigation user={user} onSignOut={handleSignOut} />
       
       <main className="max-w-7xl mx-auto py-8 px-6">
