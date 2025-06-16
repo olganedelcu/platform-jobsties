@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, CheckCircle, RotateCcw } from 'lucide-react';
+import { CheckCircle, RotateCcw } from 'lucide-react';
 import ModuleFiles from '@/components/ModuleFiles';
 
 interface InterviewPreparationModuleProps {
@@ -33,15 +33,6 @@ const InterviewPreparationModule = ({
         title="Interview Preparation" 
       />
       <div className="flex flex-wrap gap-3">
-        {moduleAction === 'Book Call' && onBookCall && (
-          <Button 
-            onClick={onBookCall}
-            className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-          >
-            <Calendar className="h-4 w-4" />
-            <span>Book Interview Preparation Call</span>
-          </Button>
-        )}
         {!isCompleted ? (
           <Button 
             onClick={onComplete}
