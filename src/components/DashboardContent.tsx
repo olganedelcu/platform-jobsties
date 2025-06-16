@@ -2,12 +2,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { useQuoteOfTheDay } from '@/hooks/useQuoteOfTheDay';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import TasksInProgressCard from '@/components/dashboard/TasksInProgressCard';
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface DashboardContentProps {
   user: any;
@@ -18,7 +16,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   const firstName = user?.user_metadata?.first_name || user?.first_name || 'there';
   
   const { upcomingSessions, profileCompletion, courseProgress, loading } = useDashboardData(user?.id);
-  const { todaysQuote } = useQuoteOfTheDay();
 
   const handleCVOptimizedClick = () => {
     navigate('/course?module=cv-optimization');
@@ -50,18 +47,6 @@ const DashboardContent = ({ user }: DashboardContentProps) => {
   return (
     <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 bg-white">
       <DashboardHeader user={user} firstName={firstName} />
-
-      {/* Quote of the day */}
-      {todaysQuote && (
-        <Card className="mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="p-6 text-center">
-            <blockquote className="text-lg font-medium text-gray-900 italic mb-2">
-              "{todaysQuote.text}"
-            </blockquote>
-            <cite className="text-sm text-blue-600 font-semibold">— {todaysQuote.author}</cite>
-          </CardContent>
-        </Card>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* Career Progress Card */}
