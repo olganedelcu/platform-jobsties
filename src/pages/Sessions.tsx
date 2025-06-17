@@ -127,16 +127,16 @@ const Sessions = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
+      <main className="max-w-7xl mx-auto py-12 sm:py-16 px-6 sm:px-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 sm:mb-12 space-y-6 sm:space-y-0">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Coaching Sessions</h1>
-            <p className="text-gray-600 mt-2">Schedule and manage your coaching sessions</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">Coaching Sessions</h1>
+            <p className="text-gray-600 mt-3">Schedule and manage your coaching sessions</p>
           </div>
           
           <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 w-full sm:w-auto">
+              <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 w-full sm:w-auto px-6 py-3">
                 <Plus className="h-4 w-4 mr-2" />
                 Schedule Session
               </Button>
@@ -157,7 +157,7 @@ const Sessions = () => {
 
         {/* Loading State */}
         {sessionsLoading && (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
             <span className="ml-2 text-gray-600">Loading sessions...</span>
           </div>
@@ -165,7 +165,7 @@ const Sessions = () => {
 
         {/* Sessions Grid */}
         {!sessionsLoading && sessions.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
             {sessions.map((session) => (
               <SessionCard
                 key={session.id}
@@ -179,12 +179,12 @@ const Sessions = () => {
 
         {/* Empty State */}
         {!sessionsLoading && sessions.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No sessions scheduled</h3>
-            <p className="text-gray-500 mb-6">Get started by scheduling your first coaching session</p>
+          <div className="text-center py-16">
+            <Calendar className="h-20 w-20 text-gray-400 mx-auto mb-6" />
+            <h3 className="text-xl font-medium text-gray-900 mb-3">No sessions scheduled</h3>
+            <p className="text-gray-500 mb-8">Get started by scheduling your first coaching session</p>
             <Button 
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-6 py-3"
               onClick={() => setShowScheduleDialog(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
