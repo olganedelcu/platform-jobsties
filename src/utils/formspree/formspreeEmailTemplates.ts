@@ -33,7 +33,7 @@ interface CourseFeedbackData {
 const sendFormspreeEmail = async (formData: FormData): Promise<void> => {
   const endpoint = getFormspreeEndpoint();
   if (!endpoint) {
-    throw new Error('JobsTiesAPI notification endpoint not configured');
+    throw new Error('JobsTies API notification endpoint not configured');
   }
 
   const response = await fetch(endpoint, {
@@ -45,12 +45,12 @@ const sendFormspreeEmail = async (formData: FormData): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error(`JobsTiesAPI error: ${response.status}`);
+    throw new Error(`JobsTies API error: ${response.status}`);
   }
 };
 
 export const sendCourseFeedbackEmail = async (data: CourseFeedbackData): Promise<void> => {
-  console.log("📝 JobsTiesAPI course feedback notification triggered:", {
+  console.log("📝 JobsTies API course feedback notification triggered:", {
     menteeEmail: data.menteeEmail,
     menteeName: data.menteeName,
     feedbackPreview: data.feedback.substring(0, 50) + "..."
@@ -74,7 +74,7 @@ export const sendCourseFeedbackEmail = async (data: CourseFeedbackData): Promise
 };
 
 export const sendSessionRescheduleEmail = async (data: SessionRescheduleData): Promise<void> => {
-  console.log("📅 JobsTiesAPI session reschedule notification triggered:", {
+  console.log("📅 JobsTies API session reschedule notification triggered:", {
     menteeEmail: data.menteeEmail,
     menteeName: data.menteeName,
     sessionType: data.sessionType
@@ -118,7 +118,7 @@ The JobsTies.Platform Team`;
 };
 
 export const sendSessionCancellationEmail = async (data: SessionCancellationData): Promise<void> => {
-  console.log("❌ JobsTiesAPI session cancellation notification triggered:", {
+  console.log("❌ JobsTies API session cancellation notification triggered:", {
     menteeEmail: data.menteeEmail,
     menteeName: data.menteeName,
     sessionType: data.sessionType

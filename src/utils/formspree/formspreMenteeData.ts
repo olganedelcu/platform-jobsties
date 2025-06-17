@@ -1,7 +1,7 @@
 
 // Helper function to get mentee details for Formspree notifications
 export const getMenteeFormspreeData = async (menteeId: string) => {
-  console.log("📧 Getting mentee data for JobsTiesAPI notification:", menteeId);
+  console.log("📧 Getting mentee data for JobsTies API notification:", menteeId);
   
   const { supabase } = await import('@/integrations/supabase/client');
   
@@ -13,7 +13,7 @@ export const getMenteeFormspreeData = async (menteeId: string) => {
       .single();
 
     if (error || !mentee) {
-      console.error('❌ Error fetching mentee data for JobsTiesAPI notification:', error);
+      console.error('❌ Error fetching mentee data for JobsTies API notification:', error);
       return null;
     }
 
@@ -23,10 +23,10 @@ export const getMenteeFormspreeData = async (menteeId: string) => {
       name: `${mentee.first_name} ${mentee.last_name}`.trim()
     };
     
-    console.log("✅ Mentee data retrieved for JobsTiesAPI notification:", menteeData);
+    console.log("✅ Mentee data retrieved for JobsTies API notification:", menteeData);
     return menteeData;
   } catch (error) {
-    console.error('❌ Failed to get mentee data for JobsTiesAPI notification:', error);
+    console.error('❌ Failed to get mentee data for JobsTies API notification:', error);
     return null;
   }
 };
