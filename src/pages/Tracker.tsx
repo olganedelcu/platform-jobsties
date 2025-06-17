@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
@@ -34,7 +33,7 @@ StatsCard.displayName = 'StatsCard';
 const Tracker = memo(() => {
   const { user, loading: authLoading, handleSignOut } = useAuthState();
   const [isPageReady, setIsPageReady] = useState(false);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('applied');
 
   const {
     applications,
