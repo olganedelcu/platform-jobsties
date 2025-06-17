@@ -1,7 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
-import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
+import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
   console.log('Fetching coach sessions for user:', userId);

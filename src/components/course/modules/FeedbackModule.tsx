@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
+import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 
 interface FeedbackModuleProps {
   userId: string;
