@@ -14,7 +14,7 @@ const SessionsEmptyState = ({ onScheduleClick }: SessionsEmptyStateProps) => {
       <h3 className="text-xl font-medium text-gray-900 mb-3">No sessions scheduled</h3>
       <p className="text-gray-500 mb-8">Get started by scheduling your first coaching session</p>
       <Button 
-        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-6 py-3"
+        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3"
         onClick={onScheduleClick}
       >
         <Plus className="h-4 w-4 mr-2" />
