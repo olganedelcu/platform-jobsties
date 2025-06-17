@@ -10,13 +10,14 @@ import { useMentees } from '@/hooks/useMentees';
 
 const ModuleFileUpload = () => {
   const [selectedMentee, setSelectedMentee] = useState<string>('');
-  const [selectedModule, setSelectedModule] = useState<'linkedin' | 'job_search_strategy' | 'interview_preparation' | ''>('');
+  const [selectedModule, setSelectedModule] = useState<'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation' | ''>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const { mentees } = useMentees();
   const { uploading, uploadModuleFile } = useModuleFileUpload();
 
   const moduleOptions = [
+    { value: 'cv_optimization', label: 'CV Optimization' },
     { value: 'linkedin', label: 'LinkedIn & Cover Letter' },
     { value: 'job_search_strategy', label: 'Job Search Strategy' },
     { value: 'interview_preparation', label: 'Interview Preparation' }
@@ -30,7 +31,7 @@ const ModuleFileUpload = () => {
   };
 
   const handleModuleChange = (value: string) => {
-    setSelectedModule(value as 'linkedin' | 'job_search_strategy' | 'interview_preparation');
+    setSelectedModule(value as 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation');
   };
 
   const handleUpload = async () => {

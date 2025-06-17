@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
-type ModuleType = 'linkedin' | 'job_search_strategy' | 'interview_preparation';
+type ModuleType = 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation';
 
 export const useModuleFileUpload = () => {
   const [uploading, setUploading] = useState(false);
