@@ -33,7 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification email to Ana
     const emailResponse = await resend.emails.send({
-      from: "JobsTies Chat <onboarding@resend.dev>",
+      from: "Platform Jobsties Chat <onboarding@resend.dev>",
       to: ["ana@jobsties.com"],
       subject: `New Message from ${menteeName || menteeEmail}`,
       html: `
@@ -47,7 +47,7 @@ const handler = async (req: Request): Promise<Response> => {
         <br>
         <p>To reply, simply respond directly to this email.</p>
         <hr>
-        <p style="color: #777; font-size: 12px;">JobsTies Platform | Respond directly to this email to contact ${menteeName}</p>
+        <p style="color: #777; font-size: 12px;">Platform Jobsties | Respond directly to this email to contact ${menteeName}</p>
       `,
       reply_to: menteeEmail,
     });
