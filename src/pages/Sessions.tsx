@@ -6,6 +6,8 @@ import Navigation from '@/components/Navigation';
 import SessionsLoadingState from '@/components/sessions/SessionsLoadingState';
 import SessionsGrid from '@/components/sessions/SessionsGrid';
 import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
+import ScheduleSession from '@/components/ScheduleSession';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionsData } from '@/hooks/useSessionsData';
@@ -15,6 +17,7 @@ const Sessions = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
 
   const {
     sessions,
@@ -67,6 +70,27 @@ const Sessions = () => {
     navigate('/');
   };
 
+  const handleScheduleSession = async (sessionData: any) => {
+    console.log('Scheduling session with data:', sessionData);
+    
+    try {
+      await handleAddSession(sessionData);
+      setShowScheduleDialog(false);
+      
+      toast({
+        title: "Success",
+        description: "Session scheduled successfully!",
+      });
+    } catch (error) {
+      console.error('Error scheduling session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to schedule session. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleReschedule = (sessionId: string) => {
     toast({
       title: "Reschedule Session",
@@ -109,8 +133,18 @@ const Sessions = () => {
         )}
 
         {!sessionsLoading && sessions.length === 0 && (
-          <SessionsEmptyState onScheduleClick={() => {}} />
+          <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
         )}
+
+        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+          <DialogContent className="max-w-6xl h-[90vh] overflow-y-auto p-0">
+            <ScheduleSession
+              onSchedule={handleScheduleSession}
+              onCancel={() => setShowScheduleDialog(false)}
+              userId={user?.id}
+            />
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
