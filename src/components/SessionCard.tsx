@@ -36,7 +36,7 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
       case 'confirmed':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'pending':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'cancelled':
         return 'bg-red-100 text-red-800 border-red-200';
       default:
@@ -50,43 +50,48 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
     }
   };
 
+  const isUpcoming = new Date(session.session_date) >= new Date();
+
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 text-white">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold">{session.session_type}</h3>
           <div className="flex items-center space-x-2">
-            <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
+            <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-3 py-1`}>
               {session.status}
             </Badge>
             {session.cal_com_booking_id && (
-              <Badge variant="outline" className="text-white border-white text-xs px-2 py-1">
+              <Badge variant="outline" className="text-white border-white/50 bg-white/10 text-xs px-3 py-1">
                 Cal.com
               </Badge>
             )}
           </div>
         </div>
-        <p className="text-blue-100 text-sm">Professional coaching session</p>
+        <p className="text-indigo-100 text-sm">Professional coaching session</p>
       </div>
       
-      <div className="p-6 space-y-4">
-        <div className="space-y-3">
+      {/* Content */}
+      <div className="p-6 space-y-6">
+        {/* Session Details */}
+        <div className="space-y-4">
           <div className="flex items-center space-x-3 text-gray-700">
             <div className="p-2 bg-blue-50 rounded-lg">
-              <Calendar className="h-4 w-4 text-blue-600" />
+              <Calendar className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <p className="font-medium">{formatDate(session.session_date)}</p>
+              <p className="font-semibold text-gray-900">{formatDate(session.session_date)}</p>
               <p className="text-sm text-gray-500">Session date</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-3 text-gray-700">
             <div className="p-2 bg-indigo-50 rounded-lg">
-              <Clock className="h-4 w-4 text-indigo-600" />
+              <Clock className="h-5 w-5 text-indigo-600" />
             </div>
             <div>
-              <p className="font-medium">{formatTime(session.session_date)}</p>
+              <p className="font-semibold text-gray-900">{formatTime(session.session_date)}</p>
               <p className="text-sm text-gray-500">{session.duration} minutes</p>
             </div>
           </div>
@@ -94,31 +99,31 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
           {session.preferred_coach && (
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-purple-50 rounded-lg">
-                <User className="h-4 w-4 text-purple-600" />
+                <User className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="font-medium">{session.preferred_coach}</p>
+                <p className="font-semibold text-gray-900">{session.preferred_coach}</p>
                 <p className="text-sm text-gray-500">Your coach</p>
               </div>
             </div>
           )}
           
-          {session.meeting_link && (
+          {session.meeting_link && isUpcoming && (
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-green-50 rounded-lg">
-                <Video className="h-4 w-4 text-green-600" />
+                <Video className="h-5 w-5 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-green-600">Video call ready</p>
+                <p className="font-semibold text-green-600">Video call ready</p>
                 <p className="text-sm text-gray-500">Meeting link available</p>
               </div>
               {session.status === 'confirmed' && (
                 <Button
                   size="sm"
                   onClick={handleJoinMeeting}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-6"
                 >
-                  <ExternalLink className="h-4 w-4 mr-1" />
+                  <ExternalLink className="h-4 w-4 mr-2" />
                   Join
                 </Button>
               )}
@@ -126,30 +131,34 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
           )}
         </div>
         
+        {/* Notes */}
         {session.notes && (
-          <div className="bg-gray-50 rounded-xl p-4 mt-4">
+          <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-sm text-gray-600 leading-relaxed">{session.notes}</p>
           </div>
         )}
         
-        <div className="flex space-x-3 pt-4">
-          {!session.cal_com_booking_id && (
+        {/* Actions */}
+        {isUpcoming && (
+          <div className="flex space-x-3 pt-2">
+            {!session.cal_com_booking_id && (
+              <Button 
+                variant="outline" 
+                className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium"
+                onClick={() => onReschedule(session.id)}
+              >
+                Reschedule
+              </Button>
+            )}
             <Button 
               variant="outline" 
-              className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium py-2.5"
-              onClick={() => onReschedule(session.id)}
+              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium px-8"
+              onClick={() => onCancel(session.id)}
             >
-              Reschedule
+              Cancel
             </Button>
-          )}
-          <Button 
-            variant="outline" 
-            className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium py-2.5"
-            onClick={() => onCancel(session.id)}
-          >
-            Cancel
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

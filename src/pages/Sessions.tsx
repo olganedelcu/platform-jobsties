@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
+import SessionsPageHeader from '@/components/sessions/SessionsPageHeader';
 import SessionsLoadingState from '@/components/sessions/SessionsLoadingState';
-import SessionsGrid from '@/components/sessions/SessionsGrid';
+import UpcomingSessions from '@/components/sessions/UpcomingSessions';
+import PastSessions from '@/components/sessions/PastSessions';
 import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
-import ScheduleSession from '@/components/ScheduleSession';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionsData } from '@/hooks/useSessionsData';
@@ -18,6 +18,7 @@ const Sessions = () => {
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
 
   const {
     sessions,
@@ -76,6 +77,7 @@ const Sessions = () => {
     try {
       await handleAddSession(sessionData);
       setShowScheduleDialog(false);
+      setSessionRefreshKey(prev => prev + 1);
       
       toast({
         title: "Success",
@@ -121,36 +123,36 @@ const Sessions = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-12 sm:py-16 px-6 sm:px-8">
+      <main className="max-w-7xl mx-auto py-8 px-6">
+        <SessionsPageHeader
+          showScheduleDialog={showScheduleDialog}
+          setShowScheduleDialog={setShowScheduleDialog}
+          onScheduleSession={handleScheduleSession}
+          userId={user?.id}
+          sessionRefreshKey={sessionRefreshKey}
+        />
+
         {sessionsLoading && <SessionsLoadingState />}
 
         {!sessionsLoading && sessions.length > 0 && (
-          <SessionsGrid
-            sessions={sessions}
-            onReschedule={handleReschedule}
-            onCancel={handleDeleteSession}
-          />
+          <div className="space-y-12">
+            <UpcomingSessions
+              sessions={sessions}
+              onReschedule={handleReschedule}
+              onCancel={handleDeleteSession}
+            />
+            
+            <PastSessions
+              sessions={sessions}
+              onReschedule={handleReschedule}
+              onCancel={handleDeleteSession}
+            />
+          </div>
         )}
 
         {!sessionsLoading && sessions.length === 0 && (
           <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
         )}
-
-        <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
-          <DialogContent className="max-w-6xl h-[90vh] overflow-y-auto p-0">
-            <DialogTitle className="sr-only">
-              Schedule New Coaching Session
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              Book a personalized coaching session with your career coach
-            </DialogDescription>
-            <ScheduleSession
-              onSchedule={handleScheduleSession}
-              onCancel={() => setShowScheduleDialog(false)}
-              userId={user?.id}
-            />
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );
