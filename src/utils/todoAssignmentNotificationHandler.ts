@@ -20,15 +20,17 @@ export const handleTodoAssignmentNotification = async (
     return;
   }
 
-  // Send Formspree bundled notifications only
   try {
+    console.log("📤 Sending todo assignment notifications via Formspree...");
+    
     await FormspreeNotificationHandlers.todoAssignment(
       menteeIds,
       todoTitle,
       count
     );
-    console.log("✅ Todo assignment notifications sent successfully");
+    
+    console.log("✅ Todo assignment notifications sent successfully via Formspree");
   } catch (error) {
-    console.error('❌ Formspree todo assignment notification error:', error);
+    console.error('❌ Todo assignment notification error:', error);
   }
 };

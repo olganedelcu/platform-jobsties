@@ -1,6 +1,5 @@
 
 import { isAnaUser } from './userValidationUtils';
-import { getMenteeNotificationData } from './menteeDataUtils';
 import { FormspreeNotificationHandlers } from './formspreeNotificationUtils';
 
 export const handleFileUploadNotification = async (
@@ -19,24 +18,16 @@ export const handleFileUploadNotification = async (
     return;
   }
 
-  const menteeData = await getMenteeNotificationData(menteeId);
-  if (!menteeData) {
-    console.log("⏭️ Skipping notification - no mentee data");
-    return;
-  }
-
   try {
-    console.log("📤 Sending file upload notification...");
+    console.log("📤 Sending file upload notification via Formspree...");
     
-    // Send Formspree bundled notification only
     await FormspreeNotificationHandlers.fileUpload(
-      menteeData.id,
+      menteeId,
       fileName
     );
     
-    console.log("✅ File upload notification sent successfully");
+    console.log("✅ File upload notification sent successfully via Formspree");
   } catch (error) {
-    // Silently handle errors to not disrupt the main flow
     console.error('❌ File upload notification error:', error);
   }
 };

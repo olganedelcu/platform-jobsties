@@ -1,6 +1,5 @@
 
 import { isAnaUser } from './userValidationUtils';
-import { getMenteeNotificationData } from './menteeDataUtils';
 import { FormspreeNotificationHandlers } from './formspreeNotificationUtils';
 
 export const handleJobRecommendationNotification = async (
@@ -21,25 +20,17 @@ export const handleJobRecommendationNotification = async (
     return;
   }
 
-  const menteeData = await getMenteeNotificationData(menteeId);
-  if (!menteeData) {
-    console.log("⏭️ Skipping notification - no mentee data");
-    return;
-  }
-
   try {
-    console.log("📤 Sending job recommendation notification...");
+    console.log("📤 Sending job recommendation notification via Formspree...");
     
-    // Send Formspree bundled notification only
     await FormspreeNotificationHandlers.jobRecommendation(
-      menteeData.id,
+      menteeId,
       jobTitle,
       companyName
     );
     
-    console.log("✅ Job recommendation notification sent successfully");
+    console.log("✅ Job recommendation notification sent successfully via Formspree");
   } catch (error) {
-    // Silently handle errors to not disrupt the main flow
     console.error('❌ Job recommendation notification error:', error);
   }
 };

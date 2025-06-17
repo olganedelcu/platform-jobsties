@@ -61,16 +61,9 @@ export const useMessageSender = () => {
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId);
 
-      // Send notification based on sender type
-      if (senderType === 'mentee') {
-        // If mentee sends message, notify coach (Ana)
-        await handleMessageNotification(
-          'ana@jobsties.com', // Always notify Ana
-          user.id,
-          content.trim()
-        );
-      } else if (senderType === 'coach' && user?.email) {
-        // If coach sends message, the existing logic handles mentee notifications
+      // Send Formspree notification based on sender type
+      if (senderType === 'coach' && user?.email) {
+        // If coach sends message, notify mentee via Formspree
         const { data: conversation } = await supabase
           .from('conversations')
           .select('mentee_id')
