@@ -5,6 +5,7 @@ import { Calendar } from 'lucide-react';
 import SessionTypeSelector from '@/components/session/SessionTypeSelector';
 import SessionForm from '@/components/session/SessionForm';
 import CalendarIntegrationBanner from '@/components/session/CalendarIntegrationBanner';
+import CalComBookingInterface from '@/components/session/CalComBookingInterface';
 
 interface ScheduleSessionProps {
   onSchedule: (sessionData: any) => void;
@@ -21,6 +22,7 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
     notes: '',
     preferredCoach: 'Ana Nedelcu'
   });
+  const [showCalComInterface, setShowCalComInterface] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +41,27 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
     
     onSchedule(sessionData);
   };
+
+  const handleCalComBooking = (bookingData: any) => {
+    console.log('Cal.com booking data:', bookingData);
+    onSchedule(bookingData);
+  };
+
+  const handleProceedToBooking = () => {
+    if (sessionData.sessionType) {
+      setShowCalComInterface(true);
+    }
+  };
+
+  // Show Cal.com booking interface if session type is selected and user chose to proceed
+  if (showCalComInterface) {
+    return (
+      <CalComBookingInterface
+        onBookSession={handleCalComBooking}
+        onBack={() => setShowCalComInterface(false)}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -68,10 +91,44 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
             }}
           />
 
-          {/* Session Form */}
+          {/* Enhanced booking options */}
           {sessionData.sessionType && (
             <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Session Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Your Booking Method</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <Card 
+                  className="cursor-pointer transition-all duration-200 hover:shadow-md border-2 border-blue-200 bg-blue-50"
+                  onClick={handleProceedToBooking}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-blue-600 text-white rounded-lg">
+                        <Calendar className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-blue-700">Calendar Booking</h4>
+                        <p className="text-sm text-blue-600">Modern calendar interface</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="cursor-pointer transition-all duration-200 hover:shadow-md border-2 border-gray-200">
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-gray-600 text-white rounded-lg">
+                        <Calendar className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-700">Quick Form</h4>
+                        <p className="text-sm text-gray-600">Traditional form booking</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               <SessionForm
                 sessionData={sessionData}
                 onSessionDataChange={(newData) => {
