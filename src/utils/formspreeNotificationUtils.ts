@@ -10,7 +10,7 @@ export const isFormspreeEnabled = (): boolean => {
 
 // Helper function to get mentee details for Formspree notifications
 export const getMenteeFormspreeData = async (menteeId: string) => {
-  console.log("📧 Getting mentee data for Formspree notification:", menteeId);
+  console.log("📧 Getting mentee data for JobsTies notification:", menteeId);
   
   const { supabase } = await import('@/integrations/supabase/client');
   
@@ -22,7 +22,7 @@ export const getMenteeFormspreeData = async (menteeId: string) => {
       .single();
 
     if (error || !mentee) {
-      console.error('❌ Error fetching mentee data for Formspree:', error);
+      console.error('❌ Error fetching mentee data for JobsTies notification:', error);
       return null;
     }
 
@@ -32,15 +32,15 @@ export const getMenteeFormspreeData = async (menteeId: string) => {
       name: `${mentee.first_name} ${mentee.last_name}`.trim()
     };
     
-    console.log("✅ Mentee data retrieved for Formspree:", menteeData);
+    console.log("✅ Mentee data retrieved for JobsTies notification:", menteeData);
     return menteeData;
   } catch (error) {
-    console.error('❌ Failed to get mentee data for Formspree:', error);
+    console.error('❌ Failed to get mentee data for JobsTies notification:', error);
     return null;
   }
 };
 
-// Notification handlers for Formspree integration
+// Notification handlers for JobsTies email integration
 export const FormspreeNotificationHandlers = {
   async jobRecommendation(
     menteeId: string, 
@@ -48,11 +48,11 @@ export const FormspreeNotificationHandlers = {
     companyName: string
   ) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping notification");
       return;
     }
 
-    console.log("🚀 Formspree job recommendation notification triggered:", {
+    console.log("🚀 JobsTies job recommendation notification triggered:", {
       menteeId,
       jobTitle,
       companyName
@@ -60,7 +60,7 @@ export const FormspreeNotificationHandlers = {
 
     const menteeData = await getMenteeFormspreeData(menteeId);
     if (!menteeData) {
-      console.log("⏭️ Skipping Formspree notification - no mentee data");
+      console.log("⏭️ Skipping JobsTies notification - no mentee data");
       return;
     }
 
@@ -72,9 +72,9 @@ export const FormspreeNotificationHandlers = {
         jobTitle,
         companyName
       );
-      console.log("✅ Job recommendation added to Formspree notification bundle");
+      console.log("✅ Job recommendation added to JobsTies notification bundle");
     } catch (error) {
-      console.error('❌ Formspree job recommendation notification error:', error);
+      console.error('❌ JobsTies job recommendation notification error:', error);
     }
   },
 
@@ -83,18 +83,18 @@ export const FormspreeNotificationHandlers = {
     fileName: string
   ) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping notification");
       return;
     }
 
-    console.log("📁 Formspree file upload notification triggered:", {
+    console.log("📁 JobsTies file upload notification triggered:", {
       menteeId,
       fileName
     });
 
     const menteeData = await getMenteeFormspreeData(menteeId);
     if (!menteeData) {
-      console.log("⏭️ Skipping Formspree notification - no mentee data");
+      console.log("⏭️ Skipping JobsTies notification - no mentee data");
       return;
     }
 
@@ -105,9 +105,9 @@ export const FormspreeNotificationHandlers = {
         menteeData.name,
         fileName
       );
-      console.log("✅ File upload added to Formspree notification bundle");
+      console.log("✅ File upload added to JobsTies notification bundle");
     } catch (error) {
-      console.error('❌ Formspree file upload notification error:', error);
+      console.error('❌ JobsTies file upload notification error:', error);
     }
   },
 
@@ -116,18 +116,18 @@ export const FormspreeNotificationHandlers = {
     messageContent: string
   ) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping notification");
       return;
     }
 
-    console.log("💬 Formspree message notification triggered:", {
+    console.log("💬 JobsTies message notification triggered:", {
       menteeId,
       messagePreview: messageContent.substring(0, 50) + "..."
     });
 
     const menteeData = await getMenteeFormspreeData(menteeId);
     if (!menteeData) {
-      console.log("⏭️ Skipping Formspree notification - no mentee data");
+      console.log("⏭️ Skipping JobsTies notification - no mentee data");
       return;
     }
 
@@ -138,9 +138,9 @@ export const FormspreeNotificationHandlers = {
         menteeData.name,
         messageContent
       );
-      console.log("✅ Message added to Formspree notification bundle");
+      console.log("✅ Message added to JobsTies notification bundle");
     } catch (error) {
-      console.error('❌ Formspree message notification error:', error);
+      console.error('❌ JobsTies message notification error:', error);
     }
   },
 
@@ -150,11 +150,11 @@ export const FormspreeNotificationHandlers = {
     count?: number
   ) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping notification");
       return;
     }
 
-    console.log("✅ Formspree todo assignment notification triggered:", {
+    console.log("✅ JobsTies todo assignment notification triggered:", {
       menteeIds,
       todoTitle,
       count
@@ -173,9 +173,9 @@ export const FormspreeNotificationHandlers = {
           todoTitle,
           count
         );
-        console.log(`✅ Todo assignment added to Formspree bundle for ${menteeData.name}`);
+        console.log(`✅ Todo assignment added to JobsTies bundle for ${menteeData.name}`);
       } catch (error) {
-        console.error(`❌ Formspree todo assignment notification error for ${menteeData.name}:`, error);
+        console.error(`❌ JobsTies todo assignment notification error for ${menteeData.name}:`, error);
       }
     });
 
@@ -188,11 +188,11 @@ export const FormspreeNotificationHandlers = {
     feedback: string;
   }) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping course feedback notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping course feedback notification");
       return;
     }
 
-    console.log("📝 Formspree course feedback notification triggered:", {
+    console.log("📝 JobsTies course feedback notification triggered:", {
       menteeEmail: data.menteeEmail,
       menteeName: data.menteeName,
       feedbackPreview: data.feedback.substring(0, 50) + "..."
@@ -201,15 +201,16 @@ export const FormspreeNotificationHandlers = {
     try {
       const endpoint = localStorage.getItem('formspree_endpoint');
       if (!endpoint) {
-        throw new Error('Formspree endpoint not configured');
+        throw new Error('JobsTies notification endpoint not configured');
       }
 
       const formData = new FormData();
       formData.append('email', data.menteeEmail);
       formData.append('name', data.menteeName);
-      formData.append('subject', 'Course Feedback Received');
+      formData.append('subject', 'Course Feedback Received - JobsTies Platform');
       formData.append('message', `Course feedback from ${data.menteeName}:\n\n${data.feedback}`);
       formData.append('_replyto', data.menteeEmail);
+      formData.append('_from', 'JobsTies Platform <feedback@jobsties.com>');
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -220,12 +221,12 @@ export const FormspreeNotificationHandlers = {
       });
 
       if (!response.ok) {
-        throw new Error(`Formspree API error: ${response.status}`);
+        throw new Error(`JobsTies API error: ${response.status}`);
       }
 
-      console.log("✅ Course feedback sent successfully via Formspree");
+      console.log("✅ Course feedback sent successfully via JobsTies Platform");
     } catch (error) {
-      console.error('❌ Formspree course feedback notification error:', error);
+      console.error('❌ JobsTies course feedback notification error:', error);
       throw error;
     }
   },
@@ -242,11 +243,11 @@ export const FormspreeNotificationHandlers = {
     notes?: string;
   }) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping session reschedule notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping session reschedule notification");
       return;
     }
 
-    console.log("📅 Formspree session reschedule notification triggered:", {
+    console.log("📅 JobsTies session reschedule notification triggered:", {
       menteeEmail: data.menteeEmail,
       menteeName: data.menteeName,
       sessionType: data.sessionType
@@ -255,7 +256,7 @@ export const FormspreeNotificationHandlers = {
     try {
       const endpoint = localStorage.getItem('formspree_endpoint');
       if (!endpoint) {
-        throw new Error('Formspree endpoint not configured');
+        throw new Error('JobsTies notification endpoint not configured');
       }
 
       const message = `Your ${data.sessionType} session has been rescheduled:
@@ -271,14 +272,18 @@ Time: ${data.newSessionTime}
 Duration: ${data.duration} minutes
 ${data.notes ? `Notes: ${data.notes}` : ''}
 
-Please update your calendar accordingly.`;
+Please update your calendar accordingly.
+
+Best regards,
+The JobsTies Team`;
 
       const formData = new FormData();
       formData.append('email', data.menteeEmail);
       formData.append('name', data.menteeName);
-      formData.append('subject', 'Session Rescheduled');
+      formData.append('subject', 'Session Rescheduled - JobsTies Platform');
       formData.append('message', message);
       formData.append('_replyto', data.menteeEmail);
+      formData.append('_from', 'JobsTies Platform <sessions@jobsties.com>');
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -289,12 +294,12 @@ Please update your calendar accordingly.`;
       });
 
       if (!response.ok) {
-        throw new Error(`Formspree API error: ${response.status}`);
+        throw new Error(`JobsTies API error: ${response.status}`);
       }
 
-      console.log("✅ Session reschedule notification sent successfully via Formspree");
+      console.log("✅ Session reschedule notification sent successfully via JobsTies Platform");
     } catch (error) {
-      console.error('❌ Formspree session reschedule notification error:', error);
+      console.error('❌ JobsTies session reschedule notification error:', error);
       throw error;
     }
   },
@@ -309,11 +314,11 @@ Please update your calendar accordingly.`;
     notes?: string;
   }) {
     if (!isFormspreeEnabled()) {
-      console.log("⏭️ Formspree not enabled, skipping session cancellation notification");
+      console.log("⏭️ JobsTies notifications not enabled, skipping session cancellation notification");
       return;
     }
 
-    console.log("❌ Formspree session cancellation notification triggered:", {
+    console.log("❌ JobsTies session cancellation notification triggered:", {
       menteeEmail: data.menteeEmail,
       menteeName: data.menteeName,
       sessionType: data.sessionType
@@ -322,7 +327,7 @@ Please update your calendar accordingly.`;
     try {
       const endpoint = localStorage.getItem('formspree_endpoint');
       if (!endpoint) {
-        throw new Error('Formspree endpoint not configured');
+        throw new Error('JobsTies notification endpoint not configured');
       }
 
       const message = `Your ${data.sessionType} session has been cancelled:
@@ -332,14 +337,18 @@ Time: ${data.sessionTime}
 Duration: ${data.duration} minutes
 ${data.notes ? `Notes: ${data.notes}` : ''}
 
-Please contact your mentor if you need to reschedule.`;
+Please contact your mentor if you need to reschedule.
+
+Best regards,
+The JobsTies Team`;
 
       const formData = new FormData();
       formData.append('email', data.menteeEmail);
       formData.append('name', data.menteeName);
-      formData.append('subject', 'Session Cancelled');
-      formData.append('message', message);
+      formData.append('subject', 'Session Cancelled - JobsTies Platform');
       formData.append('_replyto', data.menteeEmail);
+      formData.append('message', message);
+      formData.append('_from', 'JobsTies Platform <sessions@jobsties.com>');
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -350,12 +359,12 @@ Please contact your mentor if you need to reschedule.`;
       });
 
       if (!response.ok) {
-        throw new Error(`Formspree API error: ${response.status}`);
+        throw new Error(`JobsTies API error: ${response.status}`);
       }
 
-      console.log("✅ Session cancellation notification sent successfully via Formspree");
+      console.log("✅ Session cancellation notification sent successfully via JobsTies Platform");
     } catch (error) {
-      console.error('❌ Formspree session cancellation notification error:', error);
+      console.error('❌ JobsTies session cancellation notification error:', error);
       throw error;
     }
   }
