@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Users } from 'lucide-react';
@@ -22,22 +21,25 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   const [availableTimesForDate, setAvailableTimesForDate] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [anaCoachId, setAnaCoachId] = useState<string | null>(null);
+  const [coachIdLoading, setCoachIdLoading] = useState(true);
 
   // Get Ana's actual coach ID from the database
   useEffect(() => {
     const fetchAnaCoachId = async () => {
       try {
+        console.log('Fetching Ana coach ID...');
         const { data, error } = await supabase
           .from('profiles')
           .select('id')
           .eq('email', 'ana@jobsties.com')
-          .eq('role', 'coach')
+          .eq('role', 'COACH')
           .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching Ana coach ID:', error);
           setAnaCoachId(null);
         } else if (data) {
+          console.log('Found Ana coach ID:', data.id);
           setAnaCoachId(data.id);
         } else {
           console.log('Ana coach profile not found, will use default availability');
@@ -46,6 +48,8 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
       } catch (error) {
         console.error('Error fetching Ana coach ID:', error);
         setAnaCoachId(null);
+      } finally {
+        setCoachIdLoading(false);
       }
     };
 
@@ -66,10 +70,10 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   ];
 
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && !coachIdLoading) {
       loadAvailableTimesForSelectedDate();
     }
-  }, [selectedDate, anaCoachId]);
+  }, [selectedDate, anaCoachId, coachIdLoading]);
 
   const loadAvailableTimesForSelectedDate = async () => {
     if (!selectedDate) return;
@@ -77,6 +81,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     setLoadingTimes(true);
     try {
       const dateString = selectedDate.toISOString().split('T')[0];
+      console.log('Loading available times for date:', dateString, 'with coach ID:', anaCoachId);
       const times = await getAvailableTimesForDate(dateString);
       setAvailableTimesForDate(times);
     } catch (error) {
@@ -138,8 +143,8 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     }
   };
 
-  // Show loading state while availability is being fetched
-  if (loading) {
+  // Show loading state while coach ID and availability are being fetched
+  if (loading || coachIdLoading) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
         <div className="p-8 flex items-center justify-center">
@@ -150,7 +155,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     );
   }
 
-  // Show session type selection first (remove the header)
+  // Show session type selection first
   if (!selectedSessionType) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">

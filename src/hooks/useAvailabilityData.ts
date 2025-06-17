@@ -10,7 +10,8 @@ export const useAvailabilityData = (coachId?: string | null) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (coachId) {
+    // Only fetch data if we have a valid coach ID, otherwise use defaults
+    if (coachId && coachId !== 'fallback') {
       fetchData();
     } else {
       // Use default availability when no coach ID is available
@@ -21,7 +22,7 @@ export const useAvailabilityData = (coachId?: string | null) => {
   }, [coachId]);
 
   const fetchData = async () => {
-    if (!coachId) return;
+    if (!coachId || coachId === 'fallback') return;
 
     try {
       const [availabilityData, blockedDatesData] = await Promise.all([

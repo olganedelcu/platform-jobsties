@@ -5,6 +5,11 @@ import { AvailabilitySlot } from '@/types/availability';
 export class AvailabilityService {
   static async fetchAvailability(coachId: string): Promise<AvailabilitySlot[]> {
     try {
+      // If no valid coach ID, return default availability instead of querying
+      if (!coachId || coachId === 'fallback') {
+        return this.getDefaultAvailability();
+      }
+
       const { data, error } = await supabase
         .from('coach_availability')
         .select('*')
@@ -21,6 +26,11 @@ export class AvailabilityService {
 
   static async fetchBlockedDates(coachId: string): Promise<string[]> {
     try {
+      // If no valid coach ID, return empty array instead of querying
+      if (!coachId || coachId === 'fallback') {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('coach_blocked_dates')
         .select('blocked_date')
