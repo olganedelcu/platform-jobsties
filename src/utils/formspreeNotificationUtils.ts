@@ -180,5 +180,183 @@ export const FormspreeNotificationHandlers = {
     });
 
     await Promise.all(notificationPromises);
+  },
+
+  async courseFeedback(data: {
+    menteeEmail: string;
+    menteeName: string;
+    feedback: string;
+  }) {
+    if (!isFormspreeEnabled()) {
+      console.log("⏭️ Formspree not enabled, skipping course feedback notification");
+      return;
+    }
+
+    console.log("📝 Formspree course feedback notification triggered:", {
+      menteeEmail: data.menteeEmail,
+      menteeName: data.menteeName,
+      feedbackPreview: data.feedback.substring(0, 50) + "..."
+    });
+
+    try {
+      const endpoint = localStorage.getItem('formspree_endpoint');
+      if (!endpoint) {
+        throw new Error('Formspree endpoint not configured');
+      }
+
+      const formData = new FormData();
+      formData.append('email', data.menteeEmail);
+      formData.append('name', data.menteeName);
+      formData.append('subject', 'Course Feedback Received');
+      formData.append('message', `Course feedback from ${data.menteeName}:\n\n${data.feedback}`);
+      formData.append('_replyto', data.menteeEmail);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Formspree API error: ${response.status}`);
+      }
+
+      console.log("✅ Course feedback sent successfully via Formspree");
+    } catch (error) {
+      console.error('❌ Formspree course feedback notification error:', error);
+      throw error;
+    }
+  },
+
+  async sessionReschedule(data: {
+    menteeEmail: string;
+    menteeName: string;
+    sessionType: string;
+    oldSessionDate: string;
+    oldSessionTime: string;
+    newSessionDate: string;
+    newSessionTime: string;
+    duration: number;
+    notes?: string;
+  }) {
+    if (!isFormspreeEnabled()) {
+      console.log("⏭️ Formspree not enabled, skipping session reschedule notification");
+      return;
+    }
+
+    console.log("📅 Formspree session reschedule notification triggered:", {
+      menteeEmail: data.menteeEmail,
+      menteeName: data.menteeName,
+      sessionType: data.sessionType
+    });
+
+    try {
+      const endpoint = localStorage.getItem('formspree_endpoint');
+      if (!endpoint) {
+        throw new Error('Formspree endpoint not configured');
+      }
+
+      const message = `Your ${data.sessionType} session has been rescheduled:
+
+OLD TIME:
+Date: ${data.oldSessionDate}
+Time: ${data.oldSessionTime}
+
+NEW TIME:
+Date: ${data.newSessionDate}
+Time: ${data.newSessionTime}
+
+Duration: ${data.duration} minutes
+${data.notes ? `Notes: ${data.notes}` : ''}
+
+Please update your calendar accordingly.`;
+
+      const formData = new FormData();
+      formData.append('email', data.menteeEmail);
+      formData.append('name', data.menteeName);
+      formData.append('subject', 'Session Rescheduled');
+      formData.append('message', message);
+      formData.append('_replyto', data.menteeEmail);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Formspree API error: ${response.status}`);
+      }
+
+      console.log("✅ Session reschedule notification sent successfully via Formspree");
+    } catch (error) {
+      console.error('❌ Formspree session reschedule notification error:', error);
+      throw error;
+    }
+  },
+
+  async sessionCancellation(data: {
+    menteeEmail: string;
+    menteeName: string;
+    sessionType: string;
+    sessionDate: string;
+    sessionTime: string;
+    duration: number;
+    notes?: string;
+  }) {
+    if (!isFormspreeEnabled()) {
+      console.log("⏭️ Formspree not enabled, skipping session cancellation notification");
+      return;
+    }
+
+    console.log("❌ Formspree session cancellation notification triggered:", {
+      menteeEmail: data.menteeEmail,
+      menteeName: data.menteeName,
+      sessionType: data.sessionType
+    });
+
+    try {
+      const endpoint = localStorage.getItem('formspree_endpoint');
+      if (!endpoint) {
+        throw new Error('Formspree endpoint not configured');
+      }
+
+      const message = `Your ${data.sessionType} session has been cancelled:
+
+Date: ${data.sessionDate}
+Time: ${data.sessionTime}
+Duration: ${data.duration} minutes
+${data.notes ? `Notes: ${data.notes}` : ''}
+
+Please contact your mentor if you need to reschedule.`;
+
+      const formData = new FormData();
+      formData.append('email', data.menteeEmail);
+      formData.append('name', data.menteeName);
+      formData.append('subject', 'Session Cancelled');
+      formData.append('message', message);
+      formData.append('_replyto', data.menteeEmail);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Formspree API error: ${response.status}`);
+      }
+
+      console.log("✅ Session cancellation notification sent successfully via Formspree");
+    } catch (error) {
+      console.error('❌ Formspree session cancellation notification error:', error);
+      throw error;
+    }
   }
 };
