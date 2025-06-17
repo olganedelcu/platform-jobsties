@@ -3,37 +3,15 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useMentees } from '@/hooks/useMentees';
 import { useAllUploadedFiles } from '@/hooks/useAllUploadedFiles';
-import { uploadCVFile } from '@/utils/cvFileOperations';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useCVUpload = () => {
   const { toast } = useToast();
-  const [selectedMentee, setSelectedMentee] = useState<string>('');
-  const [uploadingFile, setUploadingFile] = useState(false);
   
   const { mentees, loading: menteesLoading } = useMentees();
   const { allFiles, loading: filesLoading, fetchAllFiles } = useAllUploadedFiles();
   
   const loading = menteesLoading || filesLoading;
-
-  const handleFileUpload = async (file: File) => {
-    setUploadingFile(true);
-    
-    try {
-      await uploadCVFile(
-        file,
-        selectedMentee,
-        mentees,
-        () => {
-          setSelectedMentee('');
-          fetchAllFiles();
-        },
-        toast
-      );
-    } finally {
-      setUploadingFile(false);
-    }
-  };
 
   const handleDeleteFile = async (fileId: string, filePath: string, fileType: 'cv' | 'module') => {
     try {
@@ -78,13 +56,9 @@ export const useCVUpload = () => {
   };
 
   return {
-    selectedMentee,
-    setSelectedMentee,
-    uploadingFile,
     mentees,
     allFiles,
     loading,
-    handleFileUpload,
     handleDeleteFile
   };
 };
