@@ -31,24 +31,15 @@ serve(async (req) => {
     
     console.log('Parsed webhook data:', JSON.stringify(webhookData, null, 2))
 
-    // Validate basic webhook structure
-    if (!webhookData || typeof webhookData !== 'object') {
-      console.error('Invalid webhook data structure')
-      return new Response('Invalid webhook data structure', { 
-        status: 400, 
-        headers: corsHeaders 
-      })
-    }
-
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Log the webhook event with the actual structure we received
+    // Extract event details
     const eventType = webhookData.triggerEvent || webhookData.type || 'unknown'
-    const bookingData = webhookData.payload?.booking || webhookData.booking || webhookData
+    const bookingData = webhookData.payload?.booking || webhookData.booking || webhookData.payload || webhookData
     
     console.log('Event type:', eventType)
     console.log('Booking data:', JSON.stringify(bookingData, null, 2))
@@ -58,52 +49,32 @@ serve(async (req) => {
       .from('cal_com_webhooks')
       .insert({
         event_type: eventType,
-        booking_id: bookingData?.uid || bookingData?.id || 'unknown',
+        booking_id: bookingData?.uid || bookingData?.id || bookingData?.bookingId || 'unknown',
         event_data: webhookData,
         processed: false
       })
 
-    // Check if we have booking data in the expected format
-    if (!bookingData) {
-      console.log('No booking data found in webhook, but logged for analysis')
-      return new Response('Webhook logged successfully (no booking data)', {
+    // Check if we have valid booking data
+    if (!bookingData || !bookingData.startTime) {
+      console.log('No valid booking data found, webhook logged for analysis')
+      return new Response('Webhook logged successfully (no valid booking data)', {
         status: 200,
         headers: corsHeaders
       })
     }
 
     // Process the webhook based on event type
-    let sessionUpdate: any = {}
-    let newStatus = 'pending'
-
     switch (eventType) {
       case 'BOOKING_CREATED':
-      case 'booking.created':
-        newStatus = 'confirmed'
-        sessionUpdate = {
-          status: newStatus,
-          cal_com_booking_id: bookingData.uid || bookingData.id,
-          meeting_link: bookingData.location || `https://cal.com/meeting/${bookingData.uid || bookingData.id}`
-        }
+        await handleBookingCreated(supabase, bookingData)
         break
 
       case 'BOOKING_CANCELLED':
-      case 'booking.cancelled':
-        newStatus = 'cancelled'
-        sessionUpdate = {
-          status: newStatus
-        }
+        await handleBookingCancelled(supabase, bookingData)
         break
 
       case 'BOOKING_RESCHEDULED':
-      case 'booking.rescheduled':
-        newStatus = 'confirmed'
-        sessionUpdate = {
-          status: newStatus,
-          session_date: bookingData.startTime,
-          cal_com_booking_id: bookingData.uid || bookingData.id,
-          meeting_link: bookingData.location || `https://cal.com/meeting/${bookingData.uid || bookingData.id}`
-        }
+        await handleBookingRescheduled(supabase, bookingData)
         break
 
       default:
@@ -114,93 +85,13 @@ serve(async (req) => {
         })
     }
 
-    // Only proceed with session updates if we have valid booking data
-    if (!bookingData.startTime && !bookingData.start) {
-      console.log('No valid booking time found, skipping session update')
-      return new Response('Webhook logged successfully (no valid booking time)', {
-        status: 200,
-        headers: corsHeaders
-      })
-    }
-
-    // Find the coaching session by matching the booking time and attendee email
-    const sessionDate = new Date(bookingData.startTime || bookingData.start)
-    const attendeeEmails = (bookingData.attendees || []).map((a: any) => a.email).filter(Boolean)
-    
-    console.log('Looking for session with:', {
-      sessionDate: sessionDate.toISOString(),
-      attendeeEmails
-    })
-
-    if (attendeeEmails.length === 0) {
-      console.log('No attendee emails found, skipping session matching')
-      return new Response('Webhook logged successfully (no attendee emails)', {
-        status: 200,
-        headers: corsHeaders
-      })
-    }
-
-    // Try to find the session by date and attendee email
-    const { data: sessions, error: findError } = await supabase
-      .from('coaching_sessions')
-      .select(`
-        *,
-        profiles!coaching_sessions_mentee_id_fkey(email)
-      `)
-      .gte('session_date', new Date(sessionDate.getTime() - 30 * 60 * 1000).toISOString()) // 30 min before
-      .lte('session_date', new Date(sessionDate.getTime() + 30 * 60 * 1000).toISOString()) // 30 min after
-
-    if (findError) {
-      console.error('Error finding sessions:', findError)
-      return new Response('Database error', { 
-        status: 500, 
-        headers: corsHeaders 
-      })
-    }
-
-    // Filter sessions by attendee email
-    const matchingSessions = sessions?.filter(session => 
-      attendeeEmails.includes(session.profiles?.email)
-    ) || []
-
-    console.log('Found matching sessions:', matchingSessions.length)
-
-    if (matchingSessions.length === 0) {
-      console.log('No matching sessions found')
-      return new Response('No matching session found', { 
-        status: 200, 
-        headers: corsHeaders 
-      })
-    }
-
-    // Update the first matching session
-    const sessionToUpdate = matchingSessions[0]
-    
-    const { error: updateError } = await supabase
-      .from('coaching_sessions')
-      .update(sessionUpdate)
-      .eq('id', sessionToUpdate.id)
-
-    if (updateError) {
-      console.error('Error updating session:', updateError)
-      return new Response('Failed to update session', { 
-        status: 500, 
-        headers: corsHeaders 
-      })
-    }
-
     // Mark webhook as processed
     await supabase
       .from('cal_com_webhooks')
       .update({ processed: true })
-      .eq('booking_id', bookingData.uid || bookingData.id)
+      .eq('booking_id', bookingData.uid || bookingData.id || bookingData.bookingId)
 
-    console.log('Successfully processed Cal.com webhook:', {
-      bookingId: bookingData.uid || bookingData.id,
-      sessionId: sessionToUpdate.id,
-      newStatus,
-      meetingLink: sessionUpdate.meeting_link
-    })
+    console.log('Successfully processed Cal.com webhook')
 
     return new Response('Webhook processed successfully', {
       status: 200,
@@ -215,3 +106,115 @@ serve(async (req) => {
     })
   }
 })
+
+async function handleBookingCreated(supabase: any, bookingData: any) {
+  console.log('Processing BOOKING_CREATED event')
+  
+  // Extract attendee email (the person who booked)
+  const attendees = bookingData.attendees || []
+  const attendeeEmail = attendees.length > 0 ? attendees[0].email : null
+  
+  if (!attendeeEmail) {
+    console.log('No attendee email found, cannot create session')
+    return
+  }
+
+  // Find the user profile by email
+  const { data: userProfile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, first_name, last_name, email, role')
+    .eq('email', attendeeEmail)
+    .single()
+
+  if (profileError || !userProfile) {
+    console.log('User profile not found for email:', attendeeEmail)
+    return
+  }
+
+  // Find Ana's profile (the coach)
+  const { data: coachProfile, error: coachError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', 'ana@jobsties.com')
+    .eq('role', 'COACH')
+    .single()
+
+  if (coachError || !coachProfile) {
+    console.log('Coach profile not found')
+    return
+  }
+
+  // Extract meeting details
+  const sessionDate = new Date(bookingData.startTime)
+  const meetingLink = bookingData.metadata?.videoCallUrl || `https://meet.google.com/dcr-dbrn-bvx`
+  const sessionType = bookingData.eventTitle || bookingData.title || '1-on-1 Session'
+  const duration = bookingData.length || 30
+  const notes = bookingData.additionalNotes || bookingData.description || ''
+
+  // Create the coaching session
+  const { data: newSession, error: sessionError } = await supabase
+    .from('coaching_sessions')
+    .insert({
+      mentee_id: userProfile.id,
+      coach_id: coachProfile.id,
+      session_type: sessionType,
+      session_date: sessionDate.toISOString(),
+      duration: duration,
+      notes: notes,
+      status: 'confirmed',
+      meeting_link: meetingLink,
+      preferred_coach: 'Ana Nedelcu',
+      cal_com_booking_id: bookingData.uid || bookingData.id || bookingData.bookingId
+    })
+    .select()
+    .single()
+
+  if (sessionError) {
+    console.error('Error creating coaching session:', sessionError)
+    return
+  }
+
+  console.log('Successfully created coaching session:', newSession)
+}
+
+async function handleBookingCancelled(supabase: any, bookingData: any) {
+  console.log('Processing BOOKING_CANCELLED event')
+  
+  const bookingId = bookingData.uid || bookingData.id || bookingData.bookingId
+  
+  // Find and delete the coaching session
+  const { error } = await supabase
+    .from('coaching_sessions')
+    .delete()
+    .eq('cal_com_booking_id', bookingId)
+
+  if (error) {
+    console.error('Error cancelling session:', error)
+  } else {
+    console.log('Successfully cancelled session for booking:', bookingId)
+  }
+}
+
+async function handleBookingRescheduled(supabase: any, bookingData: any) {
+  console.log('Processing BOOKING_RESCHEDULED event')
+  
+  const bookingId = bookingData.uid || bookingData.id || bookingData.bookingId
+  const newSessionDate = new Date(bookingData.startTime)
+  const meetingLink = bookingData.metadata?.videoCallUrl || `https://meet.google.com/dcr-dbrn-bvx`
+  
+  // Update the coaching session
+  const { error } = await supabase
+    .from('coaching_sessions')
+    .update({
+      session_date: newSessionDate.toISOString(),
+      meeting_link: meetingLink,
+      status: 'confirmed'
+    })
+    .eq('cal_com_booking_id', bookingId)
+
+  if (error) {
+    console.error('Error rescheduling session:', error)
+  } else {
+    console.log('Successfully rescheduled session for booking:', bookingId)
+  }
+}

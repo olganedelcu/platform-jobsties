@@ -22,8 +22,22 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
         "hideEventTypeDetails": false,
         "layout": "month_view"
       });
+
+      // Listen for booking completion
+      cal("on", {
+        action: "bookingSuccessful",
+        callback: (e: any) => {
+          console.log("Booking successful:", e.detail);
+          // Close the dialog and refresh the sessions
+          onCancel();
+          // Optional: Show success message
+          if (window.location) {
+            window.location.reload();
+          }
+        }
+      });
     })();
-  }, []);
+  }, [onCancel]);
 
   return (
     <div className="w-full max-w-6xl mx-auto">
