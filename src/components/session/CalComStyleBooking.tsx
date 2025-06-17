@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Users } from 'lucide-react';
@@ -28,7 +27,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     {
       id: '1on1',
       name: '1-on-1 Session',
-      duration: 30,
+      duration: 45,
       description: 'Personalized career coaching session with Ana',
       icon: Users,
       color: 'bg-blue-500'
@@ -101,7 +100,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
         sessionType: selectedType?.name || '1-on-1 Session',
         date: selectedDate.toISOString().split('T')[0],
         time: selectedTime,
-        duration: selectedType?.duration.toString() || '30',
+        duration: selectedType?.duration.toString() || '45',
         notes: '',
         preferredCoach: 'Ana Nedelcu'
       };
@@ -125,38 +124,12 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   if (!selectedSessionType) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
-        {/* Session Type */}
         <div className="p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Session Type</h2>
-          <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book with Ana</p>
-          
-          <div className="max-w-md">
-            {sessionTypes.map((type) => {
-              const IconComponent = type.icon;
-              return (
-                <div
-                  key={type.id}
-                  className="cursor-pointer transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-300 rounded-lg p-6"
-                  onClick={() => setSelectedSessionType(type.id)}
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className={`p-3 ${type.color} text-white rounded-xl`}>
-                      <IconComponent className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{type.name}</h3>
-                        <div className="flex items-center space-x-1 text-gray-500">
-                          <span className="text-sm">{type.duration} min</span>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 text-sm">{type.description}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <SessionTypeSelection
+            sessionTypes={sessionTypes}
+            selectedSessionType={selectedSessionType}
+            onSessionTypeSelect={setSelectedSessionType}
+          />
         </div>
 
         <div className="p-8 border-t bg-gray-50">

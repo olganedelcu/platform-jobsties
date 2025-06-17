@@ -71,7 +71,7 @@ const SessionDateTime = ({
             <SelectValue placeholder="Duration" />
           </SelectTrigger>
           <SelectContent className="bg-white border border-gray-200 shadow-lg">
-            <SelectItem value="30">30 minutes</SelectItem>
+            <SelectItem value="45">45 minutes</SelectItem>
             <SelectItem value="60">60 minutes</SelectItem>
             <SelectItem value="90">90 minutes</SelectItem>
           </SelectContent>

@@ -67,7 +67,6 @@ const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: S
               <SelectValue placeholder="Select duration" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="30">30 minutes</SelectItem>
               <SelectItem value="45">45 minutes</SelectItem>
               <SelectItem value="60">60 minutes</SelectItem>
               <SelectItem value="75">75 minutes</SelectItem>
