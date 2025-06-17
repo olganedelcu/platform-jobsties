@@ -28,7 +28,7 @@ const SessionsPageHeader = ({
       
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
         <DialogTrigger asChild>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200">
+          <Button className="bg-white hover:bg-gray-50 text-blue-600 border border-blue-600 px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-200">
             <Plus className="h-4 w-4 mr-2" />
             Schedule Session
           </Button>
