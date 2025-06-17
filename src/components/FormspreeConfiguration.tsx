@@ -122,7 +122,7 @@ const FormspreeConfiguration = () => {
             <Input
               id="formspree-endpoint"
               type="url"
-              placeholder="https://formspree.io/f/YOUR_FORM_ID"
+              placeholder="https://formspree.io/f/myzjjlvn"
               value={endpoint}
               onChange={(e) => setEndpoint(e.target.value)}
               className="mt-1"
