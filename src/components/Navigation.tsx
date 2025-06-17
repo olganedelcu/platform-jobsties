@@ -35,7 +35,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     { path: '/tracker', label: 'Tracker', icon: FileText },
     { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/todos', label: 'Tasks', icon: FileText },
-    { path: '/messages', label: 'Communication', icon: MessageSquare }
+    { path: '/messages', label: 'Chat', icon: MessageSquare }
   ];
 
   useEffect(() => {

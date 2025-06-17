@@ -21,7 +21,6 @@ const DesktopNavigation = ({ navigationItems }: DesktopNavigationProps) => {
       {navigationItems.map((item) => {
         const IconComponent = item.icon;
         const isActive = location.pathname === item.path;
-        const isMessageItem = item.path === '/messages';
         
         return (
           <Link
@@ -34,7 +33,7 @@ const DesktopNavigation = ({ navigationItems }: DesktopNavigationProps) => {
             }`}
           >
             <IconComponent className="h-5 w-5 mr-2 flex-shrink-0" />
-            {!isMessageItem && <span className="whitespace-nowrap">{item.label}</span>}
+            <span className="whitespace-nowrap">{item.label}</span>
           </Link>
         );
       })}
