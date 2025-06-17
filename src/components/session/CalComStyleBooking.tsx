@@ -7,6 +7,7 @@ import SessionTypeSelection from './SessionTypeSelection';
 import CoachInfoPanel from './CoachInfoPanel';
 import CalendarView from './CalendarView';
 import TimeSlotSelection from './TimeSlotSelection';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CalComStyleBookingProps {
   onBookSession: (sessionData: any) => void;
@@ -20,10 +21,33 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [availableTimesForDate, setAvailableTimesForDate] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
+  const [anaCoachId, setAnaCoachId] = useState<string | null>(null);
 
-  // Use Ana's coach ID - this should be the actual coach ID from your database
-  const ANA_COACH_ID = 'ana-coach-id'; // Replace with actual coach ID
-  const { isDateAvailable, getAvailableTimesForDate, loading } = useCoachAvailability(ANA_COACH_ID);
+  // Get Ana's actual coach ID from the database
+  useEffect(() => {
+    const fetchAnaCoachId = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', 'ana@jobsties.com')
+          .eq('role', 'COACH')
+          .single();
+
+        if (error) {
+          console.error('Error fetching Ana coach ID:', error);
+        } else if (data) {
+          setAnaCoachId(data.id);
+        }
+      } catch (error) {
+        console.error('Error fetching Ana coach ID:', error);
+      }
+    };
+
+    fetchAnaCoachId();
+  }, []);
+
+  const { isDateAvailable, getAvailableTimesForDate, loading } = useCoachAvailability(anaCoachId);
 
   const sessionTypes = [
     {
@@ -37,13 +61,13 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   ];
 
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && anaCoachId) {
       loadAvailableTimesForSelectedDate();
     }
-  }, [selectedDate]);
+  }, [selectedDate, anaCoachId]);
 
   const loadAvailableTimesForSelectedDate = async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || !anaCoachId) return;
     
     setLoadingTimes(true);
     try {
@@ -75,7 +99,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   };
 
   const handleDateSelect = async (date: Date) => {
-    if (isPastDate(date)) return;
+    if (isPastDate(date) || !anaCoachId) return;
     
     setSelectedDate(date);
     setSelectedTime('');
@@ -109,8 +133,8 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     }
   };
 
-  // Show loading state while availability is being fetched
-  if (loading) {
+  // Show loading state while availability is being fetched or Ana's ID is being loaded
+  if (loading || !anaCoachId) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
         <div className="p-8 flex items-center justify-center">

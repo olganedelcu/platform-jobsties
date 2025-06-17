@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { AvailabilitySlot, BookedTimeSlots } from '@/types/availability';
 import { AvailabilityService } from '@/services/availabilityService';
 
-export const useAvailabilityData = (coachId?: string) => {
+export const useAvailabilityData = (coachId?: string | null) => {
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [bookedTimeSlots, setBookedTimeSlots] = useState<BookedTimeSlots>({});
