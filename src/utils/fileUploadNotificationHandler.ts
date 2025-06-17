@@ -1,6 +1,5 @@
-
 import { isAnaUser } from './userValidationUtils';
-import { FormspreeNotificationHandlers } from './formspreeNotificationUtils';
+import { FormspreeNotificationHandlers } from './formspree/formspreeHandlers';
 
 export const handleFileUploadNotification = async (
   currentUserEmail: string,

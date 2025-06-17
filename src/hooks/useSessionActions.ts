@@ -7,7 +7,7 @@ import {
   updateSession, 
   deleteSession 
 } from '@/services/sessionsService';
-import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
+import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useSessionActions = (
