@@ -12,14 +12,20 @@ interface UpcomingSessionsProps {
 
 const UpcomingSessions = ({ sessions, onReschedule, onCancel }: UpcomingSessionsProps) => {
   const now = new Date();
-  const upcomingSessions = sessions
+  
+  // Deduplicate sessions by ID and filter upcoming sessions
+  const uniqueUpcomingSessions = sessions
+    .filter((session, index, self) => 
+      // Remove duplicates by ID
+      index === self.findIndex(s => s.id === session.id)
+    )
     .filter(session => new Date(session.session_date) >= now)
     .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
 
-  const nextSession = upcomingSessions[0];
-  const otherUpcoming = upcomingSessions.slice(1);
+  const nextSession = uniqueUpcomingSessions[0];
+  const otherUpcoming = uniqueUpcomingSessions.slice(1);
 
-  if (upcomingSessions.length === 0) {
+  if (uniqueUpcomingSessions.length === 0) {
     return (
       <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 text-center border border-blue-100">
         <CalendarDays className="h-12 w-12 text-blue-400 mx-auto mb-3" />

@@ -36,7 +36,13 @@ export const useSessionsData = (user: any): SessionsDataHookReturn => {
       
       const sessionsData = await fetchSessions(user.id);
       console.log('Fetched sessions for user:', sessionsData);
-      setSessions(sessionsData);
+      
+      // Deduplicate sessions by ID to prevent duplicates
+      const uniqueSessions = sessionsData.filter((session, index, self) => 
+        index === self.findIndex(s => s.id === session.id)
+      );
+      
+      setSessions(uniqueSessions);
     } catch (error) {
       console.error('Error fetching sessions:', error);
       toast({
