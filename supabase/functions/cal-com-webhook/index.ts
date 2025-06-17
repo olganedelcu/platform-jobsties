@@ -7,34 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface CalComWebhookPayload {
-  triggerEvent: string;
-  createdAt: string;
-  payload: {
-    booking: {
-      id: number;
-      uid: string;
-      title: string;
-      description?: string;
-      startTime: string;
-      endTime: string;
-      attendees: Array<{
-        email: string;
-        name: string;
-        timeZone: string;
-      }>;
-      organizer: {
-        email: string;
-        name: string;
-        timeZone: string;
-      };
-      location?: string;
-      status: 'ACCEPTED' | 'CANCELLED' | 'REJECTED' | 'PENDING';
-      metadata?: Record<string, any>;
-    };
-  };
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -43,17 +15,30 @@ serve(async (req) => {
 
   try {
     const body = await req.text()
+    console.log('Raw webhook body:', body)
     
     // Parse the webhook payload
-    const webhookData: CalComWebhookPayload = JSON.parse(body)
+    let webhookData: any
+    try {
+      webhookData = JSON.parse(body)
+    } catch (parseError) {
+      console.error('Failed to parse webhook body:', parseError)
+      return new Response('Invalid JSON payload', { 
+        status: 400, 
+        headers: corsHeaders 
+      })
+    }
     
-    console.log('Received Cal.com webhook:', {
-      event: webhookData.triggerEvent,
-      bookingId: webhookData.payload.booking.id,
-      bookingUid: webhookData.payload.booking.uid,
-      status: webhookData.payload.booking.status,
-      startTime: webhookData.payload.booking.startTime
-    })
+    console.log('Parsed webhook data:', JSON.stringify(webhookData, null, 2))
+
+    // Validate basic webhook structure
+    if (!webhookData || typeof webhookData !== 'object') {
+      console.error('Invalid webhook data structure')
+      return new Response('Invalid webhook data structure', { 
+        status: 400, 
+        headers: corsHeaders 
+      })
+    }
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -61,32 +46,49 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Log the webhook event
+    // Log the webhook event with the actual structure we received
+    const eventType = webhookData.triggerEvent || webhookData.type || 'unknown'
+    const bookingData = webhookData.payload?.booking || webhookData.booking || webhookData
+    
+    console.log('Event type:', eventType)
+    console.log('Booking data:', JSON.stringify(bookingData, null, 2))
+
+    // Store the raw webhook for debugging
     await supabase
       .from('cal_com_webhooks')
       .insert({
-        event_type: webhookData.triggerEvent,
-        booking_id: webhookData.payload.booking.uid,
+        event_type: eventType,
+        booking_id: bookingData?.uid || bookingData?.id || 'unknown',
         event_data: webhookData,
         processed: false
       })
 
+    // Check if we have booking data in the expected format
+    if (!bookingData) {
+      console.log('No booking data found in webhook, but logged for analysis')
+      return new Response('Webhook logged successfully (no booking data)', {
+        status: 200,
+        headers: corsHeaders
+      })
+    }
+
     // Process the webhook based on event type
-    const booking = webhookData.payload.booking
     let sessionUpdate: any = {}
     let newStatus = 'pending'
 
-    switch (webhookData.triggerEvent) {
+    switch (eventType) {
       case 'BOOKING_CREATED':
+      case 'booking.created':
         newStatus = 'confirmed'
         sessionUpdate = {
           status: newStatus,
-          cal_com_booking_id: booking.uid,
-          meeting_link: booking.location || `https://cal.com/meeting/${booking.uid}`
+          cal_com_booking_id: bookingData.uid || bookingData.id,
+          meeting_link: bookingData.location || `https://cal.com/meeting/${bookingData.uid || bookingData.id}`
         }
         break
 
       case 'BOOKING_CANCELLED':
+      case 'booking.cancelled':
         newStatus = 'cancelled'
         sessionUpdate = {
           status: newStatus
@@ -94,31 +96,49 @@ serve(async (req) => {
         break
 
       case 'BOOKING_RESCHEDULED':
+      case 'booking.rescheduled':
         newStatus = 'confirmed'
         sessionUpdate = {
           status: newStatus,
-          session_date: booking.startTime,
-          cal_com_booking_id: booking.uid,
-          meeting_link: booking.location || `https://cal.com/meeting/${booking.uid}`
+          session_date: bookingData.startTime,
+          cal_com_booking_id: bookingData.uid || bookingData.id,
+          meeting_link: bookingData.location || `https://cal.com/meeting/${bookingData.uid || bookingData.id}`
         }
         break
 
       default:
-        console.log(`Unhandled event type: ${webhookData.triggerEvent}`)
-        return new Response('Event type not handled', { 
+        console.log(`Unhandled event type: ${eventType}`)
+        return new Response('Event type not handled but logged', { 
           status: 200, 
           headers: corsHeaders 
         })
     }
 
+    // Only proceed with session updates if we have valid booking data
+    if (!bookingData.startTime && !bookingData.start) {
+      console.log('No valid booking time found, skipping session update')
+      return new Response('Webhook logged successfully (no valid booking time)', {
+        status: 200,
+        headers: corsHeaders
+      })
+    }
+
     // Find the coaching session by matching the booking time and attendee email
-    const sessionDate = new Date(booking.startTime)
-    const attendeeEmails = booking.attendees.map(a => a.email)
+    const sessionDate = new Date(bookingData.startTime || bookingData.start)
+    const attendeeEmails = (bookingData.attendees || []).map((a: any) => a.email).filter(Boolean)
     
     console.log('Looking for session with:', {
       sessionDate: sessionDate.toISOString(),
       attendeeEmails
     })
+
+    if (attendeeEmails.length === 0) {
+      console.log('No attendee emails found, skipping session matching')
+      return new Response('Webhook logged successfully (no attendee emails)', {
+        status: 200,
+        headers: corsHeaders
+      })
+    }
 
     // Try to find the session by date and attendee email
     const { data: sessions, error: findError } = await supabase
@@ -173,10 +193,10 @@ serve(async (req) => {
     await supabase
       .from('cal_com_webhooks')
       .update({ processed: true })
-      .eq('booking_id', booking.uid)
+      .eq('booking_id', bookingData.uid || bookingData.id)
 
     console.log('Successfully processed Cal.com webhook:', {
-      bookingId: booking.uid,
+      bookingId: bookingData.uid || bookingData.id,
       sessionId: sessionToUpdate.id,
       newStatus,
       meetingLink: sessionUpdate.meeting_link
