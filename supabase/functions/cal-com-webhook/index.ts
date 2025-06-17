@@ -42,29 +42,8 @@ serve(async (req) => {
   }
 
   try {
-    // Verify webhook signature
-    const signature = req.headers.get('x-cal-signature')
-    const webhookSecret = Deno.env.get('CAL_COM_WEBHOOK_SECRET')
-    
-    if (!webhookSecret) {
-      console.error('CAL_COM_WEBHOOK_SECRET not configured')
-      return new Response('Webhook secret not configured', { 
-        status: 500, 
-        headers: corsHeaders 
-      })
-    }
-
     const body = await req.text()
     
-    // Verify signature (basic verification)
-    if (!signature) {
-      console.error('No signature provided')
-      return new Response('Unauthorized', { 
-        status: 401, 
-        headers: corsHeaders 
-      })
-    }
-
     // Parse the webhook payload
     const webhookData: CalComWebhookPayload = JSON.parse(body)
     
