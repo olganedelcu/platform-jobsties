@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { EmailNotificationService } from '@/services/emailNotificationService';
+import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
 
 interface FeedbackModuleProps {
   userId: string;
@@ -38,7 +38,7 @@ const FeedbackModule = ({ userId }: FeedbackModuleProps) => {
         .single();
 
       if (userProfile?.email) {
-        await EmailNotificationService.sendCourseFeedback({
+        await FormspreeNotificationHandlers.courseFeedback({
           menteeEmail: userProfile.email,
           menteeName: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
           feedback: feedback.trim(),

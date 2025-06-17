@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
-import { EmailNotificationService } from '@/services/emailNotificationService';
+import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
   console.log('Fetching coach sessions for user:', userId);
@@ -124,7 +124,7 @@ export const cancelSession = async (sessionId: string) => {
       });
 
       try {
-        await EmailNotificationService.sendSessionCancellationNotification({
+        await FormspreeNotificationHandlers.sessionCancellation({
           menteeEmail: menteeProfile.email,
           menteeName: `${menteeProfile.first_name} ${menteeProfile.last_name}`,
           sessionType: sessionData.session_type,

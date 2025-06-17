@@ -7,7 +7,7 @@ import {
   updateSession, 
   deleteSession 
 } from '@/services/sessionsService';
-import { EmailNotificationService } from '@/services/emailNotificationService';
+import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useSessionActions = (
@@ -86,7 +86,7 @@ export const useSessionActions = (
           const oldDateTime = formatDateTime(currentSession.session_date);
           const newDateTime = formatDateTime(updates.session_date);
 
-          await EmailNotificationService.sendSessionRescheduleNotification({
+          await FormspreeNotificationHandlers.sessionReschedule({
             menteeEmail: userProfile.email,
             menteeName: `${userProfile.first_name} ${userProfile.last_name}`,
             sessionType: currentSession.session_type,
@@ -137,7 +137,7 @@ export const useSessionActions = (
       if (userProfile) {
         const dateTime = formatDateTime(sessionToDelete.session_date);
 
-        await EmailNotificationService.sendSessionCancellationNotification({
+        await FormspreeNotificationHandlers.sessionCancellation({
           menteeEmail: userProfile.email,
           menteeName: `${userProfile.first_name} ${userProfile.last_name}`,
           sessionType: sessionToDelete.session_type,
