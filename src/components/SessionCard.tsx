@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, Video } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Clock, User, Video, MapPin } from 'lucide-react';
 import { Session } from '@/types/sessions';
 
 interface SessionCardProps {
@@ -13,6 +15,7 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
+      weekday: 'long',
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
@@ -28,61 +31,100 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
     });
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'confirmed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'pending':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{session.session_type}</h3>
-          <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-            session.status === 'confirmed' 
-              ? 'bg-green-100 text-green-800' 
-              : session.status === 'pending'
-              ? 'bg-yellow-100 text-yellow-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}>
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 text-white">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-xl font-bold">{session.session_type}</h3>
+          <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
             {session.status}
-          </div>
+          </Badge>
         </div>
+        <p className="text-blue-100 text-sm">Professional coaching session</p>
       </div>
       
-      <div className="space-y-3 mb-4">
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Calendar className="h-4 w-4" />
-          <span>{formatDate(session.session_date)}</span>
+      <div className="p-6 space-y-4">
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3 text-gray-700">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Calendar className="h-4 w-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="font-medium">{formatDate(session.session_date)}</p>
+              <p className="text-sm text-gray-500">Session date</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3 text-gray-700">
+            <div className="p-2 bg-indigo-50 rounded-lg">
+              <Clock className="h-4 w-4 text-indigo-600" />
+            </div>
+            <div>
+              <p className="font-medium">{formatTime(session.session_date)}</p>
+              <p className="text-sm text-gray-500">{session.duration} minutes</p>
+            </div>
+          </div>
+          
+          {session.preferred_coach && (
+            <div className="flex items-center space-x-3 text-gray-700">
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <User className="h-4 w-4 text-purple-600" />
+              </div>
+              <div>
+                <p className="font-medium">{session.preferred_coach}</p>
+                <p className="text-sm text-gray-500">Your coach</p>
+              </div>
+            </div>
+          )}
+          
+          {session.meeting_link && (
+            <div className="flex items-center space-x-3 text-gray-700">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <Video className="h-4 w-4 text-green-600" />
+              </div>
+              <div>
+                <p className="font-medium text-green-600">Video call ready</p>
+                <p className="text-sm text-gray-500">Meeting link available</p>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Clock className="h-4 w-4" />
-          <span>{formatTime(session.session_date)} ({session.duration} min)</span>
-        </div>
-        {session.preferred_coach && (
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <User className="h-4 w-4" />
-            <span>{session.preferred_coach}</span>
+        
+        {session.notes && (
+          <div className="bg-gray-50 rounded-xl p-4 mt-4">
+            <p className="text-sm text-gray-600 leading-relaxed">{session.notes}</p>
           </div>
         )}
-        {session.meeting_link && (
-          <div className="flex items-center space-x-2 text-sm text-indigo-600">
-            <Video className="h-4 w-4" />
-            <span>Video Call Ready</span>
-          </div>
-        )}
-      </div>
-      
-      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-        <Button 
-          variant="outline" 
-          className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 flex-1"
-          onClick={() => onReschedule(session.id)}
-        >
-          Reschedule
-        </Button>
-        <Button 
-          variant="outline" 
-          className="text-red-600 border-red-600 hover:bg-red-50 flex-1"
-          onClick={() => onCancel(session.id)}
-        >
-          Cancel
-        </Button>
+        
+        <div className="flex space-x-3 pt-4">
+          <Button 
+            variant="outline" 
+            className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium py-2.5"
+            onClick={() => onReschedule(session.id)}
+          >
+            Reschedule
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium py-2.5"
+            onClick={() => onCancel(session.id)}
+          >
+            Cancel
+          </Button>
+        </div>
       </div>
     </div>
   );

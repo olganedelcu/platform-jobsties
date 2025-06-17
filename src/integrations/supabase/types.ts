@@ -81,6 +81,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cal_com_webhooks: {
+        Row: {
+          booking_id: string
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          processed: boolean
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          event_data: Json
+          event_type: string
+          id?: string
+          processed?: boolean
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          processed?: boolean
+        }
+        Relationships: []
+      }
       coach_availability: {
         Row: {
           coach_id: string

@@ -49,8 +49,7 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
     throw error;
   }
 
-  // Note: Email notifications have been removed as Resend integration is not working
-  console.log("Session created successfully, email notifications disabled");
+  console.log("Session created successfully");
 
   return data;
 };

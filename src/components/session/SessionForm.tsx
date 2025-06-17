@@ -1,195 +1,130 @@
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useCoachAvailability } from '@/hooks/useCoachAvailability';
-import AvailabilityIndicator from './AvailabilityIndicator';
-import SessionBasicDetails from './SessionBasicDetails';
-import SessionDateTime from './SessionDateTime';
-import SessionNotes from './SessionNotes';
-import SessionMeetingInfo from './SessionMeetingInfo';
-import SessionFormActions from './SessionFormActions';
-
-interface SessionFormData {
-  sessionType: string;
-  date: string;
-  time: string;
-  duration: string;
-  notes: string;
-  preferredCoach: string;
-}
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, Clock, User, FileText } from 'lucide-react';
 
 interface SessionFormProps {
-  sessionData: SessionFormData;
-  onSessionDataChange: (data: SessionFormData) => void;
+  sessionData: any;
+  onSessionDataChange: (data: any) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
 
 const SessionForm = ({ sessionData, onSessionDataChange, onSubmit, onCancel }: SessionFormProps) => {
-  const [availableTimesForSelectedDate, setAvailableTimesForSelectedDate] = useState<string[]>([]);
-  const [isSelectedDateAvailable, setIsSelectedDateAvailable] = useState<boolean>(false);
-  const [availabilityLoaded, setAvailabilityLoaded] = useState<boolean>(false);
-  
-  console.log('SessionForm rendering with data:', sessionData);
-  
-  // Use the availability hook without a specific coach ID to get default Ana availability
-  const {
-    availability,
-    blockedDates,
-    loading: availabilityLoading,
-    isDateAvailable,
-    getAvailableTimesForDate
-  } = useCoachAvailability();
-
-  console.log('Availability hook data:', {
-    availability: availability.length,
-    blockedDates: blockedDates.length,
-    loading: availabilityLoading
-  });
-
-  // Stabilize the availability loading function
-  const loadAvailabilityForDate = useCallback(async (date: string) => {
-    if (!date) {
-      setIsSelectedDateAvailable(false);
-      setAvailableTimesForSelectedDate([]);
-      setAvailabilityLoaded(true);
-      return;
-    }
-
-    console.log('Loading availability for date:', date);
-    
-    try {
-      const [dateAvailable, availableTimes] = await Promise.all([
-        isDateAvailable(date),
-        getAvailableTimesForDate(date)
-      ]);
-      
-      console.log('Availability results:', {
-        dateAvailable,
-        availableTimesCount: availableTimes.length,
-        availableTimes: availableTimes.slice(0, 5) // Log first 5 times
-      });
-      
-      setIsSelectedDateAvailable(dateAvailable);
-      setAvailableTimesForSelectedDate(availableTimes);
-    } catch (error) {
-      console.error('Error loading availability:', error);
-      setIsSelectedDateAvailable(false);
-      setAvailableTimesForSelectedDate([]);
-    } finally {
-      setAvailabilityLoaded(true);
-    }
-  }, [isDateAvailable, getAvailableTimesForDate]);
-
-  // Load availability for selected date only when the date changes and hooks are ready
-  useEffect(() => {
-    if (!availabilityLoading) {
-      loadAvailabilityForDate(sessionData.date);
-    }
-  }, [sessionData.date, availabilityLoading, loadAvailabilityForDate]);
-
-  // Filter time slots to only show available times
-  const timeSlots = useMemo(() => {
-    if (availabilityLoaded && availableTimesForSelectedDate.length > 0) {
-      console.log('Using available times from hook:', availableTimesForSelectedDate.length);
-      return availableTimesForSelectedDate;
-    }
-    
-    // Fallback to default time slots if no availability data and loading is complete
-    if (availabilityLoaded) {
-      console.log('Using fallback time slots');
-      return [
-        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-        '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
-      ];
-    }
-    
-    return [];
-  }, [availableTimesForSelectedDate, availabilityLoaded]);
-
-  const updateSessionData = useCallback((field: keyof SessionFormData, value: string) => {
-    console.log(`Updating ${field} to:`, value);
-    onSessionDataChange({
-      ...sessionData,
-      [field]: value
-    });
-  }, [sessionData, onSessionDataChange]);
-
-  // Clear time selection when date changes and it's not available
-  useEffect(() => {
-    if (availabilityLoaded && sessionData.date && !isSelectedDateAvailable && sessionData.time) {
-      console.log('Date not available, clearing time selection');
-      updateSessionData('time', '');
-    }
-  }, [sessionData.date, isSelectedDateAvailable, sessionData.time, availabilityLoaded, updateSessionData]);
-
-  // Clear time selection if the currently selected time is no longer available
-  useEffect(() => {
-    if (availabilityLoaded && sessionData.time && sessionData.date && !timeSlots.includes(sessionData.time)) {
-      console.log('Selected time is no longer available, clearing selection');
-      updateSessionData('time', '');
-    }
-  }, [sessionData.time, sessionData.date, timeSlots, availabilityLoaded, updateSessionData]);
-
-  // Get minimum date (today)
-  const minDate = new Date().toISOString().split('T')[0];
-
-  const isFormValid = !(!sessionData.sessionType || !sessionData.date || !sessionData.time || !isSelectedDateAvailable);
-  
-  console.log('Form validation:', {
-    sessionType: sessionData.sessionType,
-    date: sessionData.date,
-    time: sessionData.time,
-    isDateAvailable: isSelectedDateAvailable,
-    isFormValid
-  });
+  // Get today's date in YYYY-MM-DD format for min date
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <SessionBasicDetails
-        preferredCoach={sessionData.preferredCoach}
-        onCoachChange={(value) => updateSessionData('preferredCoach', value)}
-      />
-
-      <SessionDateTime
-        date={sessionData.date}
-        time={sessionData.time}
-        duration={sessionData.duration}
-        isDateAvailable={isSelectedDateAvailable}
-        timeSlots={timeSlots}
-        minDate={minDate}
-        onDateChange={(value) => updateSessionData('date', value)}
-        onTimeChange={(value) => updateSessionData('time', value)}
-        onDurationChange={(value) => updateSessionData('duration', value)}
-      />
-
-      {/* Availability Indicator */}
-      {availabilityLoaded && (
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <AvailabilityIndicator
-            isAvailable={isSelectedDateAvailable}
-            availableTimes={availableTimesForSelectedDate}
-            selectedDate={sessionData.date}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Date Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="date" className="text-sm font-medium text-gray-700 flex items-center">
+            <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+            Preferred Date
+          </Label>
+          <Input
+            id="date"
+            type="date"
+            value={sessionData.date}
+            min={today}
+            onChange={(e) => onSessionDataChange({...sessionData, date: e.target.value})}
+            className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+            required
           />
-          {sessionData.date && availableTimesForSelectedDate.length === 0 && (
-            <div className="mt-2 text-sm text-orange-600">
-              All time slots for this date are already booked by other mentees.
-            </div>
-          )}
         </div>
-      )}
 
-      <SessionNotes
-        notes={sessionData.notes}
-        onNotesChange={(value) => updateSessionData('notes', value)}
-      />
+        {/* Time Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="time" className="text-sm font-medium text-gray-700 flex items-center">
+            <Clock className="h-4 w-4 mr-2 text-blue-500" />
+            Preferred Time
+          </Label>
+          <Input
+            id="time"
+            type="time"
+            value={sessionData.time}
+            onChange={(e) => onSessionDataChange({...sessionData, time: e.target.value})}
+            className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+            required
+          />
+        </div>
+      </div>
 
-      <SessionMeetingInfo />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Duration */}
+        <div className="space-y-2">
+          <Label htmlFor="duration" className="text-sm font-medium text-gray-700 flex items-center">
+            <Clock className="h-4 w-4 mr-2 text-blue-500" />
+            Duration
+          </Label>
+          <Select value={sessionData.duration} onValueChange={(value) => onSessionDataChange({...sessionData, duration: value})}>
+            <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
+              <SelectValue placeholder="Select duration" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30">30 minutes</SelectItem>
+              <SelectItem value="45">45 minutes</SelectItem>
+              <SelectItem value="60">60 minutes</SelectItem>
+              <SelectItem value="75">75 minutes</SelectItem>
+              <SelectItem value="90">90 minutes</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <SessionFormActions
-        isFormValid={isFormValid}
-        onCancel={onCancel}
-      />
+        {/* Coach Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="coach" className="text-sm font-medium text-gray-700 flex items-center">
+            <User className="h-4 w-4 mr-2 text-blue-500" />
+            Preferred Coach
+          </Label>
+          <Select value={sessionData.preferredCoach} onValueChange={(value) => onSessionDataChange({...sessionData, preferredCoach: value})}>
+            <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg">
+              <SelectValue placeholder="Select coach" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Ana Nedelcu">Ana Nedelcu</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="space-y-2">
+        <Label htmlFor="notes" className="text-sm font-medium text-gray-700 flex items-center">
+          <FileText className="h-4 w-4 mr-2 text-blue-500" />
+          Additional Notes (Optional)
+        </Label>
+        <Textarea
+          id="notes"
+          placeholder="Any specific topics you'd like to discuss or questions you have..."
+          value={sessionData.notes}
+          onChange={(e) => onSessionDataChange({...sessionData, notes: e.target.value})}
+          className="min-h-[100px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg resize-none"
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
+        <Button
+          type="submit"
+          className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          Schedule Session
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 py-3 rounded-lg font-medium transition-all duration-200"
+        >
+          Cancel
+        </Button>
+      </div>
     </form>
   );
 };
