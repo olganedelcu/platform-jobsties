@@ -131,72 +131,95 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
     return
   }
 
-  // Find the user profile - try multiple approaches
-  let userProfile = null
+  // Find Ana's profile (the coach) - she's always the coach
+  const { data: coachProfile, error: coachError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', 'ana@jobsties.com')
+    .eq('role', 'COACH')
+    .single()
+
+  if (coachError || !coachProfile) {
+    console.log('Coach profile not found')
+    return
+  }
+
+  console.log('Found coach profile:', coachProfile)
+
+  // Find the mentee profile - should be different from Ana
+  let menteeProfile = null
   
-  // First try to find by email if available
-  if (attendeeEmail) {
-    console.log('Trying to find user by email:', attendeeEmail)
+  // First try to find by email if available and different from Ana's email
+  if (attendeeEmail && attendeeEmail.toLowerCase() !== 'ana@jobsties.com') {
+    console.log('Trying to find mentee by email:', attendeeEmail)
     
     // Try exact email match
     const { data: exactProfile } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
       .eq('email', attendeeEmail)
+      .eq('role', 'MENTEE')
       .single()
 
     if (exactProfile) {
-      userProfile = exactProfile
-      console.log('Found user profile with exact email match:', userProfile)
+      menteeProfile = exactProfile
+      console.log('Found mentee profile with exact email match:', menteeProfile)
     } else {
-      // Try case-insensitive email match
-      const { data: allProfiles } = await supabase
+      // Try case-insensitive email match for mentees only
+      const { data: allMenteeProfiles } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, role')
+        .eq('role', 'MENTEE')
       
-      if (allProfiles) {
-        userProfile = allProfiles.find(profile => 
+      if (allMenteeProfiles) {
+        menteeProfile = allMenteeProfiles.find(profile => 
           profile.email.toLowerCase() === attendeeEmail.toLowerCase()
         )
         
-        if (userProfile) {
-          console.log('Found user profile with case-insensitive email match:', userProfile)
+        if (menteeProfile) {
+          console.log('Found mentee profile with case-insensitive email match:', menteeProfile)
         }
       }
     }
   }
   
-  // If email didn't work, try to find by name matching
-  if (!userProfile && attendeeName) {
-    console.log('Trying to find user by name:', attendeeName)
+  // If email didn't work, try to find by name matching (but exclude Ana)
+  if (!menteeProfile && attendeeName) {
+    console.log('Trying to find mentee by name:', attendeeName)
     
-    const { data: allProfiles } = await supabase
+    const { data: allMenteeProfiles } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
+      .eq('role', 'MENTEE')
     
-    if (allProfiles) {
+    if (allMenteeProfiles) {
       // Try to match by full name or last name
       const nameParts = attendeeName.toLowerCase().split(' ')
       const lastName = nameParts[nameParts.length - 1]
       
-      userProfile = allProfiles.find(profile => {
+      menteeProfile = allMenteeProfiles.find(profile => {
         const fullName = `${profile.first_name} ${profile.last_name}`.toLowerCase()
         const profileLastName = profile.last_name.toLowerCase()
+        
+        // Make sure we're not matching Ana
+        if (profile.email.toLowerCase() === 'ana@jobsties.com') {
+          return false
+        }
         
         return fullName.includes(attendeeName.toLowerCase()) || 
                profileLastName === lastName ||
                attendeeName.toLowerCase().includes(profileLastName)
       })
       
-      if (userProfile) {
-        console.log('Found user profile by name matching:', userProfile)
+      if (menteeProfile) {
+        console.log('Found mentee profile by name matching:', menteeProfile)
       }
     }
   }
 
-  // If still no profile found, log available profiles for debugging
-  if (!userProfile) {
-    console.log('No user profile found for attendee:', { email: attendeeEmail, name: attendeeName })
+  // If still no mentee profile found, log available profiles for debugging
+  if (!menteeProfile) {
+    console.log('No mentee profile found for attendee:', { email: attendeeEmail, name: attendeeName })
     
     const { data: allProfiles } = await supabase
       .from('profiles')
@@ -213,19 +236,6 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
     return
   }
 
-  // Find Ana's profile (the coach)
-  const { data: coachProfile, error: coachError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('email', 'ana@jobsties.com')
-    .eq('role', 'COACH')
-    .single()
-
-  if (coachError || !coachProfile) {
-    console.log('Coach profile not found')
-    return
-  }
-
   // Extract meeting details
   const sessionDate = new Date(bookingData.startTime)
   const meetingLink = bookingData.metadata?.videoCallUrl || `https://meet.google.com/dcr-dbrn-bvx`
@@ -234,7 +244,7 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
   const notes = bookingData.additionalNotes || bookingData.description || ''
 
   console.log('Creating session with data:', {
-    mentee_id: userProfile.id,
+    mentee_id: menteeProfile.id,
     coach_id: coachProfile.id,
     session_type: sessionType,
     session_date: sessionDate.toISOString(),
@@ -250,7 +260,7 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
   const { data: newSession, error: sessionError } = await supabase
     .from('coaching_sessions')
     .insert({
-      mentee_id: userProfile.id,
+      mentee_id: menteeProfile.id,
       coach_id: coachProfile.id,
       session_type: sessionType,
       session_date: sessionDate.toISOString(),
