@@ -60,15 +60,15 @@ export const sendCourseFeedbackEmail = async (data: CourseFeedbackData): Promise
     const formData = new FormData();
     formData.append('email', data.menteeEmail);
     formData.append('name', data.menteeName);
-    formData.append('subject', 'Course Feedback Received - JobsTies Platform');
-    formData.append('message', `Course feedback from ${data.menteeName}:\n\n${data.feedback}\n\nBest regards,\nThe JobsTies Team`);
+    formData.append('subject', 'Course Feedback Received - JobsTies.Platform');
+    formData.append('message', `Hi ${data.menteeName},\n\nCourse feedback from ${data.menteeName}:\n\n${data.feedback}\n\nBest regards,\nThe JobsTies.Platform Team`);
     formData.append('_replyto', data.menteeEmail);
-    formData.append('_from', 'JobsTies Platform <feedback@jobsties.com>');
+    formData.append('_from', 'JobsTies.Platform <feedback@jobsties.com>');
 
     await sendFormspreeEmail(formData);
-    console.log("✅ Course feedback sent successfully via JobsTies Platform");
+    console.log("✅ Course feedback sent successfully via JobsTies.Platform");
   } catch (error) {
-    console.error('❌ JobsTies Platform course feedback notification error:', error);
+    console.error('❌ JobsTies.Platform course feedback notification error:', error);
     throw error;
   }
 };
@@ -81,7 +81,9 @@ export const sendSessionRescheduleEmail = async (data: SessionRescheduleData): P
   });
 
   try {
-    const message = `Your ${data.sessionType} session has been rescheduled:
+    const message = `Hi ${data.menteeName},
+
+Your ${data.sessionType} session has been rescheduled:
 
 OLD TIME:
 Date: ${data.oldSessionDate}
@@ -97,20 +99,20 @@ ${data.notes ? `Notes: ${data.notes}` : ''}
 Please update your calendar accordingly.
 
 Best regards,
-The JobsTies Team`;
+The JobsTies.Platform Team`;
 
     const formData = new FormData();
     formData.append('email', data.menteeEmail);
     formData.append('name', data.menteeName);
-    formData.append('subject', 'Session Rescheduled - JobsTies Platform');
+    formData.append('subject', 'Session Rescheduled - JobsTies.Platform');
     formData.append('message', message);
     formData.append('_replyto', data.menteeEmail);
-    formData.append('_from', 'JobsTies Platform <sessions@jobsties.com>');
+    formData.append('_from', 'JobsTies.Platform <sessions@jobsties.com>');
 
     await sendFormspreeEmail(formData);
-    console.log("✅ Session reschedule notification sent successfully via JobsTies Platform");
+    console.log("✅ Session reschedule notification sent successfully via JobsTies.Platform");
   } catch (error) {
-    console.error('❌ JobsTies Platform session reschedule notification error:', error);
+    console.error('❌ JobsTies.Platform session reschedule notification error:', error);
     throw error;
   }
 };
@@ -123,7 +125,9 @@ export const sendSessionCancellationEmail = async (data: SessionCancellationData
   });
 
   try {
-    const message = `Your ${data.sessionType} session has been cancelled:
+    const message = `Hi ${data.menteeName},
+
+Your ${data.sessionType} session has been cancelled:
 
 Date: ${data.sessionDate}
 Time: ${data.sessionTime}
@@ -133,20 +137,20 @@ ${data.notes ? `Notes: ${data.notes}` : ''}
 Please contact your mentor if you need to reschedule.
 
 Best regards,
-The JobsTies Team`;
+The JobsTies.Platform Team`;
 
     const formData = new FormData();
     formData.append('email', data.menteeEmail);
     formData.append('name', data.menteeName);
-    formData.append('subject', 'Session Cancelled - JobsTies Platform');
+    formData.append('subject', 'Session Cancelled - JobsTies.Platform');
     formData.append('_replyto', data.menteeEmail);
     formData.append('message', message);
-    formData.append('_from', 'JobsTies Platform <sessions@jobsties.com>');
+    formData.append('_from', 'JobsTies.Platform <sessions@jobsties.com>');
 
     await sendFormspreeEmail(formData);
-    console.log("✅ Session cancellation notification sent successfully via JobsTies Platform");
+    console.log("✅ Session cancellation notification sent successfully via JobsTies.Platform");
   } catch (error) {
-    console.error('❌ JobsTies Platform session cancellation notification error:', error);
+    console.error('❌ JobsTies.Platform session cancellation notification error:', error);
     throw error;
   }
 };

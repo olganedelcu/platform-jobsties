@@ -34,10 +34,10 @@ export const FormspreeNotificationService = {
       const formData = new FormData();
       formData.append('email', menteeEmail);
       formData.append('name', menteeName);
-      formData.append('subject', `JobsTies Platform Updates 🚀 - ${notifications.length} New Notification${notifications.length > 1 ? 's' : ''}`);
+      formData.append('subject', `JobsTies.Platform Updates 🚀 - ${notifications.length} New Notification${notifications.length > 1 ? 's' : ''}`);
       formData.append('message', emailBody);
       formData.append('_replyto', menteeEmail);
-      formData.append('_from', 'JobsTies Platform <notifications@jobsties.com>');
+      formData.append('_from', 'JobsTies.Platform <notifications@jobsties.com>');
 
       const response = await fetch(formspreeEndpoint, {
         method: 'POST',
@@ -75,7 +75,7 @@ export const FormspreeNotificationService = {
     }, {} as Record<string, typeof notifications>);
 
     let emailBody = `Hi ${menteeName},\n\n`;
-    emailBody += `You have ${notifications.length} new notification${notifications.length > 1 ? 's' : ''} from your JobsTies mentor:\n\n`;
+    emailBody += `You have ${notifications.length} new notification${notifications.length > 1 ? 's' : ''} from your JobsTies.Platform mentor:\n\n`;
 
     // Group notifications by type
     Object.entries(notificationsByType).forEach(([type, typeNotifications]) => {
@@ -89,8 +89,8 @@ export const FormspreeNotificationService = {
       });
     });
 
-    emailBody += `Log in to your JobsTies dashboard to view all details and take action: [Dashboard Link]\n\n`;
-    emailBody += `Best regards,\nThe JobsTies Team`;
+    emailBody += `Log in to your JobsTies.Platform dashboard to view all details and take action: [Dashboard Link]\n\n`;
+    emailBody += `Best regards,\nThe JobsTies.Platform Team`;
 
     return emailBody;
   },
