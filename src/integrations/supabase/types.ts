@@ -412,6 +412,7 @@ export type Database = {
       }
       coaching_sessions: {
         Row: {
+          cal_com_booking_id: string | null
           calendar_event_id: string | null
           coach_id: string | null
           created_at: string
@@ -430,6 +431,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cal_com_booking_id?: string | null
           calendar_event_id?: string | null
           coach_id?: string | null
           created_at?: string
@@ -448,6 +450,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cal_com_booking_id?: string | null
           calendar_event_id?: string | null
           coach_id?: string | null
           created_at?: string

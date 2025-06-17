@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, User, Video, MapPin } from 'lucide-react';
+import { Calendar, Clock, User, Video, ExternalLink } from 'lucide-react';
 import { Session } from '@/types/sessions';
 
 interface SessionCardProps {
@@ -44,14 +44,27 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
     }
   };
 
+  const handleJoinMeeting = () => {
+    if (session.meeting_link) {
+      window.open(session.meeting_link, '_blank');
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
       <div className="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 text-white">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold">{session.session_type}</h3>
-          <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
-            {session.status}
-          </Badge>
+          <div className="flex items-center space-x-2">
+            <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
+              {session.status}
+            </Badge>
+            {session.cal_com_booking_id && (
+              <Badge variant="outline" className="text-white border-white text-xs px-2 py-1">
+                Cal.com
+              </Badge>
+            )}
+          </div>
         </div>
         <p className="text-blue-100 text-sm">Professional coaching session</p>
       </div>
@@ -95,10 +108,20 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
               <div className="p-2 bg-green-50 rounded-lg">
                 <Video className="h-4 w-4 text-green-600" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-medium text-green-600">Video call ready</p>
                 <p className="text-sm text-gray-500">Meeting link available</p>
               </div>
+              {session.status === 'confirmed' && (
+                <Button
+                  size="sm"
+                  onClick={handleJoinMeeting}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Join
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -110,13 +133,15 @@ const SessionCard = ({ session, onReschedule, onCancel }: SessionCardProps) => {
         )}
         
         <div className="flex space-x-3 pt-4">
-          <Button 
-            variant="outline" 
-            className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium py-2.5"
-            onClick={() => onReschedule(session.id)}
-          >
-            Reschedule
-          </Button>
+          {!session.cal_com_booking_id && (
+            <Button 
+              variant="outline" 
+              className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium py-2.5"
+              onClick={() => onReschedule(session.id)}
+            >
+              Reschedule
+            </Button>
+          )}
           <Button 
             variant="outline" 
             className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium py-2.5"

@@ -14,6 +14,7 @@ export interface CoachSession {
   updated_at: string;
   mentee_name?: string;
   mentee_email?: string;
+  cal_com_booking_id?: string;
 }
 
 export interface CoachSessionsHookReturn {

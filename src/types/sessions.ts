@@ -14,6 +14,7 @@ export interface Session {
   updated_at: string;
   google_event_id?: string;
   google_calendar_id?: string;
+  cal_com_booking_id?: string;
 }
 
 export interface NewSessionData {
