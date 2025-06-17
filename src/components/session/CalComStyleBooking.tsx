@@ -1,23 +1,57 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight, Users, MessageSquare, Target, Camera } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-interface CalComBookingInterfaceProps {
+interface CalComStyleBookingProps {
   onBookSession: (sessionData: any) => void;
-  onBack: () => void;
+  onCancel: () => void;
 }
 
-const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfaceProps) => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps) => {
+  const [selectedSessionType, setSelectedSessionType] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Mock available time slots for the selected date
-  const availableTimeSlots = ['13:30', '15:30', '18:30', '19:00'];
+  const sessionTypes = [
+    {
+      id: 'general',
+      name: 'General Coaching',
+      duration: 60,
+      description: 'Comprehensive career guidance and support',
+      icon: Users,
+      color: 'bg-blue-500'
+    },
+    {
+      id: 'interview',
+      name: 'Interview Preparation',
+      duration: 45,
+      description: 'Practice interviews and feedback',
+      icon: MessageSquare,
+      color: 'bg-purple-500'
+    },
+    {
+      id: 'cv',
+      name: 'CV Review',
+      duration: 30,
+      description: 'Professional resume optimization',
+      icon: Target,
+      color: 'bg-teal-500'
+    },
+    {
+      id: 'mock',
+      name: 'Mock Interview',
+      duration: 60,
+      description: 'Realistic interview simulation',
+      icon: Camera,
+      color: 'bg-blue-600'
+    }
+  ];
+
+  const availableTimeSlots = ['15:30', '18:30', '19:00'];
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -29,12 +63,10 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
 
     const days = [];
     
-    // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(null);
     }
     
-    // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
@@ -59,7 +91,7 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
   };
 
   const isSelected = (date: Date) => {
-    return date.toDateString() === selectedDate.toDateString();
+    return selectedDate && date.toDateString() === selectedDate.toDateString();
   };
 
   const isPastDate = (date: Date) => {
@@ -81,7 +113,7 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
   const handleDateSelect = (date: Date) => {
     if (!isPastDate(date)) {
       setSelectedDate(date);
-      setSelectedTime(''); // Reset selected time when date changes
+      setSelectedTime('');
     }
   };
 
@@ -90,12 +122,13 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
   };
 
   const handleBooking = () => {
-    if (selectedDate && selectedTime) {
+    if (selectedDate && selectedTime && selectedSessionType) {
+      const selectedType = sessionTypes.find(type => type.id === selectedSessionType);
       const sessionData = {
-        sessionType: 'General Coaching',
+        sessionType: selectedType?.name || 'General Coaching',
         date: selectedDate.toISOString().split('T')[0],
         time: selectedTime,
-        duration: '30',
+        duration: selectedType?.duration.toString() || '60',
         notes: '',
         preferredCoach: 'Ana Nedelcu'
       };
@@ -106,13 +139,110 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
   const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const days = getDaysInMonth(currentMonth);
 
+  // Show session type selection first
+  if (!selectedSessionType) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="p-3 bg-white/20 rounded-xl">
+              <Calendar className="h-8 w-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">Schedule Your Session</h1>
+              <p className="text-blue-100 mt-2">Book a personalized coaching session with Ana Nedelcu</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Smart Scheduling Banner */}
+        <div className="p-8 bg-gray-50 border-b">
+          <div className="flex items-start space-x-4 bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <div className="p-3 bg-blue-600 rounded-xl">
+              <Calendar className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2 mb-2">
+                <h3 className="text-lg font-semibold text-blue-900">Smart Scheduling</h3>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Automated</Badge>
+              </div>
+              <p className="text-blue-700 mb-3">
+                Your session will be automatically added to both your calendar and Ana's calendar. You'll
+                receive a confirmation email with the meeting details and video call link.
+              </p>
+              <div className="flex items-center space-x-4 text-sm text-blue-600">
+                <div className="flex items-center space-x-1">
+                  <Clock className="h-4 w-4" />
+                  <span>Instant confirmation</span>
+                </div>
+                <span>•</span>
+                <span>Calendar sync</span>
+                <span>•</span>
+                <span>Video call setup</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Session Types */}
+        <div className="p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Session Type</h2>
+          <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {sessionTypes.map((type) => {
+              const IconComponent = type.icon;
+              return (
+                <Card 
+                  key={type.id}
+                  className="cursor-pointer transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-300"
+                  onClick={() => setSelectedSessionType(type.id)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className={`p-3 ${type.color} text-white rounded-xl`}>
+                        <IconComponent className="h-6 w-6" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{type.name}</h3>
+                          <div className="flex items-center space-x-1 text-gray-500">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-sm">{type.duration} min</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-600 text-sm">{type.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="p-8 border-t bg-gray-50">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show calendar interface
   return (
     <div className="flex flex-col lg:flex-row max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
       {/* Left Panel - Coach Info */}
       <div className="lg:w-1/3 bg-gray-900 text-white p-8">
         <div className="flex items-center space-x-4 mb-6">
           <Avatar className="h-16 w-16">
-            <AvatarImage src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" alt="Ana Nedelcu" />
+            <AvatarImage src="/lovable-uploads/a7c80f69-dda0-4640-8fd9-638d97a91768.png" alt="Ana Nedelcu" />
             <AvatarFallback>AN</AvatarFallback>
           </Avatar>
           <div>
@@ -123,10 +253,12 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
 
         <div className="space-y-4">
           <div className="border border-gray-700 rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-2">30 Min Meeting</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {sessionTypes.find(t => t.id === selectedSessionType)?.name}
+            </h3>
             <div className="flex items-center space-x-2 text-gray-300 mb-2">
               <Clock className="h-4 w-4" />
-              <span>30m</span>
+              <span>{sessionTypes.find(t => t.id === selectedSessionType)?.duration}m</span>
             </div>
             <div className="flex items-center space-x-2 text-gray-300 mb-2">
               <Video className="h-4 w-4" />
@@ -174,7 +306,6 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
           </div>
         </div>
 
-        {/* Calendar Grid */}
         <div className="grid grid-cols-7 gap-2 mb-6">
           {weekDays.map((day) => (
             <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
@@ -205,7 +336,6 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
           ))}
         </div>
 
-        {/* Time Slots */}
         {selectedDate && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -217,19 +347,19 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
               </Badge>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {availableTimeSlots.map((time) => (
                 <Button
                   key={time}
                   variant={selectedTime === time ? "default" : "outline"}
-                  className={`py-3 ${
+                  className={`py-3 justify-start ${
                     selectedTime === time 
                       ? 'bg-green-600 hover:bg-green-700 text-white' 
                       : 'border-gray-300 hover:border-green-500'
                   }`}
                   onClick={() => handleTimeSelect(time)}
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <span>{time}</span>
                   </div>
@@ -238,7 +368,7 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
             </div>
 
             {selectedTime && (
-              <div className="pt-4">
+              <div className="pt-4 space-y-3">
                 <Button
                   onClick={handleBooking}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
@@ -250,13 +380,20 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
           </div>
         )}
 
-        <div className="mt-6">
+        <div className="mt-6 flex space-x-3">
           <Button
             variant="outline"
-            onClick={onBack}
+            onClick={() => setSelectedSessionType('')}
             className="text-gray-600 hover:text-gray-800"
           >
             Back to Session Types
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            Cancel
           </Button>
         </div>
       </div>
@@ -264,4 +401,4 @@ const CalComBookingInterface = ({ onBookSession, onBack }: CalComBookingInterfac
   );
 };
 
-export default CalComBookingInterface;
+export default CalComStyleBooking;

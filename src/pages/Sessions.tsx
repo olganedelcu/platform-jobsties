@@ -46,10 +46,8 @@ const Sessions = () => {
       }
     };
 
-    // Check for existing session immediately
     checkUser();
 
-    // Set up listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
@@ -78,7 +76,6 @@ const Sessions = () => {
     try {
       await handleAddSession(sessionData);
       setShowScheduleDialog(false);
-      // Force refresh of the entire component to update availability
       setSessionRefreshKey(prev => prev + 1);
       
       toast({
@@ -104,7 +101,6 @@ const Sessions = () => {
 
   const handleCancel = async (sessionId: string) => {
     await handleDeleteSession(sessionId);
-    // Force refresh to update availability
     setSessionRefreshKey(prev => prev + 1);
   };
 
@@ -136,10 +132,8 @@ const Sessions = () => {
           sessionRefreshKey={sessionRefreshKey}
         />
 
-        {/* Loading State */}
         {sessionsLoading && <SessionsLoadingState />}
 
-        {/* Sessions Grid */}
         {!sessionsLoading && sessions.length > 0 && (
           <SessionsGrid
             sessions={sessions}
@@ -148,7 +142,6 @@ const Sessions = () => {
           />
         )}
 
-        {/* Empty State */}
         {!sessionsLoading && sessions.length === 0 && (
           <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
         )}

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import CoachNavigation from '@/components/CoachNavigation';
 import SessionsHeader from '@/components/coach/SessionsHeader';
-import SessionsList from '@/components/coach/SessionsList';
+import CoachSessionsList from '@/components/coach/CoachSessionsList';
 import { useCoachSessions } from '@/hooks/useCoachSessions';
 import { Loader2 } from 'lucide-react';
 
@@ -32,10 +32,8 @@ const CoachSessions = () => {
       }
     };
 
-    // Check for existing session immediately
     checkUser();
 
-    // Set up listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
@@ -91,7 +89,7 @@ const CoachSessions = () => {
       <main className="max-w-7xl mx-auto py-8 px-6">
         <SessionsHeader />
         
-        <SessionsList
+        <CoachSessionsList
           sessions={sessions}
           loading={sessionsLoading}
           onConfirmSession={handleConfirmSession}
