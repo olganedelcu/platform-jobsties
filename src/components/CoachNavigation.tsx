@@ -46,7 +46,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
     },
     { 
       path: '/coach/job-recommendations', 
-      label: 'Job Recommendations', 
+      label: 'Send Jobs', 
       icon: FileUp 
     },
     { 
@@ -56,7 +56,7 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
     },
     { 
       path: '/coach/cv-upload', 
-      label: 'Files Upload', 
+      label: 'Uploads', 
       icon: FileUp 
     },
     { 
@@ -103,7 +103,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
                 alt="Logo" 
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-gray-900">Coach</span>
             </Link>
           </div>
 
