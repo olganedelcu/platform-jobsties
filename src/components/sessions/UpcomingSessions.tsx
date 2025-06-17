@@ -33,12 +33,14 @@ const UpcomingSessions = ({ sessions, onReschedule, onCancel }: UpcomingSessions
     <div className="space-y-6">
       {/* Next Session Highlight */}
       {nextSession && (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
+        <div className="bg-white rounded-2xl p-6 shadow-lg shadow-blue-200 border border-blue-100">
           <div className="flex items-center gap-3 mb-4">
-            <Clock className="h-6 w-6" />
-            <h2 className="text-xl font-bold">Next Session</h2>
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Clock className="h-6 w-6 text-blue-600" />
+            </div>
+            <h2 className="text-xl font-bold text-blue-600">Next Session</h2>
           </div>
-          <div className="bg-white rounded-xl p-0 shadow-lg shadow-blue-200">
+          <div className="bg-white rounded-xl">
             <SessionCard
               session={nextSession}
               onReschedule={onReschedule}
