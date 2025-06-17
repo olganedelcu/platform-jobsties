@@ -26,10 +26,10 @@ const PastSessions = ({ sessions, onReschedule, onCancel }: PastSessionsProps) =
   const displayedSessions = isExpanded ? pastSessions : pastSessions.slice(0, 3);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <History className="h-6 w-6 text-gray-600" />
+        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <History className="h-5 w-5 text-gray-600" />
           Past Sessions ({pastSessions.length})
         </h2>
         {pastSessions.length > 3 && (
@@ -53,7 +53,7 @@ const PastSessions = ({ sessions, onReschedule, onCancel }: PastSessionsProps) =
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {displayedSessions.map((session) => (
           <div key={session.id} className="opacity-75 hover:opacity-100 transition-opacity">
             <SessionCard

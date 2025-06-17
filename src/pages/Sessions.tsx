@@ -123,7 +123,7 @@ const Sessions = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto pt-32 pb-8 px-6">
+      <main className="max-w-4xl mx-auto pt-32 pb-8 px-4">
         <SessionsPageHeader
           showScheduleDialog={showScheduleDialog}
           setShowScheduleDialog={setShowScheduleDialog}
@@ -135,7 +135,7 @@ const Sessions = () => {
         {sessionsLoading && <SessionsLoadingState />}
 
         {!sessionsLoading && sessions.length > 0 && (
-          <div className="space-y-12">
+          <div className="space-y-8">
             <UpcomingSessions
               sessions={sessions}
               onReschedule={handleReschedule}

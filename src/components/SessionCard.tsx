@@ -57,15 +57,15 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
     return (
       <div className="bg-white rounded-xl overflow-hidden">
         {/* Blue Header for Next Session */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-5 text-white">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-xl font-bold">{session.session_type}</h3>
+            <h3 className="text-lg font-bold">{session.session_type}</h3>
             <div className="flex items-center space-x-2">
-              <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-3 py-1`}>
+              <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
                 {session.status}
               </Badge>
               {session.cal_com_booking_id && (
-                <Badge variant="outline" className="text-white border-white/50 bg-white/10 text-xs px-3 py-1">
+                <Badge variant="outline" className="text-white border-white/50 bg-white/10 text-xs px-2 py-1">
                   Cal.com
                 </Badge>
               )}
@@ -75,37 +75,37 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
         </div>
         
         {/* White Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-5 space-y-4">
           {/* Session Details */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-blue-50 rounded-lg">
-                <Calendar className="h-5 w-5 text-blue-600" />
+                <Calendar className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{formatDate(session.session_date)}</p>
-                <p className="text-sm text-gray-500">Session date</p>
+                <p className="font-semibold text-gray-900 text-sm">{formatDate(session.session_date)}</p>
+                <p className="text-xs text-gray-500">Session date</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-blue-50 rounded-lg">
-                <Clock className="h-5 w-5 text-blue-600" />
+                <Clock className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{formatTime(session.session_date)}</p>
-                <p className="text-sm text-gray-500">{session.duration} minutes</p>
+                <p className="font-semibold text-gray-900 text-sm">{formatTime(session.session_date)}</p>
+                <p className="text-xs text-gray-500">{session.duration} minutes</p>
               </div>
             </div>
             
             {session.preferred_coach && (
               <div className="flex items-center space-x-3 text-gray-700">
                 <div className="p-2 bg-blue-50 rounded-lg">
-                  <User className="h-5 w-5 text-blue-600" />
+                  <User className="h-4 w-4 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{session.preferred_coach}</p>
-                  <p className="text-sm text-gray-500">Your coach</p>
+                  <p className="font-semibold text-gray-900 text-sm">{session.preferred_coach}</p>
+                  <p className="text-xs text-gray-500">Your coach</p>
                 </div>
               </div>
             )}
@@ -113,19 +113,19 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
             {session.meeting_link && isUpcoming && (
               <div className="flex items-center space-x-3 text-gray-700">
                 <div className="p-2 bg-green-50 rounded-lg">
-                  <Video className="h-5 w-5 text-green-600" />
+                  <Video className="h-4 w-4 text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-green-600">Video call ready</p>
-                  <p className="text-sm text-gray-500">Meeting link available</p>
+                  <p className="font-semibold text-green-600 text-sm">Video call ready</p>
+                  <p className="text-xs text-gray-500">Meeting link available</p>
                 </div>
                 {session.status === 'confirmed' && (
                   <Button
                     size="sm"
                     onClick={handleJoinMeeting}
-                    className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-6"
+                    className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-4"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-3 w-3 mr-1" />
                     Join
                   </Button>
                 )}
@@ -135,18 +135,18 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
           
           {/* Notes */}
           {session.notes && (
-            <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-sm text-gray-600 leading-relaxed">{session.notes}</p>
+            <div className="bg-gray-50 rounded-xl p-3">
+              <p className="text-xs text-gray-600 leading-relaxed">{session.notes}</p>
             </div>
           )}
           
           {/* Actions */}
           {isUpcoming && (
-            <div className="flex space-x-3 pt-2">
+            <div className="flex space-x-2 pt-2">
               {!session.cal_com_booking_id && (
                 <Button 
                   variant="outline" 
-                  className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium"
+                  className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium text-sm"
                   onClick={() => onReschedule(session.id)}
                 >
                   Reschedule
@@ -154,7 +154,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
               )}
               <Button 
                 variant="outline" 
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium px-8"
+                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium px-6 text-sm"
                 onClick={() => onCancel(session.id)}
               >
                 Cancel
@@ -169,15 +169,15 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold">{session.session_type}</h3>
+          <h3 className="text-lg font-bold">{session.session_type}</h3>
           <div className="flex items-center space-x-2">
-            <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-3 py-1`}>
+            <Badge className={`${getStatusColor(session.status)} font-medium border text-xs px-2 py-1`}>
               {session.status}
             </Badge>
             {session.cal_com_booking_id && (
-              <Badge variant="outline" className="text-white border-white/50 bg-white/10 text-xs px-3 py-1">
+              <Badge variant="outline" className="text-white border-white/50 bg-white/10 text-xs px-2 py-1">
                 Cal.com
               </Badge>
             )}
@@ -187,37 +187,37 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
       </div>
       
       {/* Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Session Details */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-center space-x-3 text-gray-700">
             <div className="p-2 bg-blue-50 rounded-lg">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{formatDate(session.session_date)}</p>
-              <p className="text-sm text-gray-500">Session date</p>
+              <p className="font-semibold text-gray-900 text-sm">{formatDate(session.session_date)}</p>
+              <p className="text-xs text-gray-500">Session date</p>
             </div>
           </div>
           
           <div className="flex items-center space-x-3 text-gray-700">
             <div className="p-2 bg-blue-50 rounded-lg">
-              <Clock className="h-5 w-5 text-blue-600" />
+              <Clock className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{formatTime(session.session_date)}</p>
-              <p className="text-sm text-gray-500">{session.duration} minutes</p>
+              <p className="font-semibold text-gray-900 text-sm">{formatTime(session.session_date)}</p>
+              <p className="text-xs text-gray-500">{session.duration} minutes</p>
             </div>
           </div>
           
           {session.preferred_coach && (
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-blue-50 rounded-lg">
-                <User className="h-5 w-5 text-blue-600" />
+                <User className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{session.preferred_coach}</p>
-                <p className="text-sm text-gray-500">Your coach</p>
+                <p className="font-semibold text-gray-900 text-sm">{session.preferred_coach}</p>
+                <p className="text-xs text-gray-500">Your coach</p>
               </div>
             </div>
           )}
@@ -225,19 +225,19 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
           {session.meeting_link && isUpcoming && (
             <div className="flex items-center space-x-3 text-gray-700">
               <div className="p-2 bg-green-50 rounded-lg">
-                <Video className="h-5 w-5 text-green-600" />
+                <Video className="h-4 w-4 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-green-600">Video call ready</p>
-                <p className="text-sm text-gray-500">Meeting link available</p>
+                <p className="font-semibold text-green-600 text-sm">Video call ready</p>
+                <p className="text-xs text-gray-500">Meeting link available</p>
               </div>
               {session.status === 'confirmed' && (
                 <Button
                   size="sm"
                   onClick={handleJoinMeeting}
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-6"
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-4"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-3 w-3 mr-1" />
                   Join
                 </Button>
               )}
@@ -247,18 +247,18 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
         
         {/* Notes */}
         {session.notes && (
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-sm text-gray-600 leading-relaxed">{session.notes}</p>
+          <div className="bg-gray-50 rounded-xl p-3">
+            <p className="text-xs text-gray-600 leading-relaxed">{session.notes}</p>
           </div>
         )}
         
         {/* Actions */}
         {isUpcoming && (
-          <div className="flex space-x-3 pt-2">
+          <div className="flex space-x-2 pt-2">
             {!session.cal_com_booking_id && (
               <Button 
                 variant="outline" 
-                className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium"
+                className="flex-1 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-medium text-sm"
                 onClick={() => onReschedule(session.id)}
               >
                 Reschedule
@@ -266,7 +266,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
             )}
             <Button 
               variant="outline" 
-              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium px-8"
+              className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-xl font-medium px-6 text-sm"
               onClick={() => onCancel(session.id)}
             >
               Cancel
