@@ -1,4 +1,3 @@
-
 interface FormspreeNotificationData {
   menteeEmail: string;
   menteeName: string;
@@ -34,7 +33,7 @@ export const FormspreeNotificationService = {
       const formData = new FormData();
       formData.append('email', menteeEmail);
       formData.append('name', menteeName);
-      formData.append('subject', `JobsTies Updates - ${notifications.length} New Notification${notifications.length > 1 ? 's' : ''}`);
+      formData.append('subject', `Jobsties.Platform Updates 🚀 - ${notifications.length} New Notification${notifications.length > 1 ? 's' : ''}`);
       formData.append('message', emailBody);
       formData.append('_replyto', menteeEmail);
 
