@@ -1,7 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Session, NewSessionData } from '@/types/sessions';
-import { EmailNotificationService } from '@/services/emailNotificationService';
 
 export const addSession = async (userId: string, sessionData: NewSessionData): Promise<Session> => {
   // Combine date and time into a proper timestamp
@@ -31,13 +30,6 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
     }
   }
 
-  // Get the user's profile for email notification
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('email, first_name, last_name')
-    .eq('id', userId)
-    .single();
-
   const { data, error } = await supabase
     .from('coaching_sessions')
     .insert({
@@ -57,23 +49,8 @@ export const addSession = async (userId: string, sessionData: NewSessionData): P
     throw error;
   }
 
-  // Send email notifications
-  if (userProfile?.email) {
-    try {
-      await EmailNotificationService.sendSessionBookingNotification({
-        menteeEmail: userProfile.email,
-        menteeName: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
-        sessionType: sessionData.sessionType,
-        sessionDate: sessionData.date,
-        sessionTime: sessionData.time,
-        duration: parseInt(sessionData.duration),
-        notes: sessionData.notes,
-      });
-    } catch (emailError) {
-      console.error('Failed to send email notifications:', emailError);
-      // Don't throw error - session was created successfully
-    }
-  }
+  // Note: Email notifications have been removed as Resend integration is not working
+  console.log("Session created successfully, email notifications disabled");
 
   return data;
 };

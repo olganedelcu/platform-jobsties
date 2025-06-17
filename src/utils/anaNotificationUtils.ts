@@ -1,4 +1,4 @@
-import { InAppNotificationService } from '@/services/inAppNotificationService';
+
 import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
 
 // Helper function to check if the current user is Ana
@@ -69,14 +69,7 @@ export const NotificationHandlers = {
     try {
       console.log("📤 Sending job recommendation notification...");
       
-      // Send in-app notification
-      await InAppNotificationService.sendJobRecommendationNotification(
-        menteeData.id,
-        jobTitle,
-        companyName
-      );
-      
-      // Send Formspree bundled notification
+      // Send Formspree bundled notification only
       await FormspreeNotificationHandlers.jobRecommendation(
         menteeData.id,
         jobTitle,
@@ -115,13 +108,7 @@ export const NotificationHandlers = {
     try {
       console.log("📤 Sending file upload notification...");
       
-      // Send in-app notification  
-      await InAppNotificationService.sendFileUploadNotification(
-        menteeData.id,
-        fileName
-      );
-      
-      // Send Formspree bundled notification
+      // Send Formspree bundled notification only
       await FormspreeNotificationHandlers.fileUpload(
         menteeData.id,
         fileName
@@ -159,13 +146,7 @@ export const NotificationHandlers = {
     try {
       console.log("📤 Sending message notification...");
       
-      // Send in-app notification
-      await InAppNotificationService.sendMessageNotification(
-        menteeData.id,
-        messageContent
-      );
-      
-      // Send Formspree bundled notification
+      // Send Formspree bundled notification only
       await FormspreeNotificationHandlers.message(
         menteeData.id,
         messageContent
@@ -196,36 +177,16 @@ export const NotificationHandlers = {
       return;
     }
 
-    // Send in-app notifications to all mentees
-    const inAppNotificationPromises = menteeIds.map(async (menteeId) => {
-      const menteeData = await getMenteeNotificationData(menteeId);
-      if (!menteeData) return;
-
-      try {
-        console.log(`📤 Sending todo assignment notification to ${menteeData.name}...`);
-        await InAppNotificationService.sendTodoAssignmentNotification(
-          menteeData.id,
-          todoTitle,
-          count
-        );
-        console.log(`✅ Todo assignment notification sent to ${menteeData.name}`);
-      } catch (error) {
-        // Silently handle errors to not disrupt the main flow
-        console.error(`❌ Todo assignment notification error for ${menteeData.name}:`, error);
-      }
-    });
-
-    // Send Formspree bundled notifications
+    // Send Formspree bundled notifications only
     try {
       await FormspreeNotificationHandlers.todoAssignment(
         menteeIds,
         todoTitle,
         count
       );
+      console.log("✅ Todo assignment notifications sent successfully");
     } catch (error) {
       console.error('❌ Formspree todo assignment notification error:', error);
     }
-
-    await Promise.all(inAppNotificationPromises);
   }
 };
