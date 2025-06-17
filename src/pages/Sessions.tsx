@@ -127,7 +127,7 @@ const Sessions = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
+      <main className="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Coaching Sessions</h1>
