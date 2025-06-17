@@ -25,25 +25,28 @@ export const useInAppNotifications = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Use direct query without .from() type checking for now
-      const { data, error } = await (supabase as any)
-        .from('in_app_notifications')
+      // Use the correct table name from the migration: notifications
+      const { data, error } = await supabase
+        .from('notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return;
+      }
 
       const formattedNotifications: InAppNotification[] = (data || []).map((notification: any) => ({
         id: notification.id,
         title: notification.title,
-        message: notification.message,
-        type: notification.type,
+        message: notification.content || '',
+        type: notification.notification_type || 'general',
         isRead: notification.is_read,
         createdAt: notification.created_at,
-        actionUrl: notification.action_url,
-        metadata: notification.metadata
+        actionUrl: '/coach/messages', // Default action for message notifications
+        metadata: {}
       }));
 
       setNotifications(formattedNotifications);
@@ -57,9 +60,13 @@ export const useInAppNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await (supabase as any)
-        .from('in_app_notifications')
-        .update({ is_read: true, updated_at: new Date().toISOString() })
+      const { error } = await supabase
+        .from('notifications')
+        .update({ 
+          is_read: true, 
+          read_at: new Date().toISOString(),
+          updated_at: new Date().toISOString() 
+        })
         .eq('id', notificationId);
 
       if (error) throw error;
@@ -78,9 +85,13 @@ export const useInAppNotifications = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await (supabase as any)
-        .from('in_app_notifications')
-        .update({ is_read: true, updated_at: new Date().toISOString() })
+      const { error } = await supabase
+        .from('notifications')
+        .update({ 
+          is_read: true, 
+          read_at: new Date().toISOString(),
+          updated_at: new Date().toISOString() 
+        })
         .eq('user_id', user.id)
         .eq('is_read', false);
 
@@ -95,8 +106,8 @@ export const useInAppNotifications = () => {
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const { error } = await (supabase as any)
-        .from('in_app_notifications')
+      const { error } = await supabase
+        .from('notifications')
         .delete()
         .eq('id', notificationId);
 
@@ -130,19 +141,20 @@ export const useInAppNotifications = () => {
           {
             event: 'INSERT',
             schema: 'public',
-            table: 'in_app_notifications',
+            table: 'notifications',
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
+            console.log('New notification received:', payload);
             const newNotification: InAppNotification = {
               id: payload.new.id,
               title: payload.new.title,
-              message: payload.new.message,
-              type: payload.new.type,
+              message: payload.new.content || '',
+              type: payload.new.notification_type || 'general',
               isRead: payload.new.is_read,
               createdAt: payload.new.created_at,
-              actionUrl: payload.new.action_url,
-              metadata: payload.new.metadata
+              actionUrl: '/coach/messages',
+              metadata: {}
             };
 
             setNotifications(prev => [newNotification, ...prev]);

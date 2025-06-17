@@ -15,15 +15,13 @@ export const InAppNotificationService = {
     console.log("📱 Creating in-app notification:", data);
 
     try {
-      const { error } = await (supabase as any)
-        .from('in_app_notifications')
+      const { error } = await supabase
+        .from('notifications')
         .insert({
           user_id: data.userId,
           title: data.title,
-          message: data.message,
-          type: data.type,
-          action_url: data.actionUrl,
-          metadata: data.metadata,
+          content: data.message,
+          notification_type: data.type,
           is_read: false
         });
 
@@ -79,7 +77,7 @@ export const InAppNotificationService = {
         messagePreview.substring(0, 100) + '...' : 
         messagePreview,
       type: 'message',
-      actionUrl: '/messages',
+      actionUrl: '/coach/messages',
       metadata: { messagePreview }
     });
   },
