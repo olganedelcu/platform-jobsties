@@ -10,7 +10,6 @@ import MenteesTable from '@/components/MenteesTable';
 import MenteesEmptyState from '@/components/MenteesEmptyState';
 import MenteesDebugPanel from '@/components/mentees/MenteesDebugPanel';
 import MenteesLoadingState from '@/components/mentees/MenteesLoadingState';
-import FormspreeConfiguration from '@/components/FormspreeConfiguration';
 
 const MenteesContent = () => {
   const { mentees, loading, fetchMentees } = useMentees();
@@ -54,11 +53,6 @@ const MenteesContent = () => {
           />
         </div>
       )}
-
-      {/* Formspree Configuration Section */}
-      <div className="border-t pt-8">
-        <FormspreeConfiguration />
-      </div>
     </main>
   );
 };

@@ -29,6 +29,7 @@ const CoachCalendar = lazy(() => import("./pages/coach/CoachCalendar"));
 const JobRecommendations = lazy(() => import("./pages/coach/JobRecommendations"));
 const BackupManagementPage = lazy(() => import("./pages/coach/BackupManagement"));
 const CoachMessages = lazy(() => import("./pages/coach/CoachMessages"));
+const NotificationsSettings = lazy(() => import("./pages/coach/NotificationsSettings"));
 const MenteeTodosPage = lazy(() => import("./pages/MenteeTodosPage"));
 const ApplicationDetail = lazy(() => import("./pages/ApplicationDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/coach/calendar" element={<CoachCalendar />} />
             <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
             <Route path="/coach/backup" element={<BackupManagementPage />} />
+            <Route path="/coach/send/notifications" element={<NotificationsSettings />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
