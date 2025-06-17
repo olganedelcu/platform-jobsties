@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import {
   LogOut, 
   Menu, 
   X,
-  MessageCircle,
+  MessageSquare,
   FileText,
   BookOpen,
   Calendar
@@ -31,10 +32,10 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
   const navigationItems = [
     { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
     { path: '/course', label: 'Course', icon: BookOpen },
-    { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/tracker', label: 'Tracker', icon: FileText },
-    { path: '/messages', label: 'Communication', icon: MessageCircle },
-    { path: '/todos', label: 'Tasks', icon: FileText }
+    { path: '/sessions', label: 'Sessions', icon: Calendar },
+    { path: '/todos', label: 'Tasks', icon: FileText },
+    { path: '/messages', label: 'Communication', icon: MessageSquare }
   ];
 
   useEffect(() => {
