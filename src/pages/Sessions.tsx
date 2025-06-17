@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
-import SessionsPageHeader from '@/components/sessions/SessionsPageHeader';
 import SessionsLoadingState from '@/components/sessions/SessionsLoadingState';
 import SessionsGrid from '@/components/sessions/SessionsGrid';
 import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
@@ -16,8 +15,6 @@ const Sessions = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
-  const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
 
   const {
     sessions,
@@ -70,28 +67,6 @@ const Sessions = () => {
     navigate('/');
   };
 
-  const handleScheduleSession = async (sessionData: any) => {
-    console.log('Scheduling session with data:', sessionData);
-    
-    try {
-      await handleAddSession(sessionData);
-      setShowScheduleDialog(false);
-      setSessionRefreshKey(prev => prev + 1);
-      
-      toast({
-        title: "Success",
-        description: "Session scheduled successfully!",
-      });
-    } catch (error) {
-      console.error('Error scheduling session:', error);
-      toast({
-        title: "Error",
-        description: "Failed to schedule session. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleReschedule = (sessionId: string) => {
     toast({
       title: "Reschedule Session",
@@ -101,7 +76,6 @@ const Sessions = () => {
 
   const handleCancel = async (sessionId: string) => {
     await handleDeleteSession(sessionId);
-    setSessionRefreshKey(prev => prev + 1);
   };
 
   if (authLoading) {
@@ -124,14 +98,6 @@ const Sessions = () => {
       <Navigation user={user} onSignOut={handleSignOut} />
       
       <main className="max-w-7xl mx-auto py-12 sm:py-16 px-6 sm:px-8">
-        <SessionsPageHeader
-          showScheduleDialog={showScheduleDialog}
-          setShowScheduleDialog={setShowScheduleDialog}
-          onScheduleSession={handleScheduleSession}
-          userId={user?.id}
-          sessionRefreshKey={sessionRefreshKey}
-        />
-
         {sessionsLoading && <SessionsLoadingState />}
 
         {!sessionsLoading && sessions.length > 0 && (
@@ -143,7 +109,7 @@ const Sessions = () => {
         )}
 
         {!sessionsLoading && sessions.length === 0 && (
-          <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
+          <SessionsEmptyState onScheduleClick={() => {}} />
         )}
       </main>
     </div>
