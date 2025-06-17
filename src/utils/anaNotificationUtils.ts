@@ -1,44 +1,12 @@
 
-import { FormspreeNotificationHandlers } from '@/utils/formspreeNotificationUtils';
+import { handleJobRecommendationNotification } from './jobRecommendationNotificationHandler';
+import { handleFileUploadNotification } from './fileUploadNotificationHandler';
+import { handleMessageNotification } from './messageNotificationHandler';
+import { handleTodoAssignmentNotification } from './todoAssignmentNotificationHandler';
 
-// Helper function to check if the current user is Ana
-export const isAnaUser = (userEmail?: string): boolean => {
-  const isAna = userEmail === 'ana@jobsties.com';
-  console.log("🔍 Ana user check:", { userEmail, isAna });
-  return isAna;
-};
-
-// Helper function to get mentee details for notifications
-export const getMenteeNotificationData = async (menteeId: string) => {
-  console.log("📧 Getting mentee notification data for:", menteeId);
-  
-  const { supabase } = await import('@/integrations/supabase/client');
-  
-  try {
-    const { data: mentee, error } = await supabase
-      .from('profiles')
-      .select('first_name, last_name, email, id')
-      .eq('id', menteeId)
-      .single();
-
-    if (error || !mentee) {
-      console.error('❌ Error fetching mentee data:', error);
-      return null;
-    }
-
-    const menteeData = {
-      id: mentee.id,
-      email: mentee.email,
-      name: `${mentee.first_name} ${mentee.last_name}`.trim()
-    };
-    
-    console.log("✅ Mentee data retrieved:", menteeData);
-    return menteeData;
-  } catch (error) {
-    console.error('❌ Failed to get mentee notification data:', error);
-    return null;
-  }
-};
+// Re-export utilities for backward compatibility
+export { isAnaUser } from './userValidationUtils';
+export { getMenteeNotificationData } from './menteeDataUtils';
 
 // Notification handlers for different actions
 export const NotificationHandlers = {
@@ -48,39 +16,7 @@ export const NotificationHandlers = {
     jobTitle: string, 
     companyName: string
   ) {
-    console.log("🚀 Job recommendation notification triggered:", {
-      currentUserEmail,
-      menteeId,
-      jobTitle,
-      companyName
-    });
-
-    if (!isAnaUser(currentUserEmail)) {
-      console.log("⏭️ Skipping notification - not Ana user");
-      return;
-    }
-
-    const menteeData = await getMenteeNotificationData(menteeId);
-    if (!menteeData) {
-      console.log("⏭️ Skipping notification - no mentee data");
-      return;
-    }
-
-    try {
-      console.log("📤 Sending job recommendation notification...");
-      
-      // Send Formspree bundled notification only
-      await FormspreeNotificationHandlers.jobRecommendation(
-        menteeData.id,
-        jobTitle,
-        companyName
-      );
-      
-      console.log("✅ Job recommendation notification sent successfully");
-    } catch (error) {
-      // Silently handle errors to not disrupt the main flow
-      console.error('❌ Job recommendation notification error:', error);
-    }
+    return handleJobRecommendationNotification(currentUserEmail, menteeId, jobTitle, companyName);
   },
 
   async fileUpload(
@@ -88,37 +24,7 @@ export const NotificationHandlers = {
     menteeId: string, 
     fileName: string
   ) {
-    console.log("📁 File upload notification triggered:", {
-      currentUserEmail,
-      menteeId,
-      fileName
-    });
-
-    if (!isAnaUser(currentUserEmail)) {
-      console.log("⏭️ Skipping notification - not Ana user");
-      return;
-    }
-
-    const menteeData = await getMenteeNotificationData(menteeId);
-    if (!menteeData) {
-      console.log("⏭️ Skipping notification - no mentee data");
-      return;
-    }
-
-    try {
-      console.log("📤 Sending file upload notification...");
-      
-      // Send Formspree bundled notification only
-      await FormspreeNotificationHandlers.fileUpload(
-        menteeData.id,
-        fileName
-      );
-      
-      console.log("✅ File upload notification sent successfully");
-    } catch (error) {
-      // Silently handle errors to not disrupt the main flow
-      console.error('❌ File upload notification error:', error);
-    }
+    return handleFileUploadNotification(currentUserEmail, menteeId, fileName);
   },
 
   async message(
@@ -126,37 +32,7 @@ export const NotificationHandlers = {
     menteeId: string, 
     messageContent: string
   ) {
-    console.log("💬 Message notification triggered:", {
-      currentUserEmail,
-      menteeId,
-      messagePreview: messageContent.substring(0, 50) + "..."
-    });
-
-    if (!isAnaUser(currentUserEmail)) {
-      console.log("⏭️ Skipping notification - not Ana user");
-      return;
-    }
-
-    const menteeData = await getMenteeNotificationData(menteeId);
-    if (!menteeData) {
-      console.log("⏭️ Skipping notification - no mentee data");
-      return;
-    }
-
-    try {
-      console.log("📤 Sending message notification...");
-      
-      // Send Formspree bundled notification only
-      await FormspreeNotificationHandlers.message(
-        menteeData.id,
-        messageContent
-      );
-      
-      console.log("✅ Message notification sent successfully");
-    } catch (error) {
-      // Silently handle errors to not disrupt the main flow
-      console.error('❌ Message notification error:', error);
-    }
+    return handleMessageNotification(currentUserEmail, menteeId, messageContent);
   },
 
   async todoAssignment(
@@ -165,28 +41,6 @@ export const NotificationHandlers = {
     todoTitle?: string,
     count?: number
   ) {
-    console.log("✅ Todo assignment notification triggered:", {
-      currentUserEmail,
-      menteeIds,
-      todoTitle,
-      count
-    });
-
-    if (!isAnaUser(currentUserEmail)) {
-      console.log("⏭️ Skipping notification - not Ana user");
-      return;
-    }
-
-    // Send Formspree bundled notifications only
-    try {
-      await FormspreeNotificationHandlers.todoAssignment(
-        menteeIds,
-        todoTitle,
-        count
-      );
-      console.log("✅ Todo assignment notifications sent successfully");
-    } catch (error) {
-      console.error('❌ Formspree todo assignment notification error:', error);
-    }
+    return handleTodoAssignmentNotification(currentUserEmail, menteeIds, todoTitle, count);
   }
 };
