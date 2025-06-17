@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { NotificationHandlers } from '@/utils/anaNotificationUtils';
+import { handleMessageNotification } from '@/utils/messageNotificationHandler';
 
 export interface Message {
   id: string;
@@ -198,9 +197,16 @@ export const useMessages = (conversationId: string | null) => {
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId);
 
-      // Send notification if Ana sent the message
-      if (user?.email && senderType === 'coach') {
-        // Get the mentee ID from the conversation
+      // Send notification based on sender type
+      if (senderType === 'mentee') {
+        // If mentee sends message, notify coach (Ana)
+        await handleMessageNotification(
+          'ana@jobsties.com', // Always notify Ana
+          user.id,
+          content.trim()
+        );
+      } else if (senderType === 'coach' && user?.email) {
+        // If coach sends message, the existing logic handles mentee notifications
         const { data: conversation } = await supabase
           .from('conversations')
           .select('mentee_id')
@@ -208,7 +214,7 @@ export const useMessages = (conversationId: string | null) => {
           .single();
 
         if (conversation?.mentee_id) {
-          await NotificationHandlers.message(
+          await handleMessageNotification(
             user.email,
             conversation.mentee_id,
             content.trim()

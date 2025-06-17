@@ -69,17 +69,18 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
       {/* Message Notifications Card - Show prominently if there are unread messages */}
       {messageNotifications.length > 0 && (
         <div className="mb-6">
-          <Card className="bg-blue-50 border-blue-200">
+          <Card className="bg-blue-50 border-blue-200 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-blue-900">
                 <MessageCircle className="h-5 w-5" />
                 New Messages ({messageNotifications.length})
+                <Bell className="h-4 w-4 text-blue-600 animate-pulse" />
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {messageNotifications.slice(0, 3).map((notification) => (
-                  <div key={notification.id} className="bg-white rounded-lg p-3 border border-blue-100">
+                  <div key={notification.id} className="bg-white rounded-lg p-3 border border-blue-100 shadow-sm">
                     <h4 className="font-medium text-gray-900 text-sm">{notification.title}</h4>
                     <p className="text-gray-600 text-sm mt-1">{notification.message}</p>
                     <p className="text-xs text-gray-500 mt-1">
@@ -88,14 +89,14 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
                   </div>
                 ))}
                 {messageNotifications.length > 3 && (
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-blue-700 font-medium">
                     +{messageNotifications.length - 3} more messages
                   </p>
                 )}
               </div>
               <Button 
                 onClick={() => navigate('/coach/messages')} 
-                className="w-full mt-4"
+                className="w-full mt-4 bg-blue-600 hover:bg-blue-700"
               >
                 View All Messages
               </Button>
@@ -151,7 +152,12 @@ const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
 
         <div className="bg-white p-6 rounded-lg border">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Unread Messages</h3>
-          <p className="text-3xl font-bold text-blue-600">{messageNotifications.length}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-3xl font-bold text-blue-600">{messageNotifications.length}</p>
+            {messageNotifications.length > 0 && (
+              <Bell className="h-5 w-5 text-blue-600 animate-pulse" />
+            )}
+          </div>
           <p className="text-sm text-gray-500 mt-1">New messages</p>
         </div>
       </div>
