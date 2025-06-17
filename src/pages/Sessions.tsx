@@ -123,7 +123,7 @@ const Sessions = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-8 px-6">
+      <main className="max-w-7xl mx-auto pt-24 pb-8 px-6">
         <SessionsPageHeader
           showScheduleDialog={showScheduleDialog}
           setShowScheduleDialog={setShowScheduleDialog}

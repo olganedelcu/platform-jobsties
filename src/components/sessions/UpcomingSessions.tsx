@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Session } from '@/types/sessions';
 import SessionCard from '@/components/SessionCard';
@@ -32,16 +33,17 @@ const UpcomingSessions = ({ sessions, onReschedule, onCancel }: UpcomingSessions
     <div className="space-y-6">
       {/* Next Session Highlight */}
       {nextSession && (
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
           <div className="flex items-center gap-3 mb-4">
             <Clock className="h-6 w-6" />
             <h2 className="text-xl font-bold">Next Session</h2>
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+          <div className="bg-white rounded-xl p-0 shadow-lg shadow-blue-200">
             <SessionCard
               session={nextSession}
               onReschedule={onReschedule}
               onCancel={onCancel}
+              isNextSession={true}
             />
           </div>
         </div>
