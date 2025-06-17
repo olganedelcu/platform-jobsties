@@ -22,7 +22,7 @@ export const FormspreeNotificationService = {
       timestamp: string;
     }>
   ): Promise<void> {
-    console.log("📧 Sending bundled notifications via Formspree:", {
+    console.log("📧 Sending bundled notifications via JobsTiesAPI:", {
       menteeEmail,
       menteeName,
       notificationCount: notifications.length
@@ -49,13 +49,13 @@ export const FormspreeNotificationService = {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Formspree API error: ${response.status} - ${JSON.stringify(errorData)}`);
+        throw new Error(`JobsTiesAPI error: ${response.status} - ${JSON.stringify(errorData)}`);
       }
 
       const result = await response.json();
-      console.log("✅ Bundled notifications sent successfully via Formspree:", result);
+      console.log("✅ Bundled notifications sent successfully via JobsTiesAPI:", result);
     } catch (error) {
-      console.error('❌ Failed to send bundled notifications via Formspree:', error);
+      console.error('❌ Failed to send bundled notifications via JobsTiesAPI:', error);
       throw error;
     }
   },
