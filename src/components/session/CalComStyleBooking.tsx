@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, Users } from 'lucide-react';
@@ -6,7 +7,6 @@ import SessionTypeSelection from './SessionTypeSelection';
 import CoachInfoPanel from './CoachInfoPanel';
 import CalendarView from './CalendarView';
 import TimeSlotSelection from './TimeSlotSelection';
-import { supabase } from '@/integrations/supabase/client';
 
 interface CalComStyleBookingProps {
   onBookSession: (sessionData: any) => void;
@@ -20,60 +20,26 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [availableTimesForDate, setAvailableTimesForDate] = useState<string[]>([]);
   const [loadingTimes, setLoadingTimes] = useState(false);
-  const [anaCoachId, setAnaCoachId] = useState<string | null>(null);
-  const [coachIdLoading, setCoachIdLoading] = useState(true);
 
-  // Get Ana's actual coach ID from the database
-  useEffect(() => {
-    const fetchAnaCoachId = async () => {
-      try {
-        console.log('Fetching Ana coach ID...');
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', 'ana@jobsties.com')
-          .eq('role', 'COACH')
-          .maybeSingle();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching Ana coach ID:', error);
-          setAnaCoachId(null);
-        } else if (data) {
-          console.log('Found Ana coach ID:', data.id);
-          setAnaCoachId(data.id);
-        } else {
-          console.log('Ana coach profile not found, will use default availability');
-          setAnaCoachId(null);
-        }
-      } catch (error) {
-        console.error('Error fetching Ana coach ID:', error);
-        setAnaCoachId(null);
-      } finally {
-        setCoachIdLoading(false);
-      }
-    };
-
-    fetchAnaCoachId();
-  }, []);
-
-  const { isDateAvailable, getAvailableTimesForDate, loading } = useCoachAvailability(anaCoachId);
+  // Use null as coach ID since we're using Cal.com directly
+  const { isDateAvailable, getAvailableTimesForDate, loading } = useCoachAvailability(null);
 
   const sessionTypes = [
     {
       id: '1on1',
       name: '1-on-1 Session',
       duration: 30,
-      description: 'Personalized career coaching session',
+      description: 'Personalized career coaching session with Ana',
       icon: Users,
       color: 'bg-blue-500'
     }
   ];
 
   useEffect(() => {
-    if (selectedDate && !coachIdLoading) {
+    if (selectedDate) {
       loadAvailableTimesForSelectedDate();
     }
-  }, [selectedDate, anaCoachId, coachIdLoading]);
+  }, [selectedDate]);
 
   const loadAvailableTimesForSelectedDate = async () => {
     if (!selectedDate) return;
@@ -81,7 +47,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     setLoadingTimes(true);
     try {
       const dateString = selectedDate.toISOString().split('T')[0];
-      console.log('Loading available times for date:', dateString, 'with coach ID:', anaCoachId);
+      console.log('Loading Cal.com availability for date:', dateString);
       const times = await getAvailableTimesForDate(dateString);
       setAvailableTimesForDate(times);
     } catch (error) {
@@ -115,7 +81,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     setSelectedTime('');
     setAvailableTimesForDate([]);
     
-    // Check if date is available
+    // Check if date is available via Cal.com
     const dateString = date.toISOString().split('T')[0];
     const available = await isDateAvailable(dateString);
     
@@ -143,13 +109,13 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     }
   };
 
-  // Show loading state while coach ID and availability are being fetched
-  if (loading || coachIdLoading) {
+  // Show loading state while availability is being determined
+  if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
         <div className="p-8 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mr-2" />
-          <span>Loading availability...</span>
+          <span>Loading Cal.com availability...</span>
         </div>
       </div>
     );
@@ -162,7 +128,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
         {/* Session Type */}
         <div className="p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Session Type</h2>
-          <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book</p>
+          <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book with Ana</p>
           
           <div className="max-w-md">
             {sessionTypes.map((type) => {
@@ -218,6 +184,13 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
 
       {/* Right Panel - Calendar */}
       <div className="lg:w-2/3 p-8">
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Availability powered by Cal.com</span>
+          </div>
+        </div>
+
         <CalendarView
           currentMonth={currentMonth}
           selectedDate={selectedDate}

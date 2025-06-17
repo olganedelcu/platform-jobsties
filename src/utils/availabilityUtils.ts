@@ -1,6 +1,6 @@
 
 import { AvailabilitySlot, BookedTimeSlots } from '@/types/availability';
-import { CoachCalendarService } from '@/services/coachCalendarService';
+import { CalComAvailabilityService } from '@/services/calComAvailabilityService';
 
 export class AvailabilityUtils {
   static async checkDateAvailability(
@@ -9,31 +9,10 @@ export class AvailabilityUtils {
     availability: AvailabilitySlot[],
     coachId?: string
   ): Promise<boolean> {
-    if (blockedDates.includes(date)) {
-      return false;
-    }
+    console.log('Checking availability for date:', date);
     
-    const selectedDate = new Date(date);
-    const dayOfWeek = selectedDate.getDay();
-    const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
-    
-    if (!dayAvailability?.is_available) {
-      return false;
-    }
-
-    // Check calendar availability if coach ID is provided
-    if (coachId) {
-      try {
-        const startOfDay = `${date}T00:00:00.000Z`;
-        const endOfDay = `${date}T23:59:59.999Z`;
-        return await CoachCalendarService.checkAvailability(coachId, startOfDay, endOfDay);
-      } catch (error) {
-        console.error('Error checking calendar availability:', error);
-        return false;
-      }
-    }
-
-    return true;
+    // Use Cal.com availability service for date availability
+    return await CalComAvailabilityService.checkDateAvailability(date);
   }
 
   static async getAvailableTimesForDate(
@@ -43,55 +22,28 @@ export class AvailabilityUtils {
     isDateAvailable: boolean,
     coachId?: string
   ): Promise<string[]> {
+    console.log('Getting available times for date:', date, 'isDateAvailable:', isDateAvailable);
+    
     if (!isDateAvailable) {
       return [];
     }
 
-    const selectedDate = new Date(date);
-    const dayOfWeek = selectedDate.getDay();
-    
-    const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
-    
-    if (!dayAvailability || !dayAvailability.is_available) {
+    try {
+      // Fetch available times from Cal.com
+      const calComAvailableTimes = await CalComAvailabilityService.fetchAvailability(date);
+      
+      // Filter out already booked slots from our database
+      const bookedForDate = bookedTimeSlots[date] || [];
+      const availableTimes = calComAvailableTimes.filter(time => !bookedForDate.includes(time));
+      
+      console.log('Available times from Cal.com:', calComAvailableTimes);
+      console.log('Booked times from database:', bookedForDate);
+      console.log('Final available times:', availableTimes);
+      
+      return availableTimes;
+    } catch (error) {
+      console.error('Error getting available times:', error);
       return [];
     }
-
-    const times: string[] = [];
-    const startTime = dayAvailability.start_time;
-    const endTime = dayAvailability.end_time;
-    
-    const start = new Date(`2000-01-01T${startTime}:00`);
-    const end = new Date(`2000-01-01T${endTime}:00`);
-    
-    for (let time = new Date(start); time < end; time.setMinutes(time.getMinutes() + 30)) {
-      const timeString = time.toTimeString().slice(0, 5);
-      times.push(timeString);
-    }
-    
-    const bookedForDate = bookedTimeSlots[date] || [];
-    const availableTimes = times.filter(time => !bookedForDate.includes(time));
-
-    // Further filter by checking individual time slots against calendar events
-    if (coachId) {
-      const finalAvailableTimes: string[] = [];
-      
-      for (const time of availableTimes) {
-        const startTime = `${date}T${time}:00.000Z`;
-        const endTime = new Date(new Date(startTime).getTime() + 60 * 60 * 1000).toISOString();
-        
-        try {
-          const isSlotAvailable = await CoachCalendarService.checkAvailability(coachId, startTime, endTime);
-          if (isSlotAvailable) {
-            finalAvailableTimes.push(time);
-          }
-        } catch (error) {
-          console.error('Error checking time slot availability:', error);
-        }
-      }
-      
-      return finalAvailableTimes;
-    }
-
-    return availableTimes;
   }
 }

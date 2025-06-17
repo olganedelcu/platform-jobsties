@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { AvailabilitySlot, BookedTimeSlots } from '@/types/availability';
+import { CalComAvailabilityService } from '@/services/calComAvailabilityService';
 import { AvailabilityService } from '@/services/availabilityService';
 
 export const useAvailabilityData = (coachId?: string | null) => {
@@ -10,44 +11,37 @@ export const useAvailabilityData = (coachId?: string | null) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Only fetch data if we have a valid coach ID, otherwise use defaults
-    if (coachId && coachId !== 'fallback') {
-      fetchData();
-    } else {
-      // Use default availability when no coach ID is available
-      setAvailability(AvailabilityService.getDefaultAvailability());
-      setBlockedDates([]);
-      fetchBookedSessions();
-    }
+    console.log('useAvailabilityData called with coachId:', coachId);
+    
+    // Since we're using Cal.com for availability, we use default availability structure
+    // The actual time slots will be fetched from Cal.com when needed
+    setAvailability(getCalComAvailabilityStructure());
+    setBlockedDates([]);
+    fetchBookedSessions();
   }, [coachId]);
-
-  const fetchData = async () => {
-    if (!coachId || coachId === 'fallback') return;
-
-    try {
-      const [availabilityData, blockedDatesData] = await Promise.all([
-        AvailabilityService.fetchAvailability(coachId),
-        AvailabilityService.fetchBlockedDates(coachId)
-      ]);
-
-      setAvailability(availabilityData);
-      setBlockedDates(blockedDatesData);
-    } catch (error) {
-      console.error('Error fetching availability data:', error);
-      setAvailability(AvailabilityService.getDefaultAvailability());
-      setBlockedDates([]);
-    }
-
-    await fetchBookedSessions();
-  };
 
   const fetchBookedSessions = async () => {
     try {
       const bookedSlots = await AvailabilityService.fetchBookedSessions();
       setBookedTimeSlots(bookedSlots);
+    } catch (error) {
+      console.error('Error fetching booked sessions:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Returns a structure that represents Cal.com availability (Monday-Friday, 9-5)
+  const getCalComAvailabilityStructure = (): AvailabilitySlot[] => {
+    return [
+      { id: '0', day_of_week: 0, start_time: '09:00', end_time: '17:00', is_available: false }, // Sunday
+      { id: '1', day_of_week: 1, start_time: '09:00', end_time: '17:00', is_available: true },  // Monday
+      { id: '2', day_of_week: 2, start_time: '09:00', end_time: '17:00', is_available: true },  // Tuesday
+      { id: '3', day_of_week: 3, start_time: '09:00', end_time: '17:00', is_available: true },  // Wednesday
+      { id: '4', day_of_week: 4, start_time: '09:00', end_time: '17:00', is_available: true },  // Thursday
+      { id: '5', day_of_week: 5, start_time: '09:00', end_time: '17:00', is_available: true },  // Friday
+      { id: '6', day_of_week: 6, start_time: '09:00', end_time: '17:00', is_available: false }, // Saturday
+    ];
   };
 
   return {
