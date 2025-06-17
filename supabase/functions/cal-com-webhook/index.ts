@@ -110,59 +110,106 @@ serve(async (req) => {
 async function handleBookingCreated(supabase: any, bookingData: any) {
   console.log('Processing BOOKING_CREATED event')
   
-  // Extract attendee email (the person who booked)
+  // Extract attendee information
   const attendees = bookingData.attendees || []
   let attendeeEmail = attendees.length > 0 ? attendees[0].email : null
+  let attendeeName = attendees.length > 0 ? attendees[0].name : null
   
-  // Also check responses.email for the actual email
+  // Also check responses for the actual booking details
   if (bookingData.responses?.email?.value) {
     attendeeEmail = bookingData.responses.email.value
   }
   
-  console.log('Looking for attendee email:', attendeeEmail)
+  if (bookingData.responses?.name?.value) {
+    attendeeName = bookingData.responses.name.value
+  }
   
-  if (!attendeeEmail) {
-    console.log('No attendee email found, cannot create session')
+  console.log('Looking for attendee:', { email: attendeeEmail, name: attendeeName })
+  
+  if (!attendeeEmail && !attendeeName) {
+    console.log('No attendee information found, cannot create session')
     return
   }
 
-  // Find the user profile by email - try multiple approaches
+  // Find the user profile - try multiple approaches
   let userProfile = null
   
-  // First try exact match
-  const { data: exactProfile, error: exactError } = await supabase
-    .from('profiles')
-    .select('id, first_name, last_name, email, role')
-    .eq('email', attendeeEmail)
-    .single()
-
-  if (exactProfile) {
-    userProfile = exactProfile
-    console.log('Found user profile with exact email match:', userProfile)
-  } else {
-    console.log('Exact email match failed:', exactError)
+  // First try to find by email if available
+  if (attendeeEmail) {
+    console.log('Trying to find user by email:', attendeeEmail)
     
-    // Try case-insensitive match
-    const { data: allProfiles, error: allError } = await supabase
+    // Try exact email match
+    const { data: exactProfile } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email, role')
+      .eq('email', attendeeEmail)
+      .single()
+
+    if (exactProfile) {
+      userProfile = exactProfile
+      console.log('Found user profile with exact email match:', userProfile)
+    } else {
+      // Try case-insensitive email match
+      const { data: allProfiles } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, role')
+      
+      if (allProfiles) {
+        userProfile = allProfiles.find(profile => 
+          profile.email.toLowerCase() === attendeeEmail.toLowerCase()
+        )
+        
+        if (userProfile) {
+          console.log('Found user profile with case-insensitive email match:', userProfile)
+        }
+      }
+    }
+  }
+  
+  // If email didn't work, try to find by name matching
+  if (!userProfile && attendeeName) {
+    console.log('Trying to find user by name:', attendeeName)
+    
+    const { data: allProfiles } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
     
-    if (allProfiles && !allError) {
-      userProfile = allProfiles.find(profile => 
-        profile.email.toLowerCase() === attendeeEmail.toLowerCase()
-      )
+    if (allProfiles) {
+      // Try to match by full name or last name
+      const nameParts = attendeeName.toLowerCase().split(' ')
+      const lastName = nameParts[nameParts.length - 1]
+      
+      userProfile = allProfiles.find(profile => {
+        const fullName = `${profile.first_name} ${profile.last_name}`.toLowerCase()
+        const profileLastName = profile.last_name.toLowerCase()
+        
+        return fullName.includes(attendeeName.toLowerCase()) || 
+               profileLastName === lastName ||
+               attendeeName.toLowerCase().includes(profileLastName)
+      })
       
       if (userProfile) {
-        console.log('Found user profile with case-insensitive match:', userProfile)
-      } else {
-        console.log('Available profiles:', allProfiles.map(p => p.email))
-        console.log(`No profile found for email: ${attendeeEmail}`)
+        console.log('Found user profile by name matching:', userProfile)
       }
     }
   }
 
+  // If still no profile found, log available profiles for debugging
   if (!userProfile) {
-    console.log('User profile not found for email:', attendeeEmail)
+    console.log('No user profile found for attendee:', { email: attendeeEmail, name: attendeeName })
+    
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email, role')
+    
+    if (allProfiles) {
+      console.log('Available profiles:', allProfiles.map(p => ({
+        name: `${p.first_name} ${p.last_name}`,
+        email: p.email,
+        role: p.role
+      })))
+    }
+    
     return
   }
 
