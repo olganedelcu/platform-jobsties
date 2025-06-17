@@ -112,21 +112,56 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
   
   // Extract attendee email (the person who booked)
   const attendees = bookingData.attendees || []
-  const attendeeEmail = attendees.length > 0 ? attendees[0].email : null
+  let attendeeEmail = attendees.length > 0 ? attendees[0].email : null
+  
+  // Also check responses.email for the actual email
+  if (bookingData.responses?.email?.value) {
+    attendeeEmail = bookingData.responses.email.value
+  }
+  
+  console.log('Looking for attendee email:', attendeeEmail)
   
   if (!attendeeEmail) {
     console.log('No attendee email found, cannot create session')
     return
   }
 
-  // Find the user profile by email
-  const { data: userProfile, error: profileError } = await supabase
+  // Find the user profile by email - try multiple approaches
+  let userProfile = null
+  
+  // First try exact match
+  const { data: exactProfile, error: exactError } = await supabase
     .from('profiles')
     .select('id, first_name, last_name, email, role')
     .eq('email', attendeeEmail)
     .single()
 
-  if (profileError || !userProfile) {
+  if (exactProfile) {
+    userProfile = exactProfile
+    console.log('Found user profile with exact email match:', userProfile)
+  } else {
+    console.log('Exact email match failed:', exactError)
+    
+    // Try case-insensitive match
+    const { data: allProfiles, error: allError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email, role')
+    
+    if (allProfiles && !allError) {
+      userProfile = allProfiles.find(profile => 
+        profile.email.toLowerCase() === attendeeEmail.toLowerCase()
+      )
+      
+      if (userProfile) {
+        console.log('Found user profile with case-insensitive match:', userProfile)
+      } else {
+        console.log('Available profiles:', allProfiles.map(p => p.email))
+        console.log(`No profile found for email: ${attendeeEmail}`)
+      }
+    }
+  }
+
+  if (!userProfile) {
     console.log('User profile not found for email:', attendeeEmail)
     return
   }
@@ -150,6 +185,19 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
   const sessionType = bookingData.eventTitle || bookingData.title || '1-on-1 Session'
   const duration = bookingData.length || 30
   const notes = bookingData.additionalNotes || bookingData.description || ''
+
+  console.log('Creating session with data:', {
+    mentee_id: userProfile.id,
+    coach_id: coachProfile.id,
+    session_type: sessionType,
+    session_date: sessionDate.toISOString(),
+    duration: duration,
+    notes: notes,
+    status: 'confirmed',
+    meeting_link: meetingLink,
+    preferred_coach: 'Ana Nedelcu',
+    cal_com_booking_id: bookingData.uid || bookingData.id || bookingData.bookingId
+  })
 
   // Create the coaching session
   const { data: newSession, error: sessionError } = await supabase
