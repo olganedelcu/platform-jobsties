@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight, Users, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useCoachAvailability } from '@/hooks/useCoachAvailability';
 
 interface CalComStyleBookingProps {
   onBookSession: (sessionData: any) => void;
@@ -16,6 +17,12 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [availableTimesForDate, setAvailableTimesForDate] = useState<string[]>([]);
+  const [loadingTimes, setLoadingTimes] = useState(false);
+
+  // Use Ana's coach ID - this should be the actual coach ID from your database
+  const ANA_COACH_ID = 'ana-coach-id'; // Replace with actual coach ID
+  const { isDateAvailable, getAvailableTimesForDate, loading } = useCoachAvailability(ANA_COACH_ID);
 
   const sessionTypes = [
     {
@@ -28,7 +35,27 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     }
   ];
 
-  const availableTimeSlots = ['15:30', '18:30', '19:00'];
+  useEffect(() => {
+    if (selectedDate) {
+      loadAvailableTimesForSelectedDate();
+    }
+  }, [selectedDate]);
+
+  const loadAvailableTimesForSelectedDate = async () => {
+    if (!selectedDate) return;
+    
+    setLoadingTimes(true);
+    try {
+      const dateString = selectedDate.toISOString().split('T')[0];
+      const times = await getAvailableTimesForDate(dateString);
+      setAvailableTimesForDate(times);
+    } catch (error) {
+      console.error('Error loading available times:', error);
+      setAvailableTimesForDate([]);
+    } finally {
+      setLoadingTimes(false);
+    }
+  };
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -87,10 +114,19 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     setCurrentMonth(newMonth);
   };
 
-  const handleDateSelect = (date: Date) => {
-    if (!isPastDate(date)) {
-      setSelectedDate(date);
-      setSelectedTime('');
+  const handleDateSelect = async (date: Date) => {
+    if (isPastDate(date)) return;
+    
+    setSelectedDate(date);
+    setSelectedTime('');
+    setAvailableTimesForDate([]);
+    
+    // Check if date is available
+    const dateString = date.toISOString().split('T')[0];
+    const available = await isDateAvailable(dateString);
+    
+    if (!available) {
+      setAvailableTimesForDate([]);
     }
   };
 
@@ -115,6 +151,18 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
 
   const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   const days = getDaysInMonth(currentMonth);
+
+  // Show loading state while availability is being fetched
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
+        <div className="p-8 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mr-2" />
+          <span>Loading availability...</span>
+        </div>
+      </div>
+    );
+  }
 
   // Show session type selection first
   if (!selectedSessionType) {
@@ -142,16 +190,16 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
             <div>
               <div className="flex items-center space-x-2 mb-2">
                 <h3 className="text-lg font-semibold text-blue-900">Smart Scheduling</h3>
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Automated</Badge>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700">Cal.com Integration</Badge>
               </div>
               <p className="text-blue-700 mb-3">
-                Your session will be automatically added to both your calendar and Ana's calendar. You'll
-                receive a confirmation email with the meeting details and video call link.
+                Your session will be automatically added to both your calendar and Ana's calendar. Availability
+                is synced in real-time with Ana's Cal.com calendar to ensure accurate scheduling.
               </p>
               <div className="flex items-center space-x-4 text-sm text-blue-600">
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
-                  <span>Instant confirmation</span>
+                  <span>Real-time availability</span>
                 </div>
                 <span>•</span>
                 <span>Calendar sync</span>
@@ -320,29 +368,41 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
                 {formatSelectedDate(selectedDate)}
               </h4>
               <Badge variant="secondary" className="text-xs">
-                12h • 24h
+                Available times from Cal.com
               </Badge>
             </div>
             
-            <div className="grid grid-cols-1 gap-3">
-              {availableTimeSlots.map((time) => (
-                <Button
-                  key={time}
-                  variant={selectedTime === time ? "default" : "outline"}
-                  className={`py-3 justify-start ${
-                    selectedTime === time 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : 'border-gray-300 hover:border-green-500'
-                  }`}
-                  onClick={() => handleTimeSelect(time)}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>{time}</span>
-                  </div>
-                </Button>
-              ))}
-            </div>
+            {loadingTimes ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-indigo-600 mr-2" />
+                <span>Loading available times...</span>
+              </div>
+            ) : availableTimesForDate.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Clock className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>No available times for this date</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {availableTimesForDate.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTime === time ? "default" : "outline"}
+                    className={`py-3 justify-start ${
+                      selectedTime === time 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : 'border-gray-300 hover:border-green-500'
+                    }`}
+                    onClick={() => handleTimeSelect(time)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>{time}</span>
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            )}
 
             {selectedTime && (
               <div className="pt-4 space-y-3">
