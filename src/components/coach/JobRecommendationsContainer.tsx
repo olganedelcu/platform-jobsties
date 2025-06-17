@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 import { useMenteeNames } from '@/hooks/useMenteeNames';
 import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions';
-import JobRecommendationsHeader from './JobRecommendationsHeader';
 import ApplicationsJobRecommendations from './ApplicationsJobRecommendations';
 import JobRecommendationsList from './JobRecommendationsList';
 import JobRecommendationAssignmentDialog from './JobRecommendationAssignmentDialog';
@@ -79,8 +78,6 @@ const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps)
 
   return (
     <>
-      <JobRecommendationsHeader />
-
       {/* Job Recommendations Form Section */}
       <ApplicationsJobRecommendations />
 
