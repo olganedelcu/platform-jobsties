@@ -3,8 +3,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import Navigation from '@/components/Navigation';
-import { Loader2 } from 'lucide-react';
+import PageWrapper from '@/components/layout/PageWrapper';
 import DashboardContent from '@/components/DashboardContent';
 
 const Dashboard = memo(() => {
@@ -44,45 +43,14 @@ const Dashboard = memo(() => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been logged out of your account.",
-      });
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
+  if (loading || !user) {
+    return <PageWrapper loading={true} />;
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation user={user} onSignOut={handleSignOut} />
-      <div className="pt-20">
-        <DashboardContent user={user} />
-      </div>
-    </div>
+    <PageWrapper className="pt-20">
+      <DashboardContent user={user} />
+    </PageWrapper>
   );
 });
 

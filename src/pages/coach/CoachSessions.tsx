@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import CoachNavigation from '@/components/CoachNavigation';
 import SessionsHeader from '@/components/coach/SessionsHeader';
 import CoachSessionsList from '@/components/coach/CoachSessionsList';
+import PageWrapper from '@/components/layout/PageWrapper';
 import { useCoachSessions } from '@/hooks/useCoachSessions';
-import { Loader2 } from 'lucide-react';
 
 const CoachSessions = () => {
   const navigate = useNavigate();
@@ -58,46 +57,26 @@ const CoachSessions = () => {
     handleCancelSession 
   } = useCoachSessions(user);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
   const handleJoinMeeting = (meetingLink: string) => {
     window.open(meetingLink, '_blank');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
+  if (loading || !user) {
+    return <PageWrapper loading={true} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <CoachNavigation user={user} onSignOut={handleSignOut} />
+    <PageWrapper className="max-w-7xl mx-auto py-8 px-6">
+      <SessionsHeader />
       
-      <main className="max-w-7xl mx-auto py-8 px-6">
-        <SessionsHeader />
-        
-        <CoachSessionsList
-          sessions={sessions}
-          loading={sessionsLoading}
-          onConfirmSession={handleConfirmSession}
-          onCancelSession={handleCancelSession}
-          onJoinMeeting={handleJoinMeeting}
-        />
-      </main>
-    </div>
+      <CoachSessionsList
+        sessions={sessions}
+        loading={sessionsLoading}
+        onConfirmSession={handleConfirmSession}
+        onCancelSession={handleCancelSession}
+        onJoinMeeting={handleJoinMeeting}
+      />
+    </PageWrapper>
   );
 };
 

@@ -2,13 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import Navigation from '@/components/Navigation';
 import SessionsPageHeader from '@/components/sessions/SessionsPageHeader';
 import SessionsLoadingState from '@/components/sessions/SessionsLoadingState';
 import UpcomingSessions from '@/components/sessions/UpcomingSessions';
 import PastSessions from '@/components/sessions/PastSessions';
 import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
-import { Loader2 } from 'lucide-react';
+import PageWrapper from '@/components/layout/PageWrapper';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionsData } from '@/hooks/useSessionsData';
 
@@ -66,11 +65,6 @@ const Sessions = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
   const handleScheduleSession = async (sessionData: any) => {
     console.log('Scheduling session with data:', sessionData);
     
@@ -104,57 +98,42 @@ const Sessions = () => {
     await handleDeleteSession(sessionId);
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <div className="text-lg">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
+  if (authLoading || !user) {
+    return <PageWrapper loading={true} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation user={user} onSignOut={handleSignOut} />
-      
-      <main className="max-w-4xl mx-auto pt-32 pb-8 px-4">
-        <SessionsPageHeader
-          showScheduleDialog={showScheduleDialog}
-          setShowScheduleDialog={setShowScheduleDialog}
-          onScheduleSession={handleScheduleSession}
-          userId={user?.id}
-          sessionRefreshKey={sessionRefreshKey}
-        />
+    <PageWrapper className="max-w-4xl mx-auto pt-32 pb-8 px-4">
+      <SessionsPageHeader
+        showScheduleDialog={showScheduleDialog}
+        setShowScheduleDialog={setShowScheduleDialog}
+        onScheduleSession={handleScheduleSession}
+        userId={user?.id}
+        sessionRefreshKey={sessionRefreshKey}
+      />
 
-        {sessionsLoading && <SessionsLoadingState />}
+      {sessionsLoading && <SessionsLoadingState />}
 
-        {!sessionsLoading && sessions.length > 0 && (
-          <div className="space-y-8">
-            <UpcomingSessions
-              sessions={sessions}
-              onReschedule={handleReschedule}
-              onCancel={handleDeleteSession}
-            />
-            
-            <PastSessions
-              sessions={sessions}
-              onReschedule={handleReschedule}
-              onCancel={handleDeleteSession}
-            />
-          </div>
-        )}
+      {!sessionsLoading && sessions.length > 0 && (
+        <div className="space-y-8">
+          <UpcomingSessions
+            sessions={sessions}
+            onReschedule={handleReschedule}
+            onCancel={handleDeleteSession}
+          />
+          
+          <PastSessions
+            sessions={sessions}
+            onReschedule={handleReschedule}
+            onCancel={handleDeleteSession}
+          />
+        </div>
+      )}
 
-        {!sessionsLoading && sessions.length === 0 && (
-          <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
-        )}
-      </main>
-    </div>
+      {!sessionsLoading && sessions.length === 0 && (
+        <SessionsEmptyState onScheduleClick={() => setShowScheduleDialog(true)} />
+      )}
+    </PageWrapper>
   );
 };
 

@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import AppLayout from "@/components/layout/AppLayout";
 
 // Lazy load components for better performance
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -55,40 +56,46 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<div />}>
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/sessions" element={<Sessions />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/tracker" element={<Tracker />} />
-            <Route path="/application/:id" element={<ApplicationDetail />} />
-            <Route path="/course" element={<Course />} />
-            <Route path="/todos" element={<MenteeTodosPage />} />
-            
-            {/* Coach Routes */}
-            <Route path="/coach/signup" element={<CoachSignUp />} />
-            <Route path="/coach/login" element={<CoachLogin />} />
-            <Route path="/coach/mentees" element={<Mentees />} />
-            <Route path="/coach/dashboard" element={<CoachDashboard />} />
-            <Route path="/coach/cv-upload" element={<CVUpload />} />
-            <Route path="/coach/sessions" element={<CoachSessions />} />
-            <Route path="/coach/messages" element={<CoachMessages />} />
-            <Route path="/coach/settings" element={<CoachSettings />} />
-            <Route path="/coach/profile" element={<CoachProfile />} />
-            <Route path="/coach/todos" element={<CoachTodos />} />
-            <Route path="/coach/applications" element={<Applications />} />
-            <Route path="/coach/calendar" element={<CoachCalendar />} />
-            <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
-            <Route path="/coach/backup" element={<BackupManagementPage />} />
-            <Route path="/coach/send/notifications" element={<NotificationsSettings />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <AppLayout>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            </div>
+          }>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/sessions" element={<Sessions />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/tracker" element={<Tracker />} />
+              <Route path="/application/:id" element={<ApplicationDetail />} />
+              <Route path="/course" element={<Course />} />
+              <Route path="/todos" element={<MenteeTodosPage />} />
+              
+              {/* Coach Routes */}
+              <Route path="/coach/signup" element={<CoachSignUp />} />
+              <Route path="/coach/login" element={<CoachLogin />} />
+              <Route path="/coach/mentees" element={<Mentees />} />
+              <Route path="/coach/dashboard" element={<CoachDashboard />} />
+              <Route path="/coach/cv-upload" element={<CVUpload />} />
+              <Route path="/coach/sessions" element={<CoachSessions />} />
+              <Route path="/coach/messages" element={<CoachMessages />} />
+              <Route path="/coach/settings" element={<CoachSettings />} />
+              <Route path="/coach/profile" element={<CoachProfile />} />
+              <Route path="/coach/todos" element={<CoachTodos />} />
+              <Route path="/coach/applications" element={<Applications />} />
+              <Route path="/coach/calendar" element={<CoachCalendar />} />
+              <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
+              <Route path="/coach/backup" element={<BackupManagementPage />} />
+              <Route path="/coach/send/notifications" element={<NotificationsSettings />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </AppLayout>
       </BrowserRouter>
     </QueryClientProvider>
   </ErrorBoundary>
