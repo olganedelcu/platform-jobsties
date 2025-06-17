@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Message, MessageAttachment } from '@/types/messages';
 import { useMessageFetcher } from '@/services/messages/messageFetchService';
 import { useMessageSender } from '@/services/messages/messageSendService';
 import { useAttachmentOperations } from '@/services/messages/attachmentService';
 
-export { Message, MessageAttachment } from '@/types/messages';
+export type { Message, MessageAttachment } from '@/types/messages';
 
 export const useMessages = (conversationId: string | null) => {
   const [messages, setMessages] = useState<Message[]>([]);
