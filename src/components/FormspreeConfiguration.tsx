@@ -67,7 +67,7 @@ const FormspreeConfiguration = () => {
       // Add a comprehensive test notification
       BundledNotificationService.addJobRecommendation(
         'test-mentee-123',
-        'test@example.com',
+        'olga@jobsties.com',
         'Test Mentee User',
         'Senior Software Developer - Test Position',
         'Test Company Technologies Inc.'
@@ -76,14 +76,14 @@ const FormspreeConfiguration = () => {
       // Add additional test notifications to show bundling
       BundledNotificationService.addMessage(
         'test-mentee-123',
-        'test@example.com', 
+        'olga@jobsties.com', 
         'Test Mentee User',
         'This is a test message from your JobsTies mentor to verify the notification system is working correctly.'
       );
 
       BundledNotificationService.addTodoAssignment(
         'test-mentee-123',
-        'test@example.com',
+        'olga@jobsties.com',
         'Test Mentee User',
         'Complete your LinkedIn profile optimization',
         1
@@ -96,7 +96,7 @@ const FormspreeConfiguration = () => {
 
       toast({
         title: "Test Email Sent!",
-        description: "A bundled test email with job recommendation, message, and task assignment should arrive at test@example.com shortly via your Formspree form. Check your email!"
+        description: "A bundled test email with job recommendation, message, and task assignment should arrive at olga@jobsties.com shortly via your Formspree form. Check your email!"
       });
     } catch (error) {
       console.error('❌ Test failed:', error);
@@ -187,7 +187,7 @@ const FormspreeConfiguration = () => {
         <div className="border-t pt-4">
           <h3 className="font-medium mb-2">📧 Test Email Details:</h3>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>• Test email will be sent to: test@example.com</li>
+            <li>• Test email will be sent to: olga@jobsties.com</li>
             <li>• Will include sample job recommendation, message, and task assignment</li>
             <li>• Demonstrates the bundled notification format</li>
             <li>• Should arrive within a few minutes if Formspree is working correctly</li>
