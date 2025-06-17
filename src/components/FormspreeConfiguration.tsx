@@ -62,27 +62,47 @@ const FormspreeConfiguration = () => {
     setIsTesting(true);
     
     try {
-      // Add a test notification to trigger the bundling system
+      console.log('🧪 Starting Formspree test notification...');
+      
+      // Add a comprehensive test notification
       BundledNotificationService.addJobRecommendation(
-        'test-mentee-id',
+        'test-mentee-123',
         'test@example.com',
-        'Test Mentee',
-        'Software Developer - Test Position',
-        'Test Company Inc.'
+        'Test Mentee User',
+        'Senior Software Developer - Test Position',
+        'Test Company Technologies Inc.'
+      );
+
+      // Add additional test notifications to show bundling
+      BundledNotificationService.addMessage(
+        'test-mentee-123',
+        'test@example.com', 
+        'Test Mentee User',
+        'This is a test message from your JobsTies mentor to verify the notification system is working correctly.'
+      );
+
+      BundledNotificationService.addTodoAssignment(
+        'test-mentee-123',
+        'test@example.com',
+        'Test Mentee User',
+        'Complete your LinkedIn profile optimization',
+        1
       );
 
       // Force flush to send immediately for testing
       await BundledNotificationService.flushAllNotifications();
 
+      console.log('✅ Test notification sent successfully!');
+
       toast({
-        title: "Test Notification Sent!",
-        description: "A test email should arrive at test@example.com shortly via your Formspree form."
+        title: "Test Email Sent!",
+        description: "A bundled test email with job recommendation, message, and task assignment should arrive at test@example.com shortly via your Formspree form. Check your email!"
       });
     } catch (error) {
-      console.error('Test failed:', error);
+      console.error('❌ Test failed:', error);
       toast({
         title: "Test Failed",
-        description: "Failed to send test notification. Please check your endpoint and try again.",
+        description: `Failed to send test notification: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your endpoint and try again.`,
         variant: "destructive"
       });
     } finally {
@@ -161,6 +181,16 @@ const FormspreeConfiguration = () => {
             <li>• Notification bundling active (sends every 2 hours)</li>
             <li>• Ready to send job recommendations, file uploads, messages, and task assignments</li>
             <li>• Test function available to verify email delivery</li>
+          </ul>
+        </div>
+
+        <div className="border-t pt-4">
+          <h3 className="font-medium mb-2">📧 Test Email Details:</h3>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>• Test email will be sent to: test@example.com</li>
+            <li>• Will include sample job recommendation, message, and task assignment</li>
+            <li>• Demonstrates the bundled notification format</li>
+            <li>• Should arrive within a few minutes if Formspree is working correctly</li>
           </ul>
         </div>
 
