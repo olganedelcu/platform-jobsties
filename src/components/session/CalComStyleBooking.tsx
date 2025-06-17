@@ -36,16 +36,16 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
 
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching Ana coach ID:', error);
+          setAnaCoachId(null);
         } else if (data) {
           setAnaCoachId(data.id);
         } else {
-          console.log('Ana coach profile not found, using fallback availability');
-          // Set a fallback value or handle gracefully
-          setAnaCoachId('fallback');
+          console.log('Ana coach profile not found, will use default availability');
+          setAnaCoachId(null);
         }
       } catch (error) {
         console.error('Error fetching Ana coach ID:', error);
-        setAnaCoachId('fallback');
+        setAnaCoachId(null);
       }
     };
 
@@ -66,13 +66,13 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   ];
 
   useEffect(() => {
-    if (selectedDate && anaCoachId) {
+    if (selectedDate) {
       loadAvailableTimesForSelectedDate();
     }
   }, [selectedDate, anaCoachId]);
 
   const loadAvailableTimesForSelectedDate = async () => {
-    if (!selectedDate || !anaCoachId) return;
+    if (!selectedDate) return;
     
     setLoadingTimes(true);
     try {
@@ -104,7 +104,7 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
   };
 
   const handleDateSelect = async (date: Date) => {
-    if (isPastDate(date) || !anaCoachId) return;
+    if (isPastDate(date)) return;
     
     setSelectedDate(date);
     setSelectedTime('');
@@ -138,8 +138,8 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     }
   };
 
-  // Show loading state while availability is being fetched or Ana's ID is being loaded
-  if (loading || !anaCoachId) {
+  // Show loading state while availability is being fetched
+  if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
         <div className="p-8 flex items-center justify-center">
@@ -150,14 +150,54 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     );
   }
 
-  // Show session type selection first
+  // Show session type selection first (remove the header)
   if (!selectedSessionType) {
     return (
-      <SessionTypeSelection
-        sessionTypes={sessionTypes}
-        onSelectSessionType={setSelectedSessionType}
-        onCancel={onCancel}
-      />
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl mx-auto">
+        {/* Session Type */}
+        <div className="p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Session Type</h2>
+          <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book</p>
+          
+          <div className="max-w-md">
+            {sessionTypes.map((type) => {
+              const IconComponent = type.icon;
+              return (
+                <div
+                  key={type.id}
+                  className="cursor-pointer transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-300 rounded-lg p-6"
+                  onClick={() => setSelectedSessionType(type.id)}
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className={`p-3 ${type.color} text-white rounded-xl`}>
+                      <IconComponent className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">{type.name}</h3>
+                        <div className="flex items-center space-x-1 text-gray-500">
+                          <span className="text-sm">{type.duration} min</span>
+                        </div>
+                      </div>
+                      <p className="text-gray-600 text-sm">{type.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="p-8 border-t bg-gray-50">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </Button>
+        </div>
+      </div>
     );
   }
 

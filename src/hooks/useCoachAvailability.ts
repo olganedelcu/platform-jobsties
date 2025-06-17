@@ -7,19 +7,17 @@ export const useCoachAvailability = (coachId?: string | null): UseCoachAvailabil
   const { availability, blockedDates, bookedTimeSlots, loading } = useAvailabilityData(coachId);
 
   const isDateAvailable = async (date: string): Promise<boolean> => {
-    if (!coachId) return false;
-    return AvailabilityUtils.checkDateAvailability(date, blockedDates, availability, coachId);
+    return AvailabilityUtils.checkDateAvailability(date, blockedDates, availability, coachId || undefined);
   };
 
   const getAvailableTimesForDate = async (date: string): Promise<string[]> => {
-    if (!coachId) return [];
     const available = await isDateAvailable(date);
     return AvailabilityUtils.getAvailableTimesForDate(
       date,
       availability,
       bookedTimeSlots,
       available,
-      coachId
+      coachId || undefined
     );
   };
 

@@ -13,7 +13,9 @@ export const useAvailabilityData = (coachId?: string | null) => {
     if (coachId) {
       fetchData();
     } else {
+      // Use default availability when no coach ID is available
       setAvailability(AvailabilityService.getDefaultAvailability());
+      setBlockedDates([]);
       fetchBookedSessions();
     }
   }, [coachId]);
@@ -32,6 +34,7 @@ export const useAvailabilityData = (coachId?: string | null) => {
     } catch (error) {
       console.error('Error fetching availability data:', error);
       setAvailability(AvailabilityService.getDefaultAvailability());
+      setBlockedDates([]);
     }
 
     await fetchBookedSessions();
