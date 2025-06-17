@@ -51,25 +51,50 @@ export const handleMessageNotification = async (
 
 const sendInAppNotificationToCoach = async (menteeName: string, messageContent: string) => {
   try {
-    // Get Ana's profile to send in-app notification
-    const { data: anaProfile, error } = await supabase
+    console.log("🔔 Attempting to send in-app notification to Ana...");
+    
+    // Try multiple approaches to find Ana's profile
+    const { data: anaProfiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('email', 'ana@jobsties.com')
-      .eq('role', 'COACH')
-      .single();
+      .select('id, email, role, first_name, last_name')
+      .eq('email', 'ana@jobsties.com');
 
-    if (error || !anaProfile) {
-      console.log("⏭️ Could not find Ana's profile for in-app notification");
+    console.log("👤 Ana profiles search result:", { anaProfiles, profilesError });
+
+    if (profilesError) {
+      console.error("❌ Error searching for Ana's profiles:", profilesError);
       return;
     }
+
+    if (!anaProfiles || anaProfiles.length === 0) {
+      console.log("⚠️ No profiles found for ana@jobsties.com");
+      
+      // Let's also check what profiles exist
+      const { data: allProfiles, error: allProfilesError } = await supabase
+        .from('profiles')
+        .select('email, role')
+        .limit(10);
+      
+      console.log("📋 Sample profiles in database:", allProfiles);
+      return;
+    }
+
+    // Find the coach profile specifically
+    const anaProfile = anaProfiles.find(p => p.role === 'COACH') || anaProfiles[0];
+    
+    if (!anaProfile) {
+      console.log("⏭️ Could not find Ana's coach profile");
+      return;
+    }
+
+    console.log("✅ Found Ana's profile:", { id: anaProfile.id, email: anaProfile.email, role: anaProfile.role });
 
     await InAppNotificationService.sendMessageNotification(
       anaProfile.id,
       `New message from ${menteeName}: ${messageContent.substring(0, 100)}`
     );
 
-    console.log("✅ In-app notification sent to coach");
+    console.log("✅ In-app notification sent to coach successfully");
   } catch (error) {
     console.error('❌ Error sending in-app notification to coach:', error);
   }
@@ -77,6 +102,8 @@ const sendInAppNotificationToCoach = async (menteeName: string, messageContent: 
 
 const sendEmailNotificationToCoach = async (menteeEmail: string, menteeName: string, messageContent: string) => {
   try {
+    console.log("📧 Sending email notification to ana@jobsties.com...");
+    
     const { error } = await supabase.functions.invoke('send-chat-notification', {
       body: {
         menteeEmail,
