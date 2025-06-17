@@ -31,16 +31,21 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
           .from('profiles')
           .select('id')
           .eq('email', 'ana@jobsties.com')
-          .eq('role', 'COACH')
-          .single();
+          .eq('role', 'coach')
+          .maybeSingle();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error('Error fetching Ana coach ID:', error);
         } else if (data) {
           setAnaCoachId(data.id);
+        } else {
+          console.log('Ana coach profile not found, using fallback availability');
+          // Set a fallback value or handle gracefully
+          setAnaCoachId('fallback');
         }
       } catch (error) {
         console.error('Error fetching Ana coach ID:', error);
+        setAnaCoachId('fallback');
       }
     };
 

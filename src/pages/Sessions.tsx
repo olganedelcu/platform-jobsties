@@ -7,7 +7,7 @@ import SessionsLoadingState from '@/components/sessions/SessionsLoadingState';
 import SessionsGrid from '@/components/sessions/SessionsGrid';
 import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
 import ScheduleSession from '@/components/ScheduleSession';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionsData } from '@/hooks/useSessionsData';
@@ -138,6 +138,12 @@ const Sessions = () => {
 
         <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
           <DialogContent className="max-w-6xl h-[90vh] overflow-y-auto p-0">
+            <DialogTitle className="sr-only">
+              Schedule New Coaching Session
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Book a personalized coaching session with your career coach
+            </DialogDescription>
             <ScheduleSession
               onSchedule={handleScheduleSession}
               onCancel={() => setShowScheduleDialog(false)}
