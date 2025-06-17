@@ -14,7 +14,14 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
   useEffect(() => {
     (async function () {
       const cal = await getCalApi({"namespace":"30min"});
-      cal("ui", {"cssVarsPerTheme":{"dark":{"cal-brand":"#5b53e5"}},"hideEventTypeDetails":false,"layout":"month_view"});
+      cal("ui", {
+        "cssVarsPerTheme": {
+          "light": {"cal-brand": "#5b53e5"},
+          "dark": {"cal-brand": "#5b53e5"}
+        },
+        "hideEventTypeDetails": false,
+        "layout": "month_view"
+      });
     })();
   }, []);
 
