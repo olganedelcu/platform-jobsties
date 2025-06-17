@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 import { useMenteeNames } from '@/hooks/useMenteeNames';
 import { useJobRecommendationActions } from '@/hooks/useJobRecommendationActions';
@@ -7,12 +7,15 @@ import JobRecommendationsHeader from './JobRecommendationsHeader';
 import ApplicationsJobRecommendations from './ApplicationsJobRecommendations';
 import JobRecommendationsList from './JobRecommendationsList';
 import JobRecommendationAssignmentDialog from './JobRecommendationAssignmentDialog';
+import JobRecommendationsMenteeSearch from './JobRecommendationsMenteeSearch';
 
 interface JobRecommendationsContainerProps {
   user: any;
 }
 
 const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { recommendations, loading: recommendationsLoading, deleteRecommendation, addRecommendation } = useJobRecommendations({
     userId: user?.id || '',
     isCoach: true
@@ -38,8 +41,21 @@ const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps)
   const uniqueMenteeIds = [...new Set(recommendations.map(rec => rec.mentee_id))];
   const { menteeNames, loading: menteeNamesLoading } = useMenteeNames(uniqueMenteeIds);
 
-  // Group recommendations by job details to show unique jobs
-  const groupedRecommendations = recommendations.reduce((acc, rec) => {
+  // Filter recommendations based on search term
+  const filteredRecommendations = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return recommendations;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return recommendations.filter(rec => {
+      const menteeName = menteeNames[rec.mentee_id]?.toLowerCase() || '';
+      return menteeName.includes(lowerSearchTerm);
+    });
+  }, [recommendations, searchTerm, menteeNames]);
+
+  // Group filtered recommendations by job details to show unique jobs
+  const groupedRecommendations = filteredRecommendations.reduce((acc, rec) => {
     const key = `${rec.job_title}-${rec.company_name}-${rec.job_link}`;
     if (!acc[key]) {
       acc[key] = {
@@ -58,6 +74,9 @@ const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps)
 
   const uniqueRecommendations = Object.values(groupedRecommendations);
 
+  // Count unique mentees in filtered results
+  const uniqueMenteeCount = [...new Set(filteredRecommendations.map(rec => rec.mentee_id))].length;
+
   return (
     <>
       <JobRecommendationsHeader />
@@ -65,15 +84,22 @@ const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps)
       {/* Job Recommendations Form Section */}
       <ApplicationsJobRecommendations />
 
+      {/* Search functionality */}
+      <JobRecommendationsMenteeSearch
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        resultCount={uniqueMenteeCount}
+      />
+
       {/* All Recommendations List */}
       <JobRecommendationsList
         uniqueRecommendations={uniqueRecommendations}
-        recommendations={recommendations}
+        recommendations={filteredRecommendations}
         menteeNames={menteeNames}
         selectedAssignments={selectedAssignments}
         recommendationsLoading={recommendationsLoading}
         menteeNamesLoading={menteeNamesLoading}
-        onSelectAll={(checked) => handleSelectAll(checked, recommendations)}
+        onSelectAll={(checked) => handleSelectAll(checked, filteredRecommendations)}
         onSelectAssignment={handleSelectAssignment}
         onDeleteSelected={handleDeleteSelected}
         onAssignToMoreMentees={handleAssignToMoreMentees}
