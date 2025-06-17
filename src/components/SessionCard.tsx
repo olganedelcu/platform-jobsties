@@ -89,8 +89,8 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
             </div>
             
             <div className="flex items-center space-x-3 text-gray-700">
-              <div className="p-2 bg-indigo-50 rounded-lg">
-                <Clock className="h-5 w-5 text-indigo-600" />
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Clock className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{formatTime(session.session_date)}</p>
@@ -100,8 +100,8 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
             
             {session.preferred_coach && (
               <div className="flex items-center space-x-3 text-gray-700">
-                <div className="p-2 bg-purple-50 rounded-lg">
-                  <User className="h-5 w-5 text-purple-600" />
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <User className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{session.preferred_coach}</p>
@@ -169,7 +169,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold">{session.session_type}</h3>
           <div className="flex items-center space-x-2">
@@ -183,7 +183,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
             )}
           </div>
         </div>
-        <p className="text-indigo-100 text-sm">Professional coaching session</p>
+        <p className="text-blue-100 text-sm">Professional coaching session</p>
       </div>
       
       {/* Content */}
@@ -201,8 +201,8 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
           </div>
           
           <div className="flex items-center space-x-3 text-gray-700">
-            <div className="p-2 bg-indigo-50 rounded-lg">
-              <Clock className="h-5 w-5 text-indigo-600" />
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Clock className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <p className="font-semibold text-gray-900">{formatTime(session.session_date)}</p>
@@ -212,8 +212,8 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
           
           {session.preferred_coach && (
             <div className="flex items-center space-x-3 text-gray-700">
-              <div className="p-2 bg-purple-50 rounded-lg">
-                <User className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <User className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{session.preferred_coach}</p>
