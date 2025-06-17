@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight, Users, MessageSquare, Target, Camera } from 'lucide-react';
+import { Calendar, Clock, Video, Globe, ChevronLeft, ChevronRight, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface CalComStyleBookingProps {
@@ -19,36 +19,12 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
 
   const sessionTypes = [
     {
-      id: 'general',
-      name: 'General Coaching',
-      duration: 60,
-      description: 'Comprehensive career guidance and support',
+      id: '1on1',
+      name: '1-on-1 Session',
+      duration: 30,
+      description: 'Personalized career coaching session',
       icon: Users,
       color: 'bg-blue-500'
-    },
-    {
-      id: 'interview',
-      name: 'Interview Preparation',
-      duration: 45,
-      description: 'Practice interviews and feedback',
-      icon: MessageSquare,
-      color: 'bg-purple-500'
-    },
-    {
-      id: 'cv',
-      name: 'CV Review',
-      duration: 30,
-      description: 'Professional resume optimization',
-      icon: Target,
-      color: 'bg-teal-500'
-    },
-    {
-      id: 'mock',
-      name: 'Mock Interview',
-      duration: 60,
-      description: 'Realistic interview simulation',
-      icon: Camera,
-      color: 'bg-blue-600'
     }
   ];
 
@@ -126,10 +102,10 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
     if (selectedDate && selectedTime && selectedSessionType) {
       const selectedType = sessionTypes.find(type => type.id === selectedSessionType);
       const sessionData = {
-        sessionType: selectedType?.name || 'General Coaching',
+        sessionType: selectedType?.name || '1-on-1 Session',
         date: selectedDate.toISOString().split('T')[0],
         time: selectedTime,
-        duration: selectedType?.duration.toString() || '60',
+        duration: selectedType?.duration.toString() || '30',
         notes: '',
         preferredCoach: 'Ana Nedelcu'
       };
@@ -186,12 +162,12 @@ const CalComStyleBooking = ({ onBookSession, onCancel }: CalComStyleBookingProps
           </div>
         </div>
 
-        {/* Session Types */}
+        {/* Session Type */}
         <div className="p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Session Type</h2>
           <p className="text-gray-600 mb-8">Select the type of coaching session you'd like to book</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="max-w-md">
             {sessionTypes.map((type) => {
               const IconComponent = type.icon;
               return (
