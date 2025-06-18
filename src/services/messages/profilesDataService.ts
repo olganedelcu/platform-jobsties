@@ -5,33 +5,33 @@ export const useProfilesDataService = () => {
   const getProfilesBySenderIds = async (senderIds: string[]) => {
     if (senderIds.length === 0) return [];
 
-    const { data: profiles, error: profilesError } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
       .in('id', senderIds);
 
-    if (profilesError) {
-      console.error('Error fetching profiles:', profilesError);
+    if (error) {
+      console.error('Error fetching profiles:', error);
       return [];
     }
 
-    return profiles || [];
+    return data || [];
   };
 
   const getCoachProfile = async (coachEmail: string) => {
-    const { data: coach, error: coachError } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
       .eq('email', coachEmail)
       .eq('role', 'COACH')
-      .single();
+      .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
 
-    if (coachError) {
-      console.error('Error fetching coach profile:', coachError);
+    if (error) {
+      console.error('Error fetching coach profile:', error);
       return null;
     }
 
-    return coach;
+    return data;
   };
 
   return { getProfilesBySenderIds, getCoachProfile };

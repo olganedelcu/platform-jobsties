@@ -36,6 +36,10 @@ export const useMessageFetcher = () => {
       let coachProfile = null;
       if (conversation.coach_email) {
         coachProfile = await getCoachProfile(conversation.coach_email);
+        // If coach profile not found, don't throw error, just log it
+        if (!coachProfile) {
+          console.log('Coach profile not found for email:', conversation.coach_email);
+        }
       }
 
       // Format and combine the data

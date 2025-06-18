@@ -20,12 +20,13 @@ export const useMessageFormattingService = () => {
         }
       }
 
+      // Get attachments for this message
       const messageAttachments = attachmentsData.filter(att => att.message_id === msg.id);
 
       return {
         ...msg,
         sender_name: senderName,
-        attachments: messageAttachments
+        attachments: messageAttachments || [] // Ensure attachments is always an array
       };
     });
   };

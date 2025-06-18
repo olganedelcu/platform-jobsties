@@ -2,14 +2,19 @@
 import { supabase } from '@/integrations/supabase/client';
 import { MessageAttachment } from '@/types/messages';
 import { useToast } from '@/hooks/use-toast';
+import { useStorageService } from './storageService';
 
 export const useAttachmentOperations = () => {
   const { toast } = useToast();
+  const { ensureMessageAttachmentsBucket } = useStorageService();
 
   const uploadAttachments = async (messageId: string, files: File[]) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Ensure the bucket exists
+      await ensureMessageAttachmentsBucket();
 
       const uploadPromises = files.map(async (file) => {
         const fileExt = file.name.split('.').pop();
