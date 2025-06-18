@@ -12,8 +12,15 @@ export const useAuthState = () => {
   const [loading, setLoading] = useState(true);
   const hasInitialized = useRef(false);
   const navigationInProgress = useRef(false);
+  const subscriptionRef = useRef<any>(null);
 
   useEffect(() => {
+    // Cleanup any existing subscription first
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+    }
+
     let isMounted = true;
 
     const initializeAuth = async () => {
@@ -108,6 +115,9 @@ export const useAuthState = () => {
       }
     );
 
+    // Store subscription reference to prevent duplicates
+    subscriptionRef.current = subscription;
+
     // Initialize auth state
     if (!hasInitialized.current) {
       initializeAuth();
@@ -115,7 +125,10 @@ export const useAuthState = () => {
 
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
     };
   }, [navigate, location.pathname]);
 

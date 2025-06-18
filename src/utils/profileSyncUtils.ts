@@ -10,9 +10,9 @@ export const syncUserToProfile = async (userId: string) => {
       .from('profiles')
       .select('id')
       .eq('id', userId)
-      .single();
+      .maybeSingle(); // Use maybeSingle to avoid errors when no record exists
       
-    if (checkError && checkError.code !== 'PGRST116') {
+    if (checkError) {
       console.error('Error checking for existing profile:', checkError);
       return false;
     }
@@ -30,24 +30,52 @@ export const syncUserToProfile = async (userId: string) => {
       return false;
     }
     
-    // Create profile
-    const { error: insertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        first_name: user.user_metadata?.first_name || '',
-        last_name: user.user_metadata?.last_name || '',
-        email: user.email || '',
-        role: user.user_metadata?.role === 'COACH' ? 'COACH' : 'MENTEE'
-      });
+    // Create profile with retry logic
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          first_name: user.user_metadata?.first_name || '',
+          last_name: user.user_metadata?.last_name || '',
+          email: user.email || '',
+          role: user.user_metadata?.role === 'COACH' ? 'COACH' : 'MENTEE'
+        });
+        
+      if (!insertError) {
+        console.log('Successfully synced user to profile:', userId);
+        return true;
+      }
       
-    if (insertError) {
-      console.error('Error creating profile:', insertError);
-      return false;
+      console.error(`Error creating profile (attempt ${retryCount + 1}):`, insertError);
+      
+      // If it's a duplicate key error, the profile might have been created by another process
+      if (insertError.code === '23505') {
+        console.log('Profile already exists (duplicate key), checking again...');
+        const { data: checkAgain } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        if (checkAgain) {
+          console.log('Profile confirmed to exist');
+          return true;
+        }
+      }
+      
+      retryCount++;
+      if (retryCount < maxRetries) {
+        // Wait a bit before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
     
-    console.log('Successfully synced user to profile:', userId);
-    return true;
+    console.error('Failed to create profile after all retries');
+    return false;
     
   } catch (error) {
     console.error('Error in syncUserToProfile:', error);
