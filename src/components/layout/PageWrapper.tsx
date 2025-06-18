@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 
 interface PageWrapperProps {
   loading?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
