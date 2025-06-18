@@ -12,7 +12,14 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Hooks for todo management
-  const { todos, loading: todosLoading, addTodo, updateStatus: updateTodoStatus, deleteTodo } = useMenteeTodos(userId);
+  const { 
+    todos, 
+    loading: todosLoading, 
+    addTodo, 
+    updateStatus: updateTodoStatus, 
+    deleteTodo,
+    updateTodo
+  } = useMenteeTodos(userId);
 
   const handleAddTodo = async (todoData: any) => {
     await addTodo(todoData);
@@ -32,6 +39,7 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
       onCancelAdd={() => setShowAddForm(false)}
       onUpdateStatus={updateTodoStatus}
       onDeleteTodo={deleteTodo}
+      onUpdateTodo={updateTodo}
     />
   );
 };

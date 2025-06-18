@@ -22,7 +22,14 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
 
   // Get personal tasks and assignments with error handling
   const { assignments, loading: assignmentsLoading } = useTodoAssignments(userId, false);
-  const { todos, loading: todosLoading, addTodo, updateStatus: updateTodoStatus, deleteTodo } = useMenteeTodos(userId);
+  const { 
+    todos, 
+    loading: todosLoading, 
+    addTodo, 
+    updateStatus: updateTodoStatus, 
+    deleteTodo,
+    updateTodo
+  } = useMenteeTodos(userId);
 
   const handleAddTodo = async (todoData: any) => {
     await addTodo(todoData);
@@ -108,6 +115,7 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
             onCancelAdd={() => setShowAddForm(false)}
             onUpdateStatus={updateTodoStatus}
             onDeleteTodo={deleteTodo}
+            onUpdateTodo={updateTodo}
           />
         </TabsContent>
 
@@ -137,6 +145,7 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
               todosLoading={todosLoading}
               onUpdateStatus={updateTodoStatus}
               onDeleteTodo={deleteTodo}
+              onUpdateTodo={updateTodo}
             />
           </div>
         </TabsContent>

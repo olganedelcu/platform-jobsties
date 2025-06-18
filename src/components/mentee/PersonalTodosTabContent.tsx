@@ -16,6 +16,7 @@ interface PersonalTodosTabContentProps {
   onCancelAdd: () => void;
   onUpdateStatus: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo: (todoId: string) => void;
+  onUpdateTodo?: (todoId: string, updates: any) => void;
 }
 
 const PersonalTodosTabContent = ({
@@ -24,7 +25,8 @@ const PersonalTodosTabContent = ({
   userId,
   viewMode,
   onUpdateStatus,
-  onDeleteTodo
+  onDeleteTodo,
+  onUpdateTodo
 }: PersonalTodosTabContentProps) => {
   if (viewMode === 'board') {
     return <MenteeTaskBoard userId={userId} />;
@@ -49,6 +51,7 @@ const PersonalTodosTabContent = ({
           todos={todos}
           onUpdateStatus={onUpdateStatus}
           onDeleteTodo={onDeleteTodo}
+          onUpdateTodo={onUpdateTodo}
         />
       )}
     </div>
