@@ -18,7 +18,7 @@ const CoachJobRecommendations = () => {
 
   return (
     <ProtectedCoachRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pt-16">
         <main className="max-w-7xl mx-auto py-8 px-6">
           <JobRecommendationsContainer user={user} />
         </main>

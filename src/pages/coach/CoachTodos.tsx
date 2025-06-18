@@ -88,7 +88,7 @@ const CoachTodos = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-16">
       <main className="max-w-7xl mx-auto py-8 px-6">
         <TodoList mentees={mentees} coachId={user.id} />
       </main>

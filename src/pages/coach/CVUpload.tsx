@@ -18,7 +18,7 @@ const CVUpload = () => {
 
   return (
     <ProtectedCoachRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pt-16">
         <CVUploadContent />
       </div>
     </ProtectedCoachRoute>

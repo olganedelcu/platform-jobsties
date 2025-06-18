@@ -25,7 +25,7 @@ const CoachSessions = () => {
   }
 
   return (
-    <PageWrapper className="max-w-7xl mx-auto py-8 px-6">
+    <PageWrapper className="max-w-7xl mx-auto py-8 px-6 pt-24">
       <SessionsHeader />
       
       <CoachSessionsList

@@ -18,7 +18,9 @@ const CoachDashboard = () => {
 
   return (
     <ProtectedCoachRoute>
-      <CoachDashboardContent user={user} />
+      <div className="min-h-screen bg-gray-50 pt-16">
+        <CoachDashboardContent user={user} />
+      </div>
     </ProtectedCoachRoute>
   );
 };

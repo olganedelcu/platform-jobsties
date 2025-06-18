@@ -14,7 +14,7 @@ const Applications = () => {
 
   return (
     <ProtectedCoachRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 pt-16">
         <ApplicationsContent />
       </div>
     </ProtectedCoachRoute>
