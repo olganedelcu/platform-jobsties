@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { format, startOfWeek, addWeeks } from 'date-fns';
 
 export interface JobRecommendation {
@@ -10,6 +10,11 @@ export interface JobRecommendation {
   description: string;
 }
 
+// Enhanced localStorage keys with timestamps
+const FORM_STATE_KEY = 'coach_job_recommendations_form_state';
+const FORM_OPEN_KEY = 'coach_job_recommendations_form_open';
+const FORM_TIMESTAMP_KEY = 'coach_job_recommendations_timestamp';
+
 export const useJobRecommendationForm = () => {
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [weekStartDate, setWeekStartDate] = useState(
@@ -18,6 +23,83 @@ export const useJobRecommendationForm = () => {
   const [jobRecommendations, setJobRecommendations] = useState<JobRecommendation[]>([
     { id: '1', jobTitle: '', jobLink: '', companyName: '', description: '' }
   ]);
+
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitialized = useRef(false);
+
+  // Initialize form state from localStorage on mount
+  useEffect(() => {
+    if (!isInitialized.current) {
+      try {
+        const savedFormState = localStorage.getItem(FORM_STATE_KEY);
+        const savedFormOpen = localStorage.getItem(FORM_OPEN_KEY);
+        
+        if (savedFormState && savedFormOpen) {
+          const state = JSON.parse(savedFormState);
+          const isOpen = JSON.parse(savedFormOpen);
+          
+          // Only restore if form was previously open
+          if (isOpen && state) {
+            console.log('Restoring job recommendation form state from localStorage');
+            
+            if (state.selectedMentees && Array.isArray(state.selectedMentees)) {
+              setSelectedMentees(state.selectedMentees);
+            }
+            if (state.weekStartDate) {
+              setWeekStartDate(state.weekStartDate);
+            }
+            if (state.jobRecommendations && Array.isArray(state.jobRecommendations)) {
+              setJobRecommendations(state.jobRecommendations);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error restoring form state:', error);
+        // Clear corrupted data
+        localStorage.removeItem(FORM_STATE_KEY);
+        localStorage.removeItem(FORM_OPEN_KEY);
+        localStorage.removeItem(FORM_TIMESTAMP_KEY);
+      }
+      isInitialized.current = true;
+    }
+  }, []);
+
+  // Debounced save to localStorage
+  const debouncedSave = () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    saveTimeoutRef.current = setTimeout(() => {
+      try {
+        const formState = {
+          selectedMentees,
+          weekStartDate,
+          jobRecommendations,
+          timestamp: Date.now()
+        };
+        
+        localStorage.setItem(FORM_STATE_KEY, JSON.stringify(formState));
+        localStorage.setItem(FORM_TIMESTAMP_KEY, Date.now().toString());
+        console.log('Form state auto-saved to localStorage');
+      } catch (error) {
+        console.error('Error saving form state:', error);
+      }
+    }, 1000); // Save after 1 second of inactivity
+  };
+
+  // Auto-save form state when data changes
+  useEffect(() => {
+    if (isInitialized.current) {
+      debouncedSave();
+    }
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [selectedMentees, weekStartDate, jobRecommendations]);
 
   const addNewRecommendation = () => {
     const newId = Date.now().toString();
@@ -51,6 +133,37 @@ export const useJobRecommendationForm = () => {
     setJobRecommendations([{ id: '1', jobTitle: '', jobLink: '', companyName: '', description: '' }]);
     setSelectedMentees([]);
     setWeekStartDate(format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd'));
+    
+    // Clear localStorage
+    localStorage.removeItem(FORM_STATE_KEY);
+    localStorage.removeItem(FORM_OPEN_KEY);
+    localStorage.removeItem(FORM_TIMESTAMP_KEY);
+  };
+
+  const clearDraft = () => {
+    console.log('Clearing draft from localStorage');
+    localStorage.removeItem(FORM_STATE_KEY);
+    localStorage.removeItem(FORM_OPEN_KEY);
+    localStorage.removeItem(FORM_TIMESTAMP_KEY);
+    resetForm();
+  };
+
+  const saveFormOpenState = (isOpen: boolean) => {
+    try {
+      localStorage.setItem(FORM_OPEN_KEY, JSON.stringify(isOpen));
+    } catch (error) {
+      console.error('Error saving form open state:', error);
+    }
+  };
+
+  const getFormOpenState = (): boolean => {
+    try {
+      const savedState = localStorage.getItem(FORM_OPEN_KEY);
+      return savedState ? JSON.parse(savedState) : false;
+    } catch (error) {
+      console.error('Error reading form open state:', error);
+      return false;
+    }
   };
 
   const getWeekOptions = () => {
@@ -74,6 +187,13 @@ export const useJobRecommendationForm = () => {
     );
   };
 
+  const hasDraftData = () => {
+    return selectedMentees.length > 0 || 
+           jobRecommendations.some(rec => 
+             rec.jobTitle.trim() || rec.jobLink.trim() || rec.companyName.trim() || rec.description.trim()
+           );
+  };
+
   return {
     selectedMentees,
     setSelectedMentees,
@@ -86,7 +206,11 @@ export const useJobRecommendationForm = () => {
     removeRecommendation,
     updateRecommendation,
     resetForm,
+    clearDraft,
     getWeekOptions,
-    getValidRecommendations
+    getValidRecommendations,
+    saveFormOpenState,
+    getFormOpenState,
+    hasDraftData
   };
 };

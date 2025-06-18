@@ -47,32 +47,22 @@ export const useMenteeAssignment = () => {
 
         if (assignError) {
           console.error('Error auto-assigning mentees:', assignError);
-          // Only show error if it's not a duplicate key constraint
+          // Only show error if it's not a duplicate key constraint and there are actual issues
           if (assignError.code !== '23505') {
-            toast({
-              title: "Warning",
-              description: `Could not assign ${unassignedMentees.length} mentees automatically.`,
-              variant: "destructive"
-            });
+            console.error('Non-duplicate assignment error:', assignError);
+            // No toast notification - handle silently
           } else {
-            // This is expected - mentees are already assigned, no notification needed
+            // This is expected - mentees are already assigned, completely silent
             console.log('Some mentees were already assigned (duplicate key constraint), which is expected behavior');
           }
         } else {
-          console.log('Successfully auto-assigned mentees');
-          // Remove the success toast notification - assignments happen silently
+          console.log('Successfully auto-assigned mentees silently');
+          // No notification whatsoever - assignments happen completely silently
         }
       }
     } catch (error) {
       console.error('Error in assignUnassignedMentees:', error);
-      // Don't show toast for expected duplicate errors
-      if (error && typeof error === 'object' && 'code' in error && error.code !== '23505') {
-        toast({
-          title: "Warning",
-          description: "Could not complete mentee assignments.",
-          variant: "destructive"
-        });
-      }
+      // No toast notifications for any errors - handle completely silently
     }
   };
 

@@ -10,18 +10,9 @@ import { useJobRecommendationForm } from '@/hooks/useJobRecommendationForm';
 import JobRecommendationFormSection from './JobRecommendationFormSection';
 import JobRecommendationCollapsed from './JobRecommendationCollapsed';
 
-// Local storage keys for preserving state
-const FORM_STATE_KEY = 'coach_job_recommendations_form_state';
-const FORM_OPEN_KEY = 'coach_job_recommendations_form_open';
-
 const ApplicationsJobRecommendations = () => {
   const { user } = useAuthState();
   const { toast } = useToast();
-  const [isFormOpen, setIsFormOpen] = useState(() => {
-    // Restore form open state from localStorage
-    const savedState = localStorage.getItem(FORM_OPEN_KEY);
-    return savedState ? JSON.parse(savedState) : false;
-  });
 
   const {
     selectedMentees,
@@ -33,50 +24,51 @@ const ApplicationsJobRecommendations = () => {
     removeRecommendation,
     updateRecommendation,
     resetForm,
+    clearDraft,
     getWeekOptions,
     getValidRecommendations,
-    setSelectedMentees,
-    setJobRecommendations
+    saveFormOpenState,
+    getFormOpenState,
+    hasDraftData
   } = useJobRecommendationForm();
+
+  const [isFormOpen, setIsFormOpen] = useState(() => getFormOpenState());
 
   const { addRecommendation } = useJobRecommendations({ 
     userId: user?.id || '', 
     isCoach: true 
   });
 
-  // Save form state to localStorage whenever it changes
+  // Save form open state whenever it changes
   useEffect(() => {
-    if (isFormOpen) {
-      const formState = {
-        selectedMentees,
-        weekStartDate,
-        jobRecommendations
-      };
-      localStorage.setItem(FORM_STATE_KEY, JSON.stringify(formState));
-    }
-  }, [selectedMentees, weekStartDate, jobRecommendations, isFormOpen]);
+    saveFormOpenState(isFormOpen);
+  }, [isFormOpen, saveFormOpenState]);
 
-  // Save form open state
+  // Handle page visibility changes to preserve state
   useEffect(() => {
-    localStorage.setItem(FORM_OPEN_KEY, JSON.stringify(isFormOpen));
-  }, [isFormOpen]);
-
-  // Restore form state when component mounts
-  useEffect(() => {
-    if (isFormOpen) {
-      const savedFormState = localStorage.getItem(FORM_STATE_KEY);
-      if (savedFormState) {
-        try {
-          const state = JSON.parse(savedFormState);
-          if (state.selectedMentees) setSelectedMentees(state.selectedMentees);
-          if (state.weekStartDate) setWeekStartDate(state.weekStartDate);
-          if (state.jobRecommendations) setJobRecommendations(state.jobRecommendations);
-        } catch (error) {
-          console.error('Error restoring form state:', error);
-        }
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('Page hidden - preserving form state');
+      } else {
+        console.log('Page visible - maintaining form state');
       }
-    }
-  }, [isFormOpen]);
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isFormOpen && hasDraftData()) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isFormOpen, hasDraftData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,19 +115,15 @@ const ApplicationsJobRecommendations = () => {
 
       const totalRecommendations = validRecommendations.length * selectedMentees.length;
       
-      // Show success toast without the problematic popup
       toast({
         title: "Success",
         description: `${totalRecommendations} job recommendation(s) sent successfully to ${selectedMentees.length} mentee(s).`,
       });
 
-      // Clear saved state after successful submission
-      localStorage.removeItem(FORM_STATE_KEY);
-      localStorage.removeItem(FORM_OPEN_KEY);
-      
       resetForm();
       setIsFormOpen(false);
     } catch (error) {
+      console.error('Error sending recommendations:', error);
       toast({
         title: "Error",
         description: "Failed to send job recommendations. Please try again.",
@@ -145,7 +133,7 @@ const ApplicationsJobRecommendations = () => {
   };
 
   const handleCancel = () => {
-    // Don't reset form immediately, just close it
+    // Just close the form, don't reset data
     setIsFormOpen(false);
   };
 
@@ -154,10 +142,12 @@ const ApplicationsJobRecommendations = () => {
   };
 
   const handleClearDraft = () => {
-    localStorage.removeItem(FORM_STATE_KEY);
-    localStorage.removeItem(FORM_OPEN_KEY);
-    resetForm();
+    clearDraft();
     setIsFormOpen(false);
+    toast({
+      title: "Draft Cleared",
+      description: "All draft data has been cleared.",
+    });
   };
 
   if (!isFormOpen) {
@@ -171,6 +161,11 @@ const ApplicationsJobRecommendations = () => {
           <div className="flex items-center gap-2">
             <Briefcase className="h-5 w-5" />
             Send Job Recommendations
+            {hasDraftData() && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                Draft Saved
+              </span>
+            )}
           </div>
           <div className="flex gap-2">
             <Button
