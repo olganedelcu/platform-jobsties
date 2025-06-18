@@ -109,7 +109,7 @@ const AddJobApplicationForm = ({ onAddApplication }: AddJobApplicationFormProps)
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="applied">Applied</option>
-                <option value="in_review">In Review</option>
+                <option value="to_be_considered">To Be Considered</option>
                 <option value="interviewing">Interviewing</option>
                 <option value="offer">Offer Received</option>
                 <option value="rejected">Rejected</option>

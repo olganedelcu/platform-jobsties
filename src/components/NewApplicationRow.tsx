@@ -57,7 +57,7 @@ const NewApplicationRow = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="applied">Applied</SelectItem>
-            <SelectItem value="in_review">In Review</SelectItem>
+            <SelectItem value="to_be_considered">To Be Considered</SelectItem>
             <SelectItem value="interviewing">Interviewing</SelectItem>
             <SelectItem value="offer">Offer Received</SelectItem>
             <SelectItem value="rejected">Rejected</SelectItem>

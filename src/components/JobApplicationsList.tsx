@@ -45,7 +45,7 @@ const JobApplicationsList = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
-      case 'in_review': return 'bg-yellow-100 text-yellow-800';
+      case 'to_be_considered': return 'bg-yellow-100 text-yellow-800';
       case 'interviewing': return 'bg-purple-100 text-purple-800';
       case 'offer': return 'bg-green-100 text-green-800';
       case 'rejected': return 'bg-red-100 text-red-800';
@@ -100,7 +100,7 @@ const JobApplicationsList = ({
                         className="w-full text-xs p-1 border rounded"
                       >
                         <option value="applied">Applied</option>
-                        <option value="in_review">In Review</option>
+                        <option value="to_be_considered">To Be Considered</option>
                         <option value="interviewing">Interviewing</option>
                         <option value="offer">Offer Received</option>
                         <option value="rejected">Rejected</option>
