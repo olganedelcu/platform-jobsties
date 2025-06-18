@@ -41,6 +41,9 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       
+      // Clear any existing session first
+      await supabase.auth.signOut();
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email.toLowerCase().trim(),
         password: formData.password
@@ -50,11 +53,13 @@ const LoginForm = () => {
         throw error;
       }
 
-      // Check user role and redirect appropriately
-      if (data.user) {
-        // Try to sync the user to profiles table if needed
-        const syncResult = await checkAndSyncCurrentUser();
+      if (data.user && data.session) {
+        console.log('Login successful:', data.user.id);
         
+        // Sync user to profiles table if needed
+        await checkAndSyncCurrentUser();
+        
+        // Check user role and redirect appropriately
         try {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -62,25 +67,31 @@ const LoginForm = () => {
             .eq('id', data.user.id)
             .single();
 
-          if (profileError) {
-            // Fallback to metadata
+          if (!profileError && profile) {
+            if (profile.role === 'COACH') {
+              navigate('/coach/mentees', { replace: true });
+            } else {
+              navigate('/dashboard', { replace: true });
+            }
+          } else {
+            // Fallback to metadata if profile query fails
             const userRole = data.user.user_metadata?.role;
             
             if (userRole === 'COACH') {
-              navigate('/coach/mentees');
+              navigate('/coach/mentees', { replace: true });
             } else {
-              navigate('/dashboard');
-            }
-          } else {
-            if (profile.role === 'COACH') {
-              navigate('/coach/mentees');
-            } else {
-              navigate('/dashboard');
+              navigate('/dashboard', { replace: true });
             }
           }
         } catch (profileCheckError) {
-          // Default to dashboard on profile check error
-          navigate('/dashboard');
+          console.error('Profile check error:', profileCheckError);
+          // Default redirect based on metadata
+          const userRole = data.user.user_metadata?.role;
+          if (userRole === 'COACH') {
+            navigate('/coach/mentees', { replace: true });
+          } else {
+            navigate('/dashboard', { replace: true });
+          }
         }
 
         toast({
@@ -90,6 +101,8 @@ const LoginForm = () => {
       }
       
     } catch (error: any) {
+      console.error('Login error:', error);
+      
       let errorMessage = 'Failed to sign in';
       
       if (error.message?.includes('Invalid login credentials')) {
@@ -98,6 +111,8 @@ const LoginForm = () => {
         errorMessage = 'Please check your email and click the confirmation link before signing in.';
       } else if (error.message?.includes('Too many requests')) {
         errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+      } else if (error.message?.includes('Network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -125,6 +140,7 @@ const LoginForm = () => {
           required
           placeholder="Enter your email"
           className="border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+          disabled={isLoading}
         />
       </div>
       <div className="space-y-2">
@@ -138,6 +154,7 @@ const LoginForm = () => {
           required
           placeholder="Enter your password"
           className="border-gray-200 focus:border-indigo-500 focus:ring-indigo-500"
+          disabled={isLoading}
         />
       </div>
       <Button
