@@ -1,37 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import React from 'react';
+import { useAuthState } from '@/hooks/useAuthState';
 import SessionsHeader from '@/components/coach/SessionsHeader';
 import CoachSessionsList from '@/components/coach/CoachSessionsList';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { useCoachSessions } from '@/hooks/useCoachSessions';
 
 const CoachSessions = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-          navigate('/coach/login');
-          return;
-        }
-        
-        setUser(session.user);
-        setLoading(false);
-      } catch (error) {
-        console.error('Auth check error:', error);
-        navigate('/coach/login');
-      }
-    };
-
-    checkUser();
-  }, [navigate]);
+  const { user, loading } = useAuthState();
 
   const { 
     sessions, 

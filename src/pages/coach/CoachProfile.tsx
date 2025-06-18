@@ -1,13 +1,13 @@
 
 import React from 'react';
-import CoachNavigation from '@/components/CoachNavigation';
 import ProfileCard from '@/components/ProfileCard';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useProfileData } from '@/hooks/useProfileData';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
+import PageWrapper from '@/components/layout/PageWrapper';
 
 const CoachProfile = () => {
-  const { user, loading: authLoading, handleSignOut } = useAuthState();
+  const { user, loading: authLoading } = useAuthState();
   const {
     profileData,
     profilePicture,
@@ -20,11 +20,7 @@ const CoachProfile = () => {
   } = useProfileData(user);
 
   if (authLoading || profileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <PageWrapper loading={true} />;
   }
 
   if (!user) {
@@ -34,8 +30,6 @@ const CoachProfile = () => {
   return (
     <ProtectedCoachRoute>
       <div className="min-h-screen bg-gray-50">
-        <CoachNavigation user={user} onSignOut={handleSignOut} />
-        
         <main className="max-w-7xl mx-auto py-8 px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Information */}

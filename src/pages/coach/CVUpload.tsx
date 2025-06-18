@@ -2,18 +2,14 @@
 import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
 import ProtectedCoachRoute from '@/components/ProtectedCoachRoute';
-import CoachNavigation from '@/components/CoachNavigation';
 import CVUploadContent from '@/components/CVUploadContent';
+import PageWrapper from '@/components/layout/PageWrapper';
 
 const CVUpload = () => {
-  const { user, loading, handleSignOut } = useAuthState();
+  const { user, loading } = useAuthState();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <PageWrapper loading={true} />;
   }
 
   if (!user) {
@@ -23,7 +19,6 @@ const CVUpload = () => {
   return (
     <ProtectedCoachRoute>
       <div className="min-h-screen bg-gray-50">
-        <CoachNavigation user={user} onSignOut={handleSignOut} />
         <CVUploadContent />
       </div>
     </ProtectedCoachRoute>

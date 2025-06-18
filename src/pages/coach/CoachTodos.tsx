@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import CoachNavigation from '@/components/CoachNavigation';
 import TodoList from '@/components/TodoList';
+import PageWrapper from '@/components/layout/PageWrapper';
 
 interface Mentee {
   id: string;
@@ -79,26 +79,8 @@ const CoachTodos = () => {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate('/coach-login');
-    } catch (error: any) {
-      console.error('Sign out error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive"
-      });
-    }
-  };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">Loading...</div>
-      </div>
-    );
+    return <PageWrapper loading={true} />;
   }
 
   if (!user) {
@@ -107,8 +89,6 @@ const CoachTodos = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <CoachNavigation user={user} onSignOut={handleSignOut} />
-      
       <main className="max-w-7xl mx-auto py-8 px-6">
         <TodoList mentees={mentees} coachId={user.id} />
       </main>

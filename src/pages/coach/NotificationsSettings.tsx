@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { useAuthState } from '@/hooks/useAuthState';
-import CoachNavigation from '@/components/CoachNavigation';
 import FormspreeConfiguration from '@/components/FormspreeConfiguration';
+import PageWrapper from '@/components/layout/PageWrapper';
 
 const NotificationsSettings = () => {
-  const { user, loading, handleSignOut } = useAuthState();
+  const { user, loading } = useAuthState();
 
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 animate-pulse" />;
+    return <PageWrapper loading={true} />;
   }
 
   if (!user) {
@@ -17,8 +17,6 @@ const NotificationsSettings = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <CoachNavigation user={user} onSignOut={handleSignOut} />
-      
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Notifications Settings</h1>
