@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
 import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
@@ -149,4 +150,35 @@ export const cancelSession = async (sessionId: string) => {
     console.error('Error cancelling session:', error);
     throw error;
   }
+};
+
+// New function to create a session from coach side
+export const createCoachSession = async (coachId: string, sessionData: {
+  menteeId: string;
+  sessionType: string;
+  sessionDate: string;
+  duration: number;
+  notes?: string;
+}) => {
+  const { data, error } = await supabase
+    .from('coaching_sessions')
+    .insert({
+      coach_id: coachId,
+      mentee_id: sessionData.menteeId,
+      session_type: sessionData.sessionType,
+      session_date: sessionData.sessionDate,
+      duration: sessionData.duration,
+      notes: sessionData.notes,
+      status: 'confirmed', // Coach-created sessions are automatically confirmed
+      meeting_link: `https://meet.google.com/${Math.random().toString(36).substring(2, 10)}`
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating coach session:', error);
+    throw error;
+  }
+
+  return data;
 };
