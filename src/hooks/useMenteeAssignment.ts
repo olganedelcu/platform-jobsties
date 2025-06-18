@@ -55,15 +55,12 @@ export const useMenteeAssignment = () => {
               variant: "destructive"
             });
           } else {
-            // This is expected - mentees are already assigned
+            // This is expected - mentees are already assigned, no notification needed
             console.log('Some mentees were already assigned (duplicate key constraint), which is expected behavior');
           }
         } else {
           console.log('Successfully auto-assigned mentees');
-          toast({
-            title: "Success",
-            description: `Assigned ${unassignedMentees.length} new mentees to you.`,
-          });
+          // Remove the success toast notification - assignments happen silently
         }
       }
     } catch (error) {

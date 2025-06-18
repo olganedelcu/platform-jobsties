@@ -71,9 +71,9 @@ const JobRecommendationsList = ({
               </label>
             </div>
 
-            {uniqueRecommendations.map((recommendation) => (
+            {uniqueRecommendations.map((recommendation, index) => (
               <JobRecommendationCard
-                key={`${recommendation.job_title}-${recommendation.company_name}`}
+                key={`${recommendation.job_title}-${recommendation.company_name}-${recommendation.job_link}-${index}`}
                 recommendation={recommendation}
                 menteeNames={menteeNames}
                 selectedAssignments={selectedAssignments}
