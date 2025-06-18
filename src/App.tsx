@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -22,7 +21,6 @@ const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
 const CVUpload = lazy(() => import("./pages/coach/CVUpload"));
 const CoachSessions = lazy(() => import("./pages/coach/CoachSessions"));
 const Mentees = lazy(() => import("./pages/coach/Mentees"));
-const CoachSettings = lazy(() => import("./pages/coach/CoachSettings"));
 const CoachProfile = lazy(() => import("./pages/coach/CoachProfile"));
 const CoachTodos = lazy(() => import("./pages/coach/CoachTodos"));
 const Applications = lazy(() => import("./pages/coach/Applications"));
