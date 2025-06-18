@@ -38,31 +38,14 @@ const Sessions = () => {
         
         console.log('User authenticated:', session.user.id);
         setUser(session.user);
+        setAuthLoading(false);
       } catch (error) {
         console.error('Auth check error:', error);
         navigate('/login');
-      } finally {
-        setAuthLoading(false);
       }
     };
 
     checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-        } else {
-          setUser(null);
-          if (event === 'SIGNED_OUT') {
-            navigate('/login');
-          }
-        }
-        setAuthLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const handleScheduleSession = async (sessionData: any) => {

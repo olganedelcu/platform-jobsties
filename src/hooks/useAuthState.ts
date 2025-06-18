@@ -11,16 +11,17 @@ export const useAuthState = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const hasInitialized = useRef(false);
-  const isCheckingUser = useRef(false);
+  const navigationInProgress = useRef(false);
 
   useEffect(() => {
-    const checkUser = async () => {
-      if (isCheckingUser.current) return;
-      isCheckingUser.current = true;
+    let isMounted = true;
 
+    const initializeAuth = async () => {
       try {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
+        if (!isMounted) return;
+
         if (error) {
           console.error('Session check error:', error);
           setUser(null);
@@ -33,85 +34,45 @@ export const useAuthState = () => {
         setLoading(false);
         hasInitialized.current = true;
 
-        // Handle redirects only after user state is set
-        if (!currentSession) {
-          const protectedPaths = ['/dashboard', '/coach/', '/tracker', '/sessions', '/messages', '/profile', '/todos'];
-          const isOnProtectedPath = protectedPaths.some(path => 
-            location.pathname.startsWith(path) || location.pathname === path
-          );
-          
-          if (isOnProtectedPath && 
-              location.pathname !== '/' && 
-              location.pathname !== '/login' && 
-              location.pathname !== '/signup' &&
-              !location.pathname.startsWith('/coach/login') &&
-              !location.pathname.startsWith('/coach/signup')) {
-            navigate('/login', { replace: true });
-          }
-        }
       } catch (error) {
-        console.error('Auth check error:', error);
-        setUser(null);
-        setSession(null);
-        setLoading(false);
-        hasInitialized.current = true;
-      } finally {
-        isCheckingUser.current = false;
+        console.error('Auth initialization error:', error);
+        if (isMounted) {
+          setUser(null);
+          setSession(null);
+          setLoading(false);
+          hasInitialized.current = true;
+        }
       }
     };
 
-    // Set up auth state listener FIRST
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
+        if (!isMounted) return;
+        
         console.log('Auth state change:', event, newSession?.user?.id);
         
         setSession(newSession);
         setUser(newSession?.user || null);
         
-        if (event === 'SIGNED_IN' && newSession?.user) {
-          const isDifferentUser = !user || user.id !== newSession.user.id;
+        if (event === 'SIGNED_IN' && newSession?.user && !navigationInProgress.current) {
+          navigationInProgress.current = true;
           
-          if (isDifferentUser || !hasInitialized.current) {
-            setLoading(false);
-            hasInitialized.current = true;
-            
-            // Only redirect on actual SIGNED_IN event
-            const currentPath = location.pathname;
+          // Simple redirect logic without complex profile checks
+          setTimeout(() => {
             const userRole = newSession.user.user_metadata?.role;
             
-            // Don't redirect if already on the correct dashboard
-            const isOnCorrectPage = (
-              (userRole === 'COACH' && currentPath.startsWith('/coach/')) ||
-              (userRole !== 'COACH' && (currentPath === '/dashboard' || currentPath.startsWith('/dashboard')))
-            );
-
-            if (!isOnCorrectPage) {
-              try {
-                const { data: profile } = await supabase
-                  .from('profiles')
-                  .select('role')
-                  .eq('id', newSession.user.id)
-                  .single();
-                
-                if (profile?.role === 'COACH') {
-                  navigate('/coach/mentees', { replace: true });
-                } else {
-                  navigate('/dashboard', { replace: true });
-                }
-              } catch (error) {
-                console.error('Profile fetch error during redirect:', error);
-                // Fallback to metadata
-                if (userRole === 'COACH') {
-                  navigate('/coach/mentees', { replace: true });
-                } else {
-                  navigate('/dashboard', { replace: true });
-                }
-              }
+            if (userRole === 'COACH') {
+              navigate('/coach/mentees', { replace: true });
+            } else {
+              navigate('/dashboard', { replace: true });
             }
-          }
+            
+            navigationInProgress.current = false;
+          }, 100);
+          
         } else if (event === 'SIGNED_OUT') {
-          setLoading(false);
-          hasInitialized.current = true;
+          navigationInProgress.current = false;
           
           try {
             localStorage.removeItem('coach-applications-selected');
@@ -121,7 +82,6 @@ export const useAuthState = () => {
             console.error('Cleanup error:', error);
           }
           
-          // Check if it's a coach based on current path and redirect appropriately
           if (location.pathname.startsWith('/coach/')) {
             navigate('/coach/login', { replace: true });
           } else {
@@ -136,17 +96,23 @@ export const useAuthState = () => {
       }
     );
 
-    // THEN check for existing session if not already initialized
+    // Initialize auth state
     if (!hasInitialized.current) {
-      checkUser();
+      initializeAuth();
     }
 
-    return () => subscription.unsubscribe();
-  }, [navigate, location.pathname, user]);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, location.pathname]);
 
   const handleSignOut = async () => {
+    if (navigationInProgress.current) return;
+    
     try {
       setLoading(true);
+      navigationInProgress.current = true;
       
       try {
         localStorage.removeItem('coach-applications-selected');
@@ -156,7 +122,6 @@ export const useAuthState = () => {
         console.error('Cleanup error:', error);
       }
       
-      // Check if it's a coach based on current path
       const isCoach = location.pathname.startsWith('/coach/');
       
       const { error } = await supabase.auth.signOut();
@@ -174,6 +139,7 @@ export const useAuthState = () => {
       console.error('Sign out error:', error);
     } finally {
       setLoading(false);
+      navigationInProgress.current = false;
     }
   };
 

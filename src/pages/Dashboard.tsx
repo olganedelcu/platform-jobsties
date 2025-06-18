@@ -23,24 +23,13 @@ const Dashboard = memo(() => {
         }
         
         setUser(session.user);
+        setLoading(false);
       } catch (error) {
         navigate('/login');
-      } finally {
-        setLoading(false);
       }
     };
 
     checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        navigate('/login');
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   if (loading || !user) {

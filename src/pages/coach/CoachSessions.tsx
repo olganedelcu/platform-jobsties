@@ -18,36 +18,19 @@ const CoachSessions = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          navigate('/login');
+          navigate('/coach/login');
           return;
         }
         
         setUser(session.user);
+        setLoading(false);
       } catch (error) {
         console.error('Auth check error:', error);
-        navigate('/login');
-      } finally {
-        setLoading(false);
+        navigate('/coach/login');
       }
     };
 
     checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-        } else {
-          setUser(null);
-          if (event === 'SIGNED_OUT') {
-            navigate('/login');
-          }
-        }
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const { 

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { checkAndSyncCurrentUser } from '@/utils/profileSyncUtils';
 import LoginFooter from './LoginFooter';
 
 const LoginForm = () => {
@@ -41,9 +40,6 @@ const LoginForm = () => {
     try {
       setIsLoading(true);
       
-      // Clear any existing session first
-      await supabase.auth.signOut();
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email.toLowerCase().trim(),
         password: formData.password
@@ -56,48 +52,12 @@ const LoginForm = () => {
       if (data.user && data.session) {
         console.log('Login successful:', data.user.id);
         
-        // Sync user to profiles table if needed
-        await checkAndSyncCurrentUser();
-        
-        // Check user role and redirect appropriately
-        try {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
-
-          if (!profileError && profile) {
-            if (profile.role === 'COACH') {
-              navigate('/coach/mentees', { replace: true });
-            } else {
-              navigate('/dashboard', { replace: true });
-            }
-          } else {
-            // Fallback to metadata if profile query fails
-            const userRole = data.user.user_metadata?.role;
-            
-            if (userRole === 'COACH') {
-              navigate('/coach/mentees', { replace: true });
-            } else {
-              navigate('/dashboard', { replace: true });
-            }
-          }
-        } catch (profileCheckError) {
-          console.error('Profile check error:', profileCheckError);
-          // Default redirect based on metadata
-          const userRole = data.user.user_metadata?.role;
-          if (userRole === 'COACH') {
-            navigate('/coach/mentees', { replace: true });
-          } else {
-            navigate('/dashboard', { replace: true });
-          }
-        }
-
         toast({
           title: "Success",
           description: "Welcome back!",
         });
+        
+        // Let the auth state change handler handle the redirect
       }
       
     } catch (error: any) {
