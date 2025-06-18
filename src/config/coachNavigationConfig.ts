@@ -6,8 +6,7 @@ import {
   Calendar,
   CheckSquare,
   Upload,
-  Briefcase,
-  Bell
+  Briefcase
 } from 'lucide-react';
 
 export const navItems = [
@@ -22,6 +21,5 @@ export const navItems = [
 export const settingsItems = [
   { path: '/coach/calendar', label: 'Calendar', icon: Calendar },
   { path: '/coach/cv-upload', label: 'CV Upload', icon: Upload },
-  { path: '/coach/notifications', label: 'Notifications', icon: Bell },
   { path: '/coach/backup', label: 'Backup', icon: FileText },
 ];
