@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { List, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
+import { List, CheckCircle, XCircle, Clock, Loader2, AlertCircle } from 'lucide-react';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 import ExcelLikeJobApplicationsTable from '@/components/ExcelLikeJobApplicationsTable';
 
@@ -12,6 +12,7 @@ interface TrackerTabsProps {
   statistics: {
     totalApplications: number;
     appliedCount: number;
+    toBeConsideredCount: number;
     interviewingCount: number;
     rejectedCount: number;
   };
@@ -47,7 +48,7 @@ const TrackerTabs = memo(({
     <div className="bg-white rounded-lg border shadow-sm">
       <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
         <div className="p-4 border-b">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="all" className="flex items-center gap-2">
               <List className="h-4 w-4" />
               All
@@ -63,6 +64,15 @@ const TrackerTabs = memo(({
               {statistics.appliedCount > 0 && (
                 <Badge variant="secondary" className="ml-1">
                   {statistics.appliedCount}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="to_be_considered" className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              To Be Considered
+              {statistics.toBeConsideredCount > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {statistics.toBeConsideredCount}
                 </Badge>
               )}
             </TabsTrigger>
@@ -98,6 +108,16 @@ const TrackerTabs = memo(({
         </TabsContent>
 
         <TabsContent value="applied" className="mt-0">
+          <ExcelLikeJobApplicationsTable
+            applications={filteredApplications}
+            onAddApplication={onAddApplication}
+            onUpdateApplication={onUpdateApplication}
+            onDeleteApplication={onDeleteApplication}
+            isCoachView={false}
+          />
+        </TabsContent>
+
+        <TabsContent value="to_be_considered" className="mt-0">
           <ExcelLikeJobApplicationsTable
             applications={filteredApplications}
             onAddApplication={onAddApplication}

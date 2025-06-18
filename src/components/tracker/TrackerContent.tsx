@@ -13,6 +13,7 @@ interface TrackerContentProps {
   statistics: {
     totalApplications: number;
     appliedCount: number;
+    toBeConsideredCount: number;
     interviewingCount: number;
     rejectedCount: number;
     offersCount: number;
