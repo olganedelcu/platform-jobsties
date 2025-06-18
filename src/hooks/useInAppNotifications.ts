@@ -18,12 +18,39 @@ export const useInAppNotifications = () => {
   const [notifications, setNotifications] = useState<InAppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const getActionUrl = (notificationType: string, role: string | null) => {
+    switch (notificationType) {
+      case 'message':
+        return role === 'COACH' ? '/coach/messages' : '/messages';
+      case 'todo_assignment':
+        return '/todos';
+      case 'session':
+        return '/sessions';
+      case 'job_recommendation':
+        return '/dashboard';
+      case 'file_upload':
+        return '/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Get user role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      setUserRole(profile?.role || 'MENTEE');
 
       // Use the correct table name from the migration: notifications
       const { data, error } = await supabase
@@ -45,7 +72,7 @@ export const useInAppNotifications = () => {
         type: notification.notification_type || 'general',
         isRead: notification.is_read,
         createdAt: notification.created_at,
-        actionUrl: '/coach/messages', // Default action for message notifications
+        actionUrl: getActionUrl(notification.notification_type || 'general', profile?.role || 'MENTEE'),
         metadata: {}
       }));
 
@@ -153,7 +180,7 @@ export const useInAppNotifications = () => {
               type: payload.new.notification_type || 'general',
               isRead: payload.new.is_read,
               createdAt: payload.new.created_at,
-              actionUrl: '/coach/messages',
+              actionUrl: getActionUrl(payload.new.notification_type || 'general', userRole),
               metadata: {}
             };
 
@@ -175,7 +202,7 @@ export const useInAppNotifications = () => {
     };
 
     setupRealtimeListener();
-  }, [toast]);
+  }, [toast, userRole]);
 
   return {
     notifications,

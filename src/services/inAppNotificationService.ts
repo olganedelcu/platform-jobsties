@@ -70,6 +70,15 @@ export const InAppNotificationService = {
     userId: string,
     messagePreview: string
   ): Promise<void> {
+    // Get user role to determine correct action URL
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    
+    const actionUrl = profile?.role === 'COACH' ? '/coach/messages' : '/messages';
+
     await this.createNotification({
       userId,
       title: 'New Message',
@@ -77,7 +86,7 @@ export const InAppNotificationService = {
         messagePreview.substring(0, 100) + '...' : 
         messagePreview,
       type: 'message',
-      actionUrl: '/coach/messages',
+      actionUrl,
       metadata: { messagePreview }
     });
   },
