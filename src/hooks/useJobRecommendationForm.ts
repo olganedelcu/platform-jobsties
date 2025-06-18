@@ -81,6 +81,7 @@ export const useJobRecommendationForm = () => {
     weekStartDate,
     setWeekStartDate,
     jobRecommendations,
+    setJobRecommendations,
     addNewRecommendation,
     removeRecommendation,
     updateRecommendation,
