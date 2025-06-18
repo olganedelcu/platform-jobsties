@@ -25,6 +25,7 @@ interface MenteeTodosSectionProps {
   todosLoading?: boolean;
   onUpdateStatus?: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo?: (todoId: string) => void;
+  onUpdateTodo?: (todoId: string, updates: any) => void;
 }
 
 const MenteeTodosSection = ({
@@ -42,7 +43,8 @@ const MenteeTodosSection = ({
   todos,
   todosLoading,
   onUpdateStatus,
-  onDeleteTodo
+  onDeleteTodo,
+  onUpdateTodo
 }: MenteeTodosSectionProps) => {
   return (
     <div>
@@ -101,6 +103,7 @@ const MenteeTodosSection = ({
           onCancelAdd={onCancelAdd || (() => {})}
           onUpdateStatus={onUpdateStatus || (() => {})}
           onDeleteTodo={onDeleteTodo || (() => {})}
+          onUpdateTodo={onUpdateTodo}
         />
       )}
     </div>

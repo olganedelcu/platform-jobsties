@@ -18,6 +18,7 @@ interface MenteeTodosAllTabContentProps {
   onCancelAdd: () => void;
   onUpdateStatus: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo: (todoId: string) => void;
+  onUpdateTodo: (todoId: string, updates: any) => void;
 }
 
 const MenteeTodosAllTabContent = ({
@@ -35,7 +36,8 @@ const MenteeTodosAllTabContent = ({
   onAddTodo,
   onCancelAdd,
   onUpdateStatus,
-  onDeleteTodo
+  onDeleteTodo,
+  onUpdateTodo
 }: MenteeTodosAllTabContentProps) => {
   return (
     <div className="space-y-8">
@@ -69,6 +71,7 @@ const MenteeTodosAllTabContent = ({
         todosLoading={todosLoading}
         onUpdateStatus={onUpdateStatus}
         onDeleteTodo={onDeleteTodo}
+        onUpdateTodo={onUpdateTodo}
       />
     </div>
   );
