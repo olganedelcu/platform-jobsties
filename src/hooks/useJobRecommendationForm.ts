@@ -64,7 +64,7 @@ export const useJobRecommendationForm = () => {
     }
   }, []);
 
-  // Debounced save to localStorage
+  // Debounced save to localStorage - more aggressive saving
   const debouncedSave = () => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -85,7 +85,7 @@ export const useJobRecommendationForm = () => {
       } catch (error) {
         console.error('Error saving form state:', error);
       }
-    }, 1000); // Save after 1 second of inactivity
+    }, 500); // Reduced from 1000ms to 500ms for more frequent saving
   };
 
   // Auto-save form state when data changes
@@ -98,6 +98,54 @@ export const useJobRecommendationForm = () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
+    };
+  }, [selectedMentees, weekStartDate, jobRecommendations]);
+
+  // Save immediately when page is about to unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isInitialized.current) {
+        try {
+          const formState = {
+            selectedMentees,
+            weekStartDate,
+            jobRecommendations,
+            timestamp: Date.now()
+          };
+          
+          localStorage.setItem(FORM_STATE_KEY, JSON.stringify(formState));
+          console.log('Form state saved on page unload');
+        } catch (error) {
+          console.error('Error saving form state on unload:', error);
+        }
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && isInitialized.current) {
+        // Save immediately when tab becomes hidden
+        try {
+          const formState = {
+            selectedMentees,
+            weekStartDate,
+            jobRecommendations,
+            timestamp: Date.now()
+          };
+          
+          localStorage.setItem(FORM_STATE_KEY, JSON.stringify(formState));
+          console.log('Form state saved on visibility change');
+        } catch (error) {
+          console.error('Error saving form state on visibility change:', error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [selectedMentees, weekStartDate, jobRecommendations]);
 
@@ -151,6 +199,7 @@ export const useJobRecommendationForm = () => {
   const saveFormOpenState = (isOpen: boolean) => {
     try {
       localStorage.setItem(FORM_OPEN_KEY, JSON.stringify(isOpen));
+      console.log('Form open state saved:', isOpen);
     } catch (error) {
       console.error('Error saving form open state:', error);
     }
@@ -159,7 +208,9 @@ export const useJobRecommendationForm = () => {
   const getFormOpenState = (): boolean => {
     try {
       const savedState = localStorage.getItem(FORM_OPEN_KEY);
-      return savedState ? JSON.parse(savedState) : false;
+      const isOpen = savedState ? JSON.parse(savedState) : false;
+      console.log('Retrieved form open state:', isOpen);
+      return isOpen;
     } catch (error) {
       console.error('Error reading form open state:', error);
       return false;

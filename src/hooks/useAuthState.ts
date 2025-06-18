@@ -55,21 +55,33 @@ export const useAuthState = () => {
         setSession(newSession);
         setUser(newSession?.user || null);
         
-        if (event === 'SIGNED_IN' && newSession?.user && !navigationInProgress.current) {
-          navigationInProgress.current = true;
+        // Only handle navigation for actual auth events, not initial session loading
+        if (event === 'SIGNED_IN' && newSession?.user && !navigationInProgress.current && hasInitialized.current) {
+          // Only navigate if we're on an auth page or the current page doesn't match the user's role
+          const isOnAuthPage = location.pathname === '/' || 
+                              location.pathname === '/login' || 
+                              location.pathname === '/signup' ||
+                              location.pathname === '/coach/login' ||
+                              location.pathname === '/coach/signup';
+                              
+          const userRole = newSession.user.user_metadata?.role;
+          const isCoachOnCoachPage = userRole === 'COACH' && location.pathname.startsWith('/coach/');
+          const isMenteeOnMenteePage = userRole !== 'COACH' && !location.pathname.startsWith('/coach/');
           
-          // Simple redirect logic without complex profile checks
-          setTimeout(() => {
-            const userRole = newSession.user.user_metadata?.role;
+          // Only navigate if user is on wrong page type or auth page
+          if (isOnAuthPage || (!isCoachOnCoachPage && !isMenteeOnMenteePage)) {
+            navigationInProgress.current = true;
             
-            if (userRole === 'COACH') {
-              navigate('/coach/mentees', { replace: true });
-            } else {
-              navigate('/dashboard', { replace: true });
-            }
-            
-            navigationInProgress.current = false;
-          }, 100);
+            setTimeout(() => {
+              if (userRole === 'COACH') {
+                navigate('/coach/mentees', { replace: true });
+              } else {
+                navigate('/dashboard', { replace: true });
+              }
+              
+              navigationInProgress.current = false;
+            }, 100);
+          }
           
         } else if (event === 'SIGNED_OUT') {
           navigationInProgress.current = false;
