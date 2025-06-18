@@ -31,28 +31,30 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Navigation user={user} onSignOut={handleSignOut} />
       
-      <main className="max-w-7xl mx-auto py-8 px-6">
+      <main className="max-w-7xl mx-auto py-8 px-6 pt-24">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Information */}
           <div className="lg:col-span-1">
-            <ProfileCard
-              profileData={profileData}
-              profilePicture={profilePicture}
-              isEditing={isEditing}
-              onEdit={() => setIsEditing(true)}
-              onSave={handleSaveProfile}
-              onCancel={() => setIsEditing(false)}
-              onInputChange={handleInputChange}
-              onProfilePictureUpload={handleProfilePictureUpload}
-            />
+            <div className="p-4">
+              <ProfileCard
+                profileData={profileData}
+                profilePicture={profilePicture}
+                isEditing={isEditing}
+                onEdit={() => setIsEditing(true)}
+                onSave={handleSaveProfile}
+                onCancel={() => setIsEditing(false)}
+                onInputChange={handleInputChange}
+                onProfilePictureUpload={handleProfilePictureUpload}
+              />
+            </div>
           </div>
           
           {/* Content Area - Ready for your form with questions */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-8">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 Career Goals & Questions
               </h3>
