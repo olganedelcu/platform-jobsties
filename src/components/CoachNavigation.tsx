@@ -5,7 +5,6 @@ import CoachDesktopNavigation from './navigation/CoachDesktopNavigation';
 import CoachUserProfile from './navigation/CoachUserProfile';
 import CoachMobileMenuToggle from './navigation/CoachMobileMenuToggle';
 import CoachMobileNavigation from './navigation/CoachMobileNavigation';
-import NotificationDropdown from './notifications/NotificationDropdown';
 
 interface CoachNavigationProps {
   user: any;
@@ -25,7 +24,6 @@ const CoachNavigation = ({ user, onSignOut }: CoachNavigationProps) => {
           <CoachDesktopNavigation />
           
           <div className="hidden md:flex md:items-center md:space-x-6">
-            <NotificationDropdown />
             <CoachUserProfile user={user} onSignOut={onSignOut} />
           </div>
 
