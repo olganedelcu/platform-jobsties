@@ -14,6 +14,7 @@ const CommunityFeed = ({ userId }: CommunityFeedProps) => {
   const { data: posts, isLoading, refetch } = useQuery({
     queryKey: ['community-posts'],
     queryFn: async () => {
+      console.log('Fetching community posts...');
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -29,7 +30,12 @@ const CommunityFeed = ({ userId }: CommunityFeedProps) => {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching posts:', error);
+        throw error;
+      }
+      
+      console.log('Fetched posts:', data);
       return data;
     },
   });

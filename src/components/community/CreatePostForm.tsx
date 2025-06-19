@@ -33,6 +33,7 @@ const CreatePostForm = ({ userId }: CreatePostFormProps) => {
     setIsSubmitting(true);
 
     try {
+      console.log('Creating post for user:', userId);
       const { error } = await supabase
         .from('posts')
         .insert({
@@ -41,7 +42,10 @@ const CreatePostForm = ({ userId }: CreatePostFormProps) => {
           image_url: imageUrl.trim() || null,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating post:', error);
+        throw error;
+      }
 
       toast({
         title: "Post created!",
@@ -50,6 +54,9 @@ const CreatePostForm = ({ userId }: CreatePostFormProps) => {
 
       setContent('');
       setImageUrl('');
+      
+      // Trigger a refresh of the community feed
+      window.location.reload();
     } catch (error) {
       console.error('Error creating post:', error);
       toast({

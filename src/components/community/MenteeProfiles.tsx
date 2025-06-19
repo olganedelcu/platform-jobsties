@@ -15,6 +15,7 @@ const MenteeProfiles = ({ currentUserId }: MenteeProfilesProps) => {
   const { data: mentees, isLoading } = useQuery({
     queryKey: ['mentee-profiles'],
     queryFn: async () => {
+      console.log('Fetching mentee profiles...');
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -27,7 +28,12 @@ const MenteeProfiles = ({ currentUserId }: MenteeProfilesProps) => {
         .eq('role', 'MENTEE')
         .neq('id', currentUserId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching mentee profiles:', error);
+        throw error;
+      }
+      
+      console.log('Fetched mentee profiles:', data);
       return data;
     },
   });
