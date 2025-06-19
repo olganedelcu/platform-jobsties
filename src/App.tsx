@@ -16,6 +16,7 @@ const Sessions = lazy(() => import("./pages/Sessions"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Tracker = lazy(() => import("./pages/Tracker"));
 const Course = lazy(() => import("./pages/Course"));
+const Community = lazy(() => import("./pages/Community"));
 const CoachSignUp = lazy(() => import("./pages/CoachSignUp"));
 const CoachLogin = lazy(() => import("./pages/CoachLogin"));
 const CoachDashboard = lazy(() => import("./pages/CoachDashboard"));
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/tracker" element={<Tracker />} />
               <Route path="/application/:id" element={<ApplicationDetail />} />
               <Route path="/course" element={<Course />} />
+              <Route path="/community" element={<Community />} />
               <Route path="/todos" element={<MenteeTodosPage />} />
               
               {/* Coach Routes */}
