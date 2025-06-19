@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,8 @@ import {
   MessageSquare,
   FileText,
   BookOpen,
-  Calendar
+  Calendar,
+  Users
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import DesktopNavigation from './DesktopNavigation';
@@ -34,6 +36,7 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
     { path: '/tracker', label: 'Tracker', icon: FileText },
     { path: '/sessions', label: 'Sessions', icon: Calendar },
     { path: '/todos', label: 'Tasks', icon: FileText },
+    { path: '/community', label: 'Community', icon: Users },
     { path: '/messages', label: 'Chat', icon: MessageSquare }
   ];
 
