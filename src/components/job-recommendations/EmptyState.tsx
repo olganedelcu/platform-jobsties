@@ -13,7 +13,7 @@ const EmptyState = ({ type }: EmptyStateProps) => {
         return {
           icon: <Briefcase className="h-16 w-16 mx-auto mb-4 text-gray-300" />,
           title: 'No Active Recommendations',
-          description: 'All your job recommendations have been applied to or archived.'
+          description: ''
         };
       case 'no-applied-recommendations':
         return {
@@ -48,7 +48,7 @@ const EmptyState = ({ type }: EmptyStateProps) => {
     <div className="text-center py-12 text-gray-500">
       {icon}
       <h3 className="text-lg font-medium mb-2">{title}</h3>
-      <p className="text-sm">{description}</p>
+      {description && <p className="text-sm">{description}</p>}
     </div>
   );
 };
