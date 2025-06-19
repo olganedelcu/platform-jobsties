@@ -66,65 +66,47 @@ const EnhancedRecommendationsTabs = ({
       </TabsList>
 
       <TabsContent value="active" className="mt-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Active Job Recommendations</h3>
-            <Badge variant="outline">{recommendations.active.length}</Badge>
-          </div>
-          <div className="max-h-[400px] overflow-y-auto">
-            <EnhancedRecommendationsList
-              recommendations={recommendations.active}
-              loading={loading}
-              actionLoading={actionLoading}
-              emptyType="no-active-recommendations"
-              onViewJob={onViewJob}
-              onMarkAsApplied={onMarkAsApplied}
-              onArchive={onArchive}
-              onReactivate={onReactivate}
-            />
-          </div>
+        <div className="max-h-[400px] overflow-y-auto">
+          <EnhancedRecommendationsList
+            recommendations={recommendations.active}
+            loading={loading}
+            actionLoading={actionLoading}
+            emptyType="no-active-recommendations"
+            onViewJob={onViewJob}
+            onMarkAsApplied={onMarkAsApplied}
+            onArchive={onArchive}
+            onReactivate={onReactivate}
+          />
         </div>
       </TabsContent>
 
       <TabsContent value="applied" className="mt-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">Applied Jobs</h3>
-            <Badge variant="outline">{recommendations.applied.length}</Badge>
-          </div>
-          <div className="max-h-[400px] overflow-y-auto">
-            <EnhancedRecommendationsList
-              recommendations={recommendations.applied}
-              loading={loading}
-              actionLoading={actionLoading}
-              emptyType="no-applied-recommendations"
-              onViewJob={onViewJob}
-              onMarkAsApplied={onMarkAsApplied}
-              onArchive={onArchive}
-              onReactivate={onReactivate}
-            />
-          </div>
+        <div className="max-h-[400px] overflow-y-auto">
+          <EnhancedRecommendationsList
+            recommendations={recommendations.applied}
+            loading={loading}
+            actionLoading={actionLoading}
+            emptyType="no-applied-recommendations"
+            onViewJob={onViewJob}
+            onMarkAsApplied={onMarkAsApplied}
+            onArchive={onArchive}
+            onReactivate={onReactivate}
+          />
         </div>
       </TabsContent>
 
       <TabsContent value="all" className="mt-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium">All Job Recommendations</h3>
-            <Badge variant="outline">{recommendations.all.length}</Badge>
-          </div>
-          <div className="max-h-[400px] overflow-y-auto">
-            <EnhancedRecommendationsList
-              recommendations={recommendations.all}
-              loading={loading}
-              actionLoading={actionLoading}
-              emptyType="no-recommendations"
-              onViewJob={onViewJob}
-              onMarkAsApplied={onMarkAsApplied}
-              onArchive={onArchive}
-              onReactivate={onReactivate}
-            />
-          </div>
+        <div className="max-h-[400px] overflow-y-auto">
+          <EnhancedRecommendationsList
+            recommendations={recommendations.all}
+            loading={loading}
+            actionLoading={actionLoading}
+            emptyType="no-recommendations"
+            onViewJob={onViewJob}
+            onMarkAsApplied={onMarkAsApplied}
+            onArchive={onArchive}
+            onReactivate={onReactivate}
+          />
         </div>
       </TabsContent>
     </Tabs>
