@@ -21,10 +21,10 @@ export const courseModules: CourseModuleData[] = [
   },
   {
     title: 'Job Search Strategy',
-    description: 'Develop an effective job search approach',
+    description: '',
     icon: Search,
     completed: false,
-    locked: false, // This will be dynamically calculated
+    locked: false,
     action: null
   },
   {

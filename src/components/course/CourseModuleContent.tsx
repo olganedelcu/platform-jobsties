@@ -38,7 +38,7 @@ const CourseModuleContent = ({
           userId={userId}
           moduleType="linkedin"
           title="LinkedIn & Cover Letter"
-          description="This module will help you optimize your LinkedIn profile and create compelling cover letters. Your coach may upload resources and templates to help you succeed."
+          description=""
         />
       );
     case 2:
@@ -47,7 +47,7 @@ const CourseModuleContent = ({
           userId={userId}
           moduleType="job_search_strategy"
           title="Job Search Strategy"
-          description="Learn effective job search strategies, including where to find opportunities, how to network, and how to tailor your applications for maximum impact."
+          description=""
         />
       );
     case 3:
