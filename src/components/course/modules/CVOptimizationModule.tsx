@@ -54,10 +54,6 @@ const CVOptimizationModule = ({ userId, moduleAction }: CVOptimizationModuleProp
 
   return (
     <div className="space-y-6">
-      <p className="text-gray-700">
-        Your coach can upload CV files for you to review and download. You can also upload your own CV files here for feedback.
-      </p>
-
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">

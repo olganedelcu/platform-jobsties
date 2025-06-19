@@ -5,7 +5,7 @@ import { CourseModuleData } from '@/components/course/CourseModule';
 export const courseModules: CourseModuleData[] = [
   {
     title: 'CV Optimization',
-    description: 'Perfect your CV to stand out to employers',
+    description: '',
     icon: FileText,
     completed: false,
     locked: false,
@@ -13,7 +13,7 @@ export const courseModules: CourseModuleData[] = [
   },
   {
     title: 'LinkedIn & Cover Letter',
-    description: 'Build your professional brand and write compelling cover letters',
+    description: '',
     icon: Linkedin,
     completed: false,
     locked: false,
