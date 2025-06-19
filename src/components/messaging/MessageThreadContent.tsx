@@ -42,7 +42,14 @@ const MessageThreadContent = ({
         <div className="p-4 space-y-4">
           {hasMoreMessages && (
             <div className="text-center">
-              <LoadMoreButton onClick={onLoadMore} />
+              <LoadMoreButton 
+                show={true}
+                hasMoreMessages={hasMoreMessages}
+                totalMessages={messages.length}
+                visibleMessagesCount={visibleMessages.length}
+                onLoadMore={onLoadMore}
+                variant="inline"
+              />
             </div>
           )}
           
