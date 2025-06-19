@@ -48,7 +48,7 @@ const ConversationsList = ({
     }
 
     return (
-      <ScrollArea className="flex-1 [&>div>div[style]]:!block">
+      <ScrollArea className="h-[400px]">
         <div className="space-y-1 p-2">
           {conversationsList.map((conversation) => (
             <div
