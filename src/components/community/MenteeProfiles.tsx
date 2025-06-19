@@ -80,6 +80,7 @@ const MenteeProfiles = ({ currentUserId }: MenteeProfilesProps) => {
           const postsCount = mentee.posts?.length || 0;
           const likesCount = mentee.post_likes?.length || 0;
           const commentsCount = mentee.post_comments?.length || 0;
+          const userProfile = Array.isArray(mentee.user_profiles) ? mentee.user_profiles[0] : null;
 
           return (
             <Card key={mentee.id} className="hover:shadow-md transition-shadow">
@@ -97,16 +98,16 @@ const MenteeProfiles = ({ currentUserId }: MenteeProfilesProps) => {
                     </h3>
                     <p className="text-sm text-gray-500">{mentee.email}</p>
                     
-                    {mentee.user_profiles?.[0]?.location && (
+                    {userProfile?.location && (
                       <p className="text-sm text-gray-600 mt-1">
-                        📍 {mentee.user_profiles[0].location}
+                        📍 {userProfile.location}
                       </p>
                     )}
                   </div>
 
-                  {mentee.user_profiles?.[0]?.about && (
+                  {userProfile?.about && (
                     <p className="text-sm text-gray-700 text-center line-clamp-3">
-                      {mentee.user_profiles[0].about}
+                      {userProfile.about}
                     </p>
                   )}
 
