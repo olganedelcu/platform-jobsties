@@ -66,10 +66,6 @@ const FeedbackModule = ({ userId }: FeedbackModuleProps) => {
 
   return (
     <div className="space-y-6">
-      <p className="text-gray-700">
-        Review your progress throughout the course and plan your next steps for continued career development.
-      </p>
-      
       <div className="bg-blue-50 p-6 rounded-lg">
         <h3 className="text-lg font-semibold text-blue-900 mb-4">Share Your Feedback</h3>
         <p className="text-blue-800 mb-4">

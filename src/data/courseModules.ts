@@ -29,7 +29,7 @@ export const courseModules: CourseModuleData[] = [
   },
   {
     title: 'Interview Preparation',
-    description: 'Master the art of interviewing',
+    description: '',
     icon: Video,
     completed: false,
     locked: true,
@@ -37,7 +37,7 @@ export const courseModules: CourseModuleData[] = [
   },
   {
     title: 'Feedback & Next Steps',
-    description: 'Review progress and plan future actions',
+    description: '',
     icon: MessageCircle,
     completed: false,
     locked: true,
