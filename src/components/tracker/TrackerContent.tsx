@@ -1,7 +1,6 @@
 
 import React, { memo } from 'react';
 import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobRecommendations';
-import TrackerHeader from './TrackerHeader';
 import TrackerStats from './TrackerStats';
 import TrackerTabs from './TrackerTabs';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
@@ -40,8 +39,6 @@ const TrackerContent = memo(({
   refetchApplications
 }: TrackerContentProps) => (
   <main className="max-w-7xl mx-auto pt-28 py-8 px-6">
-    <TrackerHeader />
-
     {/* Enhanced Job Recommendations Section with Archive System */}
     <div className="mb-8">
       <EnhancedWeeklyJobRecommendations 
