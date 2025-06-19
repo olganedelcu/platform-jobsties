@@ -27,9 +27,6 @@ const JobApplicationsSearch = ({
           className="pl-10"
         />
       </div>
-      <div className="text-sm text-gray-500">
-        {filteredApplications} / {totalApplications}
-      </div>
     </div>
   );
 };
