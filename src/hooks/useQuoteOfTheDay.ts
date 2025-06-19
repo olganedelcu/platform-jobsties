@@ -48,8 +48,17 @@ export const useQuoteOfTheDay = () => {
   const [todaysQuote, setTodaysQuote] = useState<Quote | null>(null);
 
   useEffect(() => {
-    // Set the specific quote requested
-    setTodaysQuote({ text: "Live a big life, be full of vision", author: "Keep Going" });
+    // Create a date-based index to ensure the same quote appears for the entire day
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const day = today.getDate();
+    
+    // Create a simple hash from the date to get a consistent index
+    const dateHash = year * 10000 + month * 100 + day;
+    const quoteIndex = dateHash % motivationalMessages.length;
+    
+    setTodaysQuote(motivationalMessages[quoteIndex]);
   }, []);
 
   return { todaysQuote };
