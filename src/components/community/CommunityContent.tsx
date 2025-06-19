@@ -15,13 +15,13 @@ const CommunityContent = ({ user }: CommunityContentProps) => {
   const [activeTab, setActiveTab] = useState('feed');
 
   return (
-    <div className="max-w-6xl mx-auto p-8 space-y-8">
-      <div className="text-center px-4">
+    <div className="max-w-6xl mx-auto p-12 space-y-12">
+      <div className="text-center px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Community</h1>
         <p className="text-gray-600">Connect with fellow mentees, share your journey, and learn from each other</p>
       </div>
 
-      <div className="px-4">
+      <div className="px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="feed" className="flex items-center gap-2">
@@ -34,7 +34,7 @@ const CommunityContent = ({ user }: CommunityContentProps) => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="feed" className="space-y-6 mt-6">
+          <TabsContent value="feed" className="space-y-8 mt-8">
             <Card>
               <CardHeader>
                 <CardTitle>Share with the Community</CardTitle>
@@ -46,7 +46,7 @@ const CommunityContent = ({ user }: CommunityContentProps) => {
             <CommunityFeed userId={user.id} />
           </TabsContent>
 
-          <TabsContent value="profiles" className="mt-6">
+          <TabsContent value="profiles" className="mt-8">
             <MenteeProfiles currentUserId={user.id} />
           </TabsContent>
         </Tabs>
