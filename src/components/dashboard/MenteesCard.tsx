@@ -6,6 +6,7 @@ import { Users, TrendingUp, BookOpen, CheckCircle2, Mail, Eye } from 'lucide-rea
 import { Mentee } from '@/hooks/useMentees';
 import MenteeProgressItem from './MenteeProgressItem';
 import { useMenteeProgressStats } from '@/hooks/useMenteeProgressStats';
+import { useCoachApplications } from '@/hooks/useCoachApplications';
 
 interface MenteesCardProps {
   mentees: Mentee[];
@@ -22,6 +23,17 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
     menteesWithRealData,
     totalMentees
   } = useMenteeProgressStats(menteeIds);
+
+  const { applications } = useCoachApplications();
+
+  // Sort mentees by application count (most applications first)
+  const sortedMentees = React.useMemo(() => {
+    return [...mentees].sort((a, b) => {
+      const aApplications = applications.filter(app => app.mentee_id === a.id);
+      const bApplications = applications.filter(app => app.mentee_id === b.id);
+      return bApplications.length - aApplications.length;
+    });
+  }, [mentees, applications]);
 
   // Debug logging
   React.useEffect(() => {
@@ -105,7 +117,7 @@ const MenteesCard = ({ mentees, loading, onViewAll }: MenteesCardProps) => {
       <CardContent className="pt-0">
         {mentees.length > 0 ? (
           <div className="space-y-4">
-            {mentees.map((mentee) => {
+            {sortedMentees.map((mentee) => {
               const progress = getMenteeProgress(mentee.id);
               return (
                 <MenteeProgressItem

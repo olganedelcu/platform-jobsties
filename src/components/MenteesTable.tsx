@@ -25,6 +25,13 @@ interface MenteesTableProps {
 }
 
 const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMentee }: MenteesTableProps) => {
+  // Sort mentees by application count (most applications first)
+  const sortedMentees = [...mentees].sort((a, b) => {
+    const aApplications = getMenteeApplications(a.id, applications);
+    const bApplications = getMenteeApplications(b.id, applications);
+    return bApplications.length - aApplications.length;
+  });
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -38,7 +45,7 @@ const MenteesTable = ({ mentees, applications, cvFiles, updateNote, getNoteForMe
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mentees.map((mentee) => {
+            {sortedMentees.map((mentee) => {
               const menteeApplications = getMenteeApplications(mentee.id, applications);
               const menteeCVFiles = getMenteeCVFiles(mentee.id, cvFiles);
 
