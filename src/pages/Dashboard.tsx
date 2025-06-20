@@ -2,13 +2,11 @@
 import React, { useState, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import PageWrapper from '@/components/layout/PageWrapper';
 import DashboardContent from '@/components/DashboardContent';
 
 const Dashboard = memo(() => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
