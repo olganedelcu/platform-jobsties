@@ -107,11 +107,11 @@ const FormspreeSystemStatus = () => {
                 <div key={index} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
                   <span>Mentee {detail.menteeId.slice(0, 8)}...</span>
                   <div className="flex items-center space-x-2">
-                    <Badge variant="outline" size="sm">
+                    <Badge variant="outline">
                       {detail.notificationCount} notifications
                     </Badge>
                     {detail.hasTimer && (
-                      <Badge variant="secondary" size="sm">
+                      <Badge variant="secondary">
                         <Clock className="h-3 w-3 mr-1" />
                         Scheduled
                       </Badge>
