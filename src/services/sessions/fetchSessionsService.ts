@@ -21,6 +21,19 @@ export const fetchSessions = async (userId: string): Promise<Session[]> => {
     throw error;
   }
 
-  console.log('Found sessions:', data?.length || 0);
-  return data || [];
+  // Check if we have data and handle the mentee relationship properly
+  const sessions: Session[] = (data || []).map(session => {
+    // Handle case where mentee might be null or an error
+    const menteeData = session.mentee && typeof session.mentee === 'object' && !('error' in session.mentee) 
+      ? session.mentee 
+      : undefined;
+
+    return {
+      ...session,
+      mentee: menteeData
+    };
+  });
+
+  console.log('Found sessions:', sessions.length);
+  return sessions;
 };
