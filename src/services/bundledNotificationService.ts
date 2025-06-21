@@ -1,5 +1,5 @@
-
-import { FormspreeNotificationService } from './formspreeNotificationService';
+import { supabase } from '@/integrations/supabase/client';
+import { AmazonSESNotificationService } from './amazonSESNotificationService';
 
 interface PendingNotification {
   id: string;
@@ -15,17 +15,16 @@ interface PendingNotification {
 class BundledNotificationManager {
   private pendingNotifications: Map<string, PendingNotification[]> = new Map();
   private timers: Map<string, NodeJS.Timeout> = new Map();
-  private readonly BUNDLE_DELAY = 30 * 1000; // 30 seconds for faster testing (was 2 hours)
-  private formspreeEndpoint: string = '';
+  private readonly BUNDLE_DELAY = 30 * 1000; // 30 seconds for faster testing
+  private sesEnabled: boolean = true; // Amazon SES is now the default
 
-  setFormspreeEndpoint(endpoint: string) {
-    this.formspreeEndpoint = endpoint;
-    console.log("🔧 Formspree endpoint configured:", endpoint);
+  constructor() {
+    console.log("🔧 Amazon SES notification service initialized");
   }
 
   addNotification(notification: PendingNotification) {
-    if (!this.formspreeEndpoint) {
-      console.warn("⚠️ Formspree endpoint not configured, skipping notification bundling");
+    if (!this.sesEnabled) {
+      console.warn("⚠️ Amazon SES not enabled, skipping notification bundling");
       return;
     }
 
@@ -65,10 +64,9 @@ class BundledNotificationManager {
     const menteeInfo = notifications[0]; // Get mentee info from first notification
     
     try {
-      console.log(`📤 Sending ${notifications.length} bundled notifications to ${menteeInfo.menteeName} (${menteeInfo.menteeEmail})`);
+      console.log(`📤 Sending ${notifications.length} bundled notifications to ${menteeInfo.menteeName} (${menteeInfo.menteeEmail}) via Amazon SES`);
       
-      await FormspreeNotificationService.sendBundledNotifications(
-        this.formspreeEndpoint,
+      await AmazonSESNotificationService.sendBundledNotifications(
         menteeInfo.menteeEmail,
         menteeInfo.menteeName,
         notifications.map(n => ({
@@ -79,12 +77,12 @@ class BundledNotificationManager {
         }))
       );
 
-      console.log(`✅ Successfully sent bundled notifications to ${menteeInfo.menteeName}`);
+      console.log(`✅ Successfully sent bundled notifications to ${menteeInfo.menteeName} via Amazon SES`);
     } catch (error) {
-      console.error(`❌ Failed to send bundled notifications to ${menteeInfo.menteeName}:`, error);
+      console.error(`❌ Failed to send bundled notifications to ${menteeInfo.menteeName} via Amazon SES:`, error);
       // Retry once after 5 seconds
       setTimeout(() => {
-        console.log(`🔄 Retrying notification send for ${menteeInfo.menteeName}`);
+        console.log(`🔄 Retrying Amazon SES notification send for ${menteeInfo.menteeName}`);
         this.sendBundledNotifications(menteeId);
       }, 5000);
     } finally {
@@ -99,13 +97,13 @@ class BundledNotificationManager {
 
   // Method to immediately send pending notifications (useful for testing or manual triggers)
   async flushNotifications(menteeId?: string) {
-    console.log("🚀 Flushing notifications immediately...");
+    console.log("🚀 Flushing notifications immediately via Amazon SES...");
     if (menteeId) {
       await this.sendBundledNotifications(menteeId);
     } else {
       // Send all pending notifications
       const menteeIds = Array.from(this.pendingNotifications.keys());
-      console.log(`📤 Flushing notifications for ${menteeIds.length} mentees`);
+      console.log(`📤 Flushing notifications for ${menteeIds.length} mentees via Amazon SES`);
       for (const id of menteeIds) {
         await this.sendBundledNotifications(id);
       }
@@ -116,7 +114,8 @@ class BundledNotificationManager {
   getStatus() {
     const menteeIds = Array.from(this.pendingNotifications.keys());
     const status = {
-      configured: !!this.formspreeEndpoint,
+      configured: this.sesEnabled,
+      service: 'Amazon SES',
       pendingMentees: menteeIds.length,
       totalNotifications: menteeIds.reduce((total, id) => 
         total + (this.pendingNotifications.get(id)?.length || 0), 0
@@ -127,7 +126,7 @@ class BundledNotificationManager {
         hasTimer: this.timers.has(id)
       }))
     };
-    console.log("📊 Notification service status:", status);
+    console.log("📊 Amazon SES notification service status:", status);
     return status;
   }
 }
@@ -136,12 +135,13 @@ class BundledNotificationManager {
 export const bundledNotificationManager = new BundledNotificationManager();
 
 export const BundledNotificationService = {
-  configure(formspreeEndpoint: string) {
-    bundledNotificationManager.setFormspreeEndpoint(formspreeEndpoint);
+  configure(endpoint?: string) {
+    // No longer needed for Amazon SES, but keeping for backward compatibility
+    console.log("🔧 Amazon SES is now the primary email service - no endpoint configuration needed");
   },
 
   addJobRecommendation(menteeId: string, menteeEmail: string, menteeName: string, jobTitle: string, companyName: string) {
-    console.log("➕ Adding job recommendation to notification bundle");
+    console.log("➕ Adding job recommendation to Amazon SES notification bundle");
     bundledNotificationManager.addNotification({
       id: `job_${Date.now()}`,
       menteeId,
@@ -155,7 +155,7 @@ export const BundledNotificationService = {
   },
 
   addFileUpload(menteeId: string, menteeEmail: string, menteeName: string, fileName: string) {
-    console.log("➕ Adding file upload to notification bundle");
+    console.log("➕ Adding file upload to Amazon SES notification bundle");
     bundledNotificationManager.addNotification({
       id: `file_${Date.now()}`,
       menteeId,
@@ -169,7 +169,7 @@ export const BundledNotificationService = {
   },
 
   addMessage(menteeId: string, menteeEmail: string, menteeName: string, messagePreview: string) {
-    console.log("➕ Adding message to notification bundle");
+    console.log("➕ Adding message to Amazon SES notification bundle");
     bundledNotificationManager.addNotification({
       id: `message_${Date.now()}`,
       menteeId,
@@ -183,7 +183,7 @@ export const BundledNotificationService = {
   },
 
   addTodoAssignment(menteeId: string, menteeEmail: string, menteeName: string, todoTitle?: string, count?: number) {
-    console.log("➕ Adding todo assignment to notification bundle");
+    console.log("➕ Adding todo assignment to Amazon SES notification bundle");
     bundledNotificationManager.addNotification({
       id: `todo_${Date.now()}`,
       menteeId,

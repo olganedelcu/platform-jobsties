@@ -7,7 +7,7 @@ import { AlertCircle, CheckCircle2, Clock, Mail } from 'lucide-react';
 import { BundledNotificationService } from '@/services/bundledNotificationService';
 import { useToast } from '@/hooks/use-toast';
 
-const FormspreeSystemStatus = () => {
+const SESSystemStatus = () => {
   const [status, setStatus] = useState<any>(null);
   const [isFlushingAll, setIsFlushingAll] = useState(false);
   const { toast } = useToast();
@@ -26,18 +26,18 @@ const FormspreeSystemStatus = () => {
   const handleFlushAll = async () => {
     setIsFlushingAll(true);
     try {
-      console.log('🚀 Manual flush triggered from UI');
+      console.log('🚀 Manual flush triggered from UI (Amazon SES)');
       await BundledNotificationService.flushAllNotifications();
       toast({
-        title: "Notifications Flushed",
-        description: "All pending notifications have been sent immediately."
+        title: "Notifications Sent",
+        description: "All pending notifications have been sent via Amazon SES."
       });
       refreshStatus();
     } catch (error) {
       console.error('❌ Manual flush failed:', error);
       toast({
-        title: "Flush Failed",
-        description: `Failed to send notifications: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        title: "Send Failed",
+        description: `Failed to send notifications via Amazon SES: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive"
       });
     } finally {
@@ -63,11 +63,18 @@ const FormspreeSystemStatus = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mail className="h-5 w-5" />
-          Notification System Status
+          Amazon SES Notification System Status
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center justify-between">
+            <span>Email Service:</span>
+            <Badge variant="default">
+              <CheckCircle2 className="h-3 w-3 mr-1" /> Amazon SES
+            </Badge>
+          </div>
+          
           <div className="flex items-center justify-between">
             <span>Configuration:</span>
             <Badge variant={status.configured ? "default" : "destructive"}>
@@ -96,6 +103,11 @@ const FormspreeSystemStatus = () => {
           <div className="flex items-center justify-between">
             <span>Bundle Delay:</span>
             <Badge variant="outline">30 seconds</Badge>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span>From Email:</span>
+            <Badge variant="outline">service@jobsties.com</Badge>
           </div>
         </div>
 
@@ -147,7 +159,7 @@ const FormspreeSystemStatus = () => {
               ) : (
                 <>
                   <Mail className="h-4 w-4 mr-2" />
-                  Send All Now
+                  Send All Now (SES)
                 </>
               )}
             </Button>
@@ -155,8 +167,9 @@ const FormspreeSystemStatus = () => {
         </div>
 
         <div className="text-xs text-gray-500 space-y-1">
-          <p>• Notifications are bundled and sent every 30 seconds for testing</p>
-          <p>• Use "Send All Now" to immediately deliver pending notifications</p>
+          <p>• Notifications are bundled and sent every 30 seconds via Amazon SES</p>
+          <p>• Emails are sent from service@jobsties.com (verified domain)</p>
+          <p>• Uses AWS SES SMTP for reliable email delivery</p>
           <p>• Check the console for detailed logging of notification delivery</p>
         </div>
       </CardContent>
@@ -164,4 +177,4 @@ const FormspreeSystemStatus = () => {
   );
 };
 
-export default FormspreeSystemStatus;
+export default SESSystemStatus;
