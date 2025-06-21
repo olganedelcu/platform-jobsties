@@ -1,4 +1,3 @@
-
 export interface Session {
   id: string;
   session_type: string;
@@ -15,6 +14,10 @@ export interface Session {
   google_event_id?: string;
   google_calendar_id?: string;
   cal_com_booking_id?: string;
+  mentee?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export interface NewSessionData {

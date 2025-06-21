@@ -7,7 +7,10 @@ export const fetchSessions = async (userId: string): Promise<Session[]> => {
   
   const { data, error } = await supabase
     .from('coaching_sessions')
-    .select('*')
+    .select(`
+      *,
+      mentee:profiles!coaching_sessions_mentee_id_fkey(first_name, last_name)
+    `)
     .eq('mentee_id', userId)
     .order('session_date', { ascending: true });
 

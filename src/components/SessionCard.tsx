@@ -24,6 +24,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
           status={session.status}
           calComBookingId={session.cal_com_booking_id}
           isNextSession={true}
+          menteeFirstName={session.mentee?.first_name}
         />
         
         <div className="p-5 space-y-4">
@@ -56,6 +57,7 @@ const SessionCard = ({ session, onReschedule, onCancel, isNextSession = false }:
         sessionType={session.session_type}
         status={session.status}
         calComBookingId={session.cal_com_booking_id}
+        menteeFirstName={session.mentee?.first_name}
       />
       
       <div className="p-4 space-y-4">
