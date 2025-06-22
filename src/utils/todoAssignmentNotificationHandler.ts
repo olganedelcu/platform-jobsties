@@ -1,7 +1,5 @@
-
 import { isAnaUser } from './userValidationUtils';
 import { FormspreeNotificationHandlers } from './formspree/formspreeHandlers';
-import { InAppNotificationService } from '@/services/inAppNotificationService';
 
 export const handleTodoAssignmentNotification = async (
   currentUserEmail: string,
@@ -22,28 +20,15 @@ export const handleTodoAssignmentNotification = async (
   }
 
   try {
-    console.log("📤 Sending todo assignment notifications...");
+    console.log("📤 Sending todo assignment notifications via Formspree...");
     
-    // Send notifications to all mentees
-    const notificationPromises = menteeIds.map(async (menteeId) => {
-      // Send in-app notification
-      await InAppNotificationService.sendTodoAssignmentNotification(
-        menteeId,
-        todoTitle,
-        count
-      );
-    });
-
-    await Promise.all(notificationPromises);
-    
-    // Send email notifications via Formspree bundling
     await FormspreeNotificationHandlers.todoAssignment(
       menteeIds,
       todoTitle,
       count
     );
     
-    console.log("✅ Todo assignment notifications sent successfully");
+    console.log("✅ Todo assignment notifications sent successfully via Formspree");
   } catch (error) {
     console.error('❌ Todo assignment notification error:', error);
   }

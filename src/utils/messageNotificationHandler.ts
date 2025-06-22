@@ -1,7 +1,5 @@
-
 import { isAnaUser } from './userValidationUtils';
 import { FormspreeNotificationHandlers } from './formspree/formspreeHandlers';
-import { InAppNotificationService } from '@/services/inAppNotificationService';
 
 export const handleMessageNotification = async (
   currentUserEmail: string,
@@ -20,21 +18,14 @@ export const handleMessageNotification = async (
   }
 
   try {
-    console.log("📤 Sending message notifications...");
+    console.log("📤 Sending message notification via Formspree...");
     
-    // Send in-app notification
-    await InAppNotificationService.sendMessageNotification(
-      menteeId,
-      messageContent
-    );
-    
-    // Send email notification via Formspree bundling
     await FormspreeNotificationHandlers.message(
       menteeId,
       messageContent
     );
     
-    console.log("✅ Message notifications sent successfully");
+    console.log("✅ Message notification sent successfully via Formspree");
   } catch (error) {
     console.error('❌ Message notification error:', error);
   }
