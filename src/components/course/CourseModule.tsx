@@ -42,6 +42,11 @@ const CourseModule = ({
     e.stopPropagation();
     if (module.action === 'Book Call' && onBookCall) {
       onBookCall();
+    } else if (index === 3) { // Interview Preparation module
+      // Navigate to sessions schedule
+      if (onBookCall) {
+        onBookCall();
+      }
     } else if (!module.completed) {
       onComplete();
     }
@@ -61,12 +66,13 @@ const CourseModule = ({
 
   const getActionText = () => {
     if (module.action === 'Book Call') return 'Book Call';
+    if (index === 3) return 'Schedule Session'; // Interview Preparation module
     if (module.completed) return 'Completed';
     return 'Complete';
   };
 
-  // Don't show the action button for Interview Preparation module (index 3)
-  const shouldShowActionButton = index !== 3;
+  // Show action button for all modules now
+  const shouldShowActionButton = true;
 
   return (
     <div className={`bg-white rounded-lg shadow overflow-hidden ${module.locked ? 'opacity-60' : ''}`}>
