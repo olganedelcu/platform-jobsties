@@ -66,7 +66,7 @@ export const settingsItems = [
     icon: Calendar,
   },
   {
-    path: '/coach/backup',
+    path: '/coach/backup-management',
     label: 'Backup',
     icon: Settings,
   },
