@@ -17,11 +17,40 @@ export const fetchRealMenteeData = async (email: string): Promise<RealMenteeData
       .from('profiles')
       .select('id, first_name, last_name, email, role')
       .eq('email', email)
-      .eq('role', 'mentee')
+      .ilike('role', 'mentee') // Use ilike for case-insensitive matching
       .single();
 
     if (error || !mentee) {
       console.error('❌ Error fetching mentee data:', error);
+      
+      // Let's also try a broader search to see what's in the database
+      console.log('🔍 Trying broader search for debugging...');
+      const { data: allWithEmail, error: debugError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, role')
+        .eq('email', email);
+        
+      console.log('🔍 All profiles with this email:', allWithEmail);
+      
+      if (allWithEmail && allWithEmail.length > 0) {
+        // Find any mentee regardless of case
+        const menteeProfile = allWithEmail.find(profile => 
+          profile.role && profile.role.toLowerCase() === 'mentee'
+        );
+        
+        if (menteeProfile) {
+          console.log('✅ Found mentee with case-insensitive search:', menteeProfile);
+          const menteeData = {
+            id: menteeProfile.id,
+            email: menteeProfile.email,
+            name: `${menteeProfile.first_name} ${menteeProfile.last_name}`.trim(),
+            first_name: menteeProfile.first_name,
+            last_name: menteeProfile.last_name
+          };
+          return menteeData;
+        }
+      }
+      
       return null;
     }
 
