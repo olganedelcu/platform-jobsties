@@ -57,6 +57,11 @@ const CourseModule = ({
     onUncomplete();
   };
 
+  const handleCompleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onComplete();
+  };
+
   const handleMessageCoachClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onMessageCoach) {
@@ -127,7 +132,30 @@ const CourseModule = ({
                     {getActionText()}
                   </Button>
                 )}
-                {module.completed && (
+                {/* Show separate Complete/Uncomplete buttons for Interview Preparation module */}
+                {index === 3 && (
+                  <>
+                    {!module.completed ? (
+                      <Button
+                        onClick={handleCompleteClick}
+                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 text-sm"
+                      >
+                        Complete
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleUncompleteClick}
+                        variant="outline"
+                        className="text-gray-600 border-gray-300 hover:bg-gray-50 px-4 py-2 text-sm flex items-center space-x-1"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        <span>Uncomplete</span>
+                      </Button>
+                    )}
+                  </>
+                )}
+                {/* Show Uncomplete button for other completed modules */}
+                {module.completed && index !== 3 && (
                   <Button
                     onClick={handleUncompleteClick}
                     variant="outline"
