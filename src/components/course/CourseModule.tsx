@@ -106,14 +106,13 @@ const CourseModule = ({
           <div className="flex items-center space-x-3">
             {!module.locked && (
               <>
-                <Button
+                <button
                   onClick={handleMessageCoachClick}
-                  variant="outline"
-                  className="text-blue-600 border-blue-300 hover:bg-blue-50 px-4 py-2 text-sm flex items-center space-x-1"
+                  className="text-blue-600 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-full transition-colors"
+                  title="Message Coach"
                 >
-                  <MessageCircle className="h-3 w-3" />
-                  <span>Message Coach</span>
-                </Button>
+                  <MessageCircle className="h-5 w-5" />
+                </button>
                 {shouldShowActionButton && (
                   <Button
                     onClick={handleActionClick}
