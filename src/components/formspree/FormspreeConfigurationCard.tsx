@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
 import { EnhancedBundledNotificationService } from '@/services/enhancedBundledNotificationService';
 import { useToast } from '@/hooks/use-toast';
+import { fetchRealMenteeData, createRealTestNotifications } from '@/utils/testNotificationUtils';
 import FormspreeStatusAlert from './FormspreeStatusAlert';
 import FormspreeEndpointForm from './FormspreeEndpointForm';
 import FormspreeActions from './FormspreeActions';
@@ -63,53 +64,73 @@ const FormspreeConfigurationCard = () => {
     setIsTesting(true);
     
     try {
-      console.log('🧪 Starting enhanced notification system test...');
+      console.log('🧪 Starting enhanced notification system test with real mentee data...');
       
-      // Test comprehensive notification bundle
+      // Fetch real mentee data
+      const realMenteeData = await fetchRealMenteeData('olganedelcuam@gmail.com');
+      
+      if (!realMenteeData) {
+        toast({
+          title: "Test Failed",
+          description: "Could not find mentee with email 'olganedelcuam@gmail.com'. Please make sure this mentee exists in the system.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ Using real mentee data for test:', realMenteeData);
+
+      // Create personalized test notifications
+      const testData = createRealTestNotifications(realMenteeData);
+
+      // Add real job recommendation
       EnhancedBundledNotificationService.addJobRecommendation(
-        'test-mentee-enhanced',
-        'olga@jobsties.com',
-        'Test Mentee User',
-        'Senior React Developer - Remote',
-        'Tech Innovation Corp'
+        realMenteeData.id,
+        realMenteeData.email,
+        realMenteeData.name,
+        testData.jobRecommendation.jobTitle,
+        testData.jobRecommendation.companyName
       );
 
+      // Add personalized message
       EnhancedBundledNotificationService.addMessage(
-        'test-mentee-enhanced',
-        'olga@jobsties.com', 
-        'Test Mentee User',
-        'Great progress on your job search! I found some excellent opportunities that match your skills. Let\'s schedule a call to discuss your strategy and next steps.'
+        realMenteeData.id,
+        realMenteeData.email, 
+        realMenteeData.name,
+        testData.message
       );
 
+      // Add personalized task
       EnhancedBundledNotificationService.addTodoAssignment(
-        'test-mentee-enhanced',
-        'olga@jobsties.com',
-        'Test Mentee User',
-        'Update LinkedIn profile with recent projects and skills',
+        realMenteeData.id,
+        realMenteeData.email,
+        realMenteeData.name,
+        testData.todoTitle,
         1
       );
 
+      // Add personalized file upload
       EnhancedBundledNotificationService.addFileUpload(
-        'test-mentee-enhanced',
-        'olga@jobsties.com',
-        'Test Mentee User',
-        'Resume_Template_Tech_2024.pdf'
+        realMenteeData.id,
+        realMenteeData.email,
+        realMenteeData.name,
+        testData.fileName
       );
 
       // Send immediately for testing
       await EnhancedBundledNotificationService.flushAllNotifications();
 
-      console.log('✅ Enhanced notification system test completed!');
+      console.log('✅ Enhanced notification system test with real data completed!');
 
       toast({
-        title: "Enhanced Test Email Sent! 🚀",
-        description: "A comprehensive test email with enhanced formatting and multiple notification types should arrive at olga@jobsties.com shortly. The new system includes both in-app and email notifications for all users!"
+        title: "Real Data Test Email Sent! 🚀",
+        description: `Comprehensive test email sent to ${realMenteeData.name} (${realMenteeData.email}) with personalized content and real mentee data!`
       });
     } catch (error) {
-      console.error('❌ Enhanced test failed:', error);
+      console.error('❌ Enhanced test with real data failed:', error);
       toast({
         title: "Test Failed",
-        description: `Failed to send enhanced test notification: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your configuration.`,
+        description: `Failed to send enhanced test notification with real data: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your configuration.`,
         variant: "destructive"
       });
     } finally {
@@ -145,6 +166,7 @@ const FormspreeConfigurationCard = () => {
             <li>• Enhanced email templates with better formatting</li>
             <li>• Intelligent bundling (30min delay for better UX)</li>
             <li>• Dynamic subject lines based on content</li>
+            <li>• <strong>Real mentee data testing available</strong></li>
           </ul>
         </div>
         
@@ -163,7 +185,18 @@ const FormspreeConfigurationCard = () => {
         </div>
 
         <FormspreeSystemStatus />
-        <FormspreeTestDetails />
+        
+        <div className="border-t pt-4">
+          <h3 className="font-medium mb-2">📧 Real Data Test Details:</h3>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>• Test email will be sent to: <strong>olganedelcuam@gmail.com</strong></li>
+            <li>• Uses real mentee data from the database</li>
+            <li>• Includes personalized job recommendation, message, task, and file upload</li>
+            <li>• Demonstrates the enhanced bundled notification format with real names</li>
+            <li>• Should arrive within a few minutes if the mentee exists in the system</li>
+          </ul>
+        </div>
+        
         <FormspreeHowItWorks />
       </CardContent>
     </Card>
