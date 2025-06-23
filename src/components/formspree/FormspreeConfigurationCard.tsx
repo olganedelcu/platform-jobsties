@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink } from 'lucide-react';
-import { BundledNotificationService } from '@/services/bundledNotificationService';
+import { EnhancedBundledNotificationService } from '@/services/enhancedBundledNotificationService';
 import { useToast } from '@/hooks/use-toast';
 import FormspreeStatusAlert from './FormspreeStatusAlert';
 import FormspreeEndpointForm from './FormspreeEndpointForm';
@@ -18,16 +18,15 @@ const FormspreeConfigurationCard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Save the provided endpoint immediately
+    // Auto-configure the enhanced system
     const formspreeEndpoint = 'https://formspree.io/f/myzjjlvn';
     localStorage.setItem('formspree_endpoint', formspreeEndpoint);
-    BundledNotificationService.configure(formspreeEndpoint);
-    console.log('✅ Formspree endpoint configured automatically:', formspreeEndpoint);
+    EnhancedBundledNotificationService.configure(formspreeEndpoint);
+    console.log('✅ Enhanced Formspree notification system configured:', formspreeEndpoint);
     
-    // Show success message
     toast({
-      title: "Formspree Configured",
-      description: "Your Formspree endpoint has been automatically configured and is ready to send notifications!"
+      title: "Enhanced Notifications Ready",
+      description: "Your enhanced notification system is configured and ready! All mentees will now receive both in-app and email notifications."
     });
   }, [toast]);
 
@@ -51,12 +50,12 @@ const FormspreeConfigurationCard = () => {
     }
 
     localStorage.setItem('formspree_endpoint', endpoint);
-    BundledNotificationService.configure(endpoint);
+    EnhancedBundledNotificationService.configure(endpoint);
     setIsConfigured(true);
 
     toast({
       title: "Success",
-      description: "Formspree configuration updated successfully"
+      description: "Enhanced notification system updated successfully"
     });
   };
 
@@ -64,47 +63,53 @@ const FormspreeConfigurationCard = () => {
     setIsTesting(true);
     
     try {
-      console.log('🧪 Starting Formspree test notification...');
+      console.log('🧪 Starting enhanced notification system test...');
       
-      // Add a comprehensive test notification
-      BundledNotificationService.addJobRecommendation(
-        'test-mentee-123',
+      // Test comprehensive notification bundle
+      EnhancedBundledNotificationService.addJobRecommendation(
+        'test-mentee-enhanced',
         'olga@jobsties.com',
         'Test Mentee User',
-        'Senior Software Developer - Test Position',
-        'Test Company Technologies Inc.'
+        'Senior React Developer - Remote',
+        'Tech Innovation Corp'
       );
 
-      // Add additional test notifications to show bundling
-      BundledNotificationService.addMessage(
-        'test-mentee-123',
+      EnhancedBundledNotificationService.addMessage(
+        'test-mentee-enhanced',
         'olga@jobsties.com', 
         'Test Mentee User',
-        'This is a test message from your JobsTies mentor to verify the notification system is working correctly.'
+        'Great progress on your job search! I found some excellent opportunities that match your skills. Let\'s schedule a call to discuss your strategy and next steps.'
       );
 
-      BundledNotificationService.addTodoAssignment(
-        'test-mentee-123',
+      EnhancedBundledNotificationService.addTodoAssignment(
+        'test-mentee-enhanced',
         'olga@jobsties.com',
         'Test Mentee User',
-        'Complete your LinkedIn profile optimization',
+        'Update LinkedIn profile with recent projects and skills',
         1
       );
 
-      // Force flush to send immediately for testing
-      await BundledNotificationService.flushAllNotifications();
+      EnhancedBundledNotificationService.addFileUpload(
+        'test-mentee-enhanced',
+        'olga@jobsties.com',
+        'Test Mentee User',
+        'Resume_Template_Tech_2024.pdf'
+      );
 
-      console.log('✅ Test notification sent successfully!');
+      // Send immediately for testing
+      await EnhancedBundledNotificationService.flushAllNotifications();
+
+      console.log('✅ Enhanced notification system test completed!');
 
       toast({
-        title: "Test Email Sent!",
-        description: "A bundled test email with job recommendation, message, and task assignment should arrive at olga@jobsties.com shortly via your Formspree form. Check your email!"
+        title: "Enhanced Test Email Sent! 🚀",
+        description: "A comprehensive test email with enhanced formatting and multiple notification types should arrive at olga@jobsties.com shortly. The new system includes both in-app and email notifications for all users!"
       });
     } catch (error) {
-      console.error('❌ Test failed:', error);
+      console.error('❌ Enhanced test failed:', error);
       toast({
         title: "Test Failed",
-        description: `Failed to send test notification: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your endpoint and try again.`,
+        description: `Failed to send enhanced test notification: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your configuration.`,
         variant: "destructive"
       });
     } finally {
@@ -119,7 +124,7 @@ const FormspreeConfigurationCard = () => {
     
     toast({
       title: "Configuration Reset",
-      description: "Formspree configuration has been cleared"
+      description: "Enhanced notification system configuration has been cleared"
     });
   };
 
@@ -128,11 +133,20 @@ const FormspreeConfigurationCard = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ExternalLink className="h-5 w-5" />
-          Formspree Email Notifications Setup
+          Enhanced Email Notification System 🚀
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <FormspreeStatusAlert />
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h3 className="font-semibold text-green-800 mb-2">✅ System Enhanced!</h3>
+          <ul className="text-sm text-green-700 space-y-1">
+            <li>• Dual notifications: In-app + Email for all users</li>
+            <li>• No user restrictions - works for everyone</li>
+            <li>• Enhanced email templates with better formatting</li>
+            <li>• Intelligent bundling (30min delay for better UX)</li>
+            <li>• Dynamic subject lines based on content</li>
+          </ul>
+        </div>
         
         <div className="space-y-4">
           <FormspreeEndpointForm 
