@@ -15,7 +15,7 @@ interface CourseContentProps {
 const CourseContent = ({ userId }: CourseContentProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [expandedModule, setExpandedModule] = useState<number | null>(0);
+  const [expandedModule, setExpandedModule] = useState<number | null>(null);
   const { progress, updateProgress } = useCourseProgress({ id: userId });
   const { createConversation } = useConversations();
 
