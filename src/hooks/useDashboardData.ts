@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { courseProgressService } from '@/services/courseProgressService';
+import { courseModules } from '@/data/courseModules';
 
 interface DashboardData {
   upcomingSessions: number;
@@ -70,12 +71,12 @@ export const useDashboardData = (userId: string): DashboardData => {
       // Fetch course progress using the same service as the course page
       const courseProgressData = await courseProgressService.fetchUserProgress(userId);
       
-      // Calculate course progress using the same logic as the course page
+      // Calculate course progress using the same logic as the course page - fixed to use actual course modules count
       const completedModules = courseProgressData.filter(module => module.completed).length;
-      const totalModules = courseProgressData.length;
+      const totalModules = courseModules.length; // Use actual course modules count (5)
       const courseProgress = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
-      console.log('Dashboard course progress calculation:', {
+      console.log('Dashboard course progress calculation (fixed):', {
         completedModules,
         totalModules,
         courseProgress,
