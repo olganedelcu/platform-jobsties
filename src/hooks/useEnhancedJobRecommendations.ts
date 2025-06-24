@@ -12,17 +12,30 @@ interface UseEnhancedJobRecommendationsProps {
   onApplicationAdded?: () => void;
 }
 
+interface CategorizedRecommendations {
+  active: JobRecommendation[];
+  applied: JobRecommendation[];
+  all: JobRecommendation[];
+}
+
 export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: UseEnhancedJobRecommendationsProps) => {
   const { user } = useAuthState();
   const { toast } = useToast();
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   
-  const { recommendations, loading, updateRecommendation } = useJobRecommendations({
+  const { recommendations: allRecommendations, loading, updateRecommendation } = useJobRecommendations({
     userId,
     isCoach: false
   });
 
   const { handleAddApplication } = useJobApplicationActions(user, [], () => {});
+
+  // Categorize recommendations based on status
+  const recommendations: CategorizedRecommendations = {
+    active: allRecommendations.filter(rec => rec.status === 'active' || !rec.status),
+    applied: allRecommendations.filter(rec => rec.status === 'applied'),
+    all: allRecommendations
+  };
 
   const handleMarkAsAppliedWithJobTracker = async (recommendation: JobRecommendation) => {
     if (!user) return;
@@ -66,19 +79,22 @@ export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: Us
     }
   };
 
-  const handleArchiveWithValidation = async (recommendation: JobRecommendation) => {
-    setActionLoading(recommendation.id);
+  const handleArchiveWithValidation = async (recommendationId: string) => {
+    setActionLoading(recommendationId);
     
     try {
-      await updateRecommendation(recommendation.id, {
+      await updateRecommendation(recommendationId, {
         archived: true,
         status: 'archived'
       });
 
-      toast({
-        title: "Job Archived",
-        description: `${recommendation.job_title} at ${recommendation.company_name} has been archived.`,
-      });
+      const recommendation = allRecommendations.find(r => r.id === recommendationId);
+      if (recommendation) {
+        toast({
+          title: "Job Archived",
+          description: `${recommendation.job_title} at ${recommendation.company_name} has been archived.`,
+        });
+      }
     } catch (error) {
       console.error('Error archiving recommendation:', error);
       toast({
@@ -91,19 +107,22 @@ export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: Us
     }
   };
 
-  const handleReactivateWithValidation = async (recommendation: JobRecommendation) => {
-    setActionLoading(recommendation.id);
+  const handleReactivateWithValidation = async (recommendationId: string) => {
+    setActionLoading(recommendationId);
     
     try {
-      await updateRecommendation(recommendation.id, {
+      await updateRecommendation(recommendationId, {
         archived: false,
         status: 'active'
       });
 
-      toast({
-        title: "Job Reactivated",
-        description: `${recommendation.job_title} at ${recommendation.company_name} has been reactivated.`,
-      });
+      const recommendation = allRecommendations.find(r => r.id === recommendationId);
+      if (recommendation) {
+        toast({
+          title: "Job Reactivated",
+          description: `${recommendation.job_title} at ${recommendation.company_name} has been reactivated.`,
+        });
+      }
     } catch (error) {
       console.error('Error reactivating recommendation:', error);
       toast({

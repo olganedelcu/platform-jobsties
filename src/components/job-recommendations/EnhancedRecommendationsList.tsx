@@ -7,7 +7,7 @@ import EmptyState from './EmptyState';
 interface EnhancedRecommendationsListProps {
   recommendations: JobRecommendation[];
   loading: boolean;
-  actionLoading: boolean;
+  actionLoading: string | null;
   emptyType: string;
   onViewJob: (jobLink: string) => void;
   onMarkAsApplied: (recommendation: JobRecommendation) => void;
@@ -47,7 +47,7 @@ const EnhancedRecommendationsList = ({
           onMarkAsApplied={onMarkAsApplied}
           onArchive={onArchive}
           onReactivate={onReactivate}
-          loading={actionLoading}
+          loading={actionLoading === recommendation.id}
         />
       ))}
     </div>

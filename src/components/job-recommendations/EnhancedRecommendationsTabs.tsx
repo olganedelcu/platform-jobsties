@@ -15,7 +15,7 @@ interface EnhancedRecommendationsTabsProps {
     all: JobRecommendation[];
   };
   loading: boolean;
-  actionLoading: boolean;
+  actionLoading: string | null;
   onViewJob: (jobLink: string) => void;
   onMarkAsApplied: (recommendation: JobRecommendation) => void;
   onArchive: (recommendationId: string) => void;
