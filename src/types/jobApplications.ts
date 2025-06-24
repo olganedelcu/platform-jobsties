@@ -10,6 +10,7 @@ export interface JobApplication {
   recruiter_name: string | null;
   coach_notes: string | null;
   mentee_notes: string | null;
+  job_link: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -23,6 +24,7 @@ export interface NewJobApplicationData {
   recruiterName?: string;
   coachNotes?: string;
   menteeNotes?: string;
+  jobLink?: string;
 }
 
 export interface JobApplicationsHookReturn {

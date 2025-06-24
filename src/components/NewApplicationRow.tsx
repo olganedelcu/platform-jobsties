@@ -81,6 +81,14 @@ const NewApplicationRow = ({
           className="w-full"
         />
       </TableCell>
+      <TableCell className="w-40">
+        <Input
+          value={newApplicationData.jobLink || ''}
+          onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobLink: e.target.value }))}
+          placeholder="https://example.com/job"
+          className="w-full"
+        />
+      </TableCell>
       <TableCell className="w-64">
         <Textarea
           value={newApplicationData.menteeNotes || ''}

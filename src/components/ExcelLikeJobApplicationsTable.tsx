@@ -39,7 +39,8 @@ const ExcelLikeJobApplicationsTable = ({
     interviewStage: '',
     recruiterName: '',
     coachNotes: '',
-    menteeNotes: ''
+    menteeNotes: '',
+    jobLink: ''
   });
 
   const {
@@ -83,7 +84,8 @@ const ExcelLikeJobApplicationsTable = ({
         interviewStage: '',
         recruiterName: '',
         coachNotes: '',
-        menteeNotes: ''
+        menteeNotes: '',
+        jobLink: ''
       });
     }
   };
@@ -98,7 +100,8 @@ const ExcelLikeJobApplicationsTable = ({
       interviewStage: '',
       recruiterName: '',
       coachNotes: '',
-      menteeNotes: ''
+      menteeNotes: '',
+      jobLink: ''
     });
   };
 
@@ -187,7 +190,7 @@ const ExcelLikeJobApplicationsTable = ({
                 
                 {filteredApplications.length === 0 && !isAddingNew && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                    <TableCell colSpan={10} className="text-center py-8 text-gray-500">
                       {searchTerm ? (
                         <>
                           No applications found matching "{searchTerm}".

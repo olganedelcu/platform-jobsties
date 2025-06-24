@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 
@@ -27,7 +28,8 @@ export const addJobApplication = async (userId: string, applicationData: NewJobA
       interview_stage: applicationData.interviewStage || null,
       recruiter_name: applicationData.recruiterName || null,
       coach_notes: applicationData.coachNotes || null,
-      mentee_notes: applicationData.menteeNotes || null
+      mentee_notes: applicationData.menteeNotes || null,
+      job_link: applicationData.jobLink || null
     })
     .select()
     .single();

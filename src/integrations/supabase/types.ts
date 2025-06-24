@@ -630,6 +630,7 @@ export type Database = {
           date_applied: string
           id: string
           interview_stage: string | null
+          job_link: string | null
           job_title: string
           mentee_id: string
           mentee_notes: string | null
@@ -644,6 +645,7 @@ export type Database = {
           date_applied: string
           id?: string
           interview_stage?: string | null
+          job_link?: string | null
           job_title: string
           mentee_id: string
           mentee_notes?: string | null
@@ -658,6 +660,7 @@ export type Database = {
           date_applied?: string
           id?: string
           interview_stage?: string | null
+          job_link?: string | null
           job_title?: string
           mentee_id?: string
           mentee_notes?: string | null
