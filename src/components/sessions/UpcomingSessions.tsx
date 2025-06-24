@@ -13,14 +13,34 @@ interface UpcomingSessionsProps {
 const UpcomingSessions = ({ sessions, onReschedule, onCancel }: UpcomingSessionsProps) => {
   const now = new Date();
   
-  // Deduplicate sessions by ID and filter upcoming sessions
+  // Enhanced deduplication: remove duplicates by multiple criteria
   const uniqueUpcomingSessions = sessions
-    .filter((session, index, self) => 
-      // Remove duplicates by ID
-      index === self.findIndex(s => s.id === session.id)
-    )
     .filter(session => new Date(session.session_date) >= now)
+    .filter((session, index, self) => {
+      // Remove duplicates by ID
+      const isFirstOccurrenceById = index === self.findIndex(s => s.id === session.id);
+      
+      // If session has cal_com_booking_id, check for duplicates by that field
+      if (session.cal_com_booking_id) {
+        const isFirstOccurrenceByBookingId = index === self.findIndex(s => 
+          s.cal_com_booking_id === session.cal_com_booking_id
+        );
+        return isFirstOccurrenceById && isFirstOccurrenceByBookingId;
+      }
+      
+      // For sessions without cal_com_booking_id, check for duplicates by date, type, and mentee
+      const isFirstOccurrenceByDateTime = index === self.findIndex(s => 
+        s.session_date === session.session_date && 
+        s.session_type === session.session_type &&
+        s.mentee_id === session.mentee_id &&
+        Math.abs(new Date(s.session_date).getTime() - new Date(session.session_date).getTime()) < 60000 // Within 1 minute
+      );
+      
+      return isFirstOccurrenceById && isFirstOccurrenceByDateTime;
+    })
     .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
+
+  console.log('Unique upcoming sessions after deduplication:', uniqueUpcomingSessions);
 
   const nextSession = uniqueUpcomingSessions[0];
   const otherUpcoming = uniqueUpcomingSessions.slice(1);

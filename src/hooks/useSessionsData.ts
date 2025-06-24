@@ -37,11 +37,30 @@ export const useSessionsData = (user: any): SessionsDataHookReturn => {
       const sessionsData = await fetchSessions(user.id);
       console.log('Fetched sessions for user:', sessionsData);
       
-      // Deduplicate sessions by ID to prevent duplicates
-      const uniqueSessions = sessionsData.filter((session, index, self) => 
-        index === self.findIndex(s => s.id === session.id)
-      );
+      // Deduplicate sessions by ID and cal_com_booking_id to prevent duplicates
+      const uniqueSessions = sessionsData.filter((session, index, self) => {
+        // First, try to deduplicate by ID
+        const isFirstOccurrenceById = index === self.findIndex(s => s.id === session.id);
+        
+        // If session has cal_com_booking_id, also check for duplicates by that field
+        if (session.cal_com_booking_id) {
+          const isFirstOccurrenceByBookingId = index === self.findIndex(s => 
+            s.cal_com_booking_id === session.cal_com_booking_id
+          );
+          return isFirstOccurrenceById && isFirstOccurrenceByBookingId;
+        }
+        
+        // For sessions without cal_com_booking_id, also check for duplicates by date and type
+        const isFirstOccurrenceByDateTime = index === self.findIndex(s => 
+          s.session_date === session.session_date && 
+          s.session_type === session.session_type &&
+          s.mentee_id === session.mentee_id
+        );
+        
+        return isFirstOccurrenceById && isFirstOccurrenceByDateTime;
+      });
       
+      console.log('Deduplicated sessions:', uniqueSessions);
       setSessions(uniqueSessions);
     } catch (error) {
       console.error('Error fetching sessions:', error);
