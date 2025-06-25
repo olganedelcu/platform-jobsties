@@ -167,17 +167,17 @@ const JobApplicationEditRow = ({
           disabled={isCoachView}
         />
       </TableCell>
-      {!isCoachView ? (
+      {!isCoachView && (
         <TableCell className="w-64">
           <Textarea
             value={editData?.coach_notes !== undefined ? editData.coach_notes : (application.coach_notes || '')}
             onChange={(e) => onEditDataChange({ coach_notes: e.target.value })}
             placeholder="Coach feedback..."
             className="w-full min-h-[60px] bg-blue-50 border-blue-200 focus:border-blue-400"
-            disabled={!isCoachView}
+            disabled={isCoachView}
           />
         </TableCell>
-      ) : null}
+      )}
     </>
   );
 };

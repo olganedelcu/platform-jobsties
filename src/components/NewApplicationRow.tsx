@@ -13,13 +13,15 @@ interface NewApplicationRowProps {
   setNewApplicationData: React.Dispatch<React.SetStateAction<NewJobApplicationData>>;
   onSave: () => Promise<void>;
   onCancel: () => void;
+  isCoachView?: boolean;
 }
 
 const NewApplicationRow = ({ 
   newApplicationData, 
   setNewApplicationData, 
   onSave, 
-  onCancel 
+  onCancel,
+  isCoachView = false
 }: NewApplicationRowProps) => {
   const handleViewJob = () => {
     if (!newApplicationData.jobLink) return;
@@ -125,14 +127,16 @@ const NewApplicationRow = ({
           className="w-full min-h-[60px]"
         />
       </TableCell>
-      <TableCell className="w-64">
-        <Textarea
-          value={newApplicationData.coachNotes || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
-          placeholder="Coach notes"
-          className="w-full min-h-[60px]"
-        />
-      </TableCell>
+      {!isCoachView && (
+        <TableCell className="w-64">
+          <Textarea
+            value={newApplicationData.coachNotes || ''}
+            onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
+            placeholder="Coach notes"
+            className="w-full min-h-[60px]"
+          />
+        </TableCell>
+      )}
       <TableCell className="w-24">
         <div className="flex gap-1">
           <Button size="sm" onClick={onSave}>

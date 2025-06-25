@@ -169,6 +169,7 @@ const ExcelLikeJobApplicationsTable = ({
                     setNewApplicationData={setNewApplicationData}
                     onSave={handleSaveNew}
                     onCancel={handleCancelNew}
+                    isCoachView={isCoachView}
                   />
                 )}
                 

@@ -67,7 +67,7 @@ const JobApplicationViewRow = ({
           <TruncatedNotes notes={application.mentee_notes} maxLength={100} />
         </div>
       </TableCell>
-      {!isCoachView ? (
+      {!isCoachView && (
         <TableCell className="w-64">
           <div className="break-words">
             {application.coach_notes ? (
@@ -79,7 +79,7 @@ const JobApplicationViewRow = ({
             )}
           </div>
         </TableCell>
-      ) : null}
+      )}
     </>
   );
 };
