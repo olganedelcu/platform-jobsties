@@ -60,7 +60,7 @@ const JobApplicationRow = ({
           onSave={handleSave}
           onCancel={handleCancel}
           onDelete={handleDelete}
-          jobLink={application.job_link}
+          applicationId={application.id}
         />
       </TableCell>
     </TableRow>

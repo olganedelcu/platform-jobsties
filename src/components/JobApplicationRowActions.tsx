@@ -1,7 +1,8 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Trash2, Edit, Save, X } from 'lucide-react';
+import { Trash2, Edit, Save, X, Eye } from 'lucide-react';
 
 interface JobApplicationRowActionsProps {
   isEditing: boolean;
@@ -11,6 +12,7 @@ interface JobApplicationRowActionsProps {
   onCancel: () => void;
   onDelete: () => void;
   jobLink?: string | null;
+  applicationId?: string;
 }
 
 const JobApplicationRowActions = ({
@@ -19,8 +21,17 @@ const JobApplicationRowActions = ({
   onEdit,
   onSave,
   onCancel,
-  onDelete
+  onDelete,
+  applicationId
 }: JobApplicationRowActionsProps) => {
+  const navigate = useNavigate();
+
+  const handleViewDetails = () => {
+    if (applicationId) {
+      navigate(`/application/${applicationId}`);
+    }
+  };
+
   return (
     <div className="flex gap-1">
       {isEditing ? (
@@ -43,6 +54,16 @@ const JobApplicationRowActions = ({
         </>
       ) : (
         <>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={handleViewDetails}
+            disabled={isAddingNew}
+            className="p-1 h-7 w-7"
+            title="View details"
+          >
+            <Eye className="h-3 w-3" />
+          </Button>
           <Button 
             size="sm" 
             variant="outline" 
