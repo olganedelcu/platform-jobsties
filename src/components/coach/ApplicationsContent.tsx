@@ -115,7 +115,7 @@ const ApplicationsContent = () => {
             }}
             onUpdateApplication={handleUpdateApplication}
             onDeleteApplication={handleDeleteApplication}
-            isCoachView={true}
+            isCoachView={false}
           />
         </TabsContent>
 

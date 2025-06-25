@@ -17,7 +17,7 @@ const JobApplicationsTableHeader = ({ showCoachNotesColumn = true }: JobApplicat
         <TableHead className="w-32">Status</TableHead>
         <TableHead className="w-32">Interview Stage</TableHead>
         <TableHead className="w-40">Recruiter</TableHead>
-        <TableHead className="w-64">My Notes</TableHead>
+        <TableHead className="w-64">Mentee Notes</TableHead>
         {showCoachNotesColumn && <TableHead className="w-64">Coach Feedback</TableHead>}
         <TableHead className="w-24">Actions</TableHead>
       </TableRow>
