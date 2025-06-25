@@ -2,7 +2,6 @@
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { JobApplication } from '@/types/jobApplications';
-import { format } from 'date-fns';
 import JobApplicationEditRow from '@/components/JobApplicationEditRow';
 import JobApplicationViewRow from '@/components/JobApplicationViewRow';
 import JobApplicationRowActions from '@/components/JobApplicationRowActions';
@@ -15,7 +14,7 @@ interface JobApplicationRowProps {
   onSave: (applicationId: string) => Promise<void>;
   onCancel: () => void;
   onDelete: (applicationId: string) => Promise<void>;
-  onEditDataChange: (field: string, value: string) => void;
+  onEditDataChange: (updates: Partial<JobApplication>) => void;
   isAddingNew: boolean;
   isCoachView?: boolean;
 }
@@ -38,7 +37,7 @@ const JobApplicationRow = ({
   const handleDelete = () => onDelete(application.id);
 
   return (
-    <TableRow>
+    <TableRow className={isEditing ? "bg-yellow-50" : "hover:bg-gray-50"}>
       {isEditing ? (
         <JobApplicationEditRow
           application={application}

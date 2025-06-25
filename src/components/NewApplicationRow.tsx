@@ -5,7 +5,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, X } from 'lucide-react';
+import { Save, X, ExternalLink } from 'lucide-react';
 import { NewJobApplicationData } from '@/types/jobApplications';
 
 interface NewApplicationRowProps {
@@ -21,6 +21,21 @@ const NewApplicationRow = ({
   onSave, 
   onCancel 
 }: NewApplicationRowProps) => {
+  const handleViewJob = () => {
+    if (!newApplicationData.jobLink) return;
+    
+    let url = newApplicationData.jobLink.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      // Silent fail for security
+    }
+  };
+
   return (
     <TableRow className="bg-blue-50">
       <TableCell className="w-32">
@@ -46,6 +61,27 @@ const NewApplicationRow = ({
           placeholder="Job title"
           className="w-full"
         />
+      </TableCell>
+      <TableCell className="w-16">
+        <div className="flex items-center gap-1">
+          <Input
+            value={newApplicationData.jobLink || ''}
+            onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobLink: e.target.value }))}
+            placeholder="Job URL"
+            className="w-full text-xs"
+          />
+          {newApplicationData.jobLink && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleViewJob}
+              title="View job posting"
+              className="p-1 h-6 w-6 shrink-0"
+            >
+              <ExternalLink className="h-2 w-2" />
+            </Button>
+          )}
+        </div>
       </TableCell>
       <TableCell className="w-32">
         <Select

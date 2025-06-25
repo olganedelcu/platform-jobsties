@@ -13,6 +13,7 @@ const JobApplicationsTableHeader = ({ showCoachNotesColumn = true }: JobApplicat
         <TableHead className="w-32">Date Applied</TableHead>
         <TableHead className="w-40">Company</TableHead>
         <TableHead className="w-40">Position</TableHead>
+        <TableHead className="w-16">Link</TableHead>
         <TableHead className="w-32">Status</TableHead>
         <TableHead className="w-32">Interview Stage</TableHead>
         <TableHead className="w-40">Recruiter</TableHead>
