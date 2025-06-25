@@ -1,116 +1,111 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Save, X } from 'lucide-react';
-import { NewJobApplicationData } from '@/types/jobApplications';
+import { Button } from '@/components/ui/button';
+import { Check, X } from 'lucide-react';
+import { JobApplicationStatusSelect } from '@/components/JobApplicationStatusSelect';
 
 interface NewApplicationRowProps {
-  newApplicationData: NewJobApplicationData;
-  setNewApplicationData: React.Dispatch<React.SetStateAction<NewJobApplicationData>>;
-  onSave: () => Promise<void>;
+  onSave: (applicationData: any) => void;
   onCancel: () => void;
 }
 
-const NewApplicationRow = ({ 
-  newApplicationData, 
-  setNewApplicationData, 
-  onSave, 
-  onCancel 
-}: NewApplicationRowProps) => {
+const NewApplicationRow = ({ onSave, onCancel }: NewApplicationRowProps) => {
+  const [newApplication, setNewApplication] = useState({
+    company_name: '',
+    job_title: '',
+    job_link: '',
+    date_applied: new Date().toISOString().split('T')[0],
+    application_status: 'applied' as const,
+    interview_stage: '',
+    recruiter_name: '',
+    mentee_notes: ''
+  });
+
+  const handleSave = () => {
+    if (newApplication.company_name && newApplication.job_title) {
+      onSave(newApplication);
+    }
+  };
+
+  const isValid = newApplication.company_name.trim() && newApplication.job_title.trim();
+
   return (
     <TableRow className="bg-blue-50">
-      <TableCell className="w-32">
+      <TableCell>
+        <Input
+          placeholder="Company name"
+          value={newApplication.company_name}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, company_name: e.target.value }))}
+          className="min-w-[120px]"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          placeholder="Job title"
+          value={newApplication.job_title}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, job_title: e.target.value }))}
+          className="min-w-[150px]"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          placeholder="https://..."
+          value={newApplication.job_link}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, job_link: e.target.value }))}
+          className="min-w-[150px]"
+        />
+      </TableCell>
+      <TableCell>
         <Input
           type="date"
-          value={newApplicationData.dateApplied}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, dateApplied: e.target.value }))}
-          className="w-full"
+          value={newApplication.date_applied}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, date_applied: e.target.value }))}
+          className="min-w-[130px]"
         />
       </TableCell>
-      <TableCell className="w-40">
-        <Input
-          value={newApplicationData.companyName}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, companyName: e.target.value }))}
-          placeholder="Company name"
-          className="w-full"
+      <TableCell>
+        <JobApplicationStatusSelect
+          value={newApplication.application_status}
+          onValueChange={(value) => setNewApplication(prev => ({ ...prev, application_status: value }))}
         />
       </TableCell>
-      <TableCell className="w-40">
+      <TableCell>
         <Input
-          value={newApplicationData.jobTitle}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobTitle: e.target.value }))}
-          placeholder="Job title"
-          className="w-full"
+          placeholder="Phone, On-site..."
+          value={newApplication.interview_stage}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, interview_stage: e.target.value }))}
+          className="min-w-[120px]"
         />
       </TableCell>
-      <TableCell className="w-32">
-        <Select
-          value={newApplicationData.applicationStatus}
-          onValueChange={(value) => setNewApplicationData(prev => ({ ...prev, applicationStatus: value }))}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="applied">Applied</SelectItem>
-            <SelectItem value="to_be_considered">To Be Considered</SelectItem>
-            <SelectItem value="interviewing">Interviewing</SelectItem>
-            <SelectItem value="offer">Offer Received</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="withdrawn">Withdrawn</SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell className="w-32">
+      <TableCell>
         <Input
-          value={newApplicationData.interviewStage || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, interviewStage: e.target.value }))}
-          placeholder="Interview stage"
-          className="w-full"
-        />
-      </TableCell>
-      <TableCell className="w-40">
-        <Input
-          value={newApplicationData.recruiterName || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, recruiterName: e.target.value }))}
           placeholder="Recruiter name"
-          className="w-full"
+          value={newApplication.recruiter_name}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, recruiter_name: e.target.value }))}
+          className="min-w-[120px]"
         />
       </TableCell>
-      <TableCell className="w-40">
+      <TableCell>
         <Input
-          value={newApplicationData.jobLink || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, jobLink: e.target.value }))}
-          placeholder="https://example.com/job"
-          className="w-full"
+          placeholder="Add notes..."
+          value={newApplication.mentee_notes}
+          onChange={(e) => setNewApplication(prev => ({ ...prev, mentee_notes: e.target.value }))}
+          className="min-w-[150px]"
         />
       </TableCell>
-      <TableCell className="w-64">
-        <Textarea
-          value={newApplicationData.menteeNotes || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, menteeNotes: e.target.value }))}
-          placeholder="Add your notes..."
-          className="w-full min-h-[60px]"
-        />
-      </TableCell>
-      <TableCell className="w-64">
-        <Textarea
-          value={newApplicationData.coachNotes || ''}
-          onChange={(e) => setNewApplicationData(prev => ({ ...prev, coachNotes: e.target.value }))}
-          placeholder="Coach notes"
-          className="w-full min-h-[60px]"
-        />
-      </TableCell>
-      <TableCell className="w-24">
-        <div className="flex gap-1">
-          <Button size="sm" onClick={onSave}>
-            <Save className="h-3 w-3" />
+      <TableCell>
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            onClick={handleSave} 
+            disabled={!isValid}
+            className="h-7 w-7 p-0"
+          >
+            <Check className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="outline" onClick={onCancel}>
+          <Button size="sm" variant="outline" onClick={onCancel} className="h-7 w-7 p-0">
             <X className="h-3 w-3" />
           </Button>
         </div>

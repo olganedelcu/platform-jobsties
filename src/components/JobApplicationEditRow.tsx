@@ -1,133 +1,101 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Save, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, X } from 'lucide-react';
+import { JobApplicationStatusSelect } from '@/components/JobApplicationStatusSelect';
 import { JobApplication } from '@/types/jobApplications';
-import { format } from 'date-fns';
 
 interface JobApplicationEditRowProps {
   application: JobApplication;
-  editData: Partial<JobApplication>;
-  isCoachView?: boolean;
-  onEditDataChange: (updates: Partial<JobApplication>) => void;
-  onSave: (applicationId: string) => Promise<void>;
+  onSave: (id: string, updates: Partial<JobApplication>) => void;
   onCancel: () => void;
-  onDelete: (applicationId: string) => Promise<void>;
 }
 
-const JobApplicationEditRow = ({ 
-  application, 
-  editData, 
-  isCoachView = false,
-  onEditDataChange, 
-  onSave, 
-  onCancel, 
-  onDelete 
-}: JobApplicationEditRowProps) => {
-  const handleSave = () => {
-    onSave(application.id);
-  };
+const JobApplicationEditRow = ({ application, onSave, onCancel }: JobApplicationEditRowProps) => {
+  const [editData, setEditData] = useState({
+    company_name: application.company_name,
+    job_title: application.job_title,
+    job_link: application.job_link || '',
+    application_status: application.application_status,
+    interview_stage: application.interview_stage || '',
+    recruiter_name: application.recruiter_name || '',
+    mentee_notes: application.mentee_notes || '',
+    date_applied: application.date_applied
+  });
 
-  const handleDelete = () => {
-    onDelete(application.id);
+  const handleSave = () => {
+    onSave(application.id, editData);
   };
 
   return (
-    <TableRow className="bg-blue-50">
-      <TableCell className="w-32">
+    <TableRow>
+      <TableCell>
+        <Input
+          value={editData.company_name}
+          onChange={(e) => setEditData(prev => ({ ...prev, company_name: e.target.value }))}
+          className="min-w-[120px]"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          value={editData.job_title}
+          onChange={(e) => setEditData(prev => ({ ...prev, job_title: e.target.value }))}
+          className="min-w-[150px]"
+        />
+      </TableCell>
+      <TableCell>
+        <Input
+          value={editData.job_link}
+          onChange={(e) => setEditData(prev => ({ ...prev, job_link: e.target.value }))}
+          placeholder="https://..."
+          className="min-w-[150px]"
+        />
+      </TableCell>
+      <TableCell>
         <Input
           type="date"
-          value={editData.date_applied ? format(new Date(editData.date_applied), 'yyyy-MM-dd') : ''}
-          onChange={(e) => onEditDataChange({ date_applied: e.target.value })}
-          className="w-full"
+          value={editData.date_applied}
+          onChange={(e) => setEditData(prev => ({ ...prev, date_applied: e.target.value }))}
+          className="min-w-[130px]"
         />
       </TableCell>
-      <TableCell className="w-40">
+      <TableCell>
+        <JobApplicationStatusSelect
+          value={editData.application_status}
+          onValueChange={(value) => setEditData(prev => ({ ...prev, application_status: value }))}
+        />
+      </TableCell>
+      <TableCell>
         <Input
-          value={editData.company_name || ''}
-          onChange={(e) => onEditDataChange({ company_name: e.target.value })}
-          placeholder="Company name"
-          className="w-full"
+          value={editData.interview_stage}
+          onChange={(e) => setEditData(prev => ({ ...prev, interview_stage: e.target.value }))}
+          placeholder="Phone, On-site..."
+          className="min-w-[120px]"
         />
       </TableCell>
-      <TableCell className="w-40">
+      <TableCell>
         <Input
-          value={editData.job_title || ''}
-          onChange={(e) => onEditDataChange({ job_title: e.target.value })}
-          placeholder="Job title"
-          className="w-full"
+          value={editData.recruiter_name}
+          onChange={(e) => setEditData(prev => ({ ...prev, recruiter_name: e.target.value }))}
+          className="min-w-[120px]"
         />
       </TableCell>
-      <TableCell className="w-32">
-        <Select
-          value={editData.application_status || 'applied'}
-          onValueChange={(value) => onEditDataChange({ application_status: value })}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="applied">Applied</SelectItem>
-            <SelectItem value="to_be_considered">To Be Considered</SelectItem>
-            <SelectItem value="interviewing">Interviewing</SelectItem>
-            <SelectItem value="offer">Offer Received</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="withdrawn">Withdrawn</SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell className="w-32">
+      <TableCell>
         <Input
-          value={editData.interview_stage || ''}
-          onChange={(e) => onEditDataChange({ interview_stage: e.target.value })}
-          placeholder="Interview stage"
-          className="w-full"
-        />
-      </TableCell>
-      <TableCell className="w-40">
-        <Input
-          value={editData.recruiter_name || ''}
-          onChange={(e) => onEditDataChange({ recruiter_name: e.target.value })}
-          placeholder="Recruiter name"
-          className="w-full"
-        />
-      </TableCell>
-      <TableCell className="w-40">
-        <Input
-          value={editData.job_link || ''}
-          onChange={(e) => onEditDataChange({ job_link: e.target.value })}
-          placeholder="https://example.com/job"
-          className="w-full"
-        />
-      </TableCell>
-      <TableCell className="w-64">
-        <Textarea
-          value={editData.mentee_notes || ''}
-          onChange={(e) => onEditDataChange({ mentee_notes: e.target.value })}
+          value={editData.mentee_notes}
+          onChange={(e) => setEditData(prev => ({ ...prev, mentee_notes: e.target.value }))}
+          className="min-w-[150px]"
           placeholder="Add your notes..."
-          className="w-full min-h-[60px]"
         />
       </TableCell>
-      {isCoachView && (
-        <TableCell className="w-64">
-          <Textarea
-            value={editData.coach_notes || ''}
-            onChange={(e) => onEditDataChange({ coach_notes: e.target.value })}
-            placeholder="Coach notes"
-            className="w-full min-h-[60px]"
-          />
-        </TableCell>
-      )}
-      <TableCell className="w-24">
-        <div className="flex gap-1">
-          <Button size="sm" onClick={handleSave}>
-            <Save className="h-3 w-3" />
+      <TableCell>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={handleSave} className="h-7 w-7 p-0">
+            <Check className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="outline" onClick={onCancel}>
+          <Button size="sm" variant="outline" onClick={onCancel} className="h-7 w-7 p-0">
             <X className="h-3 w-3" />
           </Button>
         </div>

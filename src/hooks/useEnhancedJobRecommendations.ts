@@ -1,134 +1,131 @@
 
 import { useState, useEffect } from 'react';
-import { useJobRecommendations } from '@/hooks/useJobRecommendations';
-import { useJobApplicationActions } from '@/hooks/useJobApplicationActions';
-import { useAuthState } from '@/hooks/useAuthState';
-import { useToast } from '@/hooks/use-toast';
+import { useJobRecommendations } from './useJobRecommendations';
+import { useJobRecommendationActions } from './useJobRecommendationActions';
 import { JobRecommendation } from '@/types/jobRecommendations';
-import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
-interface UseEnhancedJobRecommendationsProps {
+interface UseEnhancedJobRecommendationsParams {
   userId: string;
-  onApplicationAdded?: () => void;
+  isCoach?: boolean;
 }
 
-interface CategorizedRecommendations {
-  active: JobRecommendation[];
-  applied: JobRecommendation[];
-  all: JobRecommendation[];
-}
-
-export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: UseEnhancedJobRecommendationsProps) => {
-  const { user } = useAuthState();
+export const useEnhancedJobRecommendations = ({ userId, isCoach = false }: UseEnhancedJobRecommendationsParams) => {
   const { toast } = useToast();
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  
-  const { recommendations: allRecommendations, loading, updateRecommendation } = useJobRecommendations({
-    userId,
-    isCoach: false
+  const [activeTab, setActiveTab] = useState('active');
+
+  const {
+    recommendations: allRecommendations,
+    loading,
+    updateRecommendation,
+    refetchRecommendations
+  } = useJobRecommendations({ userId, isCoach });
+
+  const { archiveRecommendation, reactivateRecommendation } = useJobRecommendationActions({
+    updateRecommendation,
+    refetchRecommendations
   });
 
-  const { handleAddApplication } = useJobApplicationActions(user, [], () => {});
+  // Filter recommendations based on status and archived state
+  const activeRecommendations = allRecommendations.filter(
+    rec => rec.status === 'active' && !rec.archived
+  );
 
-  // Categorize recommendations based on status
-  const recommendations: CategorizedRecommendations = {
-    active: allRecommendations.filter(rec => rec.status === 'active' || !rec.status),
-    applied: allRecommendations.filter(rec => rec.status === 'applied'),
-    all: allRecommendations
+  const appliedRecommendations = allRecommendations.filter(
+    rec => rec.status === 'applied' && !rec.archived
+  );
+
+  const recommendations = {
+    active: activeRecommendations,
+    applied: appliedRecommendations,
+    all: allRecommendations.filter(rec => !rec.archived)
   };
 
-  const handleMarkAsAppliedWithJobTracker = async (recommendation: JobRecommendation) => {
-    if (!user) return;
-    
+  const handleViewJob = (jobLink: string) => {
+    window.open(jobLink, '_blank');
+  };
+
+  const handleMarkAsApplied = async (recommendation: JobRecommendation) => {
     setActionLoading(recommendation.id);
     
     try {
-      // Add to job applications tracker with job link
-      await handleAddApplication({
-        dateApplied: format(new Date(), 'yyyy-MM-dd'),
-        companyName: recommendation.company_name,
-        jobTitle: recommendation.job_title,
-        applicationStatus: 'applied',
-        jobLink: recommendation.job_link // Include the job link from recommendation
-      });
-
-      // Update recommendation status
-      await updateRecommendation(recommendation.id, {
+      // First, update the recommendation status to 'applied'
+      await updateRecommendation(recommendation.id, { 
         status: 'applied',
         applied_date: new Date().toISOString()
       });
 
-      // Call callback if provided
-      if (onApplicationAdded) {
-        onApplicationAdded();
+      // Then, create a job application entry
+      const { error: applicationError } = await supabase
+        .from('job_applications')
+        .insert({
+          mentee_id: recommendation.mentee_id,
+          company_name: recommendation.company_name,
+          job_title: recommendation.job_title,
+          job_link: recommendation.job_link,
+          date_applied: new Date().toISOString().split('T')[0],
+          application_status: 'applied',
+          mentee_notes: `Applied from weekly recommendation: ${recommendation.description || ''}`
+        });
+
+      if (applicationError) {
+        console.error('Error creating job application:', applicationError);
+        throw applicationError;
       }
 
       toast({
-        title: "Application Added",
-        description: `Your application to ${recommendation.company_name} has been added to your tracker.`,
+        title: "Success",
+        description: "Job marked as applied and added to your job tracker!",
       });
-    } catch (error) {
-      console.error('Error marking as applied:', error);
+
+      // Switch to applied tab to show the updated status
+      setActiveTab('applied');
+    } catch (error: any) {
+      console.error('Error marking job as applied:', error);
       toast({
         title: "Error",
-        description: "Failed to add application. Please try again.",
-        variant: "destructive",
+        description: "Failed to mark job as applied. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleArchiveWithValidation = async (recommendationId: string) => {
+  const handleArchive = async (recommendationId: string) => {
     setActionLoading(recommendationId);
-    
     try {
-      await updateRecommendation(recommendationId, {
-        archived: true,
-        status: 'archived'
+      await archiveRecommendation(recommendationId);
+      toast({
+        title: "Success",
+        description: "Job recommendation archived successfully.",
       });
-
-      const recommendation = allRecommendations.find(r => r.id === recommendationId);
-      if (recommendation) {
-        toast({
-          title: "Job Archived",
-          description: `${recommendation.job_title} at ${recommendation.company_name} has been archived.`,
-        });
-      }
     } catch (error) {
-      console.error('Error archiving recommendation:', error);
       toast({
         title: "Error",
-        description: "Failed to archive job. Please try again.",
-        variant: "destructive",
+        description: "Failed to archive recommendation. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleReactivateWithValidation = async (recommendationId: string) => {
+  const handleReactivate = async (recommendationId: string) => {
     setActionLoading(recommendationId);
-    
     try {
-      await updateRecommendation(recommendationId, {
-        archived: false,
-        status: 'active'
+      await reactivateRecommendation(recommendationId);
+      toast({
+        title: "Success",
+        description: "Job recommendation reactivated successfully.",
       });
-
-      const recommendation = allRecommendations.find(r => r.id === recommendationId);
-      if (recommendation) {
-        toast({
-          title: "Job Reactivated",
-          description: `${recommendation.job_title} at ${recommendation.company_name} has been reactivated.`,
-        });
-      }
     } catch (error) {
-      console.error('Error reactivating recommendation:', error);
       toast({
         title: "Error",
-        description: "Failed to reactivate job. Please try again.",
-        variant: "destructive",
+        description: "Failed to reactivate recommendation. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setActionLoading(null);
@@ -139,8 +136,11 @@ export const useEnhancedJobRecommendations = ({ userId, onApplicationAdded }: Us
     recommendations,
     loading,
     actionLoading,
-    handleMarkAsAppliedWithJobTracker,
-    handleArchiveWithValidation,
-    handleReactivateWithValidation
+    activeTab,
+    setActiveTab,
+    handleViewJob,
+    handleMarkAsApplied,
+    handleArchive,
+    handleReactivate
   };
 };

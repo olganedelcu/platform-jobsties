@@ -422,7 +422,7 @@ export type Database = {
           id: string
           is_blocking_event: boolean | null
           meeting_link: string | null
-          mentee_id: string
+          mentee_id: string | null
           notes: string | null
           preferred_coach: string | null
           session_date: string
@@ -441,7 +441,7 @@ export type Database = {
           id?: string
           is_blocking_event?: boolean | null
           meeting_link?: string | null
-          mentee_id: string
+          mentee_id?: string | null
           notes?: string | null
           preferred_coach?: string | null
           session_date: string
@@ -460,7 +460,7 @@ export type Database = {
           id?: string
           is_blocking_event?: boolean | null
           meeting_link?: string | null
-          mentee_id?: string
+          mentee_id?: string | null
           notes?: string | null
           preferred_coach?: string | null
           session_date?: string
