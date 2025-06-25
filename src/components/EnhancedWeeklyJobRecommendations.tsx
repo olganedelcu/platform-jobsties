@@ -18,10 +18,10 @@ const EnhancedWeeklyJobRecommendations = ({ userId, onApplicationAdded }: Enhanc
     recommendations,
     loading,
     actionLoading,
-    handleMarkAsApplied,
-    handleArchive,
-    handleReactivate
-  } = useEnhancedJobRecommendations({ userId });
+    handleMarkAsAppliedWithJobTracker,
+    handleArchiveWithValidation,
+    handleReactivateWithValidation
+  } = useEnhancedJobRecommendations({ userId, onApplicationAdded });
 
   const { handleViewJob } = useJobViewHandler();
 
@@ -41,9 +41,9 @@ const EnhancedWeeklyJobRecommendations = ({ userId, onApplicationAdded }: Enhanc
           loading={loading}
           actionLoading={actionLoading}
           onViewJob={handleViewJob}
-          onMarkAsApplied={handleMarkAsApplied}
-          onArchive={handleArchive}
-          onReactivate={handleReactivate}
+          onMarkAsApplied={handleMarkAsAppliedWithJobTracker}
+          onArchive={handleArchiveWithValidation}
+          onReactivate={handleReactivateWithValidation}
         />
       </CardContent>
     </Card>

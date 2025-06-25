@@ -24,7 +24,7 @@ export const useJobApplicationActions = (
       
       toast({
         title: "Application Added",
-        description: `Your application to ${applicationData.company_name} has been added successfully.`,
+        description: `Your application to ${applicationData.companyName} has been added successfully.`,
       });
     } catch (error) {
       toast({

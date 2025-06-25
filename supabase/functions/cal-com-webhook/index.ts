@@ -146,14 +146,14 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
 
   console.log('Found coach profile:', coachProfile)
 
-  // Find the mentee profile - improved matching logic
+  // Find the mentee profile - should be different from Ana
   let menteeProfile = null
   
-  // First try to find by exact email match if available and different from Ana's email
+  // First try to find by email if available and different from Ana's email
   if (attendeeEmail && attendeeEmail.toLowerCase() !== 'ana@jobsties.com') {
     console.log('Trying to find mentee by email:', attendeeEmail)
     
-    // Try exact email match first
+    // Try exact email match
     const { data: exactProfile } = await supabase
       .from('profiles')
       .select('id, first_name, last_name, email, role')
@@ -183,9 +183,9 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
     }
   }
   
-  // If still no match and we have a name, try partial matching
+  // If email didn't work, try to find by name matching (but exclude Ana)
   if (!menteeProfile && attendeeName) {
-    console.log('Trying to find mentee by name or email pattern:', attendeeName)
+    console.log('Trying to find mentee by name:', attendeeName)
     
     const { data: allMenteeProfiles } = await supabase
       .from('profiles')
@@ -193,98 +193,50 @@ async function handleBookingCreated(supabase: any, bookingData: any) {
       .eq('role', 'MENTEE')
     
     if (allMenteeProfiles) {
-      // Check if the booking email might be a variation of an existing user's email
-      // For example, "olganedelcuam@gmail.com" might be related to "olga@jobsties.com"
+      // Try to match by full name or last name
       const nameParts = attendeeName.toLowerCase().split(' ')
-      const firstName = nameParts[0]
       const lastName = nameParts[nameParts.length - 1]
       
-      // Try to find by name similarity or email pattern
       menteeProfile = allMenteeProfiles.find(profile => {
-        const profileFirstName = profile.first_name.toLowerCase()
+        const fullName = `${profile.first_name} ${profile.last_name}`.toLowerCase()
         const profileLastName = profile.last_name.toLowerCase()
-        const profileEmail = profile.email.toLowerCase()
         
         // Make sure we're not matching Ana
         if (profile.email.toLowerCase() === 'ana@jobsties.com') {
           return false
         }
         
-        // Check if name matches
-        const nameMatches = (profileFirstName === firstName || profileLastName === lastName) ||
-                           profileFirstName.includes(firstName) || firstName.includes(profileFirstName)
-        
-        // Check if email has similar patterns (like "olga" in both emails)
-        const emailPattern = attendeeEmail ? attendeeEmail.split('@')[0].toLowerCase() : ''
-        const profileEmailPattern = profileEmail.split('@')[0].toLowerCase()
-        const emailSimilar = emailPattern && (
-          profileEmailPattern.includes(emailPattern.substring(0, 4)) ||
-          emailPattern.includes(profileEmailPattern.substring(0, 4))
-        )
-        
-        return nameMatches || emailSimilar
+        return fullName.includes(attendeeName.toLowerCase()) || 
+               profileLastName === lastName ||
+               attendeeName.toLowerCase().includes(profileLastName)
       })
       
       if (menteeProfile) {
-        console.log('Found mentee profile by name/email pattern matching:', menteeProfile)
+        console.log('Found mentee profile by name matching:', menteeProfile)
       }
     }
   }
 
-  // If we still don't have a mentee profile, create a session with a placeholder
-  // This allows Ana to see the session and manually assign it later
+  // If still no mentee profile found, log available profiles for debugging
   if (!menteeProfile) {
-    console.log('No exact mentee profile found. Creating session with guest information.')
+    console.log('No mentee profile found for attendee:', { email: attendeeEmail, name: attendeeName })
     
-    // We'll create a session without a mentee_id but with the guest information in notes
-    const sessionDate = new Date(bookingData.startTime)
-    const meetingLink = bookingData.metadata?.videoCallUrl || `https://meet.google.com/dcr-dbrn-bvx`
-    const sessionType = bookingData.eventTitle || bookingData.title || '1-on-1 Session'
-    const duration = bookingData.length || 30
-    const guestInfo = `Guest: ${attendeeName} (${attendeeEmail})`
-    const originalNotes = bookingData.additionalNotes || bookingData.description || ''
-    const combinedNotes = originalNotes ? `${guestInfo}\n\nOriginal notes: ${originalNotes}` : guestInfo
-
-    console.log('Creating session with guest information:', {
-      coach_id: coachProfile.id,
-      session_type: sessionType,
-      session_date: sessionDate.toISOString(),
-      duration: duration,
-      notes: combinedNotes,
-      status: 'confirmed',
-      meeting_link: meetingLink,
-      preferred_coach: 'Ana Nedelcu',
-      cal_com_booking_id: bookingData.uid || bookingData.id || bookingData.bookingId
-    })
-
-    // Create the coaching session without mentee_id
-    const { data: newSession, error: sessionError } = await supabase
-      .from('coaching_sessions')
-      .insert({
-        coach_id: coachProfile.id,
-        mentee_id: null, // We'll set this to null for now
-        session_type: sessionType,
-        session_date: sessionDate.toISOString(),
-        duration: duration,
-        notes: combinedNotes,
-        status: 'confirmed',
-        meeting_link: meetingLink,
-        preferred_coach: 'Ana Nedelcu',
-        cal_com_booking_id: bookingData.uid || bookingData.id || bookingData.bookingId
-      })
-      .select()
-      .single()
-
-    if (sessionError) {
-      console.error('Error creating coaching session with guest info:', sessionError)
-      return
+    const { data: allProfiles } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email, role')
+    
+    if (allProfiles) {
+      console.log('Available profiles:', allProfiles.map(p => ({
+        name: `${p.first_name} ${p.last_name}`,
+        email: p.email,
+        role: p.role
+      })))
     }
-
-    console.log('Successfully created coaching session with guest information:', newSession)
+    
     return
   }
 
-  // Extract meeting details for existing mentee
+  // Extract meeting details
   const sessionDate = new Date(bookingData.startTime)
   const meetingLink = bookingData.metadata?.videoCallUrl || `https://meet.google.com/dcr-dbrn-bvx`
   const sessionType = bookingData.eventTitle || bookingData.title || '1-on-1 Session'

@@ -15,33 +15,31 @@ interface AddJobApplicationFormProps {
 const AddJobApplicationForm = ({ onAddApplication }: AddJobApplicationFormProps) => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<NewJobApplicationData>({
-    date_applied: '',
-    company_name: '',
-    job_title: '',
-    application_status: 'applied',
-    interview_stage: '',
-    recruiter_name: '',
-    mentee_notes: '',
-    job_link: ''
+    dateApplied: '',
+    companyName: '',
+    jobTitle: '',
+    applicationStatus: 'applied',
+    interviewStage: '',
+    recruiterName: '',
+    coachNotes: ''
   });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.date_applied || !formData.company_name || !formData.job_title) return;
+    if (!formData.dateApplied || !formData.companyName || !formData.jobTitle) return;
     
     setLoading(true);
     try {
       await onAddApplication(formData);
       setFormData({
-        date_applied: '',
-        company_name: '',
-        job_title: '',
-        application_status: 'applied',
-        interview_stage: '',
-        recruiter_name: '',
-        mentee_notes: '',
-        job_link: ''
+        dateApplied: '',
+        companyName: '',
+        jobTitle: '',
+        applicationStatus: 'applied',
+        interviewStage: '',
+        recruiterName: '',
+        coachNotes: ''
       });
       setShowForm(false);
     } catch (error) {
@@ -72,88 +70,79 @@ const AddJobApplicationForm = ({ onAddApplication }: AddJobApplicationFormProps)
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="date_applied">Date Applied *</Label>
+              <Label htmlFor="dateApplied">Date Applied *</Label>
               <Input
-                id="date_applied"
+                id="dateApplied"
                 type="date"
-                value={formData.date_applied}
-                onChange={(e) => setFormData(prev => ({ ...prev, date_applied: e.target.value }))}
+                value={formData.dateApplied}
+                onChange={(e) => setFormData(prev => ({ ...prev, dateApplied: e.target.value }))}
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="company_name">Company Name *</Label>
+              <Label htmlFor="companyName">Company Name *</Label>
               <Input
-                id="company_name"
-                value={formData.company_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, company_name: e.target.value }))}
+                id="companyName"
+                value={formData.companyName}
+                onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
                 required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="job_title">Job Title *</Label>
+              <Label htmlFor="jobTitle">Job Title *</Label>
               <Input
-                id="job_title"
-                value={formData.job_title}
-                onChange={(e) => setFormData(prev => ({ ...prev, job_title: e.target.value }))}
+                id="jobTitle"
+                value={formData.jobTitle}
+                onChange={(e) => setFormData(prev => ({ ...prev, jobTitle: e.target.value }))}
                 required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="job_link">Job Link</Label>
-              <Input
-                id="job_link"
-                value={formData.job_link || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, job_link: e.target.value }))}
-                placeholder="https://..."
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="application_status">Application Status</Label>
+              <Label htmlFor="applicationStatus">Application Status</Label>
               <select
-                id="application_status"
-                value={formData.application_status}
-                onChange={(e) => setFormData(prev => ({ ...prev, application_status: e.target.value as any }))}
+                id="applicationStatus"
+                value={formData.applicationStatus}
+                onChange={(e) => setFormData(prev => ({ ...prev, applicationStatus: e.target.value }))}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="applied">Applied</option>
-                <option value="interviewed">Interviewed</option>
-                <option value="offered">Offered</option>
+                <option value="to_be_considered">To Be Considered</option>
+                <option value="interviewing">Interviewing</option>
+                <option value="offer">Offer Received</option>
                 <option value="rejected">Rejected</option>
                 <option value="withdrawn">Withdrawn</option>
               </select>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="interview_stage">Interview Stage</Label>
+              <Label htmlFor="interviewStage">Interview Stage</Label>
               <Input
-                id="interview_stage"
-                value={formData.interview_stage || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, interview_stage: e.target.value }))}
+                id="interviewStage"
+                value={formData.interviewStage}
+                onChange={(e) => setFormData(prev => ({ ...prev, interviewStage: e.target.value }))}
                 placeholder="e.g., Phone Screen, Technical Round"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="recruiter_name">Recruiter Name</Label>
+              <Label htmlFor="recruiterName">Recruiter Name</Label>
               <Input
-                id="recruiter_name"
-                value={formData.recruiter_name || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, recruiter_name: e.target.value }))}
+                id="recruiterName"
+                value={formData.recruiterName}
+                onChange={(e) => setFormData(prev => ({ ...prev, recruiterName: e.target.value }))}
               />
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="mentee_notes">Notes</Label>
+            <Label htmlFor="coachNotes">Notes</Label>
             <Textarea
-              id="mentee_notes"
-              value={formData.mentee_notes || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, mentee_notes: e.target.value }))}
+              id="coachNotes"
+              value={formData.coachNotes}
+              onChange={(e) => setFormData(prev => ({ ...prev, coachNotes: e.target.value }))}
               placeholder="Any additional notes about this application..."
             />
           </div>

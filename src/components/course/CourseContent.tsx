@@ -59,20 +59,10 @@ const CourseContent = ({ userId }: CourseContentProps) => {
     }
   };
 
-  // Calculate overall progress based on completed modules - fixed to use actual course modules count
+  // Calculate overall progress based on completed modules  
   const calculateOverallProgress = () => {
     const completedModules = progress.filter(p => p.completed).length;
-    const totalModules = courseModules.length; // Use actual course modules count (5)
-    const overallProgress = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
-    
-    console.log('Course page progress calculation (fixed):', {
-      completedModules,
-      totalModules,
-      overallProgress,
-      progress
-    });
-    
-    return overallProgress;
+    return Math.min((completedModules / courseModules.length) * 100, 100);
   };
 
   // Check if a module is completed

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
 import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
@@ -24,50 +25,30 @@ export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]
       return [];
     }
 
-    // Get unique mentee IDs from sessions (filter out null values)
-    const menteeIds = [...new Set(sessions.filter(session => session.mentee_id).map(session => session.mentee_id))];
+    // Get unique mentee IDs from sessions
+    const menteeIds = [...new Set(sessions.map(session => session.mentee_id))];
     
-    // Fetch mentee profiles separately (only if we have mentee IDs)
-    let profiles: any[] = [];
-    if (menteeIds.length > 0) {
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email, role')
-        .in('id', menteeIds);
+    // Fetch mentee profiles separately
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', menteeIds);
 
-      if (profilesError) {
-        console.error('Error fetching mentee profiles:', profilesError);
-        throw profilesError;
-      }
-
-      profiles = profilesData || [];
-      console.log('Mentee profiles data:', profiles);
+    if (profilesError) {
+      console.error('Error fetching mentee profiles:', profilesError);
+      throw profilesError;
     }
+
+    console.log('Mentee profiles data:', profiles);
 
     // Create a map of mentee profiles for easy lookup
     const profileMap = new Map();
-    profiles.forEach(profile => {
+    profiles?.forEach(profile => {
       profileMap.set(profile.id, profile);
     });
 
     // Transform sessions to include mentee information
     const transformedSessions = sessions.map(session => {
-      if (!session.mentee_id) {
-        // Handle sessions without mentee_id (guest sessions)
-        console.log('Processing guest session:', session.id);
-        
-        // Extract guest info from notes if available
-        const guestMatch = session.notes?.match(/Guest: ([^(]+)\(([^)]+)\)/);
-        const guestName = guestMatch ? guestMatch[1].trim() : 'Guest';
-        const guestEmail = guestMatch ? guestMatch[2].trim() : '';
-        
-        return {
-          ...session,
-          mentee_name: guestName,
-          mentee_email: guestEmail
-        };
-      }
-
       const menteeProfile = profileMap.get(session.mentee_id);
       console.log('Processing session:', session.id, 'with mentee profile:', menteeProfile);
       
@@ -121,8 +102,8 @@ export const cancelSession = async (sessionId: string) => {
     throw fetchError;
   }
 
-  // Get the mentee profile separately if session data exists and has a mentee_id
-  if (sessionData && sessionData.mentee_id) {
+  // Get the mentee profile separately if session data exists
+  if (sessionData) {
     const { data: menteeProfile, error: profileError } = await supabase
       .from('profiles')
       .select('first_name, last_name, email')

@@ -89,29 +89,6 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
     }
   };
 
-  const updateRecommendation = async (recommendationId: string, updates: Partial<JobRecommendation>) => {
-    try {
-      const { data, error } = await supabase
-        .from('weekly_job_recommendations')
-        .update(updates)
-        .eq('id', recommendationId)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      setRecommendations(prev => 
-        prev.map(rec => rec.id === recommendationId ? { ...rec, ...updates } : rec)
-      );
-
-      return data;
-    } catch (error: any) {
-      throw error;
-    }
-  };
-
   const deleteRecommendation = async (recommendationId: string) => {
     try {
       const { error } = await supabase
@@ -148,7 +125,6 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
     recommendations,
     loading,
     addRecommendation,
-    updateRecommendation,
     deleteRecommendation,
     refetchRecommendations: fetchRecommendations
   };

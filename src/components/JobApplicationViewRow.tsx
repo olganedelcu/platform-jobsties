@@ -1,86 +1,80 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { JobApplication } from '@/types/jobApplications';
+import { format } from 'date-fns';
+import { Eye } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import JobApplicationStatusBadge from '@/components/JobApplicationStatusBadge';
 import JobApplicationRowActions from '@/components/JobApplicationRowActions';
-import { ExternalLink } from 'lucide-react';
-import { JobApplication } from '@/types/jobApplications';
+import TruncatedNotes from '@/components/TruncatedNotes';
 
 interface JobApplicationViewRowProps {
   application: JobApplication;
+  isAddingNew: boolean;
+  isCoachView: boolean;
   onEdit: (application: JobApplication) => void;
   onDelete: (applicationId: string) => Promise<void>;
-  onArchive?: (id: string) => void;
-  showCoachNotes?: boolean;
-  isAddingNew?: boolean;
-  isCoachView?: boolean;
 }
 
-const JobApplicationViewRow = ({ 
-  application, 
-  onEdit, 
-  onDelete, 
-  onArchive,
-  showCoachNotes = false,
-  isAddingNew = false,
-  isCoachView = false
+const JobApplicationViewRow = ({
+  application,
+  isAddingNew,
+  isCoachView,
+  onEdit,
+  onDelete
 }: JobApplicationViewRowProps) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   return (
-    <TableRow>
-      <TableCell className="font-medium">{application.company_name}</TableCell>
-      <TableCell>{application.job_title}</TableCell>
-      <TableCell>
-        {application.job_link ? (
-          <a 
-            href={application.job_link} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
-          >
-            <ExternalLink className="h-3 w-3" />
-            View Job
-          </a>
-        ) : (
-          <span className="text-gray-400">No link</span>
-        )}
-      </TableCell>
-      <TableCell>{formatDate(application.date_applied)}</TableCell>
-      <TableCell>
+    <TableRow className="hover:bg-gray-50">
+      <TableCell className="w-32">{format(new Date(application.date_applied), 'MMM dd, yyyy')}</TableCell>
+      <TableCell className="w-40 font-medium">{application.company_name}</TableCell>
+      <TableCell className="w-40">{application.job_title}</TableCell>
+      <TableCell className="w-32">
         <JobApplicationStatusBadge status={application.application_status} />
       </TableCell>
-      <TableCell>{application.interview_stage || '-'}</TableCell>
-      <TableCell>{application.recruiter_name || '-'}</TableCell>
-      <TableCell className="max-w-[200px]">
-        <div className="truncate" title={application.mentee_notes}>
-          {application.mentee_notes || '-'}
+      <TableCell className="w-32">{application.interview_stage || '-'}</TableCell>
+      <TableCell className="w-40">
+        <div className="break-words">
+          {application.recruiter_name || '-'}
         </div>
       </TableCell>
-      {showCoachNotes && (
-        <TableCell className="max-w-[200px]">
-          <div className="truncate" title={application.coach_notes}>
-            {application.coach_notes || '-'}
-          </div>
-        </TableCell>
-      )}
-      <TableCell>
-        <JobApplicationRowActions
-          application={application}
-          isEditing={false}
-          isAddingNew={isAddingNew}
-          isCoachView={isCoachView}
-          onEdit={onEdit}
-          onSave={async () => {}}
-          onCancel={() => {}}
-          onDelete={onDelete}
-        />
+      <TableCell className="w-64">
+        <div className="break-words">
+          <TruncatedNotes notes={application.mentee_notes} maxLength={100} />
+        </div>
+      </TableCell>
+      <TableCell className="w-64">
+        <div className="break-words">
+          {application.coach_notes ? (
+            <div className="text-sm text-gray-700 p-2 rounded bg-blue-50 border-l-2 border-blue-400">
+              {application.coach_notes}
+            </div>
+          ) : (
+            <span className="text-gray-400 text-sm">-</span>
+          )}
+        </div>
+      </TableCell>
+      <TableCell className="w-32">
+        <div className="flex items-center space-x-2">
+          {!isCoachView && (
+            <Link to={`/application/${application.id}`}>
+              <Button variant="outline" size="sm" title="View Full Application">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+          )}
+          <JobApplicationRowActions
+            application={application}
+            isEditing={false}
+            isAddingNew={isAddingNew}
+            isCoachView={isCoachView}
+            onEdit={onEdit}
+            onSave={() => Promise.resolve()}
+            onCancel={() => {}}
+            onDelete={onDelete}
+          />
+        </div>
       </TableCell>
     </TableRow>
   );

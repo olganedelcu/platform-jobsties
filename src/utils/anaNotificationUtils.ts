@@ -1,6 +1,14 @@
-import { EnhancedNotificationHandlers } from './enhancedNotificationHandler';
 
-// Updated main notification utilities with enhanced system
+import { handleJobRecommendationNotification } from './jobRecommendationNotificationHandler';
+import { handleFileUploadNotification } from './fileUploadNotificationHandler';
+import { handleMessageNotification } from './messageNotificationHandler';
+import { handleTodoAssignmentNotification } from './todoAssignmentNotificationHandler';
+
+// Re-export utilities for backward compatibility
+export { isAnaUser } from './userValidationUtils';
+export { getMenteeNotificationData } from './menteeDataUtils';
+
+// Notification handlers for different actions
 export const NotificationHandlers = {
   async jobRecommendation(
     currentUserEmail: string,
@@ -8,7 +16,7 @@ export const NotificationHandlers = {
     jobTitle: string, 
     companyName: string
   ) {
-    return EnhancedNotificationHandlers.jobRecommendation(menteeId, jobTitle, companyName);
+    return handleJobRecommendationNotification(currentUserEmail, menteeId, jobTitle, companyName);
   },
 
   async fileUpload(
@@ -16,7 +24,7 @@ export const NotificationHandlers = {
     menteeId: string, 
     fileName: string
   ) {
-    return EnhancedNotificationHandlers.fileUpload(menteeId, fileName);
+    return handleFileUploadNotification(currentUserEmail, menteeId, fileName);
   },
 
   async message(
@@ -24,7 +32,7 @@ export const NotificationHandlers = {
     menteeId: string, 
     messageContent: string
   ) {
-    return EnhancedNotificationHandlers.message(menteeId, messageContent);
+    return handleMessageNotification(currentUserEmail, menteeId, messageContent);
   },
 
   async todoAssignment(
@@ -33,10 +41,6 @@ export const NotificationHandlers = {
     todoTitle?: string,
     count?: number
   ) {
-    return EnhancedNotificationHandlers.todoAssignment(menteeIds, todoTitle, count);
+    return handleTodoAssignmentNotification(currentUserEmail, menteeIds, todoTitle, count);
   }
 };
-
-// Keep backward compatibility exports
-export { getMenteeNotificationData } from './menteeDataUtils';
-export const isAnaUser = () => true; // Now all users can send notifications

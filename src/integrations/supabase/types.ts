@@ -422,7 +422,7 @@ export type Database = {
           id: string
           is_blocking_event: boolean | null
           meeting_link: string | null
-          mentee_id: string | null
+          mentee_id: string
           notes: string | null
           preferred_coach: string | null
           session_date: string
@@ -441,7 +441,7 @@ export type Database = {
           id?: string
           is_blocking_event?: boolean | null
           meeting_link?: string | null
-          mentee_id?: string | null
+          mentee_id: string
           notes?: string | null
           preferred_coach?: string | null
           session_date: string
@@ -460,7 +460,7 @@ export type Database = {
           id?: string
           is_blocking_event?: boolean | null
           meeting_link?: string | null
-          mentee_id?: string | null
+          mentee_id?: string
           notes?: string | null
           preferred_coach?: string | null
           session_date?: string
@@ -630,7 +630,6 @@ export type Database = {
           date_applied: string
           id: string
           interview_stage: string | null
-          job_link: string | null
           job_title: string
           mentee_id: string
           mentee_notes: string | null
@@ -645,7 +644,6 @@ export type Database = {
           date_applied: string
           id?: string
           interview_stage?: string | null
-          job_link?: string | null
           job_title: string
           mentee_id: string
           mentee_notes?: string | null
@@ -660,7 +658,6 @@ export type Database = {
           date_applied?: string
           id?: string
           interview_stage?: string | null
-          job_link?: string | null
           job_title?: string
           mentee_id?: string
           mentee_notes?: string | null

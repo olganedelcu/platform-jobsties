@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
@@ -31,14 +32,14 @@ const ExcelLikeJobApplicationsTable = ({
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [newApplicationData, setNewApplicationData] = useState<NewJobApplicationData>({
-    date_applied: format(new Date(), 'yyyy-MM-dd'),
-    company_name: '',
-    job_title: '',
-    application_status: 'applied',
-    interview_stage: '',
-    recruiter_name: '',
-    mentee_notes: '',
-    job_link: ''
+    dateApplied: format(new Date(), 'yyyy-MM-dd'),
+    companyName: '',
+    jobTitle: '',
+    applicationStatus: 'applied',
+    interviewStage: '',
+    recruiterName: '',
+    coachNotes: '',
+    menteeNotes: ''
   });
 
   const {
@@ -71,18 +72,18 @@ const ExcelLikeJobApplicationsTable = ({
   };
 
   const handleSaveNew = async () => {
-    if (newApplicationData.company_name && newApplicationData.job_title) {
+    if (newApplicationData.companyName && newApplicationData.jobTitle) {
       await onAddApplication(newApplicationData);
       setIsAddingNew(false);
       setNewApplicationData({
-        date_applied: format(new Date(), 'yyyy-MM-dd'),
-        company_name: '',
-        job_title: '',
-        application_status: 'applied',
-        interview_stage: '',
-        recruiter_name: '',
-        mentee_notes: '',
-        job_link: ''
+        dateApplied: format(new Date(), 'yyyy-MM-dd'),
+        companyName: '',
+        jobTitle: '',
+        applicationStatus: 'applied',
+        interviewStage: '',
+        recruiterName: '',
+        coachNotes: '',
+        menteeNotes: ''
       });
     }
   };
@@ -90,14 +91,14 @@ const ExcelLikeJobApplicationsTable = ({
   const handleCancelNew = () => {
     setIsAddingNew(false);
     setNewApplicationData({
-      date_applied: format(new Date(), 'yyyy-MM-dd'),
-      company_name: '',
-      job_title: '',
-      application_status: 'applied',
-      interview_stage: '',
-      recruiter_name: '',
-      mentee_notes: '',
-      job_link: ''
+      dateApplied: format(new Date(), 'yyyy-MM-dd'),
+      companyName: '',
+      jobTitle: '',
+      applicationStatus: 'applied',
+      interviewStage: '',
+      recruiterName: '',
+      coachNotes: '',
+      menteeNotes: ''
     });
   };
 
@@ -149,7 +150,7 @@ const ExcelLikeJobApplicationsTable = ({
         <div className="sticky top-0 z-10 bg-white border-b">
           <div className="overflow-x-auto">
             <Table>
-              <JobApplicationsTableHeader showCoachNotes={true} />
+              <JobApplicationsTableHeader showCoachNotesColumn={true} />
             </Table>
           </div>
         </div>
@@ -161,6 +162,8 @@ const ExcelLikeJobApplicationsTable = ({
               <TableBody>
                 {!isCoachView && isAddingNew && (
                   <NewApplicationRow
+                    newApplicationData={newApplicationData}
+                    setNewApplicationData={setNewApplicationData}
                     onSave={handleSaveNew}
                     onCancel={handleCancelNew}
                   />
@@ -184,7 +187,7 @@ const ExcelLikeJobApplicationsTable = ({
                 
                 {filteredApplications.length === 0 && !isAddingNew && (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                    <TableCell colSpan={9} className="text-center py-8 text-gray-500">
                       {searchTerm ? (
                         <>
                           No applications found matching "{searchTerm}".

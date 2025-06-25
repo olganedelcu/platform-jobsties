@@ -63,8 +63,8 @@ const RecentActivityCard = ({ recentApplications, onViewAll, onAddApplication }:
                         variant="outline" 
                         className={`text-xs px-1 py-0 h-5 ${
                           application.application_status === 'applied' ? 'bg-blue-50 text-blue-700' :
-                          application.application_status === 'interviewed' ? 'bg-purple-50 text-purple-700' :
-                          application.application_status === 'offered' ? 'bg-green-50 text-green-700' :
+                          application.application_status === 'interviewing' ? 'bg-purple-50 text-purple-700' :
+                          application.application_status === 'offer' ? 'bg-green-50 text-green-700' :
                           'bg-gray-50 text-gray-700'
                         }`}
                       >

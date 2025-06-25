@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
 
@@ -7,17 +6,13 @@ export const fetchJobApplications = async (userId: string): Promise<JobApplicati
     .from('job_applications')
     .select('*')
     .eq('mentee_id', userId)
-    .order('date_applied', { ascending: false });
+    .order('created_at', { ascending: false }); // Sort by creation time, most recent first
 
   if (error) {
-    console.error('Error fetching job applications:', error);
     throw error;
   }
 
-  return (data || []).map(item => ({
-    ...item,
-    application_status: item.application_status as JobApplication['application_status']
-  }));
+  return data || [];
 };
 
 export const addJobApplication = async (userId: string, applicationData: NewJobApplicationData): Promise<JobApplication> => {
@@ -25,40 +20,35 @@ export const addJobApplication = async (userId: string, applicationData: NewJobA
     .from('job_applications')
     .insert({
       mentee_id: userId,
-      ...applicationData
+      date_applied: applicationData.dateApplied,
+      company_name: applicationData.companyName,
+      job_title: applicationData.jobTitle,
+      application_status: applicationData.applicationStatus,
+      interview_stage: applicationData.interviewStage || null,
+      recruiter_name: applicationData.recruiterName || null,
+      coach_notes: applicationData.coachNotes || null,
+      mentee_notes: applicationData.menteeNotes || null
     })
     .select()
     .single();
 
   if (error) {
-    console.error('Error adding job application:', error);
     throw error;
   }
 
-  return {
-    ...data,
-    application_status: data.application_status as JobApplication['application_status']
-  };
+  return data;
 };
 
-export const updateJobApplication = async (userId: string, applicationId: string, updates: Partial<JobApplication>): Promise<JobApplication> => {
-  const { data, error } = await supabase
+export const updateJobApplication = async (userId: string, applicationId: string, updates: Partial<JobApplication>): Promise<void> => {
+  const { error } = await supabase
     .from('job_applications')
     .update(updates)
     .eq('id', applicationId)
-    .eq('mentee_id', userId)
-    .select()
-    .single();
+    .eq('mentee_id', userId);
 
   if (error) {
-    console.error('Error updating job application:', error);
     throw error;
   }
-
-  return {
-    ...data,
-    application_status: data.application_status as JobApplication['application_status']
-  };
 };
 
 export const deleteJobApplication = async (userId: string, applicationId: string): Promise<void> => {
@@ -69,7 +59,6 @@ export const deleteJobApplication = async (userId: string, applicationId: string
     .eq('mentee_id', userId);
 
   if (error) {
-    console.error('Error deleting job application:', error);
     throw error;
   }
 };
