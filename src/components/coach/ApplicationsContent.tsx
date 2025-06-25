@@ -49,22 +49,43 @@ const ApplicationsContent = () => {
     return acc;
   }, {} as Record<string, typeof applications>);
 
-  // Filter mentees based on search term
-  const filteredMentees = mentees.filter(mentee => {
+  // Filter applications based on search term (company, position, and mentee name)
+  const filteredApplications = applications.filter(application => {
     if (!searchTerm) return true;
-    const fullName = `${mentee.first_name} ${mentee.last_name}`.toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase());
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    
+    // Search by company and position
+    const companyMatch = application.company_name.toLowerCase().includes(lowerSearchTerm);
+    const positionMatch = application.job_title.toLowerCase().includes(lowerSearchTerm);
+    
+    // Search by mentee name
+    const mentee = mentees.find(m => m.id === application.mentee_id);
+    const menteeMatch = mentee ? 
+      `${mentee.first_name} ${mentee.last_name}`.toLowerCase().includes(lowerSearchTerm) : false;
+    
+    return companyMatch || positionMatch || menteeMatch;
   });
 
-  // Only show mentees that have applications and match the search
-  const menteesWithApplications = filteredMentees.filter(
-    mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
-  );
-
-  // Get applications for filtered mentees
-  const filteredApplications = applications.filter(app => 
-    menteesWithApplications.some(mentee => mentee.id === app.mentee_id)
-  );
+  // Filter mentees based on search term and those who have applications
+  const filteredMentees = mentees.filter(mentee => {
+    const hasApplications = applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0;
+    if (!hasApplications) return false;
+    
+    if (!searchTerm) return true;
+    
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    const fullName = `${mentee.first_name} ${mentee.last_name}`.toLowerCase();
+    const nameMatch = fullName.includes(lowerSearchTerm);
+    
+    // Also check if any of their applications match the search
+    const applicationsMatch = applicationsByMentee[mentee.id].some(app => 
+      app.company_name.toLowerCase().includes(lowerSearchTerm) ||
+      app.job_title.toLowerCase().includes(lowerSearchTerm)
+    );
+    
+    return nameMatch || applicationsMatch;
+  });
 
   const totalMenteesWithApplications = mentees.filter(
     mentee => applicationsByMentee[mentee.id] && applicationsByMentee[mentee.id].length > 0
@@ -87,7 +108,7 @@ const ApplicationsContent = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         totalMentees={totalMenteesWithApplications}
-        filteredMentees={menteesWithApplications.length}
+        filteredMentees={filteredMentees.length}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -141,10 +162,11 @@ const ApplicationsContent = () => {
         </div>
       )}
 
-      {menteesWithApplications.length === 0 && searchTerm && (
+      {filteredMentees.length === 0 && searchTerm && (
         <div className="text-center py-12">
-          <div className="text-gray-500 mb-4">No mentees found matching "{searchTerm}"</div>
-          <Button variant="outline" onClick={() => setSearchTerm('')}>
+          <div className="text-gray-500 mb-4">No results found matching "{searchTerm}"</div>
+          <div className="text-sm text-gray-400">Try searching by mentee name, company, or position</div>
+          <Button variant="outline" onClick={() => setSearchTerm('')} className="mt-4">
             Clear search
           </Button>
         </div>
