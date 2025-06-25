@@ -1,62 +1,95 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Edit, Save, X, Trash2 } from 'lucide-react';
-import { JobApplication } from '@/types/jobApplications';
+import { Trash2, Edit, Save, X, ExternalLink } from 'lucide-react';
 
 interface JobApplicationRowActionsProps {
-  application: JobApplication;
   isEditing: boolean;
   isAddingNew: boolean;
-  isCoachView: boolean;
-  onEdit: (application: JobApplication) => void;
-  onSave: (applicationId: string) => Promise<void>;
+  onEdit: () => void;
+  onSave: () => void;
   onCancel: () => void;
-  onDelete: (applicationId: string) => Promise<void>;
+  onDelete: () => void;
+  jobLink?: string | null;
 }
 
 const JobApplicationRowActions = ({
-  application,
   isEditing,
   isAddingNew,
-  isCoachView,
   onEdit,
   onSave,
   onCancel,
-  onDelete
+  onDelete,
+  jobLink
 }: JobApplicationRowActionsProps) => {
-  if (isEditing) {
-    return (
-      <div className="flex gap-1">
-        <Button size="sm" onClick={() => onSave(application.id)}>
-          <Save className="h-3 w-3" />
-        </Button>
-        <Button size="sm" variant="outline" onClick={onCancel}>
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    );
-  }
+  const handleViewJob = () => {
+    if (!jobLink) return;
+    
+    let url = jobLink.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      // Silent fail for security
+    }
+  };
 
   return (
     <div className="flex gap-1">
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => onEdit(application)}
-        disabled={isAddingNew}
-      >
-        <Edit className="h-3 w-3" />
-      </Button>
-      {!isCoachView && (
+      {jobLink && (
         <Button
           size="sm"
           variant="outline"
-          onClick={() => onDelete(application.id)}
-          className="text-red-600 hover:text-red-700"
+          onClick={handleViewJob}
+          title="View job posting"
+          className="p-1 h-7 w-7"
         >
-          <Trash2 className="h-3 w-3" />
+          <ExternalLink className="h-3 w-3" />
         </Button>
+      )}
+      
+      {isEditing ? (
+        <>
+          <Button 
+            size="sm" 
+            onClick={onSave}
+            className="px-2 h-7"
+          >
+            <Save className="h-3 w-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={onCancel}
+            className="px-2 h-7"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={onEdit}
+            disabled={isAddingNew}
+            className="p-1 h-7 w-7"
+          >
+            <Edit className="h-3 w-3" />
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={onDelete}
+            disabled={isAddingNew}
+            className="p-1 h-7 w-7"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </>
       )}
     </div>
   );
