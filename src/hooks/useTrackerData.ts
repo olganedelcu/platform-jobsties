@@ -1,61 +1,57 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { JobApplication } from '@/types/jobApplications';
 
-interface UseTrackerDataParams {
+interface UseTrackerDataProps {
   applications: JobApplication[];
   activeTab: string;
 }
 
-export const useTrackerData = ({ applications, activeTab }: UseTrackerDataParams) => {
-  // Memoize statistics calculations and filtered applications
-  const { statistics, filteredApplications } = useMemo(() => {
+export const useTrackerData = ({ applications, activeTab }: UseTrackerDataProps) => {
+  const statistics = useMemo(() => {
     const totalApplications = applications.length;
     const appliedCount = applications.filter(app => app.application_status === 'applied').length;
-    const toBeConsideredCount = applications.filter(app => app.application_status === 'to_be_considered').length;
-    const interviewingCount = applications.filter(app => app.application_status === 'interviewing').length;
+    const interviewedCount = applications.filter(app => app.application_status === 'interviewed').length;
+    const offeredCount = applications.filter(app => app.application_status === 'offered').length;
     const rejectedCount = applications.filter(app => app.application_status === 'rejected').length;
-    const offersCount = applications.filter(app => app.application_status === 'offer').length;
+    const withdrawnCount = applications.filter(app => app.application_status === 'withdrawn').length;
     
+    // Calculate applications this month
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
     const applicationsThisMonth = applications.filter(app => {
       const appDate = new Date(app.date_applied);
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
       return appDate.getMonth() === currentMonth && appDate.getFullYear() === currentYear;
     }).length;
 
-    // Filter applications based on active tab
-    let filtered = applications;
+    return {
+      totalApplications,
+      appliedCount,
+      toBeConsideredCount: interviewedCount, // Map interviewed to "to be considered"
+      interviewingCount: interviewedCount,
+      rejectedCount,
+      offersCount: offeredCount,
+      applicationsThisMonth
+    };
+  }, [applications]);
+
+  const filteredApplications = useMemo(() => {
     switch (activeTab) {
       case 'applied':
-        filtered = applications.filter(app => app.application_status === 'applied');
-        break;
+        return applications.filter(app => app.application_status === 'applied');
       case 'to_be_considered':
-        filtered = applications.filter(app => app.application_status === 'to_be_considered');
-        break;
+        return applications.filter(app => app.application_status === 'interviewed');
       case 'interviewing':
-        filtered = applications.filter(app => app.application_status === 'interviewing');
-        break;
+        return applications.filter(app => app.application_status === 'interviewed');
       case 'rejected':
-        filtered = applications.filter(app => app.application_status === 'rejected');
-        break;
+        return applications.filter(app => app.application_status === 'rejected');
       default:
-        filtered = applications;
+        return applications;
     }
-
-    return {
-      statistics: {
-        totalApplications,
-        appliedCount,
-        toBeConsideredCount,
-        interviewingCount,
-        rejectedCount,
-        offersCount,
-        applicationsThisMonth
-      },
-      filteredApplications: filtered
-    };
   }, [applications, activeTab]);
 
-  return { statistics, filteredApplications };
+  return {
+    statistics,
+    filteredApplications
+  };
 };

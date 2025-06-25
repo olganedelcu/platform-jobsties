@@ -14,7 +14,10 @@ export const fetchJobApplications = async (userId: string): Promise<JobApplicati
     throw error;
   }
 
-  return data || [];
+  return (data || []).map(item => ({
+    ...item,
+    application_status: item.application_status as JobApplication['application_status']
+  }));
 };
 
 export const addJobApplication = async (userId: string, applicationData: NewJobApplicationData): Promise<JobApplication> => {
@@ -32,7 +35,10 @@ export const addJobApplication = async (userId: string, applicationData: NewJobA
     throw error;
   }
 
-  return data;
+  return {
+    ...data,
+    application_status: data.application_status as JobApplication['application_status']
+  };
 };
 
 export const updateJobApplication = async (userId: string, applicationId: string, updates: Partial<JobApplication>): Promise<JobApplication> => {
@@ -49,7 +55,10 @@ export const updateJobApplication = async (userId: string, applicationId: string
     throw error;
   }
 
-  return data;
+  return {
+    ...data,
+    application_status: data.application_status as JobApplication['application_status']
+  };
 };
 
 export const deleteJobApplication = async (userId: string, applicationId: string): Promise<void> => {

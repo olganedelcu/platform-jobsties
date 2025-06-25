@@ -9,7 +9,9 @@ interface UseJobRecommendationActionsProps {
   userId: string;
   addRecommendation?: (data: any) => Promise<any>;
   deleteRecommendation?: (id: string) => Promise<void>;
-  user?: any; // Make user optional for backward compatibility
+  updateRecommendation?: (id: string, updates: any) => Promise<void>;
+  refetchRecommendations?: () => Promise<void>;
+  user?: any;
   onApplicationAdded?: () => void;
 }
 
@@ -17,6 +19,8 @@ export const useJobRecommendationActions = ({
   userId, 
   addRecommendation, 
   deleteRecommendation,
+  updateRecommendation,
+  refetchRecommendations,
   user,
   onApplicationAdded
 }: UseJobRecommendationActionsProps) => {
@@ -107,6 +111,24 @@ export const useJobRecommendationActions = ({
     setSelectedRecommendation(null);
   };
 
+  const archiveRecommendation = async (recommendationId: string) => {
+    if (updateRecommendation) {
+      await updateRecommendation(recommendationId, { archived: true });
+      if (refetchRecommendations) {
+        await refetchRecommendations();
+      }
+    }
+  };
+
+  const reactivateRecommendation = async (recommendationId: string) => {
+    if (updateRecommendation) {
+      await updateRecommendation(recommendationId, { archived: false });
+      if (refetchRecommendations) {
+        await refetchRecommendations();
+      }
+    }
+  };
+
   // Mentee functionality: Mark recommendation as applied and add to job tracker with description in notes
   const markAsApplied = async (recommendation: JobRecommendation) => {
     if (!user) {
@@ -126,11 +148,11 @@ export const useJobRecommendationActions = ({
 
       // Add to job applications tracker with description in notes
       await addJobApplication(user.id, {
-        jobTitle: recommendation.job_title,
-        companyName: recommendation.company_name,
-        dateApplied: new Date().toISOString().split('T')[0],
-        applicationStatus: 'applied',
-        menteeNotes
+        job_title: recommendation.job_title,
+        company_name: recommendation.company_name,
+        date_applied: new Date().toISOString().split('T')[0],
+        application_status: 'applied',
+        mentee_notes
       });
 
       // Update recommendation status
@@ -169,6 +191,8 @@ export const useJobRecommendationActions = ({
     handleSelectAll,
     handleDeleteSelected,
     closeAssignmentDialog,
-    markAsApplied // Add this to the return value
+    markAsApplied,
+    archiveRecommendation,
+    reactivateRecommendation
   };
 };

@@ -33,7 +33,10 @@ const ApplicationDetail = () => {
           .single();
 
         if (error) throw error;
-        setApplication(data);
+        setApplication({
+          ...data,
+          application_status: data.application_status as JobApplication['application_status']
+        });
       } catch (error) {
         console.error('Error fetching application:', error);
         navigate('/tracker');
@@ -231,7 +234,7 @@ const ApplicationDetail = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </main>

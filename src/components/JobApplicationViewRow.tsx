@@ -9,9 +9,11 @@ import { JobApplication } from '@/types/jobApplications';
 interface JobApplicationViewRowProps {
   application: JobApplication;
   onEdit: (application: JobApplication) => void;
-  onDelete: (id: string) => void;
+  onDelete: (applicationId: string) => Promise<void>;
   onArchive?: (id: string) => void;
   showCoachNotes?: boolean;
+  isAddingNew?: boolean;
+  isCoachView?: boolean;
 }
 
 const JobApplicationViewRow = ({ 
@@ -19,7 +21,9 @@ const JobApplicationViewRow = ({
   onEdit, 
   onDelete, 
   onArchive,
-  showCoachNotes = false 
+  showCoachNotes = false,
+  isAddingNew = false,
+  isCoachView = false
 }: JobApplicationViewRowProps) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -69,9 +73,13 @@ const JobApplicationViewRow = ({
       <TableCell>
         <JobApplicationRowActions
           application={application}
+          isEditing={false}
+          isAddingNew={isAddingNew}
+          isCoachView={isCoachView}
           onEdit={onEdit}
+          onSave={async () => {}}
+          onCancel={() => {}}
           onDelete={onDelete}
-          onArchive={onArchive}
         />
       </TableCell>
     </TableRow>

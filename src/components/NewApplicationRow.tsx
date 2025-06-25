@@ -5,19 +5,20 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
 import JobApplicationStatusSelect from '@/components/JobApplicationStatusSelect';
+import { NewJobApplicationData } from '@/types/jobApplications';
 
 interface NewApplicationRowProps {
-  onSave: (applicationData: any) => void;
+  onSave: (applicationData: NewJobApplicationData) => void;
   onCancel: () => void;
 }
 
 const NewApplicationRow = ({ onSave, onCancel }: NewApplicationRowProps) => {
-  const [newApplication, setNewApplication] = useState({
+  const [newApplication, setNewApplication] = useState<NewJobApplicationData>({
     company_name: '',
     job_title: '',
     job_link: '',
     date_applied: new Date().toISOString().split('T')[0],
-    application_status: 'applied' as const,
+    application_status: 'applied',
     interview_stage: '',
     recruiter_name: '',
     mentee_notes: ''

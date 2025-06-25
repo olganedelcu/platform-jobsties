@@ -24,6 +24,7 @@ export const useEnhancedJobRecommendations = ({ userId, isCoach = false }: UseEn
   } = useJobRecommendations({ userId, isCoach });
 
   const { archiveRecommendation, reactivateRecommendation } = useJobRecommendationActions({
+    userId,
     updateRecommendation,
     refetchRecommendations
   });

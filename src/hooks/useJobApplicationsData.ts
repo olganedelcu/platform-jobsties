@@ -3,9 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchJobApplications } from '@/services/jobApplicationsService';
 import { useJobApplicationActions } from '@/hooks/useJobApplicationActions';
-import { JobApplication, JobApplicationsHookReturn } from '@/types/jobApplications';
+import { JobApplication, JobApplicationsDataHookReturn } from '@/types/jobApplications';
 
-export const useJobApplicationsData = (user: any): JobApplicationsHookReturn => {
+export const useJobApplicationsData = (user: any): JobApplicationsDataHookReturn => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
