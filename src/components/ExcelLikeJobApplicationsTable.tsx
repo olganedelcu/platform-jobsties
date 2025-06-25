@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
@@ -32,15 +31,14 @@ const ExcelLikeJobApplicationsTable = ({
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [newApplicationData, setNewApplicationData] = useState<NewJobApplicationData>({
-    dateApplied: format(new Date(), 'yyyy-MM-dd'),
-    companyName: '',
-    jobTitle: '',
-    applicationStatus: 'applied',
-    interviewStage: '',
-    recruiterName: '',
-    coachNotes: '',
-    menteeNotes: '',
-    jobLink: ''
+    date_applied: format(new Date(), 'yyyy-MM-dd'),
+    company_name: '',
+    job_title: '',
+    application_status: 'applied',
+    interview_stage: '',
+    recruiter_name: '',
+    mentee_notes: '',
+    job_link: ''
   });
 
   const {
@@ -73,19 +71,18 @@ const ExcelLikeJobApplicationsTable = ({
   };
 
   const handleSaveNew = async () => {
-    if (newApplicationData.companyName && newApplicationData.jobTitle) {
+    if (newApplicationData.company_name && newApplicationData.job_title) {
       await onAddApplication(newApplicationData);
       setIsAddingNew(false);
       setNewApplicationData({
-        dateApplied: format(new Date(), 'yyyy-MM-dd'),
-        companyName: '',
-        jobTitle: '',
-        applicationStatus: 'applied',
-        interviewStage: '',
-        recruiterName: '',
-        coachNotes: '',
-        menteeNotes: '',
-        jobLink: ''
+        date_applied: format(new Date(), 'yyyy-MM-dd'),
+        company_name: '',
+        job_title: '',
+        application_status: 'applied',
+        interview_stage: '',
+        recruiter_name: '',
+        mentee_notes: '',
+        job_link: ''
       });
     }
   };
@@ -93,15 +90,14 @@ const ExcelLikeJobApplicationsTable = ({
   const handleCancelNew = () => {
     setIsAddingNew(false);
     setNewApplicationData({
-      dateApplied: format(new Date(), 'yyyy-MM-dd'),
-      companyName: '',
-      jobTitle: '',
-      applicationStatus: 'applied',
-      interviewStage: '',
-      recruiterName: '',
-      coachNotes: '',
-      menteeNotes: '',
-      jobLink: ''
+      date_applied: format(new Date(), 'yyyy-MM-dd'),
+      company_name: '',
+      job_title: '',
+      application_status: 'applied',
+      interview_stage: '',
+      recruiter_name: '',
+      mentee_notes: '',
+      job_link: ''
     });
   };
 
@@ -153,7 +149,7 @@ const ExcelLikeJobApplicationsTable = ({
         <div className="sticky top-0 z-10 bg-white border-b">
           <div className="overflow-x-auto">
             <Table>
-              <JobApplicationsTableHeader showCoachNotesColumn={true} />
+              <JobApplicationsTableHeader showCoachNotes={true} />
             </Table>
           </div>
         </div>
@@ -165,8 +161,6 @@ const ExcelLikeJobApplicationsTable = ({
               <TableBody>
                 {!isCoachView && isAddingNew && (
                   <NewApplicationRow
-                    newApplicationData={newApplicationData}
-                    setNewApplicationData={setNewApplicationData}
                     onSave={handleSaveNew}
                     onCancel={handleCancelNew}
                   />

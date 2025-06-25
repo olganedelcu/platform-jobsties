@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,9 +44,8 @@ const JobApplicationsList = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'applied': return 'bg-blue-100 text-blue-800';
-      case 'to_be_considered': return 'bg-yellow-100 text-yellow-800';
-      case 'interviewing': return 'bg-purple-100 text-purple-800';
-      case 'offer': return 'bg-green-100 text-green-800';
+      case 'interviewed': return 'bg-purple-100 text-purple-800';
+      case 'offered': return 'bg-green-100 text-green-800';
       case 'rejected': return 'bg-red-100 text-red-800';
       case 'withdrawn': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -96,13 +94,12 @@ const JobApplicationsList = ({
                     {editingId === application.id ? (
                       <select
                         value={editData.application_status || application.application_status}
-                        onChange={(e) => setEditData(prev => ({ ...prev, application_status: e.target.value }))}
+                        onChange={(e) => setEditData(prev => ({ ...prev, application_status: e.target.value as any }))}
                         className="w-full text-xs p-1 border rounded"
                       >
                         <option value="applied">Applied</option>
-                        <option value="to_be_considered">To Be Considered</option>
-                        <option value="interviewing">Interviewing</option>
-                        <option value="offer">Offer Received</option>
+                        <option value="interviewed">Interviewed</option>
+                        <option value="offered">Offered</option>
                         <option value="rejected">Rejected</option>
                         <option value="withdrawn">Withdrawn</option>
                       </select>

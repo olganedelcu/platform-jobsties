@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { JobApplicationStatusBadge } from '@/components/JobApplicationStatusBadge';
-import { JobApplicationRowActions } from '@/components/JobApplicationRowActions';
+import JobApplicationStatusBadge from '@/components/JobApplicationStatusBadge';
+import JobApplicationRowActions from '@/components/JobApplicationRowActions';
 import { ExternalLink } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 
