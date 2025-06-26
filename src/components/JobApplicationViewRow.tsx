@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
 
 interface JobApplicationViewRowProps {
   application: JobApplication;
@@ -40,13 +41,13 @@ const JobApplicationViewRow = ({ application, isCoachView = false }: JobApplicat
         {format(new Date(application.date_applied), 'MMM dd, yyyy')}
       </TableCell>
       <TableCell 
-        className="font-medium text-blue-600 hover:text-blue-800 cursor-pointer underline hover:no-underline transition-colors" 
+        className="font-medium cursor-pointer hover:bg-gray-50 transition-colors" 
         onClick={handleCompanyClick}
       >
         {application.company_name}
       </TableCell>
       <TableCell 
-        className="text-blue-600 hover:text-blue-800 cursor-pointer underline hover:no-underline transition-colors" 
+        className="cursor-pointer hover:bg-gray-50 transition-colors" 
         onClick={handlePositionClick}
       >
         {application.job_title}
@@ -57,10 +58,10 @@ const JobApplicationViewRow = ({ application, isCoachView = false }: JobApplicat
             href={application.job_link} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-blue-600 hover:text-blue-800 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            View
+            <ExternalLink className="h-4 w-4" />
           </a>
         ) : (
           '-'
