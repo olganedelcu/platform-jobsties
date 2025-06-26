@@ -71,25 +71,8 @@ const ApplicationDetailsCard = ({
               <JobApplicationStatusBadge status={application.application_status} />
             )}
           </div>
-          
-          {/* Interview Stage - Highlighted in Red */}
-          <div className="flex items-center space-x-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <span className="text-sm font-medium text-red-700 min-w-[100px]">Interview Stage:</span>
-            {isEditing ? (
-              <Input
-                value={editData.interview_stage || ''}
-                onChange={(e) => onEditDataChange({ interview_stage: e.target.value })}
-                className="flex-1 border-red-300 focus:border-red-500"
-                placeholder="e.g., Phone Screen, Technical Interview"
-              />
-            ) : (
-              <span className="font-medium text-red-800">
-                {application.interview_stage || 'Not specified'}
-              </span>
-            )}
-          </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 md:col-span-2">
             <span className="text-sm text-gray-600 min-w-[80px]">Job Link:</span>
             {isEditing ? (
               <Input

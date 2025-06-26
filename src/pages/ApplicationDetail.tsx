@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -14,6 +13,7 @@ import ApplicationNotesSection from '@/components/application/ApplicationNotesSe
 import CoachFeedbackSection from '@/components/application/CoachFeedbackSection';
 import ContactInformationCard from '@/components/application/ContactInformationCard';
 import ApplicationTimelineCard from '@/components/application/ApplicationTimelineCard';
+import InterviewStageCard from '@/components/application/InterviewStageCard';
 
 const ApplicationDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -176,6 +176,13 @@ const ApplicationDetail = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             <ContactInformationCard
+              application={application}
+              isEditing={isEditing}
+              editData={editData}
+              onEditDataChange={handleEditDataChange}
+            />
+
+            <InterviewStageCard
               application={application}
               isEditing={isEditing}
               editData={editData}
