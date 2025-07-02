@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { courseModules } from '@/data/courseModules';
 
 interface DashboardData {
   upcomingSessions: number;
@@ -66,40 +67,42 @@ export const useDashboardData = (userId: string): DashboardData => {
         profileCompletion = Math.round((filledFields / fields.length) * 100);
       }
 
-      // Fetch course progress
+      // Fetch course progress data
       const { data: courseData, error: courseError } = await supabase
         .from('course_progress')
-        .select('progress_percentage, completed')
+        .select('module_title, completed, progress_percentage')
         .eq('user_id', userId);
 
       if (courseError) {
         console.error('Error fetching course progress:', courseError);
       }
 
-      // Calculate overall course progress
+      // Calculate overall course progress using the same logic as the course page
       let courseProgress = 0;
       if (courseData && courseData.length > 0) {
-        const totalProgress = courseData.reduce((sum, module) => sum + (module.progress_percentage || 0), 0);
-        courseProgress = Math.round(totalProgress / courseData.length);
+        // Count completed modules and calculate percentage based on total course modules
+        const completedModules = courseData.filter(module => module.completed).length;
+        courseProgress = Math.min((completedModules / courseModules.length) * 100, 100);
+      } else {
+        // If no real course data exists, fall back to CV progress calculation
+        const { data: cvFiles, error: cvError } = await supabase
+          .from('cv_files')
+          .select('id')
+          .eq('mentee_id', userId);
+
+        if (cvError) {
+          console.error('Error fetching CV files:', cvError);
+        }
+
+        // Calculate CV progress (20% per file, max 100%)
+        const cvProgress = cvFiles ? Math.min(cvFiles.length * 20, 100) : 0;
+        courseProgress = cvProgress;
       }
-
-      // Fetch CV files count
-      const { data: cvFiles, error: cvError } = await supabase
-        .from('cv_files')
-        .select('id')
-        .eq('mentee_id', userId);
-
-      if (cvError) {
-        console.error('Error fetching CV files:', cvError);
-      }
-
-      // Calculate CV progress (20% per file, max 100%)
-      const cvProgress = cvFiles ? Math.min(cvFiles.length * 20, 100) : 0;
 
       setDashboardData({
         upcomingSessions: sessions?.length || 0,
         profileCompletion,
-        courseProgress: Math.max(courseProgress, cvProgress), // Use higher of course or CV progress
+        courseProgress: Math.round(courseProgress),
         loading: false
       });
 
