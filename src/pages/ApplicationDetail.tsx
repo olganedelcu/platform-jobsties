@@ -53,14 +53,15 @@ const ApplicationDetail = () => {
   }, [user?.id, id, navigate]);
 
   const handleSave = async () => {
-    if (!application || !editData) return;
+    if (!application || !editData || !user?.id) return;
 
     setSaving(true);
     try {
       const { error } = await supabase
         .from('job_applications')
         .update(editData)
-        .eq('id', application.id);
+        .eq('id', application.id)
+        .eq('mentee_id', user.id);
 
       if (error) throw error;
 
