@@ -97,13 +97,13 @@ const TodoCard = ({
   const otherColumns = allColumns.filter(col => col.id !== currentColumnId);
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer mb-4">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between mb-3">
-          <h4 className="font-semibold text-gray-900 flex-1 pr-2 text-base">{todo.title}</h4>
+    <Card className="hover:shadow-md transition-shadow cursor-pointer mb-6">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <h4 className="font-semibold text-gray-900 flex-1 pr-3 text-lg leading-relaxed">{todo.title}</h4>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 flex-shrink-0">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -143,32 +143,36 @@ const TodoCard = ({
         </div>
         
         {todo.description && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-            {renderTextWithLinks(todo.description)}
+          <div className="mb-6 p-5 bg-gray-50 rounded-xl min-h-[120px] border-l-4 border-blue-200">
+            <div className="text-sm font-medium text-gray-700 mb-3">Description:</div>
+            <div className="space-y-3">
+              {renderTextWithLinks(todo.description)}
+            </div>
           </div>
         )}
         
-        <div className="flex flex-wrap gap-2 mb-3">
+        <div className="flex flex-wrap gap-3 mb-4">
           {showCoachAssignedLabel && (
-            <Badge className="bg-purple-100 text-purple-800">
+            <Badge className="bg-purple-100 text-purple-800 px-3 py-1">
               <User className="h-3 w-3 mr-1" />
               Coach Assigned
             </Badge>
           )}
-          <Badge className={getPriorityColor(todo.priority)}>
-            {todo.priority}
+          <Badge className={`${getPriorityColor(todo.priority)} px-3 py-1`}>
+            {todo.priority} priority
           </Badge>
           {todo.assignedTo && (
-            <Badge variant="outline">
+            <Badge variant="outline" className="px-3 py-1">
               {todo.assignedTo}
             </Badge>
           )}
         </div>
         
         {todo.due_date && (
-          <p className="text-xs text-gray-500 mt-2">
-            Due: {new Date(todo.due_date).toLocaleDateString()}
-          </p>
+          <div className="flex items-center gap-2 text-sm text-gray-600 mt-3 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+            <span className="font-medium">Due:</span>
+            <span>{new Date(todo.due_date).toLocaleDateString()}</span>
+          </div>
         )}
 
         <EditTodoDialog
