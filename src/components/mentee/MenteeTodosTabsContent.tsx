@@ -16,8 +16,8 @@ interface MenteeTodosTabsContentProps {
 }
 
 const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
-  const [assignmentsViewMode, setAssignmentsViewMode] = useState<'list' | 'board'>('board');
-  const [personalViewMode, setPersonalViewMode] = useState<'list' | 'board'>('board');
+  const [assignmentsViewMode, setAssignmentsViewMode] = useState<'list' | 'board'>('list');
+  const [personalViewMode, setPersonalViewMode] = useState<'list' | 'board'>('list');
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Get personal tasks and assignments with error handling

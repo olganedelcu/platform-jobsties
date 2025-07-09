@@ -18,7 +18,7 @@ const AssignmentsTabContent = ({
   viewMode: externalViewMode, 
   onViewModeChange 
 }: AssignmentsTabContentProps) => {
-  const [internalViewMode, setInternalViewMode] = useState<'list' | 'board'>('board');
+  const [internalViewMode, setInternalViewMode] = useState<'list' | 'board'>('list');
   const { assignments, loading } = useTodoAssignments(userId, false);
   
   const currentViewMode = externalViewMode || internalViewMode;
