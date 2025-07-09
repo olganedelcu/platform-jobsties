@@ -31,6 +31,7 @@ const BackupManagementPage = lazy(() => import("./pages/coach/BackupManagement")
 const CoachMessages = lazy(() => import("./pages/coach/CoachMessages"));
 const MenteeTodosPage = lazy(() => import("./pages/MenteeTodosPage"));
 const ApplicationDetail = lazy(() => import("./pages/ApplicationDetail"));
+const TaskDetail = lazy(() => import("./pages/TaskDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/application/:id" element={<ApplicationDetail />} />
               <Route path="/course" element={<Course />} />
               <Route path="/todos" element={<MenteeTodosPage />} />
+              <Route path="/task/:id" element={<TaskDetail />} />
               
               {/* Coach Routes */}
               <Route path="/coach/signup" element={<CoachSignUp />} />

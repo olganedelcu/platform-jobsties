@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +46,11 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/task/${todo.id}`);
+  };
 
   // Function to detect and convert URLs to clickable links
   const renderTextWithLinks = (text: string) => {
@@ -192,7 +198,7 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
   const assignmentCounts = getAssignmentStatusCounts();
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCardClick}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -257,7 +263,10 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => handleStatusUpdate('completed')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStatusUpdate('completed');
+                }}
                 className="px-3 py-2"
               >
                 <CheckCircle className="w-4 h-4" />
@@ -267,7 +276,10 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
             <Button
               size="sm"
               variant="outline"
-              onClick={handleDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete();
+              }}
               disabled={loading}
               className="px-3 py-2"
             >

@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,12 @@ interface MenteeAssignmentsListProps {
 const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
   const { assignments, loading, refreshAssignments } = useTodoAssignments(userId, false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [editingAssignment, setEditingAssignment] = useState<any>(null);
+
+  const handleCardClick = (assignmentId: string) => {
+    navigate(`/task/${assignmentId}`);
+  };
 
   const handleStatusUpdate = async (assignmentId: string, status: 'pending' | 'in_progress' | 'completed') => {
     try {
@@ -109,7 +115,11 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
         const displayDueDate = getDisplayDueDate(assignment);
 
         return (
-          <Card key={assignment.id} className="hover:shadow-md transition-shadow">
+          <Card 
+            key={assignment.id} 
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleCardClick(assignment.id)}
+          >
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -135,9 +145,11 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
                   </div>
 
                   {displayDescription && (
-                    <p className="text-gray-600 mb-4 leading-relaxed">
-                      {displayDescription}
-                    </p>
+                    <div className="mb-4 p-4 bg-gray-50 rounded-lg border-l-4 border-purple-200">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {displayDescription}
+                      </p>
+                    </div>
                   )}
 
                   <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -161,7 +173,10 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
                   {assignment.status === 'pending' && (
                     <Button
                       size="sm"
-                      onClick={() => handleStatusUpdate(assignment.id, 'in_progress')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusUpdate(assignment.id, 'in_progress');
+                      }}
                       className="flex items-center gap-2"
                     >
                       <Play className="h-4 w-4" />
@@ -172,7 +187,10 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
                   {assignment.status === 'in_progress' && (
                     <Button
                       size="sm"
-                      onClick={() => handleStatusUpdate(assignment.id, 'completed')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusUpdate(assignment.id, 'completed');
+                      }}
                       className="flex items-center gap-2"
                     >
                       <CheckCircle2 className="h-4 w-4" />
@@ -184,7 +202,10 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleStatusUpdate(assignment.id, 'in_progress')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStatusUpdate(assignment.id, 'in_progress');
+                      }}
                       className="flex items-center gap-2"
                     >
                       Reopen
@@ -194,7 +215,10 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setEditingAssignment(assignment)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingAssignment(assignment);
+                    }}
                     className="flex items-center gap-2"
                   >
                     <Edit className="h-4 w-4" />
