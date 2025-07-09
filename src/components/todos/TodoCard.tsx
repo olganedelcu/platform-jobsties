@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, Trash2, ArrowRight, User } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, ArrowRight, User, ExternalLink } from 'lucide-react';
 import EditTodoDialog from './EditTodoDialog';
 import { TodoItem, TodoColumnType } from '@/types/assignmentBoard';
 
@@ -28,6 +28,42 @@ const TodoCard = ({
   showCoachAssignedLabel = false
 }: TodoCardProps) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
+
+  // Function to detect and convert URLs to clickable links
+  const renderTextWithLinks = (text: string) => {
+    if (!text) return null;
+    
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return (
+      <div className="space-y-2">
+        {parts.map((part, index) => {
+          if (urlRegex.test(part)) {
+            return (
+              <div key={index} className="flex items-center gap-1">
+                <ExternalLink className="h-3 w-3 text-blue-600 flex-shrink-0" />
+                <a
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline break-all text-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {part}
+                </a>
+              </div>
+            );
+          }
+          return part ? (
+            <span key={index} className="block text-sm text-gray-600 leading-relaxed">
+              {part}
+            </span>
+          ) : null;
+        })}
+      </div>
+    );
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -61,17 +97,17 @@ const TodoCard = ({
   const otherColumns = allColumns.filter(col => col.id !== currentColumnId);
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <h4 className="font-medium text-gray-900 flex-1 pr-2">{todo.title}</h4>
+    <Card className="hover:shadow-md transition-shadow cursor-pointer mb-4">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between mb-3">
+          <h4 className="font-semibold text-gray-900 flex-1 pr-2 text-base">{todo.title}</h4>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0 flex-shrink-0">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-white border shadow-lg">
+            <DropdownMenuContent align="end" className="bg-white border shadow-lg z-50">
               <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -107,10 +143,12 @@ const TodoCard = ({
         </div>
         
         {todo.description && (
-          <p className="text-sm text-gray-600 mb-3">{todo.description}</p>
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            {renderTextWithLinks(todo.description)}
+          </div>
         )}
         
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-2 mb-3">
           {showCoachAssignedLabel && (
             <Badge className="bg-purple-100 text-purple-800">
               <User className="h-3 w-3 mr-1" />
@@ -128,7 +166,7 @@ const TodoCard = ({
         </div>
         
         {todo.due_date && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 mt-2">
             Due: {new Date(todo.due_date).toLocaleDateString()}
           </p>
         )}
