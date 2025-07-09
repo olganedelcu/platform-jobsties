@@ -198,8 +198,8 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
   const assignmentCounts = getAssignmentStatusCounts();
 
   return (
-    <Card className="mb-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={handleCardClick}>
-      <CardContent className="p-6">
+    <Card className="mb-6 cursor-pointer hover:shadow-lg transition-shadow min-h-[200px]" onClick={handleCardClick}>
+      <CardContent className="p-8">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">

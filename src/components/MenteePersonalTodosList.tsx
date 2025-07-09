@@ -82,12 +82,12 @@ const MenteePersonalTodosList = ({
     <>
       <div className="space-y-4">
         {todos.map((todo) => (
-          <Card 
-            key={todo.id} 
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => handleCardClick(todo.id)}
-          >
-            <CardContent className="p-6">
+        <Card 
+          key={todo.id} 
+          className="hover:shadow-lg transition-shadow cursor-pointer min-h-[200px]"
+          onClick={() => handleCardClick(todo.id)}
+        >
+          <CardContent className="p-8">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
