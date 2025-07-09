@@ -36,7 +36,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSendToMentees, setShowSendToMentees] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('board');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 

@@ -214,7 +214,6 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
             
             {todo.description && (
               <div className="mb-6 p-5 bg-gray-50 rounded-xl min-h-[120px] border-l-4 border-blue-200">
-                <div className="text-sm font-medium text-gray-700 mb-3">Description:</div>
                 <div className="space-y-3">
                   {renderTextWithLinks(todo.description)}
                 </div>
