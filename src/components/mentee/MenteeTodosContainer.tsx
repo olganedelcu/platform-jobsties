@@ -9,7 +9,7 @@ interface MenteeTodosContainerProps {
 
 const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('board');
 
   // Hooks for todo management
   const { 

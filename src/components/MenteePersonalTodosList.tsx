@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,11 @@ const MenteePersonalTodosList = ({
   onUpdateTodo 
 }: MenteePersonalTodosListProps) => {
   const [editingTodo, setEditingTodo] = useState<MenteeTodo | null>(null);
+  const navigate = useNavigate();
+
+  const handleCardClick = (todoId: string) => {
+    navigate(`/task/${todoId}`);
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -76,7 +82,11 @@ const MenteePersonalTodosList = ({
     <>
       <div className="space-y-4">
         {todos.map((todo) => (
-          <Card key={todo.id} className="hover:shadow-md transition-shadow">
+          <Card 
+            key={todo.id} 
+            className="hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleCardClick(todo.id)}
+          >
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -124,7 +134,10 @@ const MenteePersonalTodosList = ({
                   {todo.status === 'pending' && (
                     <Button
                       size="sm"
-                      onClick={() => onUpdateStatus(todo.id, 'in_progress')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateStatus(todo.id, 'in_progress');
+                      }}
                       className="flex items-center gap-2"
                     >
                       <Play className="h-4 w-4" />
@@ -135,7 +148,10 @@ const MenteePersonalTodosList = ({
                   {todo.status === 'in_progress' && (
                     <Button
                       size="sm"
-                      onClick={() => onUpdateStatus(todo.id, 'completed')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateStatus(todo.id, 'completed');
+                      }}
                       className="flex items-center gap-2"
                     >
                       <CheckCircle2 className="h-4 w-4" />
@@ -147,7 +163,10 @@ const MenteePersonalTodosList = ({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onUpdateStatus(todo.id, 'in_progress')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdateStatus(todo.id, 'in_progress');
+                      }}
                       className="flex items-center gap-2"
                     >
                       Reopen
@@ -156,17 +175,17 @@ const MenteePersonalTodosList = ({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={(e) => e.stopPropagation()}>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setEditingTodo(todo)}>
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setEditingTodo(todo); }}>
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => onDeleteTodo(todo.id)}
+                        onClick={(e) => { e.stopPropagation(); onDeleteTodo(todo.id); }}
                         className="text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
