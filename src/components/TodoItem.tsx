@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, CheckCircle, Clock, Users } from 'lucide-react';
+import { Trash2, Edit, CheckCircle, Clock, Users, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -45,6 +45,42 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  // Function to detect and convert URLs to clickable links
+  const renderTextWithLinks = (text: string) => {
+    if (!text) return null;
+    
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return (
+      <div className="space-y-2">
+        {parts.map((part, index) => {
+          if (urlRegex.test(part)) {
+            return (
+              <div key={index} className="flex items-center gap-1">
+                <ExternalLink className="h-3 w-3 text-blue-600 flex-shrink-0" />
+                <a
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline break-all text-sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {part}
+                </a>
+              </div>
+            );
+          }
+          return part ? (
+            <span key={index} className="block text-sm text-gray-600 leading-relaxed">
+              {part}
+            </span>
+          ) : null;
+        })}
+      </div>
+    );
+  };
 
   useEffect(() => {
     fetchAssignments();
@@ -156,37 +192,43 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
   const assignmentCounts = getAssignmentStatusCounts();
 
   return (
-    <Card>
-      <CardContent className="p-4">
+    <Card className="mb-6">
+      <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold">{todo.title}</h3>
-              <Badge className={getPriorityColor(todo.priority)}>
-                {todo.priority}
+            <div className="flex items-center gap-3 mb-4">
+              <h3 className="font-semibold text-lg">{todo.title}</h3>
+              <Badge className={`${getPriorityColor(todo.priority)} px-3 py-1`}>
+                {todo.priority} priority
               </Badge>
-              <Badge className={getStatusColor(todo.status)}>
+              <Badge className={`${getStatusColor(todo.status)} px-3 py-1`}>
                 {todo.status.replace('_', ' ')}
               </Badge>
             </div>
             
             {todo.description && (
-              <p className="text-gray-600 text-sm mb-2">{todo.description}</p>
+              <div className="mb-6 p-5 bg-gray-50 rounded-xl min-h-[120px] border-l-4 border-blue-200">
+                <div className="text-sm font-medium text-gray-700 mb-3">Description:</div>
+                <div className="space-y-3">
+                  {renderTextWithLinks(todo.description)}
+                </div>
+              </div>
             )}
             
             {todo.due_date && (
-              <p className="text-sm text-gray-500 mb-2">
-                <Clock className="inline w-4 h-4 mr-1" />
-                Due: {new Date(todo.due_date).toLocaleDateString()}
-              </p>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 p-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                <Clock className="w-4 h-4" />
+                <span className="font-medium">Due:</span>
+                <span>{new Date(todo.due_date).toLocaleDateString()}</span>
+              </div>
             )}
 
             {assignments.length > 0 && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm font-medium">Assigned to:</span>
-                  <span className="text-sm text-gray-600">{getAssignedMentees()}</span>
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-800">Assigned to:</span>
+                  <span className="text-sm text-blue-700">{getAssignedMentees()}</span>
                 </div>
                 
                 <div className="flex gap-2 text-xs">
@@ -210,12 +252,13 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
             )}
           </div>
           
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2 ml-6 flex-shrink-0">
             {todo.status !== 'completed' && (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => handleStatusUpdate('completed')}
+                className="px-3 py-2"
               >
                 <CheckCircle className="w-4 h-4" />
               </Button>
@@ -226,6 +269,7 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
               variant="outline"
               onClick={handleDelete}
               disabled={loading}
+              className="px-3 py-2"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
