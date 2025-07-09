@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, CheckCircle2, Play, Calendar, Trash2, Edit, MoreHorizontal } from 'lucide-react';
+import { Clock, CheckCircle2, Play, Calendar, Trash2, Edit, MoreHorizontal, ExternalLink } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,6 +64,42 @@ const MenteePersonalTodosList = ({
     setEditingTodo(null);
   };
 
+  // Function to detect and convert URLs to clickable links
+  const renderTextWithLinks = (text: string) => {
+    if (!text) return null;
+    
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return (
+      <div className="space-y-1">
+        {parts.map((part, index) => {
+          if (urlRegex.test(part)) {
+            return (
+              <div key={index} className="flex items-center gap-1">
+                <ExternalLink className="h-2 w-2 text-blue-600 flex-shrink-0" />
+                <a
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline break-all text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {part}
+                </a>
+              </div>
+            );
+          }
+          return part ? (
+            <span key={index} className="block text-xs text-gray-600">
+              {part}
+            </span>
+          ) : null;
+        })}
+      </div>
+    );
+  };
+
   if (todos.length === 0) {
     return (
       <Card>
@@ -108,9 +144,9 @@ const MenteePersonalTodosList = ({
                 </h3>
 
                 {todo.description && (
-                  <p className="text-xs text-gray-600 mb-3 line-clamp-3">
-                    {todo.description}
-                  </p>
+                  <div className="mb-3 max-h-24 overflow-y-auto">
+                    {renderTextWithLinks(todo.description)}
+                  </div>
                 )}
 
                 <div className="text-xs text-gray-500 space-y-1">
