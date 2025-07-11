@@ -15,6 +15,7 @@ export const useMenteeDataFetcher = () => {
       .ilike('role', 'mentee'); // Case insensitive search for 'mentee'
 
     console.log('All mentees from profiles table:', allMentees);
+    console.log('Total mentees fetched:', allMentees?.length || 0);
 
     if (menteesError) {
       console.error('Error fetching mentees from profiles:', menteesError);

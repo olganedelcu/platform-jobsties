@@ -34,6 +34,7 @@ export const useMenteeDataLoader = () => {
       const menteeData = await processAssignments(allMentees, user.id);
       setMentees(menteeData);
       console.log('Setting mentees to display:', menteeData);
+      console.log('Final mentee count being set:', menteeData.length);
 
     } catch (error) {
       console.error('Error fetching mentees:', error);
