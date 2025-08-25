@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { courseModules } from '@/data/courseModules';
+import { courseProgressService } from '@/services/courseProgressService';
 
 interface DashboardData {
   upcomingSessions: number;
@@ -67,42 +67,24 @@ export const useDashboardData = (userId: string): DashboardData => {
         profileCompletion = Math.round((filledFields / fields.length) * 100);
       }
 
-      // Fetch course progress data
-      const { data: courseData, error: courseError } = await supabase
-        .from('course_progress')
-        .select('module_title, completed, progress_percentage')
-        .eq('user_id', userId);
-
-      if (courseError) {
-        console.error('Error fetching course progress:', courseError);
-      }
-
-      // Calculate overall course progress using the same logic as the course page
+      // Fetch course progress using the same service as the course page
       let courseProgress = 0;
-      if (courseData && courseData.length > 0) {
-        // Count completed modules and calculate percentage based on total course modules
-        const completedModules = courseData.filter(module => module.completed).length;
-        courseProgress = Math.min((completedModules / courseModules.length) * 100, 100);
-      } else {
-        // If no real course data exists, fall back to CV progress calculation
-        const { data: cvFiles, error: cvError } = await supabase
-          .from('cv_files')
-          .select('id')
-          .eq('mentee_id', userId);
-
-        if (cvError) {
-          console.error('Error fetching CV files:', cvError);
+      try {
+        const courseData = await courseProgressService.fetchUserProgress(userId);
+        
+        if (courseData && courseData.length > 0) {
+          // Calculate average progress across all modules (same as course page)
+          const avgProgress = courseData.reduce((sum, module) => sum + module.progressPercentage, 0) / courseData.length;
+          courseProgress = Math.round(avgProgress);
         }
-
-        // Calculate CV progress (20% per file, max 100%)
-        const cvProgress = cvFiles ? Math.min(cvFiles.length * 20, 100) : 0;
-        courseProgress = cvProgress;
+      } catch (courseError) {
+        console.error('Error fetching course progress:', courseError);
       }
 
       setDashboardData({
         upcomingSessions: sessions?.length || 0,
         profileCompletion,
-        courseProgress: Math.round(courseProgress),
+        courseProgress,
         loading: false
       });
 
