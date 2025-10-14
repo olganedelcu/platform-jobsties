@@ -18,7 +18,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     location.pathname === '/login' || 
                     location.pathname === '/signup' ||
                     location.pathname === '/coach/login' ||
-                    location.pathname === '/coach/signup';
+                    location.pathname === '/coach/signup' ||
+                    location.pathname === '/student/login' ||
+                    location.pathname === '/student/signup';
 
   if (loading || isAuthPage || !user) {
     return <>{children}</>;
