@@ -58,11 +58,24 @@ const StudentSignUpForm = () => {
       
       navigate('/student/login');
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to create account',
-        variant: 'destructive',
-      });
+      console.error('Student signup error:', error);
+      
+      // Check if the error is due to user already existing
+      if (error.message?.includes('already registered') || 
+          error.message?.includes('User already registered') ||
+          error.status === 400) {
+        toast({
+          title: 'Account Already Exists',
+          description: 'This email is already registered. Please try logging in instead, or use a different email address.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: error.message || 'Failed to create account',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsLoading(false);
     }
