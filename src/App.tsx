@@ -3,7 +3,7 @@ import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppLayout from "@/components/layout/AppLayout";
 
@@ -69,6 +69,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               
               {/* Student Routes */}
+              <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
               <Route path="/student/login" element={<StudentLogin />} />
               <Route path="/student/signup" element={<StudentSignUp />} />
               <Route path="/student/dashboard" element={<Dashboard />} />
