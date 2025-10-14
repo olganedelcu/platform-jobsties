@@ -1220,14 +1220,14 @@ export type Database = {
           application_stage: string | null
           applied_date: string | null
           archived: boolean | null
-          coach_id: string
+          coach_id: string | null
           company_name: string
           created_at: string
           description: string | null
           id: string
           job_link: string
           job_title: string
-          mentee_id: string
+          mentee_id: string | null
           status: string | null
           updated_at: string
           week_start_date: string
@@ -1236,14 +1236,14 @@ export type Database = {
           application_stage?: string | null
           applied_date?: string | null
           archived?: boolean | null
-          coach_id: string
+          coach_id?: string | null
           company_name: string
           created_at?: string
           description?: string | null
           id?: string
           job_link: string
           job_title: string
-          mentee_id: string
+          mentee_id?: string | null
           status?: string | null
           updated_at?: string
           week_start_date: string
@@ -1252,14 +1252,14 @@ export type Database = {
           application_stage?: string | null
           applied_date?: string | null
           archived?: boolean | null
-          coach_id?: string
+          coach_id?: string | null
           company_name?: string
           created_at?: string
           description?: string | null
           id?: string
           job_link?: string
           job_title?: string
-          mentee_id?: string
+          mentee_id?: string | null
           status?: string | null
           updated_at?: string
           week_start_date?: string
