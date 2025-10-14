@@ -1290,6 +1290,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      decrypt_token: {
+        Args: { encrypted_token: string }
+        Returns: string
+      }
+      encrypt_token: {
+        Args: { token: string }
+        Returns: string
+      }
       get_backup_statistics: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1300,6 +1308,14 @@ export type Database = {
           total_size: number
         }[]
       }
+      get_coach_google_token: {
+        Args: { coach_email_param: string }
+        Returns: {
+          access_token: string
+          expires_at: string
+          refresh_token: string
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -1308,6 +1324,14 @@ export type Database = {
         Args: { coach_user_id: string }
         Returns: {
           application_id: string
+        }[]
+      }
+      get_user_google_token: {
+        Args: { user_uuid: string }
+        Returns: {
+          access_token: string
+          expires_at: string
+          refresh_token: string
         }[]
       }
       hide_application: {
@@ -1324,6 +1348,24 @@ export type Database = {
           p_status: string
         }
         Returns: string
+      }
+      store_coach_google_token: {
+        Args: {
+          access_tok: string
+          coach_email_param: string
+          expires: string
+          refresh_tok: string
+        }
+        Returns: undefined
+      }
+      store_user_google_token: {
+        Args: {
+          access_tok: string
+          expires: string
+          refresh_tok: string
+          user_uuid: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
