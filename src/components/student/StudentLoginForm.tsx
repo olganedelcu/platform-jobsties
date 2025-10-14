@@ -26,14 +26,14 @@ const StudentLoginForm = () => {
       if (error) throw error;
 
       if (data.user) {
-        // Check if user is a mentee
+        // Check if user is a student
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
 
-        if (profile?.role !== 'MENTEE') {
+        if (profile?.role !== 'STUDENT') {
           await supabase.auth.signOut();
           toast({
             title: 'Access Denied',
@@ -47,7 +47,7 @@ const StudentLoginForm = () => {
           title: 'Welcome back!',
           description: 'Successfully signed in.',
         });
-        navigate('/dashboard');
+        navigate('/student/dashboard');
       }
     } catch (error: any) {
       toast({

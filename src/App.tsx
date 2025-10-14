@@ -71,6 +71,11 @@ const App = () => (
               {/* Student Routes */}
               <Route path="/student/login" element={<StudentLogin />} />
               <Route path="/student/signup" element={<StudentSignUp />} />
+              <Route path="/student/dashboard" element={<Dashboard />} />
+              <Route path="/student/tracker" element={<Tracker />} />
+              <Route path="/student/todos" element={<MenteeTodosPage />} />
+              <Route path="/student/profile" element={<Profile />} />
+              <Route path="/student/backup" element={<BackupManagementPage />} />
               
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
