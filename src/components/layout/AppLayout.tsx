@@ -3,6 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import CoachNavigation from '@/components/CoachNavigation';
+import StudentNavigation from '@/components/StudentNavigation';
 import { useAuthState } from '@/hooks/useAuthState';
 
 interface AppLayoutProps {
@@ -27,11 +28,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }
 
   const isCoachRoute = location.pathname.startsWith('/coach/');
+  const isStudentRoute = location.pathname.startsWith('/student/');
 
   return (
     <div className="min-h-screen bg-gray-50">
       {isCoachRoute ? (
         <CoachNavigation user={user} onSignOut={handleSignOut} />
+      ) : isStudentRoute ? (
+        <StudentNavigation user={user} onSignOut={handleSignOut} />
       ) : (
         <Navigation user={user} onSignOut={handleSignOut} />
       )}
