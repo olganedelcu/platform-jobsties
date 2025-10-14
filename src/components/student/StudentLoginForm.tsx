@@ -27,17 +27,33 @@ const StudentLoginForm = () => {
 
       if (data.user) {
         // Check if user is a student
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
+
+        // Handle case where profile doesn't exist
+        if (!profile && !profileError) {
+          await supabase.auth.signOut();
+          toast({
+            title: 'Account Setup Required',
+            description: 'Please sign up as a student first.',
+            variant: 'destructive',
+          });
+          navigate('/student/signup');
+          return;
+        }
+
+        if (profileError) {
+          throw profileError;
+        }
 
         if (profile?.role !== 'STUDENT') {
           await supabase.auth.signOut();
           toast({
             title: 'Access Denied',
-            description: 'This portal is for students only.',
+            description: 'This portal is for students only. Please use the correct login page for your account type.',
             variant: 'destructive',
           });
           return;
