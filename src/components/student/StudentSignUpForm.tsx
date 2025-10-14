@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { createMenteeAccount } from '@/services/signUpService';
+import { createStudentAccount } from '@/services/signUpService';
 
 const StudentSignUpForm = () => {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const StudentSignUpForm = () => {
     setIsLoading(true);
 
     try {
-      await createMenteeAccount(formData);
+      await createStudentAccount(formData);
       
       toast({
         title: 'Success!',

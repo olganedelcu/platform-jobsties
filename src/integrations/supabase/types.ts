@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1293,11 +1293,11 @@ export type Database = {
       get_backup_statistics: {
         Args: Record<PropertyKey, never>
         Returns: {
+          backup_count: number
           backup_type: string
           last_backup: string
           success_rate: number
           total_size: number
-          backup_count: number
         }[]
       }
       get_current_user_role: {
@@ -1311,17 +1311,17 @@ export type Database = {
         }[]
       }
       hide_application: {
-        Args: { coach_user_id: string; app_id: string }
+        Args: { app_id: string; coach_user_id: string }
         Returns: undefined
       }
       log_backup_operation: {
         Args: {
-          p_backup_type: string
-          p_status: string
           p_backup_location?: string
-          p_file_size?: number
+          p_backup_type: string
           p_error_message?: string
+          p_file_size?: number
           p_metadata?: Json
+          p_status: string
         }
         Returns: string
       }
