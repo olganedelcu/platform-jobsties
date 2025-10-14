@@ -10,6 +10,8 @@ import AppLayout from "@/components/layout/AppLayout";
 // Lazy load components for better performance
 const SignUp = lazy(() => import("./pages/SignUp"));
 const Login = lazy(() => import("./pages/Login"));
+const StudentLogin = lazy(() => import("./pages/StudentLogin"));
+const StudentSignUp = lazy(() => import("./pages/StudentSignUp"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Sessions = lazy(() => import("./pages/Sessions"));
@@ -65,6 +67,11 @@ const App = () => (
               <Route path="/" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
+              
+              {/* Student Routes */}
+              <Route path="/student/login" element={<StudentLogin />} />
+              <Route path="/student/signup" element={<StudentSignUp />} />
+              
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/sessions" element={<Sessions />} />
