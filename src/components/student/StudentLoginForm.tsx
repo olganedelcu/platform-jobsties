@@ -23,9 +23,31 @@ const StudentLoginForm = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle specific error cases
+        if (error.message.includes('Email not confirmed')) {
+          toast({
+            title: 'Email Not Confirmed',
+            description: 'Please check your email and click the confirmation link before logging in.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        throw error;
+      }
 
       if (data.user) {
+        // Check if email is confirmed
+        if (!data.user.email_confirmed_at) {
+          await supabase.auth.signOut();
+          toast({
+            title: 'Email Not Confirmed',
+            description: 'Please check your email and click the confirmation link to activate your account.',
+            variant: 'destructive',
+          });
+          return;
+        }
+
         // Check if user is a student
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
