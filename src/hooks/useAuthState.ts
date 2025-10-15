@@ -69,34 +69,19 @@ export const useAuthState = () => {
                               location.pathname === '/login' || 
                               location.pathname === '/signup' ||
                               location.pathname === '/coach/login' ||
-                              location.pathname === '/coach/signup' ||
-                              location.pathname === '/student/login' ||
-                              location.pathname === '/student/signup';
+                              location.pathname === '/coach/signup';
                               
           const userRole = newSession.user.user_metadata?.role;
           const isCoachOnCoachPage = userRole === 'COACH' && location.pathname.startsWith('/coach/');
-          const isStudentOnStudentPage = userRole === 'STUDENT' && location.pathname.startsWith('/student/');
-          const isMenteeOnMenteePage = userRole === 'MENTEE' && (
-            location.pathname.startsWith('/dashboard') ||
-            location.pathname.startsWith('/profile') ||
-            location.pathname.startsWith('/sessions') ||
-            location.pathname.startsWith('/messages') ||
-            location.pathname.startsWith('/tracker') ||
-            location.pathname.startsWith('/course') ||
-            location.pathname.startsWith('/todos') ||
-            location.pathname.startsWith('/application') ||
-            location.pathname.startsWith('/task')
-          );
+          const isMenteeOnMenteePage = userRole !== 'COACH' && !location.pathname.startsWith('/coach/');
           
           // Only navigate if user is on wrong page type or auth page
-          if (isOnAuthPage || (!isCoachOnCoachPage && !isStudentOnStudentPage && !isMenteeOnMenteePage)) {
+          if (isOnAuthPage || (!isCoachOnCoachPage && !isMenteeOnMenteePage)) {
             navigationInProgress.current = true;
             
             setTimeout(() => {
               if (userRole === 'COACH') {
                 navigate('/coach/mentees', { replace: true });
-              } else if (userRole === 'STUDENT') {
-                navigate('/student/dashboard', { replace: true });
               } else {
                 navigate('/dashboard', { replace: true });
               }

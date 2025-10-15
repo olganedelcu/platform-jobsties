@@ -3,15 +3,13 @@ import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppLayout from "@/components/layout/AppLayout";
 
 // Lazy load components for better performance
 const SignUp = lazy(() => import("./pages/SignUp"));
 const Login = lazy(() => import("./pages/Login"));
-const StudentLogin = lazy(() => import("./pages/StudentLogin"));
-const StudentSignUp = lazy(() => import("./pages/StudentSignUp"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Sessions = lazy(() => import("./pages/Sessions"));
@@ -67,17 +65,6 @@ const App = () => (
               <Route path="/" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
-              
-              {/* Student Routes */}
-              <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
-              <Route path="/student/login" element={<StudentLogin />} />
-              <Route path="/student/signup" element={<StudentSignUp />} />
-              <Route path="/student/dashboard" element={<Dashboard />} />
-              <Route path="/student/tracker" element={<Tracker />} />
-              <Route path="/student/todos" element={<MenteeTodosPage />} />
-              <Route path="/student/profile" element={<Profile />} />
-              <Route path="/student/backup" element={<BackupManagementPage />} />
-              
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/sessions" element={<Sessions />} />

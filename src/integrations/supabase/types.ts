@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
+  // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1220,14 +1220,14 @@ export type Database = {
           application_stage: string | null
           applied_date: string | null
           archived: boolean | null
-          coach_id: string | null
+          coach_id: string
           company_name: string
           created_at: string
           description: string | null
           id: string
           job_link: string
           job_title: string
-          mentee_id: string | null
+          mentee_id: string
           status: string | null
           updated_at: string
           week_start_date: string
@@ -1236,14 +1236,14 @@ export type Database = {
           application_stage?: string | null
           applied_date?: string | null
           archived?: boolean | null
-          coach_id?: string | null
+          coach_id: string
           company_name: string
           created_at?: string
           description?: string | null
           id?: string
           job_link: string
           job_title: string
-          mentee_id?: string | null
+          mentee_id: string
           status?: string | null
           updated_at?: string
           week_start_date: string
@@ -1252,14 +1252,14 @@ export type Database = {
           application_stage?: string | null
           applied_date?: string | null
           archived?: boolean | null
-          coach_id?: string | null
+          coach_id?: string
           company_name?: string
           created_at?: string
           description?: string | null
           id?: string
           job_link?: string
           job_title?: string
-          mentee_id?: string | null
+          mentee_id?: string
           status?: string | null
           updated_at?: string
           week_start_date?: string
@@ -1290,30 +1290,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      decrypt_token: {
-        Args: { encrypted_token: string }
-        Returns: string
-      }
-      encrypt_token: {
-        Args: { token: string }
-        Returns: string
-      }
       get_backup_statistics: {
         Args: Record<PropertyKey, never>
         Returns: {
-          backup_count: number
           backup_type: string
           last_backup: string
           success_rate: number
           total_size: number
-        }[]
-      }
-      get_coach_google_token: {
-        Args: { coach_email_param: string }
-        Returns: {
-          access_token: string
-          expires_at: string
-          refresh_token: string
+          backup_count: number
         }[]
       }
       get_current_user_role: {
@@ -1326,46 +1310,20 @@ export type Database = {
           application_id: string
         }[]
       }
-      get_user_google_token: {
-        Args: { user_uuid: string }
-        Returns: {
-          access_token: string
-          expires_at: string
-          refresh_token: string
-        }[]
-      }
       hide_application: {
-        Args: { app_id: string; coach_user_id: string }
+        Args: { coach_user_id: string; app_id: string }
         Returns: undefined
       }
       log_backup_operation: {
         Args: {
-          p_backup_location?: string
           p_backup_type: string
-          p_error_message?: string
-          p_file_size?: number
-          p_metadata?: Json
           p_status: string
+          p_backup_location?: string
+          p_file_size?: number
+          p_error_message?: string
+          p_metadata?: Json
         }
         Returns: string
-      }
-      store_coach_google_token: {
-        Args: {
-          access_tok: string
-          coach_email_param: string
-          expires: string
-          refresh_tok: string
-        }
-        Returns: undefined
-      }
-      store_user_google_token: {
-        Args: {
-          access_tok: string
-          expires: string
-          refresh_tok: string
-          user_uuid: string
-        }
-        Returns: undefined
       }
     }
     Enums: {
