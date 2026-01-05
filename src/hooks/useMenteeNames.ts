@@ -6,13 +6,18 @@ interface MenteeNameMap {
   [menteeId: string]: string;
 }
 
-export const useMenteeNames = (menteeIds: string[]) => {
+export const useMenteeNames = (menteeIds: (string | null | undefined)[]) => {
   const [menteeNames, setMenteeNames] = useState<MenteeNameMap>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMenteeNames = async () => {
-      if (menteeIds.length === 0) {
+      // Filter out null, undefined, and "null" string values
+      const validMenteeIds = menteeIds.filter(
+        (id): id is string => id != null && id !== 'null' && id !== ''
+      );
+      
+      if (validMenteeIds.length === 0) {
         setLoading(false);
         return;
       }
@@ -21,7 +26,7 @@ export const useMenteeNames = (menteeIds: string[]) => {
         const { data, error } = await supabase
           .from('profiles')
           .select('id, first_name, last_name')
-          .in('id', menteeIds);
+          .in('id', validMenteeIds);
 
         if (error) {
           console.error('Error fetching mentee names:', error);
