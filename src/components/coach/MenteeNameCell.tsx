@@ -8,6 +8,8 @@ interface MenteeNameCellProps {
 }
 
 const MenteeNameCell = ({ menteeId, menteeName }: MenteeNameCellProps) => {
+  const safeId = menteeId || '';
+  
   if (!menteeName) {
     return (
       <div className="flex items-center space-x-3">
@@ -18,7 +20,7 @@ const MenteeNameCell = ({ menteeId, menteeName }: MenteeNameCellProps) => {
         </Avatar>
         <div>
           <div className="font-medium text-gray-900">Unknown Mentee</div>
-          <div className="text-sm text-gray-500">{menteeId.slice(0, 8)}...</div>
+          <div className="text-sm text-gray-500">{safeId ? `${safeId.slice(0, 8)}...` : 'No ID'}</div>
         </div>
       </div>
     );
@@ -38,7 +40,7 @@ const MenteeNameCell = ({ menteeId, menteeName }: MenteeNameCellProps) => {
       </Avatar>
       <div>
         <div className="font-medium text-gray-900">{menteeName}</div>
-        <div className="text-sm text-gray-500">{menteeId.slice(0, 8)}...</div>
+        <div className="text-sm text-gray-500">{safeId ? `${safeId.slice(0, 8)}...` : 'No ID'}</div>
       </div>
     </div>
   );
