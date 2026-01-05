@@ -106,18 +106,14 @@ const CareerProgressCard = ({
       <CardContent className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-900">Career Progress</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Applications Progress</h3>
           <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700">
             <span className="w-2 h-2 bg-green-500 rounded-full mr-2 inline-block" />
-            Live
+            Working
           </Badge>
         </div>
 
-        {/* Progress */}
-        <div className="text-3xl font-bold text-blue-600 mb-2">
-          {courseProgress}%
-        </div>
-        <Progress value={courseProgress} className="mb-6 h-2" />
+      
 
         {/* Chart */}
         <div className="mt-10 relative">
