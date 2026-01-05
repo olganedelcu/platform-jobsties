@@ -107,9 +107,6 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
         {/* Career Progress (now includes weekly applications chart) */}
         <CareerProgressCard
           courseProgress={courseProgress}
-          onCVOptimizedClick={navigationHandlers.handleCVOptimizedClick}
-          onInterviewPrepClick={navigationHandlers.handleInterviewPrepClick}
-          onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
           applications={applications}
         />
 
