@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
+// replaced CareerProgressCard with ApplicationsThisMonthCard to show weekly bars
 import DashboardTaskBoard from '@/components/dashboard/DashboardTaskBoard';
+import CareerProgressCard from '@/components/dashboard/CareerProgressCard';
 import MenteeRecentActivityCard from '@/components/dashboard/MenteeRecentActivityCard';
 import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMonthCard';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
@@ -103,12 +104,13 @@ const DashboardContent = memo(({ user }: DashboardContentProps) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-        {/* Career Progress Card */}
+        {/* Career Progress (now includes weekly applications chart) */}
         <CareerProgressCard
           courseProgress={courseProgress}
           onCVOptimizedClick={navigationHandlers.handleCVOptimizedClick}
           onInterviewPrepClick={navigationHandlers.handleInterviewPrepClick}
           onSalaryNegotiationClick={navigationHandlers.handleSalaryNegotiationClick}
+          applications={applications}
         />
 
         {/* Recent Activity */}

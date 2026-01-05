@@ -71,9 +71,12 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
   const weeklyTarget = 30;
   const progressPercentage = Math.min((applicationsThisWeek / weeklyTarget) * 100, 100);
 
+ 
+
+
   if (loading) {
     return (
-      <Card className="border border-gray-200 shadow-sm w-72 h-16">
+      <Card className="border border-gray-200 shadow-sm w-72">
         <CardContent className="p-2 h-full flex items-center justify-center">
           <div className="animate-pulse flex items-center gap-4">
             <div className="h-4 bg-gray-200 rounded w-12"></div>
@@ -89,10 +92,10 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
 
   return (
     <Card 
-      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-72 h-16" 
+      className="border border-gray-200 shadow-sm cursor-pointer hover:shadow-md transition-shadow w-72" 
       onClick={onClick}
     >
-      <CardContent className="p-2 h-full flex items-center justify-center">
+      <CardContent className="p-3">
         <div className="flex items-center gap-4">
           <div className="text-lg font-bold text-blue-600">
             {applicationsThisWeek}/30
@@ -101,13 +104,15 @@ const ApplicationsThisMonthCard = ({ applications, loading, onClick }: Applicati
             <div className="text-xs text-gray-600 mb-1 text-center">Applications this week</div>
             {/* Progress bar */}
             <div className="w-full bg-gray-200 rounded-full h-1">
-              <div 
-                className="bg-blue-500 h-1 rounded-full transition-all duration-300" 
+              <div
+                className="bg-blue-500 h-1 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
           </div>
         </div>
+
+       
       </CardContent>
     </Card>
   );
