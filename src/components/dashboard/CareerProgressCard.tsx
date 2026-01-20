@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 
 interface CareerProgressCardProps {
@@ -11,6 +13,7 @@ interface CareerProgressCardProps {
 
 const WEEKLY_TARGET = 30;
 const MAX_WEEKS = 12;
+const WEEKS_PER_PAGE = 4;
 
 /* ---------- Date helpers ---------- */
 
@@ -96,10 +99,24 @@ const CareerProgressCard = ({
     [applications]
   );
 
-  const maxCount = counts.length ? Math.max(...counts) : 0;
+  // Pagination state - start with the latest 4 weeks
+  const totalWeeks = weeks.length;
+  const totalPages = Math.ceil(totalWeeks / WEEKS_PER_PAGE);
+  const [currentPage, setCurrentPage] = useState(totalPages - 1); // Start at last page (latest weeks)
+
+  // Get current page data
+  const startIdx = currentPage * WEEKS_PER_PAGE;
+  const endIdx = Math.min(startIdx + WEEKS_PER_PAGE, totalWeeks);
+  const displayedWeeks = weeks.slice(startIdx, endIdx);
+  const displayedCounts = counts.slice(startIdx, endIdx);
+
+  const maxCount = displayedCounts.length ? Math.max(...displayedCounts) : 0;
   const chartMax = Math.max(maxCount, WEEKLY_TARGET, 1);
   const targetPercent = (WEEKLY_TARGET / chartMax) * 100;
   const yTicks = [chartMax, Math.round(chartMax / 2), 0];
+
+  const canGoPrevious = currentPage > 0;
+  const canGoNext = currentPage < totalPages - 1;
 
   return (
     <Card className="border border-gray-200 shadow-sm">
@@ -113,7 +130,34 @@ const CareerProgressCard = ({
           </Badge>
         </div>
 
-      
+        {/* Navigation Controls */}
+        {totalWeeks > WEEKS_PER_PAGE && (
+          <div className="flex items-center justify-between mb-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p - 1)}
+              disabled={!canGoPrevious}
+              className="h-8"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <span className="text-xs text-gray-500">
+              Showing weeks {startIdx + 1}-{endIdx} of {totalWeeks}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={!canGoNext}
+              className="h-8"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        )}
 
         {/* Chart */}
         <div className="mt-10 relative">
@@ -145,11 +189,11 @@ const CareerProgressCard = ({
 
               {/* Bars */}
               <div className="flex items-end justify-center gap-4 h-full pb-14 relative z-10">
-                {counts.map((count, i) => {
+                {displayedCounts.map((count, i) => {
                   const height = (count / chartMax) * 100;
 
                   return (
-                    <div key={weeks[i]?.key ?? i} className="w-8 flex justify-center">
+                    <div key={displayedWeeks[i]?.key ?? i} className="w-8 flex justify-center">
                       <div className="relative w-6 h-32 bg-gray-100 rounded-full">
                         <div
                           className="absolute bottom-0 left-0 right-0 bg-blue-500 rounded-full transition-all"
@@ -166,7 +210,7 @@ const CareerProgressCard = ({
 
               {/* Week labels BELOW x-axis */}
               <div className="absolute left-0 right-0 bottom-0 flex justify-center gap-4">
-                {weeks.map((w) => (
+                {displayedWeeks.map((w) => (
                   <div
                     key={w.key}
                     className="w-8 text-[10px] text-gray-600 text-center font-medium"
