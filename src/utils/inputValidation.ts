@@ -4,8 +4,8 @@ import DOMPurify from 'dompurify';
 // Input validation rules and patterns
 export const ValidationRules = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\+?[\d\s\-\(\)]{10,15}$/,
-  url: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+  phone: /^\+?[\d\s\-()]{10,15}$/,
+  url: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/,
   alphanumeric: /^[a-zA-Z0-9]+$/,
   alphanumericWithSpaces: /^[a-zA-Z0-9\s]+$/,
   noSpecialChars: /^[a-zA-Z0-9\s\-_]+$/,
@@ -15,7 +15,7 @@ export const ValidationRules = {
   time: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/,
   sqlInjectionPatterns: [
     /(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE)?|INSERT|MERGE|SELECT|UPDATE|UNION|SCRIPT)\b)/gi,
-    /(\'|(\'\')|(\-\-)|(;)|(\s*(\|\|)\s*))/gi,
+    /('|('')|(--)|;|\s*(\|\|)\s*)/gi,
     /(\b(OR|AND)\b.*\b(=|LIKE)\b)/gi,
     /(\bUNION\b.*\bSELECT\b)/gi
   ],

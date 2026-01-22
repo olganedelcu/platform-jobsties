@@ -49,44 +49,40 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
   };
 
   const addRecommendation = async (recommendationData: NewJobRecommendationData) => {
-    try {
-      const { data, error } = await supabase
-        .from('weekly_job_recommendations')
-        .insert({
-          coach_id: userId,
-          mentee_id: recommendationData.menteeId,
-          job_title: recommendationData.jobTitle,
-          job_link: recommendationData.jobLink,
-          company_name: recommendationData.companyName,
-          description: recommendationData.description || null,
-          week_start_date: recommendationData.weekStartDate,
-          status: 'active', // Default status for new recommendations
-          archived: false
-        })
-        .select()
-        .single();
+    const { data, error } = await supabase
+      .from('weekly_job_recommendations')
+      .insert({
+        coach_id: userId,
+        mentee_id: recommendationData.menteeId,
+        job_title: recommendationData.jobTitle,
+        job_link: recommendationData.jobLink,
+        company_name: recommendationData.companyName,
+        description: recommendationData.description || null,
+        week_start_date: recommendationData.weekStartDate,
+        status: 'active', // Default status for new recommendations
+        archived: false
+      })
+      .select()
+      .single();
 
-      if (error) {
-        throw error;
-      }
-
-      setRecommendations(prev => [data as JobRecommendation, ...prev]);
-      
-      // Send notification if Ana is the one creating the recommendation
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        await NotificationHandlers.jobRecommendation(
-          user.email,
-          recommendationData.menteeId,
-          recommendationData.jobTitle,
-          recommendationData.companyName
-        );
-      }
-      
-      return data;
-    } catch (error: unknown) {
-      throw error; // Re-throw to let the caller handle it
+    if (error) {
+      throw error;
     }
+
+    setRecommendations(prev => [data as JobRecommendation, ...prev]);
+
+    // Send notification if Ana is the one creating the recommendation
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      await NotificationHandlers.jobRecommendation(
+        user.email,
+        recommendationData.menteeId,
+        recommendationData.jobTitle,
+        recommendationData.companyName
+      );
+    }
+
+    return data;
   };
 
   const deleteRecommendation = async (recommendationId: string) => {
