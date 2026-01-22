@@ -6,8 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppLayout from "@/components/layout/AppLayout";
 
-// Test CI connection - intentional error
-const testVariable: any = "This will fail CI";
 
 // Lazy load components for better performance
 const SignUp = lazy(() => import("./pages/SignUp"));
