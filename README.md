@@ -1,12 +1,8 @@
-# JobSties Career Coaching Platform
+# Jobsties Platform
 
 ## Project info
 
 A comprehensive career coaching platform built with React, TypeScript, and Supabase.
-
-## How can I edit this code?
-
-There are several ways of editing your application.
 
 **Use your preferred IDE**
 
