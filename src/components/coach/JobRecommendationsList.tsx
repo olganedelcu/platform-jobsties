@@ -5,10 +5,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from 'lucide-react';
 import BulkActionsSection from './BulkActionsSection';
 import JobRecommendationCard from './JobRecommendationCard';
+import { JobRecommendation } from '@/types/jobRecommendations';
+
+interface GroupedRecommendation extends JobRecommendation {
+  assignments: {
+    id: string;
+    mentee_id: string;
+    week_start_date: string;
+    created_at: string;
+  }[];
+}
 
 interface JobRecommendationsListProps {
-  uniqueRecommendations: any[];
-  recommendations: any[];
+  uniqueRecommendations: GroupedRecommendation[];
+  recommendations: JobRecommendation[];
   menteeNames: { [key: string]: string };
   selectedAssignments: string[];
   recommendationsLoading: boolean;
@@ -16,7 +26,7 @@ interface JobRecommendationsListProps {
   onSelectAll: (checked: boolean) => void;
   onSelectAssignment: (assignmentId: string, checked: boolean) => void;
   onDeleteSelected: () => void;
-  onAssignToMoreMentees: (recommendation: any) => void;
+  onAssignToMoreMentees: (recommendation: GroupedRecommendation) => void;
   onDeleteRecommendation: (assignmentId: string) => void;
 }
 

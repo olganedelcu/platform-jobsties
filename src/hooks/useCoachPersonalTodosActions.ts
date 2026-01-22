@@ -3,11 +3,15 @@ import { TodoColumnType, TodoItem } from '@/types/assignmentBoard';
 import { coachPersonalTodosService } from '@/services/coachPersonalTodosService';
 import { mapColumnTitleToStatus } from '@/utils/coachTodosTransformers';
 
+interface ToastFunction {
+  (props: { title: string; description: string; variant?: 'default' | 'destructive' }): void;
+}
+
 export const useCoachPersonalTodosActions = (
   coachId: string,
   columns: TodoColumnType[],
   setColumns: React.Dispatch<React.SetStateAction<TodoColumnType[]>>,
-  toast: any
+  toast: ToastFunction
 ) => {
   const addColumn = (title: string) => {
     const newColumn: TodoColumnType = {
@@ -50,7 +54,7 @@ export const useCoachPersonalTodosActions = (
         title: "Success",
         description: "Todo added successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding todo:', error);
       toast({
         title: "Error",
@@ -87,7 +91,7 @@ export const useCoachPersonalTodosActions = (
         title: "Success",
         description: "Todo updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating todo:', error);
       toast({
         title: "Error",
@@ -113,7 +117,7 @@ export const useCoachPersonalTodosActions = (
         title: "Success",
         description: "Todo deleted successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting todo:', error);
       toast({
         title: "Error",
@@ -153,7 +157,7 @@ export const useCoachPersonalTodosActions = (
         title: "Success",
         description: "Todo moved successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving todo:', error);
       toast({
         title: "Error",

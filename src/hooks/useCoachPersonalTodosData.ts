@@ -48,7 +48,7 @@ export const useCoachPersonalTodosData = (coachId: string) => {
           todos: todosByStatus.completed
         }
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching personal todos:', error);
       toast({
         title: "Error",

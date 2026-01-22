@@ -4,10 +4,17 @@ import { useJobRecommendations } from '@/hooks/useJobRecommendations';
 import { useAuthState } from '@/hooks/useAuthState';
 import { useToast } from '@/hooks/use-toast';
 
+interface ValidRecommendation {
+  jobTitle: string;
+  jobLink: string;
+  companyName: string;
+  description?: string;
+}
+
 interface JobRecommendationFormActionsProps {
   selectedMentees: string[];
   weekStartDate: string;
-  getValidRecommendations: () => any[];
+  getValidRecommendations: () => ValidRecommendation[];
   resetForm: () => void;
   setIsFormOpen: (isOpen: boolean) => void;
   children: React.ReactNode;

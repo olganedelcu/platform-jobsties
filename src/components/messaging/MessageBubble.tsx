@@ -2,14 +2,14 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { User, Bot } from 'lucide-react';
-import { Message } from '@/hooks/useMessages';
+import { Message, MessageAttachment as MessageAttachmentType } from '@/hooks/useMessages';
 import { formatDistanceToNow } from 'date-fns';
 import MessageAttachment from './MessageAttachment';
 
 interface MessageBubbleProps {
   message: Message;
   isCurrentUser: boolean;
-  onDownloadAttachment: (attachment: any) => void;
+  onDownloadAttachment: (attachment: MessageAttachmentType) => void;
 }
 
 const MessageBubble = ({ message, isCurrentUser, onDownloadAttachment }: MessageBubbleProps) => {

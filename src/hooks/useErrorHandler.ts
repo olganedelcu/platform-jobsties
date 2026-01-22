@@ -6,7 +6,7 @@ import { SecureErrorHandler, SanitizedError, ErrorContext } from '@/utils/errorH
 interface UseErrorHandlerReturn {
   error: SanitizedError | null;
   isLoading: boolean;
-  handleError: (error: Error | any, context?: ErrorContext) => void;
+  handleError: (error: Error | unknown, context?: ErrorContext) => void;
   clearError: () => void;
   executeWithErrorHandling: <T>(
     asyncFn: () => Promise<T>,
@@ -20,7 +20,7 @@ export const useErrorHandler = (): UseErrorHandlerReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleError = useCallback((error: Error | any, context?: ErrorContext) => {
+  const handleError = useCallback((error: Error | unknown, context?: ErrorContext) => {
     const sanitizedError = SecureErrorHandler.handleError(error, context);
     setError(sanitizedError);
     return sanitizedError;

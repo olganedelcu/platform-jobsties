@@ -1,14 +1,15 @@
 
 import { useToast } from '@/hooks/use-toast';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
-import { 
-  addJobApplication, 
-  updateJobApplication, 
-  deleteJobApplication 
+import {
+  addJobApplication,
+  updateJobApplication,
+  deleteJobApplication
 } from '@/services/jobApplicationsService';
+import type { User } from '@supabase/supabase-js';
 
 export const useJobApplicationActions = (
-  user: any,
+  user: User | null,
   applications: JobApplication[],
   setApplications: React.Dispatch<React.SetStateAction<JobApplication[]>>
 ) => {

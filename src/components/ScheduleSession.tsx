@@ -4,8 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import Cal, { getCalApi } from "@calcom/embed-react";
 
+interface SessionData {
+  date?: string;
+  time?: string;
+  duration?: string;
+  notes?: string;
+  preferredCoach?: string;
+}
+
 interface ScheduleSessionProps {
-  onSchedule: (sessionData: any) => void;
+  onSchedule: (sessionData: SessionData) => void;
   onCancel: () => void;
   userId?: string;
 }
@@ -26,7 +34,7 @@ const ScheduleSession = ({ onSchedule, onCancel, userId }: ScheduleSessionProps)
       // Listen for booking completion
       cal("on", {
         action: "bookingSuccessful",
-        callback: (e: any) => {
+        callback: (e: { detail: unknown }) => {
           console.log("Booking successful:", e.detail);
           // Close the dialog and refresh the sessions
           onCancel();

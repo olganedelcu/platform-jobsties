@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import TodoCard from './TodoCard';
 import AddTodoDialog from './AddTodoDialog';
-import { TodoColumnType } from '@/types/assignmentBoard';
+import { TodoColumnType, TodoItem } from '@/types/assignmentBoard';
 
 interface TodoColumnProps {
   column: TodoColumnType;
-  onAddTodo: (todo: any) => void;
-  onUpdateTodo: (todoId: string, updates: any) => void;
+  onAddTodo: (todo: Partial<TodoItem>) => void;
+  onUpdateTodo: (todoId: string, updates: Partial<TodoItem>) => void;
   onDeleteTodo: (todoId: string) => void;
   onMoveTodo: (todoId: string, fromColumnId: string, toColumnId: string) => void;
   allColumns: TodoColumnType[];
@@ -28,7 +28,7 @@ const TodoColumn = ({
 }: TodoColumnProps) => {
   const [showAddDialog, setShowAddDialog] = useState(false);
 
-  const handleAddTodo = (todoData: any) => {
+  const handleAddTodo = (todoData: Partial<TodoItem>) => {
     onAddTodo(todoData);
     setShowAddDialog(false);
   };

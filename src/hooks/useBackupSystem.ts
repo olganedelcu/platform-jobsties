@@ -8,11 +8,12 @@ interface BackupLog {
   backup_type: string;
   status: string;
   started_at: string;
-  completed_at?: string;
-  file_size?: number;
-  backup_location?: string;
-  error_message?: string;
-  metadata?: any;
+  completed_at?: string | null;
+  file_size?: number | null;
+  backup_location?: string | null;
+  error_message?: string | null;
+  metadata?: unknown;
+  created_at?: string;
 }
 
 interface BackupConfiguration {
@@ -21,7 +22,9 @@ interface BackupConfiguration {
   schedule_cron: string;
   retention_days: number;
   is_enabled: boolean;
-  config_data?: any;
+  config_data?: unknown;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface BackupStatistics {
@@ -50,7 +53,7 @@ export const useBackupSystem = () => {
 
       if (error) throw error;
       setBackupLogs(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch backup logs",
@@ -68,7 +71,7 @@ export const useBackupSystem = () => {
 
       if (error) throw error;
       setBackupConfigs(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch backup configurations",
@@ -84,7 +87,7 @@ export const useBackupSystem = () => {
 
       if (error) throw error;
       setBackupStats(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch backup statistics",
@@ -123,8 +126,8 @@ export const useBackupSystem = () => {
       }
 
       return data.backup;
-    } catch (error: any) {
-      const errorMessage = error.message || "Failed to perform backup";
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to perform backup";
       toast({
         title: "Error",
         description: errorMessage,
@@ -140,7 +143,7 @@ export const useBackupSystem = () => {
     try {
       const { error } = await supabase
         .from('backup_configurations')
-        .update(updates)
+        .update(updates as Record<string, unknown>)
         .eq('id', configId);
 
       if (error) throw error;
@@ -151,7 +154,7 @@ export const useBackupSystem = () => {
       });
 
       await fetchBackupConfigs();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to update backup configuration",
@@ -183,7 +186,7 @@ export const useBackupSystem = () => {
         title: "Success",
         description: "Backup file downloaded successfully",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to download backup file",
@@ -237,7 +240,7 @@ export const useBackupSystem = () => {
       });
 
       await fetchBackupLogs();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to clean up old backups",

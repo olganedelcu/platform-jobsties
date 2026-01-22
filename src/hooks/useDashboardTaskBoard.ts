@@ -43,7 +43,7 @@ export const useDashboardTaskBoard = (userId: string) => {
       }));
 
       setTasks(transformedTasks);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching dashboard tasks:', error);
       toast({
         title: "Error",
@@ -74,7 +74,7 @@ export const useDashboardTaskBoard = (userId: string) => {
         title: "Success",
         description: "Task status updated"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating task status:', error);
       toast({
         title: "Error",

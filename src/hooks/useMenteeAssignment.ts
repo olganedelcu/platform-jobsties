@@ -4,11 +4,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Mentee } from './useMentees';
 
+interface RawMentee {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role?: string;
+}
+
 export const useMenteeAssignment = () => {
   const { toast } = useToast();
   const [isAssigning, setIsAssigning] = useState(false);
 
-  const assignUnassignedMentees = async (allMentees: any[], userId: string) => {
+  const assignUnassignedMentees = async (allMentees: RawMentee[], userId: string) => {
     try {
       // Get existing assignments for this coach
       const { data: existingAssignments, error: assignmentsError } = await supabase
@@ -66,7 +74,7 @@ export const useMenteeAssignment = () => {
     }
   };
 
-  const processAssignments = async (allMentees: any[], userId: string): Promise<Mentee[]> => {
+  const processAssignments = async (allMentees: RawMentee[], userId: string): Promise<Mentee[]> => {
     await assignUnassignedMentees(allMentees, userId);
 
     // Return only the mentee data without the role field for the component

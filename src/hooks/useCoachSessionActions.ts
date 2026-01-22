@@ -3,9 +3,10 @@ import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { confirmSession, cancelSession } from '@/services/coachSessionsService';
 import { CoachSession } from '@/types/coachSessions';
+import type { User } from '@supabase/supabase-js';
 
 export const useCoachSessionActions = (
-  user: any,
+  user: User | null,
   sessions: CoachSession[],
   setSessions: React.Dispatch<React.SetStateAction<CoachSession[]>>
 ) => {

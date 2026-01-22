@@ -7,9 +7,10 @@ import ApplicationsJobRecommendations from './ApplicationsJobRecommendations';
 import JobRecommendationsList from './JobRecommendationsList';
 import JobRecommendationAssignmentDialog from './JobRecommendationAssignmentDialog';
 import JobRecommendationsMenteeSearch from './JobRecommendationsMenteeSearch';
+import { User } from '@supabase/supabase-js';
 
 interface JobRecommendationsContainerProps {
-  user: any;
+  user: User | null;
 }
 
 const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps) => {
@@ -69,7 +70,7 @@ const JobRecommendationsContainer = ({ user }: JobRecommendationsContainerProps)
       created_at: rec.created_at
     });
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, { assignments: { id: string; mentee_id: string; week_start_date: string; created_at: string }[] } & typeof filteredRecommendations[0]>);
 
   const uniqueRecommendations = Object.values(groupedRecommendations);
 

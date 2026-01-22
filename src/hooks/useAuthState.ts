@@ -12,7 +12,7 @@ export const useAuthState = () => {
   const [loading, setLoading] = useState(true);
   const hasInitialized = useRef(false);
   const navigationInProgress = useRef(false);
-  const subscriptionRef = useRef<any>(null);
+  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
 
   useEffect(() => {
     // Cleanup any existing subscription first

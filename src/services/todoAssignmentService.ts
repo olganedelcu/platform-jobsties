@@ -129,7 +129,7 @@ export const updateAssignmentStatus = async (
   assignmentId: string, 
   status: 'pending' | 'in_progress' | 'completed'
 ): Promise<void> => {
-  const updateData: any = { status };
+  const updateData: Record<string, unknown> = { status };
   
   // Set timestamps based on status
   if (status === 'in_progress') {

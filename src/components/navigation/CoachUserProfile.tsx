@@ -2,9 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import NotificationDropdown from '../notifications/NotificationDropdown';
+import { User } from '@supabase/supabase-js';
 
 interface CoachUserProfileProps {
-  user: any;
+  user: User | null;
   onSignOut: () => void;
 }
 

@@ -4,8 +4,9 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchCoachSessions } from '@/services/coachSessionsService';
 import { useCoachSessionActions } from '@/hooks/useCoachSessionActions';
 import { CoachSession, CoachSessionsHookReturn } from '@/types/coachSessions';
+import type { User } from '@supabase/supabase-js';
 
-export const useCoachSessions = (user: any): CoachSessionsHookReturn => {
+export const useCoachSessions = (user: User | null): CoachSessionsHookReturn => {
   const [sessions, setSessions] = useState<CoachSession[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

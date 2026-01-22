@@ -39,9 +39,19 @@ export const useCVFiles = () => {
         return;
       }
 
+      interface RawCVFile {
+        id: string;
+        mentee_id: string;
+        coach_id: string;
+        file_name: string;
+        file_url: string;
+        file_size: number | null;
+        uploaded_at: string;
+      }
+
       // Then, for each CV file, get both mentee and coach profile information
       const formattedFiles = await Promise.all(
-        cvFilesData.map(async (file: any) => {
+        cvFilesData.map(async (file: RawCVFile) => {
           // Get mentee info
           const { data: menteeData, error: menteeError } = await supabase
             .from('profiles')

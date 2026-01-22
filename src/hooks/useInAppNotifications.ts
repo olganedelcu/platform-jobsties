@@ -11,7 +11,7 @@ export interface InAppNotification {
   isRead: boolean;
   createdAt: string;
   actionUrl?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export const useInAppNotifications = () => {
@@ -65,11 +65,20 @@ export const useInAppNotifications = () => {
         return;
       }
 
-      const formattedNotifications: InAppNotification[] = (data || []).map((notification: any) => ({
+      interface RawNotification {
+        id: string;
+        title: string;
+        content: string;
+        notification_type: string;
+        is_read: boolean;
+        created_at: string;
+      }
+
+      const formattedNotifications: InAppNotification[] = (data || []).map((notification: RawNotification) => ({
         id: notification.id,
         title: notification.title,
         message: notification.content || '',
-        type: notification.notification_type || 'general',
+        type: (notification.notification_type || 'general') as 'job_recommendation' | 'file_upload' | 'message' | 'todo_assignment' | 'session' | 'general',
         isRead: notification.is_read,
         createdAt: notification.created_at,
         actionUrl: getActionUrl(notification.notification_type || 'general', profile?.role || 'MENTEE'),

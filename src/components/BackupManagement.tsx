@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,16 +8,15 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useBackupSystem } from '@/hooks/useBackupSystem';
 import { 
-  Database, 
-  Download, 
-  Play, 
-  Settings, 
-  Trash2, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+  Database,
+  Download,
+  Play,
+  Settings,
+  Trash2,
+  Clock,
+  CheckCircle,
+  XCircle,
   AlertCircle,
-  HardDrive,
   BarChart3,
   AlertTriangle
 } from 'lucide-react';
@@ -37,7 +36,8 @@ const BackupManagement = () => {
     deleteOldBackups
   } = useBackupSystem();
 
-  const [selectedBackupType, setSelectedBackupType] = useState<string>('database_full');
+  type BackupType = 'database_full' | 'database_incremental' | 'storage_files' | 'critical_tables' | 'manual';
+  const [selectedBackupType, setSelectedBackupType] = useState<BackupType>('database_full');
   const [selectedTables, setSelectedTables] = useState<string[]>([]);
   const { toast } = useToast();
 
@@ -76,7 +76,7 @@ const BackupManagement = () => {
 
   const handleManualBackup = async () => {
     try {
-      await performBackup(selectedBackupType as any, {
+      await performBackup(selectedBackupType, {
         compress: true,
         tables: selectedTables
       });
@@ -84,10 +84,11 @@ const BackupManagement = () => {
         title: "Success",
         description: "Backup completed successfully",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Backup failed. Please try again.";
       toast({
         title: "Error",
-        description: error.message || "Backup failed. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

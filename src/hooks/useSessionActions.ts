@@ -1,17 +1,17 @@
 
-import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Session, NewSessionData } from '@/types/sessions';
-import { 
-  addSession, 
-  updateSession, 
-  deleteSession 
+import {
+  addSession,
+  updateSession,
+  deleteSession
 } from '@/services/sessionsService';
 import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 export const useSessionActions = (
-  user: any,
+  user: User | null,
   sessions: Session[],
   setSessions: React.Dispatch<React.SetStateAction<Session[]>>
 ) => {

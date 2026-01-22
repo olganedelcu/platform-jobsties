@@ -8,11 +8,12 @@ import { Building2, MessageSquare } from 'lucide-react';
 import { JobApplication } from '@/types/jobApplications';
 import { format } from 'date-fns';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
+import { User } from '@supabase/supabase-js';
 
 interface MenteeRecentActivityCardProps {
   onViewAll: () => void;
   onAddApplication: () => void;
-  user: any;
+  user: User | null;
 }
 
 const MenteeRecentActivityCard = ({ onViewAll, onAddApplication, user }: MenteeRecentActivityCardProps) => {

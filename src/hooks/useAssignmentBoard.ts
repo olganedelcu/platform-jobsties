@@ -87,7 +87,12 @@ export const useAssignmentBoard = (coachId: string) => {
         await updateStatus(todoId, updates.status);
       } else {
         // Handle other updates (title, description, priority, due_date)
-        const detailUpdates: any = {};
+        const detailUpdates: {
+          mentee_title?: string;
+          mentee_description?: string;
+          mentee_priority?: 'low' | 'medium' | 'high';
+          mentee_due_date?: string;
+        } = {};
         if (updates.title !== undefined) detailUpdates.mentee_title = updates.title;
         if (updates.description !== undefined) detailUpdates.mentee_description = updates.description;
         if (updates.priority !== undefined) detailUpdates.mentee_priority = updates.priority;
@@ -116,7 +121,7 @@ export const useAssignmentBoard = (coachId: string) => {
         title: "Success",
         description: "Task updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to update task",
@@ -179,7 +184,7 @@ export const useAssignmentBoard = (coachId: string) => {
         title: "Success",
         description: "Task moved successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving assignment:', error);
       toast({
         title: "Error",

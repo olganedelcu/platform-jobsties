@@ -88,7 +88,7 @@ export const useCourseProgress = (params: UseCourseProgressParams) => {
       }));
 
       setProgress(formattedProgress);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching course progress:', error);
       setError(error.message);
       
@@ -120,7 +120,7 @@ export const useCourseProgress = (params: UseCourseProgressParams) => {
     try {
       await courseProgressService.updateProgress(params.id, moduleTitle, progressPercentage, completed);
       await fetchProgress(); // Refresh the progress data
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating course progress:', error);
       setError(error.message);
     }

@@ -20,7 +20,7 @@ export const useMenteeTodos = (userId: string) => {
       setLoading(true);
       const data = await fetchMenteeTodos(userId);
       setTodos(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading todos:', error);
       toast({
         title: "Error",
@@ -49,7 +49,7 @@ export const useMenteeTodos = (userId: string) => {
         title: "Success",
         description: "Task added successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding todo:', error);
       toast({
         title: "Error",
@@ -71,7 +71,7 @@ export const useMenteeTodos = (userId: string) => {
         title: "Success",
         description: "Task status updated"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating todo status:', error);
       toast({
         title: "Error",
@@ -106,7 +106,7 @@ export const useMenteeTodos = (userId: string) => {
         title: "Success",
         description: "Task updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating todo:', error);
       toast({
         title: "Error",
@@ -124,7 +124,7 @@ export const useMenteeTodos = (userId: string) => {
         title: "Success",
         description: "Task deleted successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting todo:', error);
       toast({
         title: "Error",

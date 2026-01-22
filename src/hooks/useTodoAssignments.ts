@@ -23,7 +23,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
       setLoading(true);
       const data = await fetchTodoAssignments(userId, isCoach);
       setAssignments(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading assignments:', error);
       toast({
         title: "Error",
@@ -49,7 +49,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
         title: "Success",
         description: "Assignment status updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating assignment status:', error);
       toast({
         title: "Error",
@@ -78,7 +78,7 @@ export const useTodoAssignments = (userId: string, isCoach: boolean = false) => 
         title: "Success",
         description: "Assignment updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating assignment details:', error);
       toast({
         title: "Error",

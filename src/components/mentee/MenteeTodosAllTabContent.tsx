@@ -1,6 +1,7 @@
 
 import React from 'react';
 import MenteeTodosSection from './MenteeTodosSection';
+import { MenteeTodo } from '@/services/menteeTodosService';
 
 interface MenteeTodosAllTabContentProps {
   userId: string;
@@ -9,16 +10,16 @@ interface MenteeTodosAllTabContentProps {
   showAddForm: boolean;
   assignmentTasks: number;
   personalTasks: number;
-  todos: any[];
+  todos: MenteeTodo[];
   todosLoading: boolean;
   onAssignmentsViewModeChange: (mode: 'list' | 'board') => void;
   onPersonalViewModeChange: (mode: 'list' | 'board') => void;
   onShowAddForm: () => void;
-  onAddTodo: (todoData: any) => void;
+  onAddTodo: (todoData: Omit<MenteeTodo, 'id' | 'created_at' | 'updated_at'>) => void;
   onCancelAdd: () => void;
   onUpdateStatus: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo: (todoId: string) => void;
-  onUpdateTodo: (todoId: string, updates: any) => void;
+  onUpdateTodo: (todoId: string, updates: Partial<MenteeTodo>) => void;
 }
 
 const MenteeTodosAllTabContent = ({

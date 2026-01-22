@@ -5,13 +5,25 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Building2, ExternalLink, User, UserPlus, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import MenteeNameCell from './MenteeNameCell';
+import { JobRecommendation } from '@/types/jobRecommendations';
+
+interface RecommendationAssignment {
+  id: string;
+  mentee_id: string;
+  week_start_date: string;
+  created_at: string;
+}
+
+interface GroupedRecommendation extends JobRecommendation {
+  assignments: RecommendationAssignment[];
+}
 
 interface JobRecommendationCardProps {
-  recommendation: any;
+  recommendation: GroupedRecommendation;
   menteeNames: { [key: string]: string };
   selectedAssignments: string[];
   onSelectAssignment: (assignmentId: string, checked: boolean) => void;
-  onAssignToMoreMentees: (recommendation: any) => void;
+  onAssignToMoreMentees: (recommendation: GroupedRecommendation) => void;
   onDeleteRecommendation: (assignmentId: string) => void;
 }
 
@@ -71,7 +83,7 @@ const JobRecommendationCard = ({
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {recommendation.assignments.map((assignment: any) => (
+          {recommendation.assignments.map((assignment) => (
             <div key={assignment.id} className="bg-gray-50 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 flex-1">

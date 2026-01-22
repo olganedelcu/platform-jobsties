@@ -1,6 +1,7 @@
 
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { User } from '@supabase/supabase-js';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useJobApplicationsData } from '@/hooks/useJobApplicationsData';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -12,13 +13,13 @@ import ApplicationsThisMonthCard from '@/components/dashboard/ApplicationsThisMo
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 
 interface DashboardContentProps {
-  user: any;
+  user: User | null;
 }
 
 const DashboardContent = memo(({ user }: DashboardContentProps) => {
   const navigate = useNavigate();
-  const firstName = useMemo(() => 
-    user?.user_metadata?.first_name || user?.first_name || 'there',
+  const firstName = useMemo(() =>
+    user?.user_metadata?.first_name || 'there',
     [user]
   );
   

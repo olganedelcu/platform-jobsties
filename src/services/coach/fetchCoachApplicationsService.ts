@@ -109,7 +109,7 @@ export const fetchMenteeApplications = async (): Promise<JobApplication[]> => {
       // Don't throw error, just continue without filtering
       hiddenApplicationIds = [];
     } else {
-      hiddenApplicationIds = hiddenApplications?.map((hidden: any) => hidden.application_id) || [];
+      hiddenApplicationIds = hiddenApplications?.map((hidden: { application_id: string }) => hidden.application_id) || [];
     }
 
     console.log('Hidden application IDs:', hiddenApplicationIds);

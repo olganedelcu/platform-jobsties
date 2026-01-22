@@ -14,7 +14,7 @@ interface UseFormValidationReturn<T> {
   touched: Record<string, boolean>;
   isValid: boolean;
   isSubmitting: boolean;
-  setValue: (field: keyof T, value: any) => void;
+  setValue: (field: keyof T, value: unknown) => void;
   setValues: (values: Partial<T>) => void;
   setError: (field: keyof T, error: string) => void;
   clearError: (field: keyof T) => void;
@@ -27,9 +27,9 @@ interface UseFormValidationReturn<T> {
   validateForm: () => Promise<boolean>;
 }
 
-export const useFormValidation = <T extends Record<string, any>>(
+export const useFormValidation = <T extends Record<string, unknown>>(
   initialValues: T,
-  validationRules: Record<keyof T, any>,
+  validationRules: Record<keyof T, Record<string, unknown>>,
   options: UseFormValidationOptions = {}
 ): UseFormValidationReturn<T> => {
   const {
@@ -110,7 +110,7 @@ export const useFormValidation = <T extends Record<string, any>>(
     return result.isValid;
   }, [values, validationRules, sanitizeInputs]);
 
-  const setValue = useCallback((field: keyof T, value: any) => {
+  const setValue = useCallback((field: keyof T, value: unknown) => {
     setValuesState(prev => ({
       ...prev,
       [field]: value

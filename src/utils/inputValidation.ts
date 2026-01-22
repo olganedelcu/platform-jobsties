@@ -39,7 +39,7 @@ export interface ValidationError {
 export interface ValidationResult {
   isValid: boolean;
   errors: ValidationError[];
-  sanitizedValue?: any;
+  sanitizedValue?: Record<string, unknown>;
 }
 
 // Input sanitization class
@@ -148,7 +148,7 @@ export class InputSanitizer {
 
 // Input validator class
 export class InputValidator {
-  static validateRequired(value: any, fieldName: string): ValidationError | null {
+  static validateRequired(value: unknown, fieldName: string): ValidationError | null {
     if (value === null || value === undefined || value === '') {
       return {
         field: fieldName,
@@ -286,9 +286,9 @@ export class InputValidator {
 
 // Form validation utility
 export class FormValidator {
-  static validate(data: Record<string, any>, rules: Record<string, any>): ValidationResult {
+  static validate(data: Record<string, unknown>, rules: Record<string, Record<string, unknown>>): ValidationResult {
     const errors: ValidationError[] = [];
-    const sanitizedData: Record<string, any> = {};
+    const sanitizedData: Record<string, unknown> = {};
 
     Object.keys(rules).forEach(fieldName => {
       const fieldRules = rules[fieldName];
@@ -316,45 +316,52 @@ export class FormValidator {
       }
 
       // Type-specific validation and sanitization
-      let sanitizedValue = fieldValue;
+      let sanitizedValue: unknown = fieldValue;
 
-      if (fieldRules.type === 'email') {
-        const emailError = InputValidator.validateEmail(fieldValue, fieldName);
-        if (emailError) errors.push(emailError);
-        sanitizedValue = InputSanitizer.sanitizeEmail(fieldValue);
-      } else if (fieldRules.type === 'url') {
-        const urlError = InputValidator.validateUrl(fieldValue, fieldName);
-        if (urlError) errors.push(urlError);
-        sanitizedValue = InputSanitizer.sanitizeUrl(fieldValue);
-      } else if (fieldRules.type === 'text') {
-        const lengthError = InputValidator.validateLength(
-          fieldValue, 
-          fieldRules.minLength || 0, 
-          fieldRules.maxLength || 1000, 
-          fieldName
-        );
-        if (lengthError) errors.push(lengthError);
-        sanitizedValue = InputSanitizer.sanitizeText(fieldValue, {
-          allowHtml: fieldRules.allowHtml || false,
-          maxLength: fieldRules.maxLength || 1000
-        });
-      } else if (fieldRules.type === 'uuid') {
-        const uuidError = InputValidator.validateUUID(fieldValue, fieldName);
-        if (uuidError) errors.push(uuidError);
-      } else if (fieldRules.type === 'date') {
-        const dateError = InputValidator.validateDate(fieldValue, fieldName);
-        if (dateError) errors.push(dateError);
-      }
+      if (typeof fieldValue === 'string') {
+        if (fieldRules.type === 'email') {
+          const emailError = InputValidator.validateEmail(fieldValue, fieldName);
+          if (emailError) errors.push(emailError);
+          sanitizedValue = InputSanitizer.sanitizeEmail(fieldValue);
+        } else if (fieldRules.type === 'url') {
+          const urlError = InputValidator.validateUrl(fieldValue, fieldName);
+          if (urlError) errors.push(urlError);
+          sanitizedValue = InputSanitizer.sanitizeUrl(fieldValue);
+        } else if (fieldRules.type === 'text') {
+          const minLength = typeof fieldRules.minLength === 'number' ? fieldRules.minLength : 0;
+          const maxLength = typeof fieldRules.maxLength === 'number' ? fieldRules.maxLength : 1000;
+          const lengthError = InputValidator.validateLength(
+            fieldValue,
+            minLength,
+            maxLength,
+            fieldName
+          );
+          if (lengthError) errors.push(lengthError);
+          sanitizedValue = InputSanitizer.sanitizeText(fieldValue, {
+            allowHtml: fieldRules.allowHtml === true,
+            maxLength: maxLength
+          });
+        } else if (fieldRules.type === 'uuid') {
+          const uuidError = InputValidator.validateUUID(fieldValue, fieldName);
+          if (uuidError) errors.push(uuidError);
+        } else if (fieldRules.type === 'date') {
+          const dateError = InputValidator.validateDate(fieldValue, fieldName);
+          if (dateError) errors.push(dateError);
+        }
 
-      // Pattern validation
-      if (fieldRules.pattern) {
-        const patternError = InputValidator.validatePattern(
-          fieldValue,
-          fieldRules.pattern,
-          fieldName,
-          fieldRules.patternMessage || `${fieldName} format is invalid`
-        );
-        if (patternError) errors.push(patternError);
+        // Pattern validation
+        if (fieldRules.pattern && fieldRules.pattern instanceof RegExp) {
+          const patternMessage = typeof fieldRules.patternMessage === 'string'
+            ? fieldRules.patternMessage
+            : `${fieldName} format is invalid`;
+          const patternError = InputValidator.validatePattern(
+            fieldValue,
+            fieldRules.pattern,
+            fieldName,
+            patternMessage
+          );
+          if (patternError) errors.push(patternError);
+        }
       }
 
       // Custom validation
@@ -375,10 +382,15 @@ export class FormValidator {
 }
 
 // Export utility functions for common use cases
-export const sanitizeUserInput = (input: string, options?: any) => 
+export const sanitizeUserInput = (input: string, options?: {
+  allowHtml?: boolean;
+  maxLength?: number;
+  removeScripts?: boolean;
+  removeSqlPatterns?: boolean;
+}) =>
   InputSanitizer.sanitizeText(input, options);
 
-export const validateFormData = (data: Record<string, any>, rules: Record<string, any>) => 
+export const validateFormData = (data: Record<string, unknown>, rules: Record<string, Record<string, unknown>>) =>
   FormValidator.validate(data, rules);
 
 export const isValidEmail = (email: string) => 

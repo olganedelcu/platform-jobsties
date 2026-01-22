@@ -1,10 +1,9 @@
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { useSignUpValidation } from '@/hooks/useSignUpValidation';
+import { useSignUpValidation, type SignUpFormData } from '@/hooks/useSignUpValidation';
 import { createMenteeAccount } from '@/services/signUpService';
 import SignUpFormFields from '@/components/signup/SignUpFormFields';
 import SignUpFormNavigation from '@/components/signup/SignUpFormNavigation';
@@ -25,7 +24,7 @@ const ValidatedSignUpForm = () => {
     handleSubmit
   } = useSignUpValidation();
 
-  const onSubmit = async (formData: any) => {
+  const onSubmit = async (formData: SignUpFormData) => {
     const success = await executeWithErrorHandling(
       async () => {
         const result = await createMenteeAccount(formData);

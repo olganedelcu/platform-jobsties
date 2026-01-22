@@ -1,6 +1,6 @@
 
-import React from 'react';
 import { Link } from 'react-router-dom';
+import type { User } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LucideIcon, LogOut } from 'lucide-react';
@@ -14,7 +14,7 @@ interface NavigationItem {
 interface MobileNavigationProps {
   isOpen: boolean;
   navigationItems: NavigationItem[];
-  user: any;
+  user: User | null;
   profilePicture: string | null;
   onSignOut: () => void;
   onClose: () => void;

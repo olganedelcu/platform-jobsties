@@ -83,7 +83,7 @@ export const useCoachAssignmentsBoard = (coachId: string) => {
           todos: todosByStatus.completed
         }
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching coach assigned todos:', error);
       toast({
         title: "Error",
@@ -149,7 +149,7 @@ export const useCoachAssignmentsBoard = (coachId: string) => {
         title: "Success",
         description: "Assignment updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating assigned todo:', error);
       toast({
         title: "Error",
@@ -180,7 +180,7 @@ export const useCoachAssignmentsBoard = (coachId: string) => {
         title: "Success",
         description: "Assignment deleted successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting assigned todo:', error);
       toast({
         title: "Error",
@@ -240,7 +240,7 @@ export const useCoachAssignmentsBoard = (coachId: string) => {
         title: "Success",
         description: "Assignment moved successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving assigned todo:', error);
       toast({
         title: "Error",

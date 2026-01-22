@@ -5,11 +5,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import PageWrapper from '@/components/layout/PageWrapper';
 import DashboardContent from '@/components/DashboardContent';
+import { User } from '@supabase/supabase-js';
 
 const Dashboard = memo(() => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

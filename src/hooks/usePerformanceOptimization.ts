@@ -40,18 +40,18 @@ export const usePerformanceOptimization = () => {
   }, []);
 
   // Debounce function for search and form inputs
-  const debounce = useCallback((func: Function, delay: number) => {
+  const debounce = useCallback(<T extends unknown[]>(func: (...args: T) => void, delay: number) => {
     let timeoutId: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (...args: T) => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => func(...args), delay);
     };
   }, []);
 
   // Throttle function for high-frequency events
-  const throttle = useCallback((func: Function, delay: number) => {
+  const throttle = useCallback(<T extends unknown[]>(func: (...args: T) => void, delay: number) => {
     let lastCall = 0;
-    return (...args: any[]) => {
+    return (...args: T) => {
       const now = Date.now();
       if (now - lastCall >= delay) {
         lastCall = now;

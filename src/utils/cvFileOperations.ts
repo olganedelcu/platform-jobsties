@@ -107,7 +107,7 @@ export const uploadCVFile = async (
     // Call the success callback function
     onSuccess();
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error",
       description: error.message || "Failed to upload document.",
@@ -153,7 +153,7 @@ export const deleteCVFile = async (
     // Call the success callback function
     onSuccess();
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     toast({
       title: "Error",
       description: error.message || "Failed to delete document.",

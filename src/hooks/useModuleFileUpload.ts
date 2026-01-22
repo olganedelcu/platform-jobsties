@@ -102,7 +102,7 @@ export const useModuleFileUpload = () => {
 
       return true;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading module file:', error);
       toast({
         title: "Error",

@@ -57,7 +57,7 @@ export const useMenteeProgress = (menteeIds: string[]) => {
 
       setProgressData(formattedData);
       setError(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setError(error.message || 'Failed to fetch progress data');
       
       // Only set fallback data if we don't have any data yet

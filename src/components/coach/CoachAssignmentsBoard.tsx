@@ -126,7 +126,7 @@ const CoachAssignmentsBoard = ({ coachId }: CoachAssignmentsBoardProps) => {
         title: "Success",
         description: "Assignment status updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving assignment:', error);
       toast({
         title: "Error",

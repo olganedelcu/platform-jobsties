@@ -74,7 +74,7 @@ const CoachLogin = () => {
         
         navigate('/coach/mentees');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message || 'Failed to sign in',

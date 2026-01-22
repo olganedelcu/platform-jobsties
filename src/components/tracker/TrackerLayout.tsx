@@ -2,9 +2,10 @@
 import React, { memo } from 'react';
 import Navigation from '@/components/Navigation';
 import { Loader2 } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
 
 interface TrackerLayoutProps {
-  user: any;
+  user: User | null;
   onSignOut: () => void;
   loading?: boolean;
   children: React.ReactNode;

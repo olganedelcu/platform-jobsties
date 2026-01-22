@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import TodoList from '@/components/TodoList';
 import PageWrapper from '@/components/layout/PageWrapper';
+import { User } from '@supabase/supabase-js';
 
 interface Mentee {
   id: string;
@@ -16,7 +17,7 @@ interface Mentee {
 const CoachTodos = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +53,7 @@ const CoachTodos = () => {
 
       setUser(user);
       await fetchMentees();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auth check error:', error);
       navigate('/coach-login');
     } finally {
@@ -69,7 +70,7 @@ const CoachTodos = () => {
 
       if (error) throw error;
       setMentees(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching mentees:', error);
       toast({
         title: "Error",

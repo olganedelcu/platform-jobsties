@@ -55,7 +55,7 @@ const validationRules = {
   confirmPassword: {
     required: true,
     type: 'text',
-    custom: (value: string, fieldName: string, allValues: any) => {
+    custom: (value: string, fieldName: string, allValues: Record<string, unknown>) => {
       if (value !== allValues?.password) {
         return {
           field: 'confirmPassword',

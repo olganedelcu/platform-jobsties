@@ -2,9 +2,10 @@
 import React from 'react';
 import { useTimeBasedGreeting } from '@/hooks/useTimeBasedGreeting';
 import { useQuoteOfTheDay } from '@/hooks/useQuoteOfTheDay';
+import { User } from '@supabase/supabase-js';
 
 interface DashboardHeaderProps {
-  user: any;
+  user: User | null;
   firstName: string;
   applicationsThisMonth: number;
   onTrackerClick: () => void;

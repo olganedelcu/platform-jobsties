@@ -88,7 +88,7 @@ export const useMenteeTaskBoardData = (userId: string) => {
           todos: todosByStatus.completed
         }
       ]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch your tasks",

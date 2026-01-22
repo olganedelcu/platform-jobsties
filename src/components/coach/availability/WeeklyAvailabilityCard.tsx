@@ -15,7 +15,7 @@ interface AvailabilitySlot {
 
 interface WeeklyAvailabilityCardProps {
   availability: AvailabilitySlot[];
-  onUpdateAvailability: (dayIndex: number, field: string, value: any) => void;
+  onUpdateAvailability: (dayIndex: number, field: string, value: boolean | string) => void;
   onSave: () => void;
   saving: boolean;
 }

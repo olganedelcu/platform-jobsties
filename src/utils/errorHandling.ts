@@ -58,9 +58,10 @@ class SecureErrorHandler {
     return sanitized;
   }
 
-  static categorizeError(error: Error | any): string {
-    const message = error?.message?.toLowerCase() || '';
-    const status = error?.status || error?.code;
+  static categorizeError(error: Error | unknown): string {
+    const errorObj = error as { message?: string; status?: number; code?: string };
+    const message = errorObj?.message?.toLowerCase() || '';
+    const status = errorObj?.status || errorObj?.code;
 
     if (status === 401 || message.includes('unauthorized')) {
       return 'UNAUTHORIZED';
@@ -96,21 +97,23 @@ class SecureErrorHandler {
     return 'SERVER_ERROR';
   }
 
-  static handleError(error: Error | any, context?: ErrorContext): SanitizedError {
-    const errorId = `ERR_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+  static handleError(error: Error | unknown, context?: ErrorContext): SanitizedError {
+    const errorId = `ERR_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 11)}`;
     const errorCode = this.categorizeError(error);
     const userFriendlyMessage = this.errorMessages[errorCode] || 'An unexpected error occurred.';
+
+    const errorObj = error as { message?: string; stack?: string };
 
     // Log sanitized error for debugging (in production, send to monitoring service)
     const logData = {
       errorId,
       code: errorCode,
-      originalMessage: this.sanitizeMessage(error?.message || 'Unknown error'),
+      originalMessage: this.sanitizeMessage(errorObj?.message || 'Unknown error'),
       context: {
         ...context,
         timestamp: new Date().toISOString(),
       },
-      stack: error?.stack?.split('\n').slice(0, 3).join('\n'), // Limited stack trace
+      stack: errorObj?.stack?.split('\n').slice(0, 3).join('\n'), // Limited stack trace
     };
 
     console.error('Handled Error:', logData);

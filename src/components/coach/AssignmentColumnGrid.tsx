@@ -4,12 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { User } from 'lucide-react';
 import TodoColumn from '@/components/todos/TodoColumn';
 import AddColumnButton from '@/components/todos/AddColumnButton';
-import { TodoColumnType } from '@/types/assignmentBoard';
+import { TodoColumnType, TodoItem } from '@/types/assignmentBoard';
 
 interface AssignmentColumnGridProps {
   columns: TodoColumnType[];
-  onAddTodo: (columnId: string, todo: any) => void;
-  onUpdateTodo: (columnId: string, todoId: string, updates: any) => void;
+  onAddTodo: (columnId: string, todo: Partial<TodoItem>) => void;
+  onUpdateTodo: (columnId: string, todoId: string, updates: Partial<TodoItem>) => void;
   onDeleteTodo: (columnId: string, todoId: string) => void;
   onMoveTodo: (todoId: string, fromColumnId: string, toColumnId: string) => void;
   onShowAddColumn: () => void;

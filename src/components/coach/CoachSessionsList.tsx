@@ -66,7 +66,7 @@ const CoachSessionsList = ({
     </Card>
   );
 
-  const handleScheduleSession = (sessionData: any) => {
+  const handleScheduleSession = (sessionData: Record<string, unknown>) => {
     console.log('Coach scheduling session:', sessionData);
     setShowScheduleDialog(false);
     // The session will be automatically added via the Cal.com integration

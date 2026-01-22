@@ -5,10 +5,18 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Calendar } from 'lucide-react';
 import ScheduleSession from '@/components/ScheduleSession';
 
+interface SessionData {
+  date?: string;
+  time?: string;
+  duration?: string;
+  notes?: string;
+  preferredCoach?: string;
+}
+
 interface SessionsPageHeaderProps {
   showScheduleDialog: boolean;
   setShowScheduleDialog: (show: boolean) => void;
-  onScheduleSession: (sessionData: any) => void;
+  onScheduleSession: (sessionData: SessionData) => void;
   userId?: string;
   sessionRefreshKey: number;
 }

@@ -37,7 +37,7 @@ export class AvailabilityService {
         .eq('coach_id', coachId);
 
       if (error) throw error;
-      return data?.map((item: any) => item.blocked_date) || [];
+      return data?.map((item: { blocked_date: string }) => item.blocked_date) || [];
     } catch (error) {
       console.error('Error fetching blocked dates:', error);
       throw error;

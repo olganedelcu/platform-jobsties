@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, CheckCircle2, Play, Calendar, Trash2, User, Edit } from 'lucide-react';
 import { useTodoAssignments } from '@/hooks/useTodoAssignments';
-import { updateAssignmentStatus } from '@/services/todoAssignmentService';
+import { updateAssignmentStatus, TodoAssignmentWithDetails } from '@/services/todoAssignmentService';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import EditAssignmentDialog from './mentee/EditAssignmentDialog';
@@ -19,7 +19,7 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
   const { assignments, loading, refreshAssignments } = useTodoAssignments(userId, false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [editingAssignment, setEditingAssignment] = useState<any>(null);
+  const [editingAssignment, setEditingAssignment] = useState<TodoAssignmentWithDetails | null>(null);
 
   const handleCardClick = (assignmentId: string) => {
     navigate(`/task/${assignmentId}`);
@@ -61,19 +61,19 @@ const MenteeAssignmentsList = ({ userId }: MenteeAssignmentsListProps) => {
     }
   };
 
-  const getDisplayTitle = (assignment: any) => {
+  const getDisplayTitle = (assignment: TodoAssignmentWithDetails) => {
     return assignment.mentee_title || assignment.todo?.title || 'Untitled Task';
   };
 
-  const getDisplayDescription = (assignment: any) => {
+  const getDisplayDescription = (assignment: TodoAssignmentWithDetails) => {
     return assignment.mentee_description || assignment.todo?.description || '';
   };
 
-  const getDisplayPriority = (assignment: any) => {
+  const getDisplayPriority = (assignment: TodoAssignmentWithDetails) => {
     return assignment.mentee_priority || assignment.todo?.priority || 'medium';
   };
 
-  const getDisplayDueDate = (assignment: any) => {
+  const getDisplayDueDate = (assignment: TodoAssignmentWithDetails) => {
     return assignment.mentee_due_date || assignment.todo?.due_date;
   };
 

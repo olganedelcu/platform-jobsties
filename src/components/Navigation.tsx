@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import type { User as UserType } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  BarChart3, 
-  User, 
-  LogOut, 
-  Menu, 
+import {
+  BarChart3,
+  User,
+  LogOut,
+  Menu,
   X,
   MessageSquare,
   FileText,
@@ -20,7 +21,7 @@ import UserProfileSection from './UserProfileSection';
 import NotificationDropdown from './notifications/NotificationDropdown';
 
 interface NavigationProps {
-  user: any;
+  user: UserType | null;
   onSignOut: () => void;
 }
 

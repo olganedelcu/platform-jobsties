@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchSessions } from '@/services/sessionsService';
 import { useSessionActions } from '@/hooks/useSessionActions';
-import { Session, SessionsDataHookReturn } from '@/types/sessions';
+import { Session, SessionsDataHookReturn, NewSessionData } from '@/types/sessions';
 import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
-export const useSessionsData = (user: any): SessionsDataHookReturn => {
+export const useSessionsData = (user: User | null): SessionsDataHookReturn => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -55,7 +56,7 @@ export const useSessionsData = (user: any): SessionsDataHookReturn => {
     }
   };
 
-  const handleAddSessionWithRefresh = async (sessionData: any) => {
+  const handleAddSessionWithRefresh = async (sessionData: NewSessionData) => {
     await handleAddSession(sessionData);
     // Trigger a refresh of the component using the availability hook
     setRefreshTrigger(prev => prev + 1);

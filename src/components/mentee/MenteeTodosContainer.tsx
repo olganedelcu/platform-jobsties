@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useMenteeTodos } from '@/hooks/useMenteeTodos';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
+import { MenteeTodo } from '@/services/menteeTodosService';
 
 interface MenteeTodosContainerProps {
   userId: string;
@@ -12,16 +13,16 @@ const MenteeTodosContainer = ({ userId }: MenteeTodosContainerProps) => {
   const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
 
   // Hooks for todo management
-  const { 
-    todos, 
-    loading: todosLoading, 
-    addTodo, 
-    updateStatus: updateTodoStatus, 
+  const {
+    todos,
+    loading: todosLoading,
+    addTodo,
+    updateStatus: updateTodoStatus,
     deleteTodo,
     updateTodo
   } = useMenteeTodos(userId);
 
-  const handleAddTodo = async (todoData: any) => {
+  const handleAddTodo = async (todoData: Omit<MenteeTodo, 'id' | 'created_at' | 'updated_at'>) => {
     await addTodo(todoData);
     setShowAddForm(false);
   };

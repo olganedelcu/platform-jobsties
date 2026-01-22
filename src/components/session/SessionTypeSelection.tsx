@@ -7,7 +7,7 @@ interface SessionType {
   name: string;
   duration: number;
   description: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 

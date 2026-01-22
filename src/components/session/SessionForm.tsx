@@ -7,9 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Clock, User, FileText } from 'lucide-react';
 
+interface SessionData {
+  date: string;
+  time: string;
+  duration: string;
+  preferredCoach: string;
+  notes: string;
+}
+
 interface SessionFormProps {
-  sessionData: any;
-  onSessionDataChange: (data: any) => void;
+  sessionData: SessionData;
+  onSessionDataChange: (data: SessionData) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }

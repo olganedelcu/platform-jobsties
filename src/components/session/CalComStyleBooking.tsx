@@ -7,8 +7,17 @@ import CoachInfoPanel from './CoachInfoPanel';
 import CalendarView from './CalendarView';
 import TimeSlotSelection from './TimeSlotSelection';
 
+interface SessionData {
+  sessionType: string;
+  date: string;
+  time: string;
+  duration: string;
+  notes: string;
+  preferredCoach: string;
+}
+
 interface CalComStyleBookingProps {
-  onBookSession: (sessionData: any) => void;
+  onBookSession: (sessionData: SessionData) => void;
   onCancel: () => void;
 }
 

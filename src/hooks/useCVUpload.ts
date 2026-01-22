@@ -46,7 +46,7 @@ export const useCVUpload = () => {
       // Refresh the files list
       fetchAllFiles();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: error.message || "Failed to delete file.",

@@ -15,7 +15,7 @@ interface AvailabilitySlot {
 interface DayAvailabilityRowProps {
   day: string;
   slot: AvailabilitySlot;
-  onUpdate: (field: string, value: any) => void;
+  onUpdate: (field: string, value: boolean | string) => void;
 }
 
 const DayAvailabilityRow = ({ day, slot, onUpdate }: DayAvailabilityRowProps) => {

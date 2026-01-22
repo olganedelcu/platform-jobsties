@@ -4,9 +4,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { navItems, settingsItems } from '@/config/coachNavigationConfig';
 import CoachUserProfile from './CoachUserProfile';
 import NotificationDropdown from '../notifications/NotificationDropdown';
+import { User } from '@supabase/supabase-js';
 
 interface CoachMobileNavigationProps {
-  user: any;
+  user: User | null;
   onSignOut: () => void;
   onClose: () => void;
 }

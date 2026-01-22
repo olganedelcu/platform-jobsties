@@ -10,11 +10,13 @@ import SessionsEmptyState from '@/components/sessions/SessionsEmptyState';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { useToast } from '@/hooks/use-toast';
 import { useSessionsData } from '@/hooks/useSessionsData';
+import { User } from '@supabase/supabase-js';
+import { NewSessionData } from '@/types/sessions';
 
 const Sessions = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   const [sessionRefreshKey, setSessionRefreshKey] = useState(0);
@@ -48,14 +50,24 @@ const Sessions = () => {
     checkUser();
   }, [navigate]);
 
-  const handleScheduleSession = async (sessionData: any) => {
+  const handleScheduleSession = async (sessionData: Partial<NewSessionData>) => {
     console.log('Scheduling session with data:', sessionData);
-    
+
     try {
-      await handleAddSession(sessionData);
+      // Convert partial session data to full NewSessionData with defaults
+      const fullSessionData: NewSessionData = {
+        sessionType: sessionData.sessionType || '1-on-1 Session',
+        date: sessionData.date || '',
+        time: sessionData.time || '',
+        duration: sessionData.duration || '45',
+        notes: sessionData.notes || '',
+        preferredCoach: sessionData.preferredCoach || 'Ana Nedelcu'
+      };
+
+      await handleAddSession(fullSessionData);
       setShowScheduleDialog(false);
       setSessionRefreshKey(prev => prev + 1);
-      
+
       toast({
         title: "Success",
         description: "Session scheduled successfully!",

@@ -52,7 +52,7 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
       }));
 
       setFiles(typedFiles);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to load module files.",
@@ -86,7 +86,7 @@ export const useModuleFiles = ({ userId, moduleType }: UseModuleFilesParams) => 
         title: "Success",
         description: `Downloaded ${file.file_name}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to download file.",

@@ -7,7 +7,7 @@ export interface CreateNotificationData {
   message: string;
   type: 'job_recommendation' | 'file_upload' | 'message' | 'todo_assignment' | 'session' | 'general';
   actionUrl?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export const InAppNotificationService = {

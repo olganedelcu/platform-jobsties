@@ -155,7 +155,7 @@ export const useSendTodosToMentees = (coachId: string) => {
       }]);
       setSelectedMentees([]);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending todos:', error);
       toast({
         title: "Error",

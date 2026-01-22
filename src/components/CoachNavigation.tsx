@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { User } from '@supabase/supabase-js';
 import CoachNavigationHeader from './navigation/CoachNavigationHeader';
 import CoachDesktopNavigation from './navigation/CoachDesktopNavigation';
 import CoachUserProfile from './navigation/CoachUserProfile';
@@ -7,7 +8,7 @@ import CoachMobileMenuToggle from './navigation/CoachMobileMenuToggle';
 import CoachMobileNavigation from './navigation/CoachMobileNavigation';
 
 interface CoachNavigationProps {
-  user: any;
+  user: User | null;
   onSignOut: () => void;
 }
 

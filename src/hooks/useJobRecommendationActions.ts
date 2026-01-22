@@ -1,31 +1,32 @@
 
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { JobRecommendation } from '@/types/jobRecommendations';
+import { JobRecommendation, NewJobRecommendationData } from '@/types/jobRecommendations';
 import { addJobApplication } from '@/services/jobApplicationsService';
 import { updateJobRecommendationStatus } from '@/services/jobRecommendationArchiveService';
+import type { User } from '@supabase/supabase-js';
 
 interface UseJobRecommendationActionsProps {
   userId: string;
-  addRecommendation?: (data: any) => Promise<any>;
+  addRecommendation?: (data: NewJobRecommendationData) => Promise<JobRecommendation>;
   deleteRecommendation?: (id: string) => Promise<void>;
-  user?: any; // Make user optional for backward compatibility
+  user?: User | null;
   onApplicationAdded?: () => void;
 }
 
-export const useJobRecommendationActions = ({ 
-  userId, 
-  addRecommendation, 
+export const useJobRecommendationActions = ({
+  userId,
+  addRecommendation,
   deleteRecommendation,
   user,
   onApplicationAdded
 }: UseJobRecommendationActionsProps) => {
   const { toast } = useToast();
-  const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<JobRecommendation | null>(null);
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
 
-  const handleAssignToMoreMentees = (recommendation: any) => {
+  const handleAssignToMoreMentees = (recommendation: JobRecommendation) => {
     setSelectedRecommendation(recommendation);
     setAssignmentDialogOpen(true);
   };
@@ -71,7 +72,7 @@ export const useJobRecommendationActions = ({
     }
   };
 
-  const handleSelectAll = (checked: boolean, recommendations: any[]) => {
+  const handleSelectAll = (checked: boolean, recommendations: JobRecommendation[]) => {
     if (checked) {
       const allAssignmentIds = recommendations.map(rec => rec.id);
       setSelectedAssignments(allAssignmentIds);

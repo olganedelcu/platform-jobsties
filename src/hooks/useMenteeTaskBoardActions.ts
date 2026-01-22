@@ -73,7 +73,7 @@ export const useMenteeTaskBoardActions = (
         title: "Success",
         description: "Task added successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to add task",
@@ -106,7 +106,7 @@ export const useMenteeTaskBoardActions = (
         title: "Success",
         description: "Task updated successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to update task",
@@ -134,7 +134,7 @@ export const useMenteeTaskBoardActions = (
         title: "Success",
         description: "Task deleted successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to delete task",
@@ -193,7 +193,7 @@ export const useMenteeTaskBoardActions = (
         title: "Success",
         description: "Task moved successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error moving task:', error);
       toast({
         title: "Error",

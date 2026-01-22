@@ -10,6 +10,7 @@ import PersonalTodosTabContent from './PersonalTodosTabContent';
 import MenteeTodosAllTabContent from './MenteeTodosAllTabContent';
 import MenteeTodoForm from '@/components/MenteeTodoForm';
 import MenteeTodosSection from './MenteeTodosSection';
+import { MenteeTodo } from '@/services/menteeTodosService';
 
 interface MenteeTodosTabsContentProps {
   userId: string;
@@ -31,7 +32,7 @@ const MenteeTodosTabsContent = ({ userId }: MenteeTodosTabsContentProps) => {
     updateTodo
   } = useMenteeTodos(userId);
 
-  const handleAddTodo = async (todoData: any) => {
+  const handleAddTodo = async (todoData: Omit<MenteeTodo, 'id' | 'created_at' | 'updated_at'>) => {
     await addTodo(todoData);
     setShowAddForm(false);
   };

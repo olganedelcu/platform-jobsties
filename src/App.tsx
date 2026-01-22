@@ -2,7 +2,6 @@
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppLayout from "@/components/layout/AppLayout";
@@ -34,68 +33,51 @@ const ApplicationDetail = lazy(() => import("./pages/ApplicationDetail"));
 const TaskDetail = lazy(() => import("./pages/TaskDetail"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: (failureCount, error: any) => {
-        if (error?.status === 401 || error?.status === 403) {
-          return false;
-        }
-        return failureCount < 3;
-      },
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (replaces cacheTime)
-    },
-  },
-});
-
 const App = () => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppLayout>
-          <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-          }>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/sessions" element={<Sessions />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/tracker" element={<Tracker />} />
-              <Route path="/application/:id" element={<ApplicationDetail />} />
-              <Route path="/course" element={<Course />} />
-              <Route path="/todos" element={<MenteeTodosPage />} />
-              <Route path="/task/:id" element={<TaskDetail />} />
-              
-              {/* Coach Routes */}
-              <Route path="/coach/signup" element={<CoachSignUp />} />
-              <Route path="/coach/login" element={<CoachLogin />} />
-              <Route path="/coach/mentees" element={<Mentees />} />
-              <Route path="/coach/dashboard" element={<CoachDashboard />} />
-              <Route path="/coach/cv-upload" element={<CVUpload />} />
-              <Route path="/coach/sessions" element={<CoachSessions />} />
-              <Route path="/coach/messages" element={<CoachMessages />} />
-              <Route path="/coach/profile" element={<CoachProfile />} />
-              <Route path="/coach/todos" element={<CoachTodos />} />
-              <Route path="/coach/applications" element={<Applications />} />
-              <Route path="/coach/calendar" element={<CoachCalendar />} />
-              <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
-              <Route path="/coach/backup" element={<BackupManagementPage />} />
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </AppLayout>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <Toaster />
+    <Sonner />
+    <BrowserRouter>
+      <AppLayout>
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/sessions" element={<Sessions />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/tracker" element={<Tracker />} />
+            <Route path="/application/:id" element={<ApplicationDetail />} />
+            <Route path="/course" element={<Course />} />
+            <Route path="/todos" element={<MenteeTodosPage />} />
+            <Route path="/task/:id" element={<TaskDetail />} />
+
+            {/* Coach Routes */}
+            <Route path="/coach/signup" element={<CoachSignUp />} />
+            <Route path="/coach/login" element={<CoachLogin />} />
+            <Route path="/coach/mentees" element={<Mentees />} />
+            <Route path="/coach/dashboard" element={<CoachDashboard />} />
+            <Route path="/coach/cv-upload" element={<CVUpload />} />
+            <Route path="/coach/sessions" element={<CoachSessions />} />
+            <Route path="/coach/messages" element={<CoachMessages />} />
+            <Route path="/coach/profile" element={<CoachProfile />} />
+            <Route path="/coach/todos" element={<CoachTodos />} />
+            <Route path="/coach/applications" element={<Applications />} />
+            <Route path="/coach/calendar" element={<CoachCalendar />} />
+            <Route path="/coach/job-recommendations" element={<JobRecommendations />} />
+            <Route path="/coach/backup" element={<BackupManagementPage />} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </AppLayout>
+    </BrowserRouter>
   </ErrorBoundary>
 );
 

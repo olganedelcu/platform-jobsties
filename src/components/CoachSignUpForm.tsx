@@ -96,11 +96,12 @@ const CoachSignUpForm = () => {
         // Redirect to coach login page after successful signup
         navigate('/coach-login');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Coach signup error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create coach account';
       toast({
         title: "Error",
-        description: error.message || 'Failed to create coach account',
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

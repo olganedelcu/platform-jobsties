@@ -6,7 +6,7 @@ import { BarChart, TrendingUp, Target, Award } from 'lucide-react';
 interface StatsCardProps {
   title: string;
   value: number;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 

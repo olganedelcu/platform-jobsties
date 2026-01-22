@@ -60,21 +60,23 @@ const LoginForm = () => {
         // Let the auth state change handler handle the redirect
       }
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      
+
       let errorMessage = 'Failed to sign in';
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
-      } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
-      } else if (error.message?.includes('Too many requests')) {
-        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
-      } else if (error.message?.includes('Network')) {
-        errorMessage = 'Network error. Please check your connection and try again.';
-      } else if (error.message) {
-        errorMessage = error.message;
+
+      if (error instanceof Error) {
+        if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message?.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        } else if (error.message?.includes('Too many requests')) {
+          errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+        } else if (error.message?.includes('Network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
       }
       
       toast({

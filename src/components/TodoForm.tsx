@@ -108,7 +108,7 @@ const TodoForm = ({ mentees, coachId, onTodoAdded, onCancel }: TodoFormProps) =>
         title: "Success",
         description: successMessage
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to add todo",

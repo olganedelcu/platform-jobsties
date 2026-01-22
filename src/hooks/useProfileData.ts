@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 interface ProfileData {
   firstName: string;
@@ -12,7 +13,7 @@ interface ProfileData {
   about: string;
 }
 
-export const useProfileData = (user: any) => {
+export const useProfileData = (user: User | null) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
@@ -140,11 +141,11 @@ export const useProfileData = (user: any) => {
         description: "Your profile has been successfully saved.",
       });
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving profile:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to save profile.",
+        description: error instanceof Error ? error.message : "Failed to save profile.",
         variant: "destructive"
       });
     }

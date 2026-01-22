@@ -128,7 +128,7 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
         title: "Success",
         description: "Todo deleted successfully"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to delete todo",
@@ -153,7 +153,7 @@ const TodoItem = ({ todo, mentees, onTodoUpdated, onTodoDeleted }: TodoItemProps
         title: "Success",
         description: "Todo status updated"
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to update todo status",

@@ -63,7 +63,7 @@ const TodoList = ({ mentees, coachId }: TodoListProps) => {
       }));
       
       setTodos(typedTodos);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch todos",

@@ -94,7 +94,7 @@ export const useAllUploadedFiles = () => {
         .sort((a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime());
 
       setAllFiles(allFormattedFiles);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to fetch uploaded files",

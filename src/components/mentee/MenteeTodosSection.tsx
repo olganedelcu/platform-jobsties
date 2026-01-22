@@ -8,6 +8,7 @@ import MenteeAssignmentsList from '@/components/MenteeAssignmentsList';
 import CoachAssignmentsBoard from '@/components/coach/CoachAssignmentsBoard';
 import PersonalTodosTabContent from './PersonalTodosTabContent';
 import MenteeTodoForm from '@/components/MenteeTodoForm';
+import { MenteeTodo } from '@/services/menteeTodosService';
 
 interface MenteeTodosSectionProps {
   type: 'assignments' | 'personal';
@@ -19,13 +20,13 @@ interface MenteeTodosSectionProps {
   userId: string;
   showAddForm?: boolean;
   onShowAddForm?: () => void;
-  onAddTodo?: (todoData: any) => void;
+  onAddTodo?: (todoData: Omit<MenteeTodo, 'id' | 'created_at' | 'updated_at'>) => void;
   onCancelAdd?: () => void;
-  todos?: any[];
+  todos?: MenteeTodo[];
   todosLoading?: boolean;
   onUpdateStatus?: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo?: (todoId: string) => void;
-  onUpdateTodo?: (todoId: string, updates: any) => void;
+  onUpdateTodo?: (todoId: string, updates: Partial<MenteeTodo>) => void;
 }
 
 const MenteeTodosSection = ({

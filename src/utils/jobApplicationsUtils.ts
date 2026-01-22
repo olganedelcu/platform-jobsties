@@ -12,12 +12,12 @@ export const getStatusColor = (status: string) => {
 };
 
 interface LocalDraft {
-  formData: any;
+  formData: Record<string, unknown>;
   lastUpdated: string;
   applicationId: string;
 }
 
-export const saveDraftToLocalStorage = (applicationId: string, formData: any) => {
+export const saveDraftToLocalStorage = (applicationId: string, formData: Record<string, unknown>) => {
   try {
     if (!applicationId || !formData || Object.keys(formData).length === 0) {
       return;

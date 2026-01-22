@@ -4,8 +4,9 @@ import { useToast } from '@/hooks/use-toast';
 import { fetchJobApplications } from '@/services/jobApplicationsService';
 import { useJobApplicationActions } from '@/hooks/useJobApplicationActions';
 import { JobApplication, JobApplicationsHookReturn } from '@/types/jobApplications';
+import type { User } from '@supabase/supabase-js';
 
-export const useJobApplicationsData = (user: any): JobApplicationsHookReturn => {
+export const useJobApplicationsData = (user: User | null): JobApplicationsHookReturn => {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();

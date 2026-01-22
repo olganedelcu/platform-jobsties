@@ -1,6 +1,6 @@
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { User } from '@supabase/supabase-js';
 import { useMentees } from '@/hooks/useMentees';
 import { useCoachApplications } from '@/hooks/useCoachApplications';
 import { useCoachSessions } from '@/hooks/useCoachSessions';
@@ -17,12 +17,12 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, Bell } from 'lucide-react';
 
 interface CoachDashboardContentProps {
-  user: any;
+  user: User | null;
 }
 
 const CoachDashboardContent = ({ user }: CoachDashboardContentProps) => {
   const navigate = useNavigate();
-  const firstName = user?.user_metadata?.first_name || user?.first_name || 'Coach';
+  const firstName = user?.user_metadata?.first_name || 'Coach';
   
   const { mentees, loading: menteesLoading } = useMentees();
   const { applications, loading: applicationsLoading } = useCoachApplications();

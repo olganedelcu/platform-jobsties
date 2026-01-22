@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { syncUserToProfile } from '@/utils/profileSyncUtils';
+import type { User } from '@supabase/supabase-js';
 
 export const useMenteeTodosAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export const useMenteeTodosAuth = () => {
 
       console.log('User authorized as mentee');
       setUser(user);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auth check error:', error);
       toast({
         title: "Authentication Error",
@@ -90,7 +91,7 @@ export const useMenteeTodosAuth = () => {
     try {
       await supabase.auth.signOut();
       navigate('/login');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign out error:', error);
       toast({
         title: "Error",

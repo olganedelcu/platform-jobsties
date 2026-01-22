@@ -59,9 +59,25 @@ export const useConversations = () => {
         return;
       }
 
+      interface ProfileData {
+        first_name: string;
+        last_name: string;
+      }
+
+      interface RawConversation {
+        id: string;
+        mentee_id: string;
+        coach_email: string;
+        subject: string;
+        status: string;
+        created_at: string;
+        updated_at: string;
+        profiles: ProfileData;
+      }
+
       // Format conversations with mentee names and get last message
       const formattedConversations = await Promise.all(
-        (data || []).map(async (conv: any) => {
+        (data || []).map(async (conv: RawConversation) => {
           const mentee = conv.profiles;
           const menteeName = mentee ? `${mentee.first_name} ${mentee.last_name}` : 'Unknown';
 
@@ -75,7 +91,13 @@ export const useConversations = () => {
             .single();
 
           return {
-            ...conv,
+            id: conv.id,
+            mentee_id: conv.mentee_id,
+            coach_email: conv.coach_email,
+            subject: conv.subject,
+            status: conv.status as 'active' | 'archived' | 'closed',
+            created_at: conv.created_at,
+            updated_at: conv.updated_at,
             mentee_name: menteeName,
             last_message: lastMessage?.content || ''
           };

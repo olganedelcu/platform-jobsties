@@ -4,9 +4,10 @@ import EnhancedWeeklyJobRecommendations from '@/components/EnhancedWeeklyJobReco
 import TrackerStats from './TrackerStats';
 import TrackerTabs from './TrackerTabs';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
+import { User } from '@supabase/supabase-js';
 
 interface TrackerContentProps {
-  user: any;
+  user: User | null;
   activeTab: string;
   onTabChange: (tab: string) => void;
   statistics: {

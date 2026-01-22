@@ -101,21 +101,23 @@ const MenteeSignUpForm = () => {
         // Redirect to login page after successful signup
         navigate('/login');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      
+
       let errorMessage = 'Failed to create account. Please try again.';
-      
-      if (error.message?.includes('already registered') || error.message?.includes('already been registered')) {
-        errorMessage = 'An account with this email already exists. Please try logging in instead.';
-      } else if (error.message?.includes('Invalid email')) {
-        errorMessage = 'Please enter a valid email address.';
-      } else if (error.message?.includes('Password')) {
-        errorMessage = 'Password must be at least 6 characters long.';
-      } else if (error.message?.includes('Email rate limit exceeded')) {
-        errorMessage = 'Too many signup attempts. Please wait a moment and try again.';
-      } else if (error.message) {
-        errorMessage = error.message;
+
+      if (error instanceof Error) {
+        if (error.message?.includes('already registered') || error.message?.includes('already been registered')) {
+          errorMessage = 'An account with this email already exists. Please try logging in instead.';
+        } else if (error.message?.includes('Invalid email')) {
+          errorMessage = 'Please enter a valid email address.';
+        } else if (error.message?.includes('Password')) {
+          errorMessage = 'Password must be at least 6 characters long.';
+        } else if (error.message?.includes('Email rate limit exceeded')) {
+          errorMessage = 'Too many signup attempts. Please wait a moment and try again.';
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
       }
       
       toast({

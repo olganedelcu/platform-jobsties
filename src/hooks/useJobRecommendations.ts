@@ -37,7 +37,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
       }
 
       setRecommendations((data || []) as JobRecommendation[]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to load job recommendations.",
@@ -84,7 +84,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
       }
       
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw error; // Re-throw to let the caller handle it
     }
   };
@@ -106,7 +106,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
         title: "Recommendation Deleted",
         description: "Job recommendation has been deleted successfully.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
         description: "Failed to delete job recommendation. Please try again.",

@@ -3,20 +3,21 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import MenteePersonalTodosList from '@/components/MenteePersonalTodosList';
 import MenteeTaskBoard from './MenteeTaskBoard';
+import { MenteeTodo } from '@/services/menteeTodosService';
 
 interface PersonalTodosTabContentProps {
-  todos: any[];
+  todos: MenteeTodo[];
   showAddForm: boolean;
   todosLoading: boolean;
   userId: string;
   viewMode: 'list' | 'board';
   onViewModeChange: (mode: 'list' | 'board') => void;
   onShowAddForm: () => void;
-  onAddTodo: (todoData: any) => void;
+  onAddTodo: (todoData: Omit<MenteeTodo, 'id' | 'created_at' | 'updated_at'>) => void;
   onCancelAdd: () => void;
   onUpdateStatus: (todoId: string, status: 'pending' | 'in_progress' | 'completed') => void;
   onDeleteTodo: (todoId: string) => void;
-  onUpdateTodo?: (todoId: string, updates: any) => void;
+  onUpdateTodo?: (todoId: string, updates: Partial<MenteeTodo>) => void;
 }
 
 const PersonalTodosTabContent = ({
