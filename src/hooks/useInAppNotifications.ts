@@ -165,12 +165,14 @@ export const useInAppNotifications = () => {
 
   // Listen for real-time notifications
   useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
     const setupRealtimeListener = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) return;
 
-      const channel = supabase
+      channel = supabase
         .channel('notifications')
         .on(
           'postgres_changes',
@@ -204,13 +206,15 @@ export const useInAppNotifications = () => {
           }
         )
         .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
     };
 
     setupRealtimeListener();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [toast, userRole]);
 
   return {
