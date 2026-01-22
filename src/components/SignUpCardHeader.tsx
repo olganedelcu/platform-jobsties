@@ -6,9 +6,9 @@ const SignUpCardHeader = () => {
   return (
     <CardHeader className="space-y-4 text-center bg-white rounded-t-lg px-6 py-8">
       <div className="flex justify-center">
-        <img 
-          src="/lovable-uploads/b3a57fab-5a88-4c26-96d9-859a520b7897.png" 
-          alt="JobSties Logo" 
+        <img
+          src="/assets/logo-white.png"
+          alt="JobSties Logo"
           className="h-16 w-auto"
         />
       </div>

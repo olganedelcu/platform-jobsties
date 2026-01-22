@@ -6,7 +6,7 @@ export const usePerformanceOptimization = () => {
   const preloadResources = useCallback(() => {
     // Preload commonly used images or icons
     const imageUrls = [
-      '/lovable-uploads/2cce55be-7c68-4353-a238-ea69facff480.png'
+      '/assets/favicon.png'
     ];
 
     imageUrls.forEach(url => {

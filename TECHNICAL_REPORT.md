@@ -30,7 +30,7 @@ This report provides a comprehensive technical analysis of the JobSTies career c
 - **Row Level Security (RLS)** - Database-level security policies
 
 ### Development & Deployment
-- **Lovable Platform** - Development and hosting environment
+- **Vite** - Fast build tool and development server
 - **GitHub Integration** - Version control and CI/CD
 - **Edge Functions** - Serverless functions for backend logic
 

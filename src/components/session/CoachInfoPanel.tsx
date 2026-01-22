@@ -31,7 +31,7 @@ const CoachInfoPanel = ({ selectedSessionType, sessionTypes, selectedDate, selec
     <div className="lg:w-1/3 bg-gray-900 text-white p-8">
       <div className="flex items-center space-x-4 mb-6">
         <Avatar className="h-16 w-16">
-          <AvatarImage src="/lovable-uploads/a7c80f69-dda0-4640-8fd9-638d97a91768.png" alt="Ana Nedelcu" />
+          <AvatarImage src="/assets/coach-avatar.png" alt="Ana Nedelcu" />
           <AvatarFallback>AN</AvatarFallback>
         </Avatar>
         <div>

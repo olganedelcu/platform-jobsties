@@ -71,9 +71,9 @@ const Navigation = ({ user, onSignOut }: NavigationProps) => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
-              <img 
-                src="/lovable-uploads/187c9aad-b772-4ca0-99ab-6bd2978bb1c2.png" 
-                alt="Platform Logo" 
+              <img
+                src="/assets/logo-navigation.png"
+                alt="Platform Logo"
                 className="h-12 w-auto"
               />
             </Link>

@@ -9,9 +9,9 @@ const HomeCoach = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
       <div className="text-center space-y-8 p-8">
         <div className="flex justify-center mb-8">
-          <img 
-            src="/lovable-uploads/09eb05af-ad26-4901-aafd-0d84888e4010.png" 
-            alt="Jobsties Platform Logo" 
+          <img
+            src="/assets/logo-primary.png"
+            alt="Jobsties Platform Logo"
             className="h-20 w-auto"
           />
         </div>
