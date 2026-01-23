@@ -1,12 +1,10 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 
 interface FeedbackModuleProps {
   userId: string;
@@ -28,31 +26,15 @@ const FeedbackModule = ({ userId }: FeedbackModuleProps) => {
     }
 
     setIsSubmittingFeedback(true);
-    
+
     try {
-      // Get user profile for email
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('email, first_name, last_name')
-        .eq('id', userId)
-        .single();
+      // Feedback submission disabled (formspree removed)
+      toast({
+        title: "Feedback Noted",
+        description: "Thank you for your feedback!",
+      });
 
-      if (userProfile?.email) {
-        await FormspreeNotificationHandlers.courseFeedback({
-          menteeEmail: userProfile.email,
-          menteeName: `${userProfile.first_name} ${userProfile.last_name}`.trim(),
-          feedback: feedback.trim(),
-        });
-
-        toast({
-          title: "Feedback Sent",
-          description: "Thank you! Your feedback has been sent successfully.",
-        });
-        
-        setFeedback('');
-      } else {
-        throw new Error('Unable to find user profile');
-      }
+      setFeedback('');
     } catch (error) {
       toast({
         title: "Error",

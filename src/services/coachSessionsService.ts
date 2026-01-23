@@ -1,7 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { CoachSession } from '@/types/coachSessions';
-import { FormspreeNotificationHandlers } from '@/utils/formspree/formspreeHandlers';
 
 export const fetchCoachSessions = async (userId: string): Promise<CoachSession[]> => {
   console.log('Fetching coach sessions for user:', userId);
@@ -90,56 +89,6 @@ export const confirmSession = async (sessionId: string, coachId: string) => {
 };
 
 export const cancelSession = async (sessionId: string) => {
-  // First, get the session details before deleting
-  const { data: sessionData, error: fetchError } = await supabase
-    .from('coaching_sessions')
-    .select('*')
-    .eq('id', sessionId)
-    .single();
-
-  if (fetchError) {
-    console.error('Error fetching session for cancellation:', fetchError);
-    throw fetchError;
-  }
-
-  // Get the mentee profile separately if session data exists
-  if (sessionData) {
-    const { data: menteeProfile, error: profileError } = await supabase
-      .from('profiles')
-      .select('first_name, last_name, email')
-      .eq('id', sessionData.mentee_id)
-      .single();
-
-    if (!profileError && menteeProfile) {
-      const date = new Date(sessionData.session_date);
-      const formattedDate = date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      const formattedTime = date.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      });
-
-      try {
-        await FormspreeNotificationHandlers.sessionCancellation({
-          menteeEmail: menteeProfile.email,
-          menteeName: `${menteeProfile.first_name} ${menteeProfile.last_name}`,
-          sessionType: sessionData.session_type,
-          sessionDate: formattedDate,
-          sessionTime: formattedTime,
-          duration: sessionData.duration,
-          notes: sessionData.notes
-        });
-      } catch (emailError) {
-        console.error('Error sending cancellation email:', emailError);
-        // Don't throw email error, still proceed with deletion
-      }
-    }
-  }
-
   // Delete the session
   const { error } = await supabase
     .from('coaching_sessions')
