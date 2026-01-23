@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
 type ModuleType = 'cv_optimization' | 'linkedin' | 'job_search_strategy' | 'interview_preparation';
 
@@ -91,14 +90,7 @@ export const useModuleFileUpload = () => {
         description: `Module file uploaded successfully.`,
       });
 
-      // Send notification if Ana uploaded the file
-      if (user?.email) {
-        await NotificationHandlers.fileUpload(
-          user.email,
-          menteeId,
-          file.name
-        );
-      }
+      // Notification removed (formspree disabled)
 
       return true;
 

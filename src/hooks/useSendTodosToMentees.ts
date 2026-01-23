@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useMentees } from '@/hooks/useMentees';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
 interface Todo {
   id: string;
@@ -129,16 +128,7 @@ export const useSendTodosToMentees = (coachId: string) => {
 
       await Promise.all(assignmentPromises);
 
-      // Send notifications if Ana is the one sending todos
-      if (user?.email) {
-        const firstTodoTitle = validTodos[0]?.title;
-        await NotificationHandlers.todoAssignment(
-          user.email,
-          selectedMentees,
-          firstTodoTitle,
-          validTodos.length
-        );
-      }
+      // Notification removed (formspree disabled)
 
       toast({
         title: "Todos sent successfully",

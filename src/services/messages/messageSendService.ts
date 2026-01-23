@@ -1,6 +1,5 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { handleMessageNotification } from '@/utils/messageNotificationHandler';
 import { useToast } from '@/hooks/use-toast';
 
 export const useMessageSender = () => {
@@ -61,23 +60,7 @@ export const useMessageSender = () => {
         .update({ updated_at: new Date().toISOString() })
         .eq('id', conversationId);
 
-      // Send Formspree notification based on sender type
-      if (senderType === 'coach' && user?.email) {
-        // If coach sends message, notify mentee via Formspree
-        const { data: conversation } = await supabase
-          .from('conversations')
-          .select('mentee_id')
-          .eq('id', conversationId)
-          .single();
-
-        if (conversation?.mentee_id) {
-          await handleMessageNotification(
-            user.email,
-            conversation.mentee_id,
-            content.trim()
-          );
-        }
-      }
+      // Notification removed (formspree disabled)
 
       return message;
     } catch (error) {

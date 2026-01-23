@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { JobRecommendation, NewJobRecommendationData } from '@/types/jobRecommendations';
-import { NotificationHandlers } from '@/utils/anaNotificationUtils';
 
 interface UseJobRecommendationsParams {
   userId: string;
@@ -71,16 +70,7 @@ export const useJobRecommendations = ({ userId, isCoach = false }: UseJobRecomme
 
     setRecommendations(prev => [data as JobRecommendation, ...prev]);
 
-    // Send notification if Ana is the one creating the recommendation
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      await NotificationHandlers.jobRecommendation(
-        user.email,
-        recommendationData.menteeId,
-        recommendationData.jobTitle,
-        recommendationData.companyName
-      );
-    }
+    // Notification removed (formspree disabled)
 
     return data;
   };
