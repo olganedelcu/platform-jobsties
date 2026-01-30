@@ -13,10 +13,6 @@ interface StoredDraft {
   lastUpdated: string;
 }
 
-/**
- * hook for managing job application draft state
- * includes autosave, restore, cross-tab sync, and cleanup
- */
 export const useDraftManagement = () => {
   const { toast } = useToast();
 
