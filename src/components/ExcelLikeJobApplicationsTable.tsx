@@ -158,7 +158,7 @@ const ExcelLikeJobApplicationsTable = ({
           </div>
         </div>
 
-        {/* Scrollable Body - Increased height from 500px to 700px */}
+        {/* scrollable Body  */}
         <ScrollArea className="h-[700px]">
           <div className="overflow-x-auto">
             <Table>
