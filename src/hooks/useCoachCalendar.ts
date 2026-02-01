@@ -32,7 +32,7 @@ export const useCoachCalendar = (coachId: string) => {
     try {
       setLoading(true);
       
-      // Check if Google Calendar is connected
+      // check if google calendar is connected
       const isGoogleConnected = await CoachCalendarService.checkGoogleConnection(coachId);
       
       const [calendarSettings, calendarEvents] = await Promise.all([
