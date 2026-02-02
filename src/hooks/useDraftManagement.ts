@@ -19,8 +19,6 @@ export const useDraftManagement = () => {
   const [hasAutoSavedDraft, setHasAutoSavedDraft] = useState(false);
 
   // refs
-  const hasRestoredDrafts = useRef(false);
-  const lastEditingId = useRef<string | null>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // autosave logic
@@ -114,18 +112,12 @@ export const useDraftManagement = () => {
 
   // actions
   const handleEdit = useCallback((application: JobApplication) => {
-    if (lastEditingId.current !== application.id) {
-      hasRestoredDrafts.current = false;
-      lastEditingId.current = application.id;
-    }
-
     const existingDraft = loadDraftFromLocalStorage(application.id);
     setEditingId(application.id);
 
-    if (existingDraft && !hasRestoredDrafts.current) {
+    if (existingDraft) {
       setEditData(existingDraft.formData);
       setHasAutoSavedDraft(true);
-      hasRestoredDrafts.current = true;
       return;
     }
 
@@ -159,9 +151,6 @@ export const useDraftManagement = () => {
         setHasAutoSavedDraft(false);
 
         clearDraftFromLocalStorage(applicationId);
-
-        hasRestoredDrafts.current = false;
-        lastEditingId.current = null;
       } catch (error) {
         console.error("error saving application:", error);
       }
