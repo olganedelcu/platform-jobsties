@@ -9,7 +9,6 @@ import { format } from 'date-fns';
 import JobApplicationsTableHeader from '@/components/JobApplicationsTableHeader';
 import JobApplicationRow from '@/components/JobApplicationRow';
 import NewApplicationRow from '@/components/NewApplicationRow';
-import DraftRestorationBanner from '@/components/DraftRestorationBanner';
 import AutoSaveIndicator from '@/components/AutoSaveIndicator';
 import JobApplicationsSearch from '@/components/JobApplicationsSearch';
 import { useDraftManagement } from '@/hooks/useDraftManagement';
@@ -46,15 +45,11 @@ const ExcelLikeJobApplicationsTable = ({
   const {
     editingId,
     editData,
-    showRestorationBanner,
-    restorationTimestamp,
     hasAutoSavedDraft,
     handleEdit,
     handleSave,
     handleCancel,
-    handleEditDataChange,
-    handleDiscardDraft,
-    handleDismissBanner
+    handleEditDataChange
   } = useDraftManagement();
 
   // Filter applications based on search term
@@ -138,16 +133,6 @@ const ExcelLikeJobApplicationsTable = ({
         </div>
       )}
 
-      {showRestorationBanner && (
-        <div className="p-4 pb-0">
-          <DraftRestorationBanner
-            lastUpdated={restorationTimestamp}
-            onDismiss={handleDismissBanner}
-            onDiscard={handleDiscardDraft}
-          />
-        </div>
-      )}
-      
       <div className="relative">
         {/* Fixed Header */}
         <div className="sticky top-0 z-10 bg-white border-b">

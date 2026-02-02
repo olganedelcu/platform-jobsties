@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { JobApplication } from "@/types/jobApplications";
 import {
   loadDraftFromLocalStorage,
@@ -14,13 +13,9 @@ interface StoredDraft {
 }
 
 export const useDraftManagement = () => {
-  const { toast } = useToast();
-
   // state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<Partial<JobApplication>>({});
-  const [showRestorationBanner, setShowRestorationBanner] = useState(false);
-  const [restorationTimestamp, setRestorationTimestamp] = useState("");
   const [hasAutoSavedDraft, setHasAutoSavedDraft] = useState(false);
 
   // refs
@@ -129,8 +124,6 @@ export const useDraftManagement = () => {
 
     if (existingDraft && !hasRestoredDrafts.current) {
       setEditData(existingDraft.formData);
-      setShowRestorationBanner(true);
-      setRestorationTimestamp(existingDraft.lastUpdated);
       setHasAutoSavedDraft(true);
       hasRestoredDrafts.current = true;
       return;
@@ -163,7 +156,6 @@ export const useDraftManagement = () => {
 
         setEditingId(null);
         setEditData({});
-        setShowRestorationBanner(false);
         setHasAutoSavedDraft(false);
 
         clearDraftFromLocalStorage(applicationId);
@@ -180,26 +172,7 @@ export const useDraftManagement = () => {
   const handleCancel = useCallback(() => {
     setEditingId(null);
     setEditData({});
-    setShowRestorationBanner(false);
     setHasAutoSavedDraft(false);
-  }, []);
-
-  const handleDiscardDraft = useCallback(() => {
-    if (!editingId) return;
-
-    clearDraftFromLocalStorage(editingId);
-    setShowRestorationBanner(false);
-    setHasAutoSavedDraft(false);
-    hasRestoredDrafts.current = false;
-
-    toast({
-      title: "Draft Discarded",
-      description: "Your unsaved changes have been discarded.",
-    });
-  }, [editingId, toast]);
-
-  const handleDismissBanner = useCallback(() => {
-    setShowRestorationBanner(false);
   }, []);
 
   const handleEditDataChange = useCallback(
@@ -212,15 +185,11 @@ export const useDraftManagement = () => {
   return {
     editingId,
     editData,
-    showRestorationBanner,
-    restorationTimestamp,
     hasAutoSavedDraft,
 
     handleEdit,
     handleSave,
     handleCancel,
     handleEditDataChange,
-    handleDiscardDraft,
-    handleDismissBanner,
   };
 };
