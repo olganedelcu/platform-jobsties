@@ -1,7 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus } from 'lucide-react';
 import { JobApplication, NewJobApplicationData } from '@/types/jobApplications';
@@ -12,6 +10,8 @@ import NewApplicationRow from '@/components/NewApplicationRow';
 import AutoSaveIndicator from '@/components/AutoSaveIndicator';
 import JobApplicationsSearch from '@/components/JobApplicationsSearch';
 import { useDraftManagement } from '@/hooks/useDraftManagement';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 interface ExcelLikeJobApplicationsTableProps {
   applications: JobApplication[];

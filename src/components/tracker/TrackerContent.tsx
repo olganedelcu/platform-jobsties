@@ -40,7 +40,7 @@ const TrackerContent = memo(({
   refetchApplications
 }: TrackerContentProps) => (
   <main className="max-w-7xl mx-auto pt-28 py-8 px-6">
-    {/* Enhanced Job Recommendations Section with Archive System */}
+    {/* job recommendatins with archive */}
     <div className="mb-8">
       <EnhancedWeeklyJobRecommendations 
         userId={user.id} 
